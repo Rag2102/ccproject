@@ -1,0 +1,9 @@
+# Git LFS tracking for the 3 large Azure files (156MB/154MB/198MB -- each
+# would otherwise exceed GitHub's 100MB per-file limit). These aren't
+# included in this bundle (see README.md -> "Getting the large Azure
+# files"); once you've fetched/regenerated them locally, `git lfs install`
+# + this file is all that's needed for `git add`/`git commit`/`git push`
+# to route them through LFS automatically.
+data/raw/azure/vmtable.csv.gz filter=lfs diff=lfs merge=lfs -text
+data/processed/azure_vms_clean.csv.gz filter=lfs diff=lfs merge=lfs -text
+data/processed/azure_vms_with_costs.csv.gz filter=lfs diff=lfs merge=lfs -text

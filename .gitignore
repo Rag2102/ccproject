@@ -1,0 +1,8 @@
+__pycache__/
+*.pyc
+.DS_Store
+node_modules/
+*.pdf
+page-*.jpg
+.ipynb_checkpoints/
+.venv/
