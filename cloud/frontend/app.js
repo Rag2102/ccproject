@@ -111,7 +111,7 @@ async function runPredict() {
       ' (' + data.costs.migration_time_s + 's, blackout ' + data.costs.migration_blackout_s + 's).';
     if (data.mc_dropout_std !== null && data.mc_dropout_std !== undefined) {
       note += ' MC-dropout uncertainty (std across 15 stochastic passes): ' + data.mc_dropout_std.toFixed(4) +
-              ' -- this model is NumPy-only and less well-calibrated than the HistGBM default; see task11_summary.md.';
+              ' -- this model is NumPy-only and less well-calibrated than the HistGBM default.';
     }
     document.getElementById('model-note').textContent = note;
   } catch (e) {

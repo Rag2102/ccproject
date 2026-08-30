@@ -178,7 +178,20 @@
     color: var(--muted-2); font-size: 13px; text-align: center; padding: 56px 0;
     border: 1px dashed var(--card-border); border-radius: 12px;
   }
-  img.chart { width: 100%; border-radius: 12px; border: 1px solid var(--card-border); margin-top: 12px; display: block; }
+  .chart-panel {
+    background: rgba(255,255,255,0.02); border: 1px solid var(--card-border);
+    border-radius: 14px; padding: 18px 20px 16px; margin-top: 0;
+  }
+  .chart-panel .chart-eyebrow {
+    display: block; font-size: 11px; font-weight: 700; text-transform: uppercase;
+    letter-spacing: 0.06em; color: var(--grad-2); margin-bottom: 6px;
+  }
+  .chart-panel h3 { margin: 0 0 6px; font-size: 15px; font-weight: 600; color: #fff; line-height: 1.4; }
+  .chart-panel .chart-caption { margin: 0 0 14px; font-size: 12.5px; color: var(--muted); line-height: 1.55; }
+  .chart-wrap { position: relative; height: 260px; }
+  .chart-legend { display: flex; gap: 18px; margin-top: 14px; flex-wrap: wrap; }
+  .chart-legend span { display: flex; align-items: center; gap: 7px; font-size: 11.5px; color: var(--muted); }
+  .chart-legend i { width: 9px; height: 9px; border-radius: 3px; display: inline-block; }
   .pill {
     display: inline-block; background: rgba(124,92,255,0.12); color: #b9a8ff;
     border: 1px solid rgba(124,92,255,0.3); border-radius: 999px; padding: 3px 11px; font-size: 11px; font-weight: 600;
@@ -211,8 +224,8 @@
 
       <label>Failure-probability model</label>
       <div class="radio-row">
-        <label class="opt"><input type="radio" name="which_model" value="histgbm" checked> Calibrated HistGBM (task 3, recommended)</label>
-        <label class="opt"><input type="radio" name="which_model" value="gqat"> GQAT-Net-inspired (task 11, NumPy)</label>
+        <label class="opt"><input type="radio" name="which_model" value="histgbm" checked> Calibrated HistGBM (recommended)</label>
+        <label class="opt"><input type="radio" name="which_model" value="gqat"> GQAT-Net-inspired (experimental, NumPy)</label>
       </div>
 
       <label for="model_grp">Drive model</label>
@@ -263,7 +276,7 @@
 
   <div class="card">
     <h2>The project's real findings <span class="pill">precomputed, from the actual experiments</span></h2>
-    <p class="sub">These numbers come from the full replay simulation (task 8) and the correlation-sweep follow-up (task 9) over the real Backblaze + Azure datasets -- not from this demo's live calculator above.</p>
+    <p class="sub">These numbers come from a full historical replay simulation and a follow-up correlation-sensitivity study over the real Backblaze + Azure datasets -- not from this demo's live calculator above.</p>
     <div class="grid-2">
       <div>
         <table id="headline-table">
@@ -271,18 +284,25 @@
           <tbody></tbody>
         </table>
         <p class="note">Under random workload placement, the two policies land within ~3% of each other on total cost
-          (matched to the same migration budget) -- the honest, non-confirmatory task 8 result. The follow-up
-          experiment below shows where the hypothesis <i>does</i> hold.</p>
+          (matched to the same migration budget) -- an honest, non-confirmatory baseline result. The follow-up
+          experiment on the right shows where the hypothesis <i>does</i> hold.</p>
       </div>
-      <div>
-        <img class="chart" src="figures/correlation_sweep_chart.png" alt="Correlation sweep chart">
+      <div class="chart-panel">
+        <span class="chart-eyebrow">Correlation sensitivity</span>
+        <h3>Cost-sensitive policy overtakes the threshold near &rho; &approx; 0.3</h3>
+        <p class="chart-caption">As workload criticality and hardware failure risk become more correlated, cost-awareness starts paying off -- and keeps paying off as that correlation grows.</p>
+        <div class="chart-wrap"><canvas id="correlationChart"></canvas></div>
+        <div class="chart-legend">
+          <span><i style="background:var(--cs)"></i>Cost-sensitive policy wins</span>
+          <span><i style="background:var(--th)"></i>Threshold policy wins</span>
+        </div>
       </div>
     </div>
   </div>
 
   <div class="card">
-    <h2>Task 11: does a deep attention model beat the calibrated hazard model?</h2>
-    <p class="sub">Both models scored on the identical held-out test rows. See docs/task11_summary.md for the full writeup, including why TensorFlow/PyTorch aren't used here.</p>
+    <h2>Does a deep attention model beat the calibrated hazard model?</h2>
+    <p class="sub">Both models scored on the identical held-out test rows -- including why a deep attention architecture doesn't beat a well-calibrated gradient-boosted model here.</p>
     <table id="comparison-table">
       <thead><tr><th>Model</th><th>ROC-AUC</th><th>PR-AUC</th><th>Brier</th><th>ECE</th></tr></thead>
       <tbody></tbody>
@@ -296,6 +316,126 @@
 
 <script src="config.js"></script>
 <script src="app.js"></script>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.4/dist/chart.umd.min.js"></script>
+<script>
+(function () {
+  var el = document.getElementById('correlationChart');
+  if (!el || typeof Chart === 'undefined') return;
+
+  var points = [
+    { x: 0.00, y: -3.12 },
+    { x: 0.31, y: 0.29 },
+    { x: 0.73, y: 1.95 },
+    { x: 0.86, y: 3.44 }
+  ];
+
+  var css = getComputedStyle(document.documentElement);
+  var csColor = (css.getPropertyValue('--cs') || '#6ea8ff').trim();
+  var thColor = (css.getPropertyValue('--th') || '#ff8f6e').trim();
+  var mutedColor = (css.getPropertyValue('--muted') || '#8791a8').trim();
+  var gridColor = 'rgba(255,255,255,0.06)';
+
+  var zonesAndLabels = {
+    id: 'zonesAndLabels',
+    beforeDraw: function (chart) {
+      var ctx = chart.ctx, area = chart.chartArea, y = chart.scales.y;
+      var zeroY = y.getPixelForValue(0);
+      ctx.save();
+      ctx.fillStyle = 'rgba(110,168,255,0.06)';
+      ctx.fillRect(area.left, area.top, area.right - area.left, zeroY - area.top);
+      ctx.fillStyle = 'rgba(255,143,110,0.06)';
+      ctx.fillRect(area.left, zeroY, area.right - area.left, area.bottom - zeroY);
+
+      ctx.setLineDash([4, 4]);
+      ctx.strokeStyle = 'rgba(255,255,255,0.18)';
+      ctx.beginPath();
+      ctx.moveTo(area.left, zeroY);
+      ctx.lineTo(area.right, zeroY);
+      ctx.stroke();
+      ctx.setLineDash([]);
+
+      ctx.font = "600 10.5px Inter, sans-serif";
+      ctx.textAlign = 'left';
+      ctx.fillStyle = csColor;
+      ctx.fillText('COST-SENSITIVE POLICY WINS', area.left + 6, area.top + 14);
+      ctx.fillStyle = thColor;
+      ctx.textBaseline = 'bottom';
+      ctx.fillText('THRESHOLD POLICY WINS', area.left + 6, area.bottom - 6);
+      ctx.restore();
+    },
+    afterDatasetsDraw: function (chart) {
+      var ctx = chart.ctx;
+      var meta = chart.getDatasetMeta(0);
+      ctx.save();
+      ctx.font = "700 12px 'JetBrains Mono', monospace";
+      ctx.textAlign = 'center';
+      meta.data.forEach(function (point, i) {
+        var v = points[i].y;
+        var label = (v > 0 ? '+' : '') + v.toFixed(1) + '%';
+        ctx.fillStyle = v >= 0 ? csColor : thColor;
+        ctx.fillText(label, point.x, point.y - 14);
+      });
+      ctx.restore();
+    }
+  };
+
+  new Chart(el.getContext('2d'), {
+    type: 'line',
+    data: {
+      datasets: [{
+        data: points,
+        borderColor: csColor,
+        borderWidth: 2.5,
+        pointRadius: 5,
+        pointHoverRadius: 7,
+        pointBackgroundColor: '#0a0e17',
+        pointBorderColor: csColor,
+        pointBorderWidth: 2.5,
+        tension: 0,
+        fill: false
+      }]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      layout: { padding: { top: 24, right: 14, bottom: 4, left: 2 } },
+      plugins: {
+        legend: { display: false },
+        tooltip: {
+          backgroundColor: '#161c2e',
+          borderColor: 'rgba(255,255,255,0.12)',
+          borderWidth: 1,
+          padding: 10,
+          titleFont: { family: 'Inter', size: 12, weight: '600' },
+          bodyFont: { family: 'JetBrains Mono', size: 11.5 },
+          callbacks: {
+            title: function (items) { return 'ρ ≈ ' + items[0].parsed.x.toFixed(2); },
+            label: function (item) { return (item.parsed.y > 0 ? '+' : '') + item.parsed.y.toFixed(2) + '% advantage'; }
+          }
+        }
+      },
+      scales: {
+        x: {
+          type: 'linear', min: 0, max: 0.95,
+          title: { display: true, text: 'Achieved rank-correlation (ρ) between workload criticality and host risk', color: mutedColor, font: { family: 'Inter', size: 11 } },
+          ticks: { color: mutedColor, font: { family: 'Inter', size: 10.5 }, stepSize: 0.2 },
+          grid: { color: gridColor },
+          border: { color: 'rgba(255,255,255,0.12)' }
+        },
+        y: {
+          min: -5, max: 5,
+          title: { display: true, text: 'Cost-sensitive advantage on total cost', color: mutedColor, font: { family: 'Inter', size: 11 } },
+          ticks: { color: mutedColor, font: { family: 'Inter', size: 10.5 }, callback: function (v) { return (v > 0 ? '+' : '') + v + '%'; } },
+          grid: { color: gridColor },
+          border: { display: false }
+        }
+      }
+    },
+    plugins: [zonesAndLabels]
+  });
+})();
+</script>
 
 </body>
 </html>

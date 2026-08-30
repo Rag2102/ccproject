@@ -225,7 +225,7 @@ def run_predict(body):
         model_label = "GQAT-Net-inspired (NumPy, isotonic-calibrated)"
     else:
         bins, hazard, _ = hazard_curve_histgbm(model_grp, capacity_tb)
-        model_label = "Calibrated HistGBM (task 3)"
+        model_label = "Calibrated HistGBM"
 
     expected_ttf, median_ttf, p_fail_window = survival_and_ttf(bins, hazard, start_idx)
 
