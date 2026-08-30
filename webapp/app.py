@@ -20,6 +20,9 @@ Then open http://127.0.0.1:5000 in a browser.
 import sys
 from pathlib import Path
 
+import json
+import os
+
 import numpy as np
 import pandas as pd
 import joblib
@@ -44,7 +47,6 @@ print("Loading models and reference data...")
 HGB_BUNDLE = joblib.load(MODELS_DIR / "failure_probability_model.joblib")
 GQAT_BUNDLE = joblib.load(MODELS_DIR / "gqat_net_numpy_model.joblib")
 HAZARD_LOOKUP = pd.read_csv(PROCESSED / "hazard_lookup_table.csv")
-VM_COSTS = pd.read_csv(PROCESSED / "azure_vms_with_costs.csv.gz")
 COMPARISON = pd.read_csv(PROCESSED / "gqat_net_vs_histgbm_comparison.csv")
 HEADLINE = pd.read_csv(PROCESSED / "simulation_headline_summary.csv", index_col=0)
 CORR_SWEEP = pd.read_csv(PROCESSED / "correlated_assignment_sweep.csv")
@@ -70,11 +72,13 @@ MAX_DIRTY_RATE_MBPS_AT_100PCT_CPU = 150
 STOPCOPY_FALLBACK_S = 60
 BASE_BLACKOUT_S = 1.0
 
-SIZE_TIER_PROFILE = (
-    VM_COSTS.groupby("size_tier")[["memory_gb", "vcores", "avg_cpu"]]
-    .median().round(2).to_dict("index")
-)
-SIZE_TIERS = ["small", "medium", "large", "xlarge"]
+# Precomputed from data/processed/azure_vms_with_costs.csv.gz (a 198MB Git-LFS
+# file we don't want a deployed web app loading into memory just to read 3
+# median values). Regenerate via:
+#   VM_COSTS.groupby("size_tier")[["memory_gb","vcores","avg_cpu"]].median().round(2)
+with open(PROCESSED / "size_tier_profile.json") as _f:
+    SIZE_TIER_PROFILE = json.load(_f)
+SIZE_TIERS = sorted(SIZE_TIER_PROFILE.keys())  # real categories only (the Azure data has no "xlarge")
 
 print(f"Loaded. {len(MODEL_GROUPS)} drive model groups, tau_default={TAU_DEFAULT:.5f}, "
       f"size-tier profiles: {SIZE_TIER_PROFILE}")
@@ -267,4 +271,5 @@ def predict():
 
 
 if __name__ == "__main__":
-    app.run(host="127.0.0.1", port=5000, debug=False)
+    port = int(os.environ.get("PORT", 5000))
+    app.run(host="0.0.0.0", port=port, debug=False)
