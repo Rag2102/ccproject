@@ -60,7 +60,7 @@ async function loadMeta() {
 
   const btn = document.getElementById("run-btn");
   btn.disabled = false;
-  btn.textContent = "Run live prediction";
+  btn.querySelector(".btn-label").textContent = "Run live prediction";
 }
 
 const ageInput = document.getElementById('age_days');
@@ -79,7 +79,8 @@ async function runPredict() {
     which_model: which_model,
   };
   const btn = document.getElementById('run-btn');
-  btn.disabled = true; btn.textContent = 'Running model...';
+  const label = btn.querySelector('.btn-label');
+  btn.disabled = true; btn.classList.add('loading'); label.textContent = 'Running model...';
   try {
     const res = await fetch(`${window.API_BASE}/api/predict`, {
       method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify(payload)
@@ -87,7 +88,10 @@ async function runPredict() {
     if (!res.ok) throw new Error(`HTTP ${res.status}`);
     const data = await res.json();
     document.getElementById('result-placeholder').style.display = 'none';
-    document.getElementById('result').style.display = 'block';
+    const resultEl = document.getElementById('result');
+    resultEl.style.display = 'none';
+    void resultEl.offsetWidth; // restart fade-in animation on every run
+    resultEl.style.display = 'block';
 
     document.getElementById('stat-pfail').textContent = (data.p_fail_within_window*100).toFixed(3) + '%';
     document.getElementById('stat-ttf').textContent = data.expected_ttf_days;
@@ -113,12 +117,12 @@ async function runPredict() {
   } catch (e) {
     alert('Prediction failed: ' + e + '\n\nIs the API_BASE in config.js correct, and is the Lambda deployed?');
   } finally {
-    btn.disabled = false; btn.textContent = 'Run live prediction';
+    btn.disabled = false; btn.classList.remove('loading'); label.textContent = 'Run live prediction';
   }
 }
 
 loadMeta().catch(e => {
-  document.getElementById('run-btn').textContent = 'Failed to load (see console)';
+  document.getElementById('run-btn').querySelector('.btn-label').textContent = 'Failed to load (see console)';
   console.error('Failed to load /api/meta:', e);
   alert('Could not load reference data from the API: ' + e + '\n\nCheck that config.js has the correct API_BASE.');
 });

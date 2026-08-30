@@ -2,62 +2,199 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
 <title>VM Mitigation Policy -- Live Demo (AWS)</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@500&display=swap" rel="stylesheet">
 <style>
   :root {
-    --blue: #256abf; --red: #e34948; --ink: #1c2430; --muted: #5b6b7f;
-    --bg: #f7f9fc; --card: #ffffff; --border: #e2e8f0; --good: #1f9d55; --bad: #c0392b;
+    --bg: #0a0e17;
+    --bg-2: #0d1220;
+    --card: rgba(255,255,255,0.035);
+    --card-border: rgba(255,255,255,0.09);
+    --card-border-hover: rgba(255,255,255,0.16);
+    --ink: #eef1f8;
+    --muted: #8791a8;
+    --muted-2: #5c6779;
+    --cs: #6ea8ff;
+    --th: #ff8f6e;
+    --good: #4ade80;
+    --bad: #ff6b6b;
+    --grad-1: #7c5cff;
+    --grad-2: #5ac8fa;
+    --radius: 16px;
+    --shadow-lg: 0 20px 60px -20px rgba(0,0,0,0.6);
   }
   * { box-sizing: border-box; }
-  body { margin: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-         background: var(--bg); color: var(--ink); }
-  header { background: linear-gradient(135deg, var(--blue), #163f75); color: #fff; padding: 28px 32px; }
-  header h1 { margin: 0 0 6px; font-size: 22px; }
-  header p { margin: 0; opacity: 0.9; font-size: 14px; max-width: 900px; line-height: 1.5; }
-  header .pill { display: inline-block; background: rgba(255,255,255,0.18); border-radius: 999px;
-    padding: 2px 10px; font-size: 11px; font-weight: 700; margin-bottom: 10px; letter-spacing: 0.02em; }
-  main { max-width: 1180px; margin: 0 auto; padding: 24px 20px 60px; display: grid; gap: 24px; }
-  .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; }
-  @media (max-width: 900px) { .grid-2 { grid-template-columns: 1fr; } }
-  .card { background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 20px 22px; }
-  .card h2 { margin: 0 0 4px; font-size: 16px; }
-  .card .sub { color: var(--muted); font-size: 12.5px; margin: 0 0 16px; line-height: 1.5; }
-  label { display: block; font-size: 12.5px; font-weight: 600; color: var(--muted); margin: 14px 0 5px; }
-  select, input[type=number], input[type=range] { width: 100%; padding: 8px 10px; border-radius: 8px;
-    border: 1px solid var(--border); font-size: 14px; background: #fff; }
-  .radio-row { display: flex; gap: 14px; margin-top: 6px; }
-  .radio-row label.opt { display: flex; align-items: center; gap: 6px; font-weight: 500; color: var(--ink); font-size: 13.5px; margin: 0; }
-  button.run { margin-top: 18px; width: 100%; padding: 11px; border: none; border-radius: 8px;
-    background: var(--blue); color: #fff; font-size: 14.5px; font-weight: 600; cursor: pointer; }
-  button.run:hover { background: #1c5599; }
-  button.run:disabled { opacity: 0.6; cursor: default; }
-  .range-val { font-size: 12.5px; color: var(--muted); text-align: right; }
-  .result-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-top: 18px; }
-  .policy-box { border-radius: 10px; padding: 16px; border: 1.5px solid var(--border); }
-  .policy-box h3 { margin: 0 0 10px; font-size: 14px; }
-  .badge { display: inline-block; padding: 4px 10px; border-radius: 999px; font-size: 12.5px; font-weight: 700; }
-  .badge.migrate { background: #fdeceb; color: var(--bad); }
-  .badge.wait { background: #e9f7ef; color: var(--good); }
-  .kv { display: flex; justify-content: space-between; font-size: 12.5px; margin: 5px 0; color: var(--muted); }
-  .kv b { color: var(--ink); font-weight: 600; }
-  .stat-row { display: flex; gap: 16px; margin-top: 14px; flex-wrap: wrap; }
-  .stat { flex: 1; min-width: 120px; background: #f2f5fa; border-radius: 8px; padding: 10px 12px; }
-  .stat .n { font-size: 18px; font-weight: 700; }
-  .stat .l { font-size: 11px; color: var(--muted); }
+  html { scroll-behavior: smooth; }
+  body {
+    margin: 0;
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    color: var(--ink);
+    background:
+      radial-gradient(700px 420px at 12% -10%, rgba(124,92,255,0.22), transparent 60%),
+      radial-gradient(600px 400px at 92% 8%, rgba(90,200,250,0.14), transparent 55%),
+      radial-gradient(900px 600px at 50% 110%, rgba(255,143,110,0.08), transparent 60%),
+      linear-gradient(180deg, var(--bg-2), var(--bg) 40%);
+    background-attachment: fixed;
+    min-height: 100vh;
+    -webkit-font-smoothing: antialiased;
+  }
+  h1, h2, h3 { font-family: 'Space Grotesk', 'Inter', sans-serif; letter-spacing: -0.01em; }
+
+  header { padding: 56px 32px 40px; max-width: 1180px; margin: 0 auto; position: relative; }
+  header .pill {
+    display: inline-flex; align-items: center; gap: 8px;
+    font-size: 12px; font-weight: 600; letter-spacing: 0.03em;
+    color: var(--cs); background: rgba(110,168,255,0.1); border: 1px solid rgba(110,168,255,0.25);
+    padding: 6px 14px; border-radius: 999px; margin-bottom: 18px;
+  }
+  header h1 {
+    margin: 0 0 14px; font-size: clamp(26px, 4vw, 40px); font-weight: 700; line-height: 1.15;
+    max-width: 900px;
+    background: linear-gradient(120deg, #ffffff 30%, #b9c3e0 70%);
+    -webkit-background-clip: text; background-clip: text; color: transparent;
+  }
+  header p { margin: 0; color: var(--muted); font-size: 15px; max-width: 760px; line-height: 1.65; }
+
+  main { max-width: 1180px; margin: 0 auto; padding: 8px 20px 80px; display: grid; gap: 22px; }
+  .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 22px; align-items: start; }
+  @media (max-width: 900px) { .grid-2 { grid-template-columns: 1fr; } header { padding: 40px 20px 28px; } }
+
+  .card {
+    background: var(--card);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border: 1px solid var(--card-border);
+    border-radius: var(--radius);
+    padding: 26px 28px;
+    box-shadow: var(--shadow-lg);
+    transition: border-color 0.25s ease;
+  }
+  .card:hover { border-color: var(--card-border-hover); }
+  .card h2 { margin: 0 0 6px; font-size: 17px; font-weight: 600; color: #fff; }
+  .card .sub { color: var(--muted); font-size: 13px; margin: 0 0 20px; line-height: 1.6; }
+
+  label { display: block; font-size: 12px; font-weight: 600; color: var(--muted); margin: 16px 0 6px; text-transform: uppercase; letter-spacing: 0.04em; }
+  select, input[type=number] {
+    width: 100%; padding: 11px 12px; border-radius: 10px;
+    border: 1px solid var(--card-border); font-size: 14px; font-family: inherit;
+    background: rgba(255,255,255,0.03); color: var(--ink);
+    transition: border-color 0.2s ease, box-shadow 0.2s ease;
+  }
+  select:focus, input:focus { outline: none; border-color: var(--cs); box-shadow: 0 0 0 4px rgba(110,168,255,0.15); }
+  select option { background: #10141f; color: var(--ink); }
+
+  input[type=range] {
+    width: 100%; -webkit-appearance: none; appearance: none; height: 6px; border-radius: 999px;
+    background: linear-gradient(90deg, var(--grad-1), var(--grad-2));
+    margin-top: 4px;
+  }
+  input[type=range]::-webkit-slider-thumb {
+    -webkit-appearance: none; width: 18px; height: 18px; border-radius: 50%;
+    background: #fff; box-shadow: 0 0 0 4px rgba(124,92,255,0.35), 0 2px 8px rgba(0,0,0,0.4);
+    cursor: pointer; transition: transform 0.15s ease;
+  }
+  input[type=range]::-webkit-slider-thumb:hover { transform: scale(1.15); }
+  input[type=range]::-moz-range-thumb {
+    width: 18px; height: 18px; border-radius: 50%; border: none;
+    background: #fff; box-shadow: 0 0 0 4px rgba(124,92,255,0.35); cursor: pointer;
+  }
+
+  .radio-row { display: flex; gap: 10px; margin-top: 8px; flex-wrap: wrap; }
+  .radio-row label.opt {
+    display: flex; align-items: center; gap: 7px; font-weight: 500; color: var(--ink); font-size: 13px;
+    margin: 0; padding: 9px 13px; border-radius: 10px; border: 1px solid var(--card-border);
+    background: rgba(255,255,255,0.02); cursor: pointer; transition: all 0.2s ease; text-transform: none; letter-spacing: 0;
+  }
+  .radio-row label.opt:hover { border-color: var(--card-border-hover); background: rgba(255,255,255,0.05); }
+  .radio-row input[type=radio] { accent-color: var(--cs); }
+
+  button.run {
+    margin-top: 22px; width: 100%; padding: 14px; border: none; border-radius: 12px;
+    background: linear-gradient(120deg, var(--grad-1), var(--grad-2));
+    color: #fff; font-size: 14.5px; font-weight: 700; cursor: pointer; font-family: inherit;
+    box-shadow: 0 8px 24px -8px rgba(124,92,255,0.6);
+    transition: transform 0.15s ease, box-shadow 0.15s ease, opacity 0.15s ease;
+    display: flex; align-items: center; justify-content: center; gap: 8px;
+  }
+  button.run:hover { transform: translateY(-1px); box-shadow: 0 12px 30px -8px rgba(124,92,255,0.75); }
+  button.run:active { transform: translateY(0); }
+  button.run:disabled { opacity: 0.65; cursor: default; transform: none; }
+  .spinner {
+    width: 14px; height: 14px; border-radius: 50%; border: 2px solid rgba(255,255,255,0.4);
+    border-top-color: #fff; animation: spin 0.7s linear infinite; display: none;
+  }
+  button.run.loading .spinner { display: inline-block; }
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  .range-val { font-size: 12px; color: var(--muted-2); text-align: right; text-transform: none; letter-spacing: 0; font-weight: 500; margin-top: 4px; }
+
+  .result-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-top: 20px; }
+  @media (max-width: 520px) { .result-grid { grid-template-columns: 1fr; } }
+  .policy-box {
+    border-radius: 14px; padding: 18px; border: 1px solid var(--card-border);
+    background: rgba(255,255,255,0.02); transition: border-color 0.2s ease;
+  }
+  .policy-box.cs { border-color: rgba(110,168,255,0.35); }
+  .policy-box.th { border-color: rgba(255,143,110,0.3); }
+  .policy-box h3 { margin: 0 0 12px; font-size: 13px; font-weight: 600; color: var(--muted); text-transform: uppercase; letter-spacing: 0.04em; }
+
+  .badge {
+    display: inline-flex; align-items: center; gap: 6px; padding: 5px 12px; border-radius: 999px;
+    font-size: 12px; font-weight: 700; letter-spacing: 0.02em; margin-bottom: 12px;
+  }
+  .badge.migrate { background: rgba(255,107,107,0.12); color: var(--bad); box-shadow: 0 0 0 1px rgba(255,107,107,0.25) inset; }
+  .badge.wait { background: rgba(74,222,128,0.12); color: var(--good); box-shadow: 0 0 0 1px rgba(74,222,128,0.25) inset; }
+  .badge::before { content: ''; width: 6px; height: 6px; border-radius: 50%; background: currentColor; }
+
+  .kv { display: flex; justify-content: space-between; gap: 12px; font-size: 12.5px; margin: 8px 0; color: var(--muted); }
+  .kv b { color: var(--ink); font-weight: 600; font-family: 'JetBrains Mono', monospace; font-size: 12px; }
+
+  .stat-row { display: flex; gap: 12px; margin-top: 18px; flex-wrap: wrap; }
+  .stat {
+    flex: 1; min-width: 130px; border-radius: 12px; padding: 14px 16px;
+    background: rgba(255,255,255,0.03); border: 1px solid var(--card-border);
+  }
+  .stat .n {
+    font-size: 22px; font-weight: 700; font-family: 'Space Grotesk', sans-serif;
+    background: linear-gradient(120deg, #fff, #b9c3e0); -webkit-background-clip: text; background-clip: text; color: transparent;
+  }
+  .stat .l { font-size: 11px; color: var(--muted-2); margin-top: 4px; text-transform: uppercase; letter-spacing: 0.04em; }
+
   table { width: 100%; border-collapse: collapse; font-size: 12.5px; }
-  th, td { text-align: left; padding: 6px 8px; border-bottom: 1px solid var(--border); }
-  th { color: var(--muted); font-weight: 600; }
-  .note { font-size: 12px; color: var(--muted); background: #f2f5fa; border-radius: 8px; padding: 10px 12px; margin-top: 14px; line-height: 1.5; }
-  .placeholder { color: var(--muted); font-size: 13px; text-align: center; padding: 40px 0; }
-  img.chart { width: 100%; border-radius: 8px; border: 1px solid var(--border); margin-top: 10px; }
-  .pill { display: inline-block; background: #eef2f8; color: var(--blue); border-radius: 999px; padding: 2px 9px; font-size: 11px; font-weight: 600; }
+  th, td { text-align: left; padding: 10px 10px; border-bottom: 1px solid var(--card-border); }
+  th { color: var(--muted); font-weight: 600; text-transform: uppercase; font-size: 11px; letter-spacing: 0.04em; }
+  td { color: var(--ink); font-family: 'JetBrains Mono', monospace; font-size: 12px; }
+  td:first-child { font-family: 'Inter', sans-serif; color: var(--muted); text-transform: capitalize; }
+  tr:last-child td { border-bottom: none; }
+
+  .note {
+    font-size: 12.5px; color: var(--muted); background: rgba(255,255,255,0.03);
+    border: 1px solid var(--card-border); border-radius: 10px; padding: 12px 14px; margin-top: 16px; line-height: 1.6;
+  }
+  .placeholder {
+    color: var(--muted-2); font-size: 13px; text-align: center; padding: 56px 0;
+    border: 1px dashed var(--card-border); border-radius: 12px;
+  }
+  img.chart { width: 100%; border-radius: 12px; border: 1px solid var(--card-border); margin-top: 12px; display: block; }
+  .pill {
+    display: inline-block; background: rgba(124,92,255,0.12); color: #b9a8ff;
+    border: 1px solid rgba(124,92,255,0.3); border-radius: 999px; padding: 3px 11px; font-size: 11px; font-weight: 600;
+  }
+
+  #result { animation: fadeUp 0.4s ease; }
+  @keyframes fadeUp { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+
+  ::selection { background: rgba(124,92,255,0.35); }
 </style>
 </head>
 <body>
 
 <header>
-  <div class="pill">AWS: S3 + CloudFront (this page) &nbsp;→&nbsp; API Gateway + Lambda (the model)</div>
-  <h1>A workload-aware, cost-sensitive VM mitigation policy -- live demo</h1>
+  <div class="pill">AWS: S3 + CloudFront (this page) &nbsp;&rarr;&nbsp; API Gateway + Lambda (the model)</div>
+  <h1>A workload-aware, cost-sensitive VM mitigation policy</h1>
   <p>Pick a real drive model, an age, and a workload profile below. The app runs the chosen failure-probability
      model live, builds a survival curve, derives time-to-failure, computes real migration cost via the
      Clark et al. pre-copy formula, and shows what the cost-sensitive policy and the plain probability-threshold
@@ -81,8 +218,9 @@
       <label for="model_grp">Drive model</label>
       <select id="model_grp"></select>
 
-      <label for="age_days">Current drive age (days) -- <span id="age_val" class="range-val"></span></label>
+      <label for="age_days">Current drive age (days)</label>
       <input type="range" id="age_days" min="0" max="3000" step="30" value="900">
+      <div id="age_val" class="range-val"></div>
 
       <label for="criticality_tier">Workload criticality</label>
       <select id="criticality_tier"></select>
@@ -90,7 +228,7 @@
       <label for="size_tier">VM size tier</label>
       <select id="size_tier"></select>
 
-      <button class="run" id="run-btn" onclick="runPredict()" disabled>Loading reference data...</button>
+      <button class="run" id="run-btn" onclick="runPredict()" disabled><span class="spinner"></span><span class="btn-label">Loading reference data...</span></button>
     </div>
 
     <div class="card">
@@ -104,18 +242,18 @@
           <div class="stat"><div class="n" id="stat-mediattf">--</div><div class="l">median TTF (days)</div></div>
         </div>
         <div class="result-grid">
-          <div class="policy-box" style="border-color:#256abf">
+          <div class="policy-box cs">
             <h3>Cost-sensitive policy</h3>
             <div id="cs-badge"></div>
             <div class="kv"><span>Expected cost of inaction</span><b id="cs-cost">--</b></div>
             <div class="kv"><span>Migration cost</span><b id="cs-migcost">--</b></div>
             <div class="kv"><span>Urgency weight</span><b id="cs-urgency">--</b></div>
           </div>
-          <div class="policy-box" style="border-color:#e34948">
+          <div class="policy-box th">
             <h3>Threshold baseline</h3>
             <div id="th-badge"></div>
             <div class="kv"><span>Threshold (tau)</span><b id="th-tau">--</b></div>
-            <div class="kv"><span>Rule</span><b>migrate iff p_fail &gt; tau</b></div>
+            <div class="kv"><span>Rule</span><b style="font-family:inherit; font-weight:500; color:var(--muted)">migrate iff p_fail &gt; tau</b></div>
           </div>
         </div>
         <div class="note" id="model-note"></div>
