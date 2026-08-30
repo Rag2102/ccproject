@@ -6,3 +6,17 @@ node_modules/
 page-*.jpg
 .ipynb_checkpoints/
 .venv/
+
+# Terraform (cloud/infra) -- state and local caches, never committed
+# (state can contain sensitive values, and is specific to your own AWS
+# account's deployment, not something to share via git).
+cloud/infra/.terraform/
+cloud/infra/.terraform.lock.hcl
+cloud/infra/*.tfstate
+cloud/infra/*.tfstate.*
+cloud/infra/*.tfplan
+cloud/infra/crash.log
+
+# Generated at `terraform apply` time from config.js.tpl -- never hand-edit
+# or commit a real one (see cloud/frontend/config.js.tpl).
+cloud/frontend/config.js

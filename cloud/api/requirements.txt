@@ -1,0 +1,22 @@
+# Subset of the root requirements.txt actually needed at runtime by
+# webapp/core.py (no gunicorn -- Lambda doesn't need a WSGI server, our own
+# lambda_function.py adapter calls the Flask app directly; no matplotlib --
+# that's only used by the offline report-generation scripts, never imported
+# by core.py/app.py). Pinned to the EXACT SAME versions as the root
+# requirements.txt for the same reason documented there: the two .joblib
+# models only unpickle reliably against the versions they were saved with.
+# Keep these two files' shared package versions in sync.
+#
+# EXCEPTION: numpy is deliberately left unpinned here (range only). The
+# exact numpy==2.4.4 pin has no published manylinux wheel for this image's
+# platform, which forces pip to compile it from source -- and this base
+# image has no C compiler, so that fails outright. Unlike scikit-learn's
+# pickled model (the actual thing that broke on Render over an exact
+# version mismatch), nothing here unpickles a numpy object across versions,
+# so a nearby numpy version is safe.
+pandas==3.0.2
+numpy>=2.0,<3
+scikit-learn==1.8.0
+scipy==1.17.1
+joblib==1.5.3
+flask==3.1.3

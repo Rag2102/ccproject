@@ -31,6 +31,24 @@ either kind of heavyweight tool would. This mirrors `docs/project_scope.md`'s or
 purpose-built replay simulator instead of CloudSim/SimGrid for the *evaluation* itself (task 8) -- the same
 "wrong tool for this job" reasoning applies even more strongly to a demo.
 
+## A second deployment: real cloud architecture on AWS
+
+The Render deployment above is one traditional server. `cloud/` holds a
+second, more substantial deployment built specifically to demonstrate
+cloud-native architecture: a static frontend on S3 + CloudFront, a
+serverless JSON API on API Gateway + Lambda (container images, since
+pandas/scikit-learn make zip-based Lambda painful), and -- the most
+interesting piece -- the correlation-sweep experiment (task 9) reworked
+from a single-seed local for-loop into 55 real, independent Lambda
+invocations fanned out by a Step Functions Map state and combined by an
+aggregator Lambda into a proper mean +/- std per correlation value.
+
+Both deployments share the exact same prediction logic (`webapp/core.py`)
+-- see `docs/cloud_architecture.md` for the full design and a diagram, and
+`cloud/README.md` for the exact `terraform apply` / `docker build` / `aws
+stepfunctions start-execution` commands to deploy it into your own AWS
+account.
+
 ## Repository layout
 
 ```

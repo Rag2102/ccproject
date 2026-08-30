@@ -1,0 +1,14 @@
+# Lambda container image for the aggregation step (mean/std across seeds at
+# each rho, uploaded to S3). Deliberately its own tiny image, independent of
+# the worker's -- it never touches the 198MB VM table, only small JSON, so
+# there's no reason to share the heavier image and slow down its own
+# build/push or cold starts.
+#
+#   docker build -f cloud/sim/Dockerfile.aggregator -t vm-mitigation-sim-aggregator .
+FROM public.ecr.aws/lambda/python:3.11
+
+# No pip install needed: csv/json/statistics are stdlib, and boto3 ships
+# preinstalled in every AWS Lambda Python base image.
+COPY cloud/sim/aggregator_lambda_function.py ./
+
+CMD ["aggregator_lambda_function.handler"]

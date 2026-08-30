@@ -1,0 +1,10 @@
+# Worker Lambda only -- sim_core.py needs pandas/numpy (no scikit-learn: it
+# only calls policy.py's plain-numpy decision functions, unlike the API
+# Lambda's joblib models). Pinned to the same versions as the rest of the
+# project for consistency, though unlike webapp/core.py's models, nothing
+# here is unpickled across versions, so this pin is about reproducibility,
+# not correctness -- which is also why numpy is a range, not an exact pin:
+# numpy==2.4.4 has no published wheel for this image's platform, and this
+# minimal base image has no C compiler to build it from source with.
+pandas==3.0.2
+numpy>=2.0,<3

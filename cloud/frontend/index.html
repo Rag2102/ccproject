@@ -1,0 +1,163 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>VM Mitigation Policy -- Live Demo (AWS)</title>
+<style>
+  :root {
+    --blue: #256abf; --red: #e34948; --ink: #1c2430; --muted: #5b6b7f;
+    --bg: #f7f9fc; --card: #ffffff; --border: #e2e8f0; --good: #1f9d55; --bad: #c0392b;
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+         background: var(--bg); color: var(--ink); }
+  header { background: linear-gradient(135deg, var(--blue), #163f75); color: #fff; padding: 28px 32px; }
+  header h1 { margin: 0 0 6px; font-size: 22px; }
+  header p { margin: 0; opacity: 0.9; font-size: 14px; max-width: 900px; line-height: 1.5; }
+  header .pill { display: inline-block; background: rgba(255,255,255,0.18); border-radius: 999px;
+    padding: 2px 10px; font-size: 11px; font-weight: 700; margin-bottom: 10px; letter-spacing: 0.02em; }
+  main { max-width: 1180px; margin: 0 auto; padding: 24px 20px 60px; display: grid; gap: 24px; }
+  .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; }
+  @media (max-width: 900px) { .grid-2 { grid-template-columns: 1fr; } }
+  .card { background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 20px 22px; }
+  .card h2 { margin: 0 0 4px; font-size: 16px; }
+  .card .sub { color: var(--muted); font-size: 12.5px; margin: 0 0 16px; line-height: 1.5; }
+  label { display: block; font-size: 12.5px; font-weight: 600; color: var(--muted); margin: 14px 0 5px; }
+  select, input[type=number], input[type=range] { width: 100%; padding: 8px 10px; border-radius: 8px;
+    border: 1px solid var(--border); font-size: 14px; background: #fff; }
+  .radio-row { display: flex; gap: 14px; margin-top: 6px; }
+  .radio-row label.opt { display: flex; align-items: center; gap: 6px; font-weight: 500; color: var(--ink); font-size: 13.5px; margin: 0; }
+  button.run { margin-top: 18px; width: 100%; padding: 11px; border: none; border-radius: 8px;
+    background: var(--blue); color: #fff; font-size: 14.5px; font-weight: 600; cursor: pointer; }
+  button.run:hover { background: #1c5599; }
+  button.run:disabled { opacity: 0.6; cursor: default; }
+  .range-val { font-size: 12.5px; color: var(--muted); text-align: right; }
+  .result-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-top: 18px; }
+  .policy-box { border-radius: 10px; padding: 16px; border: 1.5px solid var(--border); }
+  .policy-box h3 { margin: 0 0 10px; font-size: 14px; }
+  .badge { display: inline-block; padding: 4px 10px; border-radius: 999px; font-size: 12.5px; font-weight: 700; }
+  .badge.migrate { background: #fdeceb; color: var(--bad); }
+  .badge.wait { background: #e9f7ef; color: var(--good); }
+  .kv { display: flex; justify-content: space-between; font-size: 12.5px; margin: 5px 0; color: var(--muted); }
+  .kv b { color: var(--ink); font-weight: 600; }
+  .stat-row { display: flex; gap: 16px; margin-top: 14px; flex-wrap: wrap; }
+  .stat { flex: 1; min-width: 120px; background: #f2f5fa; border-radius: 8px; padding: 10px 12px; }
+  .stat .n { font-size: 18px; font-weight: 700; }
+  .stat .l { font-size: 11px; color: var(--muted); }
+  table { width: 100%; border-collapse: collapse; font-size: 12.5px; }
+  th, td { text-align: left; padding: 6px 8px; border-bottom: 1px solid var(--border); }
+  th { color: var(--muted); font-weight: 600; }
+  .note { font-size: 12px; color: var(--muted); background: #f2f5fa; border-radius: 8px; padding: 10px 12px; margin-top: 14px; line-height: 1.5; }
+  .placeholder { color: var(--muted); font-size: 13px; text-align: center; padding: 40px 0; }
+  img.chart { width: 100%; border-radius: 8px; border: 1px solid var(--border); margin-top: 10px; }
+  .pill { display: inline-block; background: #eef2f8; color: var(--blue); border-radius: 999px; padding: 2px 9px; font-size: 11px; font-weight: 600; }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="pill">AWS: S3 + CloudFront (this page) &nbsp;→&nbsp; API Gateway + Lambda (the model)</div>
+  <h1>A workload-aware, cost-sensitive VM mitigation policy -- live demo</h1>
+  <p>Pick a real drive model, an age, and a workload profile below. The app runs the chosen failure-probability
+     model live, builds a survival curve, derives time-to-failure, computes real migration cost via the
+     Clark et al. pre-copy formula, and shows what the cost-sensitive policy and the plain probability-threshold
+     baseline each decide -- side by side, on the same inputs. This page is static (served from S3/CloudFront);
+     every prediction is a real serverless Lambda invocation, not a lookup into a precomputed table.</p>
+</header>
+
+<main>
+
+  <div class="grid-2">
+    <div class="card">
+      <h2>Try it: live policy calculator</h2>
+      <p class="sub">Every prediction below is a real forward pass through a trained model, running in AWS Lambda -- not a lookup into a precomputed table.</p>
+
+      <label>Failure-probability model</label>
+      <div class="radio-row">
+        <label class="opt"><input type="radio" name="which_model" value="histgbm" checked> Calibrated HistGBM (task 3, recommended)</label>
+        <label class="opt"><input type="radio" name="which_model" value="gqat"> GQAT-Net-inspired (task 11, NumPy)</label>
+      </div>
+
+      <label for="model_grp">Drive model</label>
+      <select id="model_grp"></select>
+
+      <label for="age_days">Current drive age (days) -- <span id="age_val" class="range-val"></span></label>
+      <input type="range" id="age_days" min="0" max="3000" step="30" value="900">
+
+      <label for="criticality_tier">Workload criticality</label>
+      <select id="criticality_tier"></select>
+
+      <label for="size_tier">VM size tier</label>
+      <select id="size_tier"></select>
+
+      <button class="run" id="run-btn" onclick="runPredict()" disabled>Loading reference data...</button>
+    </div>
+
+    <div class="card">
+      <h2>Result</h2>
+      <p class="sub">Both policies see the exact same p_fail, time-to-failure, migration cost and failure cost -- the threshold baseline just ignores everything except p_fail, by design (that's the comparison this project is about).</p>
+      <div id="result-placeholder" class="placeholder">Run a prediction to see both policies' decisions.</div>
+      <div id="result" style="display:none">
+        <div class="stat-row">
+          <div class="stat"><div class="n" id="stat-pfail">--</div><div class="l" id="stat-pfail-label">P(fail within window)</div></div>
+          <div class="stat"><div class="n" id="stat-ttf">--</div><div class="l">expected TTF (days)</div></div>
+          <div class="stat"><div class="n" id="stat-mediattf">--</div><div class="l">median TTF (days)</div></div>
+        </div>
+        <div class="result-grid">
+          <div class="policy-box" style="border-color:#256abf">
+            <h3>Cost-sensitive policy</h3>
+            <div id="cs-badge"></div>
+            <div class="kv"><span>Expected cost of inaction</span><b id="cs-cost">--</b></div>
+            <div class="kv"><span>Migration cost</span><b id="cs-migcost">--</b></div>
+            <div class="kv"><span>Urgency weight</span><b id="cs-urgency">--</b></div>
+          </div>
+          <div class="policy-box" style="border-color:#e34948">
+            <h3>Threshold baseline</h3>
+            <div id="th-badge"></div>
+            <div class="kv"><span>Threshold (tau)</span><b id="th-tau">--</b></div>
+            <div class="kv"><span>Rule</span><b>migrate iff p_fail &gt; tau</b></div>
+          </div>
+        </div>
+        <div class="note" id="model-note"></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <h2>The project's real findings <span class="pill">precomputed, from the actual experiments</span></h2>
+    <p class="sub">These numbers come from the full replay simulation (task 8) and the correlation-sweep follow-up (task 9) over the real Backblaze + Azure datasets -- not from this demo's live calculator above.</p>
+    <div class="grid-2">
+      <div>
+        <table id="headline-table">
+          <thead><tr><th>Metric</th><th>Cost-sensitive</th><th>Threshold (matched budget)</th></tr></thead>
+          <tbody></tbody>
+        </table>
+        <p class="note">Under random workload placement, the two policies land within ~3% of each other on total cost
+          (matched to the same migration budget) -- the honest, non-confirmatory task 8 result. The follow-up
+          experiment below shows where the hypothesis <i>does</i> hold.</p>
+      </div>
+      <div>
+        <img class="chart" src="figures/correlation_sweep_chart.png" alt="Correlation sweep chart">
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <h2>Task 11: does a deep attention model beat the calibrated hazard model?</h2>
+    <p class="sub">Both models scored on the identical held-out test rows. See docs/task11_summary.md for the full writeup, including why TensorFlow/PyTorch aren't used here.</p>
+    <table id="comparison-table">
+      <thead><tr><th>Model</th><th>ROC-AUC</th><th>PR-AUC</th><th>Brier</th><th>ECE</th></tr></thead>
+      <tbody></tbody>
+    </table>
+    <p class="note">The gradient-boosted hazard model wins on every metric, especially calibration -- consistent with
+      the well-known finding that tree-based models tend to match or beat deep architectures on small-feature-count
+      tabular problems, and a reminder that a fancier architecture doesn't automatically produce a usable probability.</p>
+  </div>
+
+</main>
+
+<script src="config.js"></script>
+<script src="app.js"></script>
+
+</body>
+</html>
