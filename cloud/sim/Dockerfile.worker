@@ -1,0 +1,40 @@
+# Lambda container image for one (rho, seed) trial of the distributed
+# correlation-sweep simulation. Build from the REPO ROOT:
+#
+#   docker build -f cloud/sim/Dockerfile.worker -t vm-mitigation-sim-worker .
+#
+# See cloud/README.md for the full build -> push (ECR) -> deploy flow, and
+# docs/cloud_architecture.md for how this fits into the Step Functions Map
+# state that fans out many of these concurrently.
+FROM public.ecr.aws/lambda/python:3.12
+
+# See cloud/api/Dockerfile's comment: the real fix for numpy's build
+# failure was switching the base image from :3.11 (Amazon Linux 2, glibc
+# 2.26 -- too old for numpy's manylinux_2_28 wheels, forcing a from-source
+# build that then failed on AL2's outdated gcc) to :3.12 (Amazon Linux
+# 2023, glibc 2.34), which lets pip pull the prebuilt wheel directly. No
+# compiler toolchain needed.
+
+COPY cloud/sim/requirements.txt ./
+# See cloud/api/Dockerfile's comment on why this upgrade step is needed --
+# same reasoning applies here (numpy in particular).
+RUN pip install --no-cache-dir --upgrade pip setuptools wheel
+RUN pip install --no-cache-dir -r requirements.txt
+
+# sim_core.py + policy.py (the latter copied fresh from scripts/ so there is
+# exactly one source of truth for the decision logic -- see webapp's
+# Dockerfile for the same reasoning applied to the API image) + the handler.
+COPY cloud/sim/sim_core.py ./
+COPY scripts/policy.py ./
+COPY cloud/sim/worker_lambda_function.py ./
+
+# The 3 files sim_core.load_data() reads. azure_vms_with_costs.csv.gz is the
+# large (~198MB) Git-LFS file -- unlike the API image, THIS worker genuinely
+# needs the full per-VM table (the simulation operates at VM granularity),
+# so it's bundled in full rather than reduced to a summary.
+COPY data/processed/backblaze_drives_clean.csv \
+     data/processed/ttf_lookup_table.csv \
+     data/processed/azure_vms_with_costs.csv.gz \
+     ./data/
+
+CMD ["worker_lambda_function.handler"]
