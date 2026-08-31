@@ -7,6 +7,13 @@ resource "aws_apigatewayv2_api" "api" {
   name          = "${var.project_name}-api"
   protocol_type = "HTTP"
 
+  # Mostly vestigial since s3_frontend.tf started proxying /api/* through
+  # the same CloudFront distribution the frontend is served from: same-
+  # origin requests don't trigger a CORS preflight in the first place, so
+  # the frontend no longer actually depends on this. Left in place (harmless
+  # either way) as a safety net for anyone hitting the raw API Gateway
+  # invoke_url directly during local debugging with the origin-verify
+  # header manually added (see waf.tf, cloud/api/lambda_function.py).
   cors_configuration {
     # Scoped to the actual CloudFront frontend rather than "*" -- this is a
     # live reference (not a hardcoded domain), so it can never drift: if the

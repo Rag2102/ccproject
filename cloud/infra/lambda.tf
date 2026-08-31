@@ -55,6 +55,18 @@ resource "aws_lambda_function" "api" {
   # actually faster, rather than just hoping it finishes in time.
   memory_size = 3008
   timeout     = 30 # already at API Gateway HTTP API's own integration ceiling; raising this further wouldn't help
+
+  environment {
+    variables = {
+      # Checked by cloud/api/lambda_function.py's handler() before it does
+      # anything else -- a request without this exact value gets a 403.
+      # Only CloudFront (s3_frontend.tf's api-gateway origin custom_header)
+      # knows this value, so this is what actually stops the raw API
+      # Gateway invoke_url from being called directly and bypassing WAF.
+      # See waf.tf for why this exists instead of a REST API usage plan.
+      ORIGIN_VERIFY_SECRET = random_password.origin_verify_secret.result
+    }
+  }
 }
 
 resource "aws_lambda_function" "sim_worker" {

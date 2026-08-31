@@ -13,9 +13,16 @@ by the static frontend (cloud/frontend/) -- `/` and `/figures/<f>` still
 work (inherited unchanged from webapp/app.py) but the frontend doesn't hit
 them; S3 + CloudFront serve the HTML and PNG figures directly instead,
 which is faster and doesn't spend a Lambda invocation on a static file.
+
+Also checks a shared-secret header (see _reject_unless_from_cloudfront
+below) before doing anything else: cloud/infra/s3_frontend.tf now puts
+CloudFront in front of this API (so WAF -- unavailable on HTTP APIs
+directly -- can protect it), and this is what stops the raw API Gateway
+invoke_url from being called directly, bypassing CloudFront and WAF both.
 """
 import base64
 import io
+import os
 import sys
 from pathlib import Path
 
@@ -30,6 +37,32 @@ sys.path.insert(0, str(WEBAPP_DIR))
 from app import app as flask_app  # noqa: E402
 
 _TEXTUAL_CONTENT_TYPE_PREFIXES = ("text/", "application/json", "application/javascript")
+
+# Set by cloud/infra/lambda.tf from a Terraform-generated random_password;
+# CloudFront is configured (s3_frontend.tf) to send this exact value as the
+# X-Origin-Verify header on every request it forwards to this Lambda's API
+# Gateway origin. Unset (local `python3 app.py` / test runs, where this
+# module isn't even imported) means the check below is skipped entirely --
+# never fails closed in a context where CloudFront was never involved.
+_ORIGIN_VERIFY_HEADER = "x-origin-verify"
+_ORIGIN_VERIFY_SECRET = os.environ.get("ORIGIN_VERIFY_SECRET")
+
+
+def _reject_unless_from_cloudfront(event):
+    """Return an API-Gateway-shaped 403 response dict if this request
+    didn't come through CloudFront (i.e. someone hit the raw API Gateway
+    invoke_url directly), else None. See module docstring."""
+    if not _ORIGIN_VERIFY_SECRET:
+        return None
+    headers = {k.lower(): v for k, v in (event.get("headers") or {}).items()}
+    if headers.get(_ORIGIN_VERIFY_HEADER) != _ORIGIN_VERIFY_SECRET:
+        return {
+            "statusCode": 403,
+            "headers": {"Content-Type": "application/json"},
+            "body": '{"error": "forbidden: call this API through the CloudFront-fronted frontend URL, not the raw API Gateway endpoint"}',
+            "isBase64Encoded": False,
+        }
+    return None
 
 
 def _wsgi_environ_from_event(event):
@@ -78,6 +111,10 @@ def _wsgi_environ_from_event(event):
 
 
 def handler(event, context):
+    rejection = _reject_unless_from_cloudfront(event)
+    if rejection is not None:
+        return rejection
+
     environ = _wsgi_environ_from_event(event)
     response_meta = {}
 

@@ -7,19 +7,41 @@
 # (ECR repos must exist and have an image pushed before the Lambda
 # resources in lambda.tf can be created).
 
+# scan_on_push runs Amazon ECR's basic image scan (CVE database, backed by
+# Clair) on every image this project pushes -- catches known
+# vulnerabilities in the base image and any OS/Python packages baked into
+# it (pandas/scikit-learn/scipy pull in a fair amount of native code) that
+# `pip-audit` in CI (.github/workflows/ci.yml) wouldn't see, since that
+# only looks at the Python dependency tree, not the underlying image.
+# Findings show up under each repo in the ECR console (Console -> ECR ->
+# repository -> Images -> Scan status) -- nothing here fails a build
+# automatically, since a finding needs a human judgment call the same way
+# a pip-audit finding does (see ci.yml's comment on that same tension).
 resource "aws_ecr_repository" "api" {
   name         = "${var.project_name}-api"
   force_delete = true
+
+  image_scanning_configuration {
+    scan_on_push = true
+  }
 }
 
 resource "aws_ecr_repository" "sim_worker" {
   name         = "${var.project_name}-sim-worker"
   force_delete = true
+
+  image_scanning_configuration {
+    scan_on_push = true
+  }
 }
 
 resource "aws_ecr_repository" "sim_aggregator" {
   name         = "${var.project_name}-sim-aggregator"
   force_delete = true
+
+  image_scanning_configuration {
+    scan_on_push = true
+  }
 }
 
 # Every docker push in this project reuses the ":latest" tag (see

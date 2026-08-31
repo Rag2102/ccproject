@@ -1,5 +1,10 @@
 # A Workload-Aware, Cost-Sensitive Mitigation Policy for Cloud VM Failures
 
+[![CI](https://github.com/Rag2102/ccproject/actions/workflows/ci.yml/badge.svg)](https://github.com/Rag2102/ccproject/actions/workflows/ci.yml)
+![Python](https://img.shields.io/badge/python-3.12-blue)
+![Terraform](https://img.shields.io/badge/IaC-Terraform-844FBA)
+![AWS](https://img.shields.io/badge/cloud-AWS-FF9900)
+
 A project testing whether a cost-sensitive VM mitigation policy — one that weighs failure probability, estimated time-to-failure, workload criticality, and migration cost — reduces customer-impacting VM failures and unnecessary migrations better than a plain probability-threshold policy (the common baseline, and the strategy Microsoft's Narya explicitly improves on).
 
 **Headline result:** under random workload placement the two policies come out roughly matched (the threshold slightly ahead at a fair, matched migration budget); the cost-sensitive policy's advantage emerges cleanly and monotonically once workload criticality correlates with real hardware risk at a plausible level (rank-correlation ρ ≳ 0.3), reaching +3.4% lower realized cost at ρ=0.9. Full writeup: [`docs/VM_Mitigation_Policy_Report.docx`](docs/VM_Mitigation_Policy_Report.docx).
@@ -43,11 +48,28 @@ from a single-seed local for-loop into 55 real, independent Lambda
 invocations fanned out by a Step Functions Map state and combined by an
 aggregator Lambda into a proper mean +/- std per correlation value.
 
+```mermaid
+flowchart LR
+    subgraph render["Render (traditional server)"]
+      FLASK["Flask + gunicorn\nrenders the page AND serves /api/*"]
+    end
+    subgraph aws["AWS (serverless, cloud-native)"]
+      CF["CloudFront CDN + WAF"] --> S3["S3\n(static frontend)"]
+      CF -- "/api/*" --> APIGW["API Gateway"] --> LAM["Lambda\n(container image)"]
+    end
+    CORE["webapp/core.py\nmodels + hazard curves + policy decisions\n(the ONE place any of this logic lives)"]
+    FLASK -.->|imports| CORE
+    LAM -.->|imports, via app.py| CORE
+    Browser1["Browser"] --> FLASK
+    Browser2["Browser"] --> CF
+```
+
 Both deployments share the exact same prediction logic (`webapp/core.py`)
--- see `docs/cloud_architecture.md` for the full design and a diagram, and
-`cloud/README.md` for the exact `terraform apply` / `docker build` / `aws
-stepfunctions start-execution` commands to deploy it into your own AWS
-account.
+-- see `docs/cloud_architecture.md` for the full design and a more
+detailed diagram of the AWS side, `docs/openapi.yaml` for the API
+contract both expose, and `cloud/README.md` for the exact `terraform
+apply` / `docker build` / `aws stepfunctions start-execution` commands to
+deploy the AWS side into your own account.
 
 ## Repository layout
 

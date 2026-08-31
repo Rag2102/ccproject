@@ -13,11 +13,38 @@ the same principle scripts/policy.py already applies to the two policies.
 """
 import sys
 import json
+import time
 from pathlib import Path
 
 import numpy as np
 import pandas as pd
 import joblib
+from pydantic import BaseModel, Field, field_validator, ValidationError as PydanticValidationError
+
+
+def _log_event(event, **fields):
+    """Emit one JSON object per log line, to stdout. CloudWatch Logs (the
+    AWS deployment) ingests a Lambda's stdout automatically with no extra
+    wiring, and Render's log viewer (the other deployment) shows stdout
+    directly too -- so this one function, called from one shared module,
+    covers structured logging for both deployments without depending on
+    either platform's SDK. Plain print() rather than the logging module:
+    print() always resolves the *current* sys.stdout at call time, which
+    matters for testability (pytest's capsys fixture replaces sys.stdout
+    per-test; a logging.StreamHandler created once at import time would
+    keep writing to whatever object sys.stdout was bound to back then) and
+    there's no need here for logging's level filtering or handler
+    ecosystem for one function that always emits at the same level.
+    flush=True so the line is visible immediately in a short-lived Lambda
+    invocation rather than sitting in a buffer.
+
+    `event` names what happened (predict_served, predict_rejected, ...);
+    fields are whatever's relevant to that event -- never anything
+    sensitive, since none of this project's inputs are personal data
+    (drive model, age in days, workload criticality/size tier are all
+    fleet/VM metadata, not user-identifying). See docs/observability.md.
+    """
+    print(json.dumps({"event": event, "ts": round(time.time(), 3), **fields}, default=str), flush=True)
 
 ROOT = Path(__file__).resolve().parents[1]
 SCRIPTS = ROOT / "scripts"
@@ -72,6 +99,80 @@ SIZE_TIERS = sorted(SIZE_TIER_PROFILE.keys())  # real categories only (the Azure
 
 print(f"Loaded. {len(MODEL_GROUPS)} drive model groups, tau_default={TAU_DEFAULT:.5f}, "
       f"size-tier profiles: {SIZE_TIER_PROFILE}")
+
+WHICH_MODELS = ("histgbm", "gqat")
+MAX_VALID_AGE_DAYS = 20_000  # ~55 years -- generous but bounded; also rejects NaN/inf,
+                              # since pydantic's ge/le comparisons are always False for NaN
+
+
+# ---------------------------------------------------------------------------
+# Input validation for /api/predict, shared by both deployments (see module
+# docstring) -- one schema, checked once, so a malformed request gets a
+# clean 400 with a specific reason instead of an unhandled 500 from deep
+# inside the model code (a bad dict lookup, a NaN reaching a numpy // op,
+# etc). Enum-style fields are validated against the *real* categories the
+# models were trained on / the reference data actually has, not a
+# hand-maintained duplicate list, so this can't silently drift out of sync.
+# ---------------------------------------------------------------------------
+class PredictRequest(BaseModel):
+    model_grp: str
+    age_days: float = Field(ge=0, le=MAX_VALID_AGE_DAYS)
+    criticality_tier: str
+    size_tier: str
+    which_model: str = "histgbm"
+
+    @field_validator("model_grp")
+    @classmethod
+    def _check_model_grp(cls, v):
+        if v not in MODEL_GROUPS:
+            raise ValueError(f"must be one of {MODEL_GROUPS}")
+        return v
+
+    @field_validator("criticality_tier")
+    @classmethod
+    def _check_criticality_tier(cls, v):
+        allowed = sorted(CRITICALITY_MAP.keys())
+        if v not in allowed:
+            raise ValueError(f"must be one of {allowed}")
+        return v
+
+    @field_validator("size_tier")
+    @classmethod
+    def _check_size_tier(cls, v):
+        if v not in SIZE_TIERS:
+            raise ValueError(f"must be one of {SIZE_TIERS}")
+        return v
+
+    @field_validator("which_model")
+    @classmethod
+    def _check_which_model(cls, v):
+        if v not in WHICH_MODELS:
+            raise ValueError(f"must be one of {WHICH_MODELS}")
+        return v
+
+
+class InputValidationError(Exception):
+    """Raised by run_predict() when the request body fails validation.
+    Carries a list of clean, field-level messages so the Flask route (and,
+    transitively, the AWS Lambda WSGI wrapper) can return a proper 400 with
+    a useful body instead of letting a raw exception surface as a 500."""
+
+    def __init__(self, errors):
+        self.errors = errors
+        super().__init__("; ".join(errors))
+
+
+def validate_predict_request(raw_body):
+    """Validate a raw JSON body against PredictRequest. Returns the
+    validated model on success; raises InputValidationError (never a bare
+    pydantic/KeyError/TypeError) on any problem, including a non-dict body."""
+    if not isinstance(raw_body, dict):
+        raise InputValidationError(["request body must be a JSON object"])
+    try:
+        return PredictRequest(**raw_body)
+    except PydanticValidationError as exc:
+        errors = [f"{'.'.join(str(p) for p in e['loc']) or '(body)'}: {e['msg']}" for e in exc.errors()]
+        raise InputValidationError(errors) from None
 
 
 # ---------------------------------------------------------------------------
@@ -207,12 +308,20 @@ def get_meta():
 def run_predict(body):
     """body: dict with model_grp, age_days, criticality_tier, size_tier,
     which_model. Returns a JSON-serializable dict -- the exact same shape
-    /api/predict has always returned."""
-    model_grp = body["model_grp"]
-    age_days = float(body["age_days"])
-    criticality_tier = body["criticality_tier"]
-    size_tier = body["size_tier"]
-    which_model = body.get("which_model", "histgbm")
+    /api/predict has always returned. Raises InputValidationError (caught by
+    both deployments' routes and turned into a clean HTTP 400) if body is
+    malformed, has an out-of-range value, or names an unknown category."""
+    request_start = time.perf_counter()
+    try:
+        req = validate_predict_request(body)
+    except InputValidationError as exc:
+        _log_event("predict_rejected", errors=exc.errors)
+        raise
+    model_grp = req.model_grp
+    age_days = req.age_days
+    criticality_tier = req.criticality_tier
+    size_tier = req.size_tier
+    which_model = req.which_model
 
     capacity_tb = CAPACITY_BY_MODEL.get(model_grp, 4.0)
     start_idx = int(min(age_days, MAX_AGE_DAYS - BIN_DAYS) // BIN_DAYS)
@@ -237,7 +346,7 @@ def run_predict(body):
     )
     th_migrate = bool(policy.threshold_decision(p_fail_window, TAU_DEFAULT))
 
-    return {
+    result = {
         "model_used": model_label,
         "p_fail_within_window": p_fail_window,
         "expected_ttf_days": round(expected_ttf, 1),
@@ -256,3 +365,21 @@ def run_predict(body):
             "tau": TAU_DEFAULT,
         },
     }
+
+    _log_event(
+        "predict_served",
+        model_grp=model_grp,
+        which_model=which_model,
+        age_days=age_days,
+        criticality_tier=criticality_tier,
+        size_tier=size_tier,
+        p_fail_within_window=round(p_fail_window, 6),
+        cost_sensitive_migrate=result["cost_sensitive"]["migrate"],
+        threshold_migrate=result["threshold"]["migrate"],
+        # A pure inference-time measurement (model call + policy math), not
+        # end-to-end request latency -- this excludes cold start and
+        # anything Flask/API Gateway/CloudFront add around it, which is
+        # exactly the piece lambda.tf's memory-sizing comment is about.
+        duration_ms=round((time.perf_counter() - request_start) * 1000, 2),
+    )
+    return result

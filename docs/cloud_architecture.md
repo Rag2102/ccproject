@@ -33,11 +33,13 @@ however that server is hosted.
 
 ```mermaid
 flowchart TB
-    subgraph static["Static tier: S3 + CloudFront"]
+    subgraph edge["One CloudFront distribution, two origins, WAF attached"]
+      WAF["AWS WAF\nmanaged rule groups + per-IP rate limit"] -.-> CF
       CF["CloudFront CDN"] --> S3F["S3 bucket\n(index.html, app.js, config.js, figures/*.png)"]
+      CF -- "/api/* only,\nwith X-Origin-Verify secret header" --> APIGW["API Gateway HTTP API"]
     end
-    subgraph dynamic["Dynamic tier: API Gateway + Lambda"]
-      APIGW["API Gateway HTTP API"] --> APILAM["Lambda (container image)\nwebapp/core.py + app.py"]
+    subgraph dynamic["Dynamic tier"]
+      APIGW --> APILAM["Lambda (container image)\nchecks X-Origin-Verify, then\nwebapp/core.py + app.py"]
       APILAM --> MODELS["Bundled in the image:\nfailure_probability_model.joblib\ngqat_net_numpy_model.joblib"]
     end
     subgraph sim["Distributed simulation: Step Functions"]
@@ -49,10 +51,21 @@ flowchart TB
       W3 --> AGG
       AGG --> S3R["S3 bucket\n(results CSV/JSON)"]
     end
-    Browser["Browser"] --> CF
-    Browser -- "fetch /api/meta, /api/predict" --> APIGW
+    Browser["Browser"] -- "everything, same origin:\n/, /api/meta, /api/predict" --> CF
     Operator["you (AWS CLI)"] -- "start-execution" --> SFN
 ```
+
+Both tiers sit behind the *same* CloudFront distribution and the *same*
+WAF web ACL now (`cloud/infra/waf.tf`, `cloud/infra/s3_frontend.tf`) --
+not because API Gateway HTTP APIs support that natively (they don't: no
+usage plans, no API keys, no WAF -- those are REST-API-only features), but
+because putting CloudFront in front of the API is what makes protecting it
+with WAF possible at all. A shared secret CloudFront injects as a request
+header (`X-Origin-Verify`) and the Lambda checks before doing anything
+else is what stops the raw API Gateway URL from being called directly,
+bypassing CloudFront and WAF both. See `cloud/infra/waf.tf`'s comment for
+the full reasoning, including why an API key wouldn't have added real
+security here anyway (it would have had to live in public browser JS).
 
 ## One source of truth, two deployments
 
@@ -126,6 +139,18 @@ there are 4 of them or 400).
   autoscaling group, launch template, or scaling policy to author. Where a
   traditional EC2-based architecture would need one, "there's nothing to
   configure" *is* the architectural answer.
-- **CORS is wide open (`*`)** -- reasonable for a public read-only demo;
-  `cloud/infra/api_gateway.tf` has a comment on tightening it to the exact
-  CloudFront domain if you want to lock it down further.
+- **CORS is scoped to the CloudFront domain, and now mostly moot** --
+  `cloud/infra/api_gateway.tf` locks `allow_origins` to the live
+  CloudFront domain (not `*`), but since the frontend now calls `/api/*`
+  on that same CloudFront distribution (see above), those are same-origin
+  requests that never trigger a CORS preflight in the first place. The
+  API Gateway CORS config is kept only as a safety net for direct calls
+  to the raw invoke URL during local debugging.
+- **No custom domain means no per-client API keys, and that's fine** --
+  even on a REST API (where API Gateway usage plans/keys are actually
+  supported), an API key handed to an anonymous public browser demo would
+  have to live in public JS, which defeats what a "key" is for. The WAF
+  rate-based rule (`cloud/infra/waf.tf`) protects this deployment against
+  the thing that actually matters for a public demo -- request floods from
+  a given source -- without pretending an unauthenticated demo has
+  individually-identifiable clients to issue keys to.

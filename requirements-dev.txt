@@ -2,3 +2,4 @@
 # runtime by app.py or lambda_function.py, so kept out of the pins those
 # rely on (see requirements.txt's own comment on why those are exact).
 pytest==8.3.4
+requests==2.33.1  # scripts/load_test.py only

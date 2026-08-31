@@ -40,9 +40,28 @@ terraform {
       source  = "hashicorp/null"
       version = "~> 3.2"
     }
+    # Generates the CloudFront->API-Gateway shared secret (waf.tf /
+    # s3_frontend.tf) -- also new, also needs `terraform init` rerun.
+    random = {
+      source  = "hashicorp/random"
+      version = "~> 3.6"
+    }
   }
 }
 
 provider "aws" {
   region = var.aws_region
+}
+
+# CloudFront WAF web ACLs (scope = "CLOUDFRONT") are only ever created
+# against the us-east-1 API endpoint, regardless of which region the rest
+# of this project deploys into -- an AWS platform requirement, not a
+# choice this project made. var.aws_region defaults to us-east-1 today,
+# so the two providers currently point at the same place, but pinning
+# this one explicitly means a future change to var.aws_region can't
+# silently break `terraform apply` by trying to create the web ACL in the
+# wrong region. See waf.tf.
+provider "aws" {
+  alias  = "us_east_1"
+  region = "us-east-1"
 }

@@ -3,7 +3,10 @@
 // via Jinja; this page has no server, so it fetches the identical JSON from
 // GET /api/meta (Lambda, via core.get_meta() -- see webapp/core.py) and
 // builds the DOM itself. API_BASE comes from config.js, which Terraform
-// generates with the real API Gateway URL at deploy time (cloud/infra).
+// generates as "" (same-origin): CloudFront proxies /api/* on this same
+// distribution through to the API Gateway origin behind it (see
+// cloud/infra/s3_frontend.tf and waf.tf), so these fetches never leave
+// the page's own domain.
 
 let META = null;
 

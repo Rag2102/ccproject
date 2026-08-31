@@ -27,3 +27,67 @@ jobs:
 
       - name: Gradient check (scripts/gqat_net_numpy.py's hand-derived backward pass)
         run: python scripts/test_gqat_numpy_gradcheck.py
+
+  # Scans every requirements*.txt this project actually deploys with
+  # (root, cloud/api, cloud/sim) against the PyPI Advisory Database for
+  # known CVEs in the pinned versions. Deliberately a separate job from
+  # `test` (not a step in it) so a new CVE landing in an unrelated
+  # dependency shows up as its own clearly-labeled red X in the PR check
+  # list, not buried inside the test job's log.
+  #
+  # One real tension worth being explicit about: requirements.txt pins
+  # pandas/numpy/scikit-learn/scipy/joblib to the EXACT versions the
+  # saved .joblib models in models/ were trained and pickled with (see
+  # that file's own comment) -- scikit-learn does not guarantee pickles
+  # unpickle correctly across versions, which is exactly what broke the
+  # first Render deploy attempt. So if this job ever goes red, the fix is
+  # NOT automatically "bump the pin and re-run" -- it's a real judgment
+  # call: is the CVE actually reachable from how this project uses the
+  # package, and if a bump is needed, the .joblib models have to be
+  # re-verified to still unpickle (or retrained) against the new version
+  # before merging, not just the audit re-run.
+  pip-audit:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install pip-audit
+        run: python -m pip install --upgrade pip pip-audit
+
+      - name: Audit root requirements (Render deployment + pipeline scripts)
+        run: pip-audit -r requirements.txt
+
+      - name: Audit cloud/api requirements (API Lambda image)
+        run: pip-audit -r cloud/api/requirements.txt
+
+      - name: Audit cloud/sim requirements (simulation worker/aggregator Lambda images)
+        run: pip-audit -r cloud/sim/requirements.txt
+
+  # scripts/package.json's one dependency (docx, used only to generate
+  # docs/*.docx report files -- never imported by anything that runs in
+  # either live deployment) gets the same treatment npm's own tooling
+  # would give a real frontend project. No committed package-lock.json
+  # (a single floating dependency for an internal report-builder script
+  # didn't seem to warrant one) -- `npm install` generates one fresh each
+  # run instead of trusting a stale local lock, which is also why this is
+  # `npm install && npm audit` rather than the more common `npm ci`.
+  npm-audit:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+
+      - name: Install scripts/ dependencies
+        working-directory: scripts
+        run: npm install
+
+      - name: npm audit (fail on high/critical)
+        working-directory: scripts
+        run: npm audit --audit-level=high

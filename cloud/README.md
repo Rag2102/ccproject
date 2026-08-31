@@ -4,7 +4,9 @@ This is a second, more substantial deployment alongside the Render one (see
 the root `README.md`'s "See it working" section) -- built specifically to
 demonstrate real cloud-native architecture: a static CDN-served frontend,
 a serverless JSON API, and a genuinely distributed simulation. See
-`docs/cloud_architecture.md` for the full design rationale and diagram.
+`docs/cloud_architecture.md` for the full design rationale and diagram,
+and `docs/openapi.yaml` for the API contract (generated from the live
+model data by `scripts/generate_openapi.py`, not hand-typed).
 
 Everything here runs in **your own AWS account** using **your own AWS
 credentials** -- nothing in this repo has (or could have) your credentials.
@@ -73,6 +75,12 @@ are small.
 
 ## 3. Deploy everything else (phase 2 of 2)
 
+If you already ran `terraform init` once before this project added AWS
+WAF and the CloudFront-to-API-Gateway shared secret (`waf.tf`,
+`s3_frontend.tf`), run `terraform init -upgrade` once first -- it added a
+new provider (`hashicorp/random`) that a plain `terraform apply` won't
+pick up on its own. A first-time `terraform init` already covers this.
+
 ```bash
 cd cloud/infra
 terraform apply
@@ -80,14 +88,23 @@ terraform apply
 
 This creates the Lambda functions (now that their images exist), the API
 Gateway, the S3 buckets + the frontend's static files (including a
-generated `config.js` pointing at the real API URL), the CloudFront
-distribution, and the Step Functions state machine.
+generated `config.js` pointing at the API same-origin, via CloudFront --
+see below), the CloudFront distribution (now fronting both the frontend
+*and* the API, with AWS WAF attached), and the Step Functions state
+machine.
 
 ```bash
 terraform output
 ```
 
-`frontend_url` is your shareable live-demo link. **CloudFront can take 5-15
+`frontend_url` is your shareable live-demo link, and also how you reach
+the API now: `https://<frontend_url>/api/predict` etc, proxied through
+the same CloudFront distribution. The `api_url` output (the raw API
+Gateway invoke URL) is intentionally no longer callable directly -- it
+403s anything that doesn't carry the shared secret header only CloudFront
+knows, which is what lets WAF actually protect the API (HTTP APIs can't
+take a usage plan, an API key, or WAF directly -- see `cloud/infra/
+waf.tf`'s comment for the full reasoning). **CloudFront can take 5-15
 minutes to fully propagate after first creation** -- if it doesn't load
 immediately, that's why; give it a few minutes and retry.
 
@@ -126,6 +143,46 @@ it with different `rho_values`/`seeds` -- see the generator snippet in
 file. No redeploy needed -- the trial list is just the execution's input,
 not baked into any Lambda or the state machine.
 
+## 5. (Optional) Get alerted when something breaks
+
+`terraform apply` also creates an SNS topic and 5 CloudWatch alarms
+(errors, throttling, near-timeout duration, API Gateway 5xx, failed
+simulation executions -- see `docs/observability.md` for the full list
+and reasoning). Terraform can't subscribe your email to it without
+hardcoding your address into version-controlled infra, so do it yourself
+once:
+
+```bash
+aws sns subscribe --topic-arn "$(terraform output -raw alerts_topic_arn)" \
+  --protocol email --notification-endpoint you@example.com
+```
+
+Then confirm the email AWS sends you -- the subscription stays "pending
+confirmation" and silent until you click that link.
+
+## 6. (Optional) Load-test the live API
+
+`scripts/load_test.py` (repo root, not `cloud/`) sends a batch of
+concurrent `/api/predict` requests with realistic payloads (drawn live
+from `/api/meta`, so they always match whatever categories the deployed
+models actually support) and reports latency percentiles and the status
+code breakdown. Needs `pip install -r requirements-dev.txt` for
+`requests`, and a network that can actually reach your deployed URL (this
+can't be run from inside an offline dev sandbox -- see the script's own
+docstring):
+
+```bash
+python3 scripts/load_test.py --url "$(terraform output -raw frontend_url)"
+```
+
+The default concurrency (5) stays comfortably under both rate limits this
+project ships (the API Gateway stage throttle and the WAF rate rule --
+`cloud/infra/api_gateway.tf`, `cloud/infra/waf.tf`). Raising
+`--concurrency` well past that is a legitimate way to confirm those
+limits actually engage (`--help` for all options); you should start
+seeing HTTP 429s, which the script calls out explicitly rather than
+reporting as a plain failure.
+
 ## Cost
 
 Designed to stay inside AWS's free tier for occasional/demo use: Lambda
@@ -135,6 +192,16 @@ Functions (4,000 free state transitions/month), S3 (5GB free for 12
 months). The one thing that isn't free indefinitely is ECR storage past
 500MB total (the sim-worker image alone, with the bundled 198MB dataset, is
 likely to exceed that) -- a few cents/month at most for a repo this size.
+
+**AWS WAF (`waf.tf`) is the one addition here that is never free**, tier or
+no tier: roughly $5/month flat for the web ACL plus $1/month per rule (3
+rules = $3/month here) plus ~$0.60 per million requests it evaluates --
+call it ~$8-9/month minimum while the distribution exists, independent of
+how much the demo actually gets used. `terraform destroy` when you're done
+demoing (below) stops this the same as everything else; there's no way to
+keep the rest of this free-tier-friendly and still have WAF protect the
+API, since WAF is what makes that protection possible at all on an HTTP
+API (see `waf.tf`'s comment).
 
 When you're done demonstrating this and want zero ongoing cost:
 

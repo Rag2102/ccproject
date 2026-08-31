@@ -9,6 +9,8 @@ models/ and data/processed/ (see core.py's module-level load) -- these are
 small, git-tracked files, so this runs the same way in CI as it does
 locally, no fixtures or mocking required.
 """
+import json
+
 import numpy as np
 import pytest
 
@@ -119,7 +121,10 @@ def test_migration_and_failure_cost_matches_formula(size_tier, criticality_tier)
     assert result["precopy_converges"] == converges
     if converges:
         expected_time_s = memory_mb / (core.MIGRATION_BANDWIDTH_MBPS - dirty_rate_mbps)
-        assert result["migration_time_s"] == pytest.approx(expected_time_s, rel=1e-6)
+        # core.py rounds this field to 2dp before returning it (it's a
+        # user-facing API value); compare against the same rounding rather
+        # than the raw float, or this fails on every non-round input.
+        assert result["migration_time_s"] == pytest.approx(round(expected_time_s, 2), abs=0.005)
         assert result["migration_blackout_s"] == pytest.approx(core.BASE_BLACKOUT_S)
     else:
         assert result["migration_time_s"] == pytest.approx(core.STOPCOPY_FALLBACK_S)
@@ -196,3 +201,106 @@ def test_run_predict_never_leaks_internal_task_labels():
     for which_model in ("histgbm", "gqat"):
         result = core.run_predict(dict(GOLDEN_PAYLOAD, which_model=which_model))
         assert "task" not in result["model_used"].lower()
+
+
+# ---------------------------------------------------------------------------
+# Input validation (task 40) -- run_predict() must reject a malformed or
+# out-of-range request with a clean InputValidationError carrying
+# field-level messages, never let a bad body reach deep model code as a
+# raw KeyError/TypeError/ValueError (which would surface as an unhandled
+# 500 through both webapp/app.py and, via its WSGI wrapping,
+# cloud/api/lambda_function.py). Enum fields are checked against the real
+# categories (core.MODEL_GROUPS / core.CRITICALITY_MAP / core.SIZE_TIERS)
+# rather than a hand-copied list, so these tests can't silently drift out
+# of sync with the actual trained models' categories.
+# ---------------------------------------------------------------------------
+@pytest.mark.parametrize("bad_body", [None, "a string", ["a", "list"], 42, 3.14])
+def test_run_predict_rejects_non_dict_body(bad_body):
+    with pytest.raises(core.InputValidationError):
+        core.run_predict(bad_body)
+
+
+def test_run_predict_rejects_empty_body_naming_every_missing_field():
+    with pytest.raises(core.InputValidationError) as excinfo:
+        core.run_predict({})
+    joined = " ".join(excinfo.value.errors)
+    for field in ("model_grp", "age_days", "criticality_tier", "size_tier"):
+        assert field in joined
+
+
+@pytest.mark.parametrize("field,bad_value", [
+    ("model_grp", "NOT_A_REAL_DRIVE_MODEL"),
+    ("criticality_tier", "ultra"),
+    ("size_tier", "xlarge"),
+    ("which_model", "gpt4"),
+])
+def test_run_predict_rejects_unknown_enum_values(field, bad_value):
+    payload = dict(GOLDEN_PAYLOAD, **{field: bad_value})
+    with pytest.raises(core.InputValidationError) as excinfo:
+        core.run_predict(payload)
+    assert field in excinfo.value.errors[0]
+
+
+@pytest.mark.parametrize("bad_age", [
+    -1, -0.5, 999_999, float("nan"), float("inf"), float("-inf"), "not-a-number", None, [1, 2],
+])
+def test_run_predict_rejects_bad_age_days(bad_age):
+    payload = dict(GOLDEN_PAYLOAD, age_days=bad_age)
+    with pytest.raises(core.InputValidationError):
+        core.run_predict(payload)
+
+
+def test_run_predict_accepts_extra_unknown_fields():
+    # a forward-compatible frontend sending an extra field (e.g. future
+    # telemetry) shouldn't break the request -- only the fields the schema
+    # actually declares are validated.
+    payload = dict(GOLDEN_PAYLOAD, some_future_field="ignored")
+    result = core.run_predict(payload)
+    assert result["model_used"] == "Calibrated HistGBM"
+
+
+def test_run_predict_which_model_defaults_to_histgbm():
+    payload = {k: v for k, v in GOLDEN_PAYLOAD.items() if k != "which_model"}
+    result = core.run_predict(payload)
+    assert result["model_used"] == "Calibrated HistGBM"
+
+
+# ---------------------------------------------------------------------------
+# Structured logging (task 45) -- run_predict() emits one JSON log line per
+# call (predict_served on success, predict_rejected on a validation
+# failure) via Python's stdlib logging, which both deployments already
+# capture for free (CloudWatch ingests a Lambda's stdout automatically;
+# Render's log viewer shows stdout directly) -- see core.py's _log_event.
+# ---------------------------------------------------------------------------
+def test_run_predict_logs_one_structured_json_line_on_success(capsys):
+    core.run_predict(GOLDEN_PAYLOAD)
+    out = capsys.readouterr().out.strip().splitlines()
+    assert len(out) == 1, f"expected exactly one log line, got {out!r}"
+    record = json.loads(out[0])
+    assert record["event"] == "predict_served"
+    assert record["model_grp"] == GOLDEN_PAYLOAD["model_grp"]
+    assert record["which_model"] == GOLDEN_PAYLOAD["which_model"]
+    assert isinstance(record["p_fail_within_window"], float)
+    assert isinstance(record["duration_ms"], float)
+    assert record["duration_ms"] >= 0
+
+
+def test_run_predict_logs_one_structured_json_line_on_rejection(capsys):
+    with pytest.raises(core.InputValidationError):
+        core.run_predict({})
+    out = capsys.readouterr().out.strip().splitlines()
+    assert len(out) == 1, f"expected exactly one log line, got {out!r}"
+    record = json.loads(out[0])
+    assert record["event"] == "predict_rejected"
+    assert isinstance(record["errors"], list)
+    assert len(record["errors"]) > 0
+
+
+def test_run_predict_valid_request_unaffected_by_validation():
+    # validation should be transparent to a well-formed request -- an int
+    # age_days (as the golden payload uses) and the equivalent float must
+    # produce identical predictions.
+    result_int = core.run_predict(GOLDEN_PAYLOAD)
+    result_float = core.run_predict(dict(GOLDEN_PAYLOAD, age_days=900.0))
+    assert result_int["p_fail_within_window"] == result_float["p_fail_within_window"]
+    assert result_int["expected_ttf_days"] == result_float["expected_ttf_days"]

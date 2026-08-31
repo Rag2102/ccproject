@@ -51,8 +51,17 @@ def api_meta():
 
 @app.route("/api/predict", methods=["POST"])
 def predict():
-    body = request.get_json(force=True)
-    return jsonify(core.run_predict(body))
+    # silent=True: a malformed/non-JSON body returns None instead of Flask
+    # raising its own 400 with an HTML error page -- we want a JSON error
+    # body on every failure path, matching what both frontends' fetch()
+    # calls expect to parse.
+    body = request.get_json(silent=True)
+    if body is None:
+        return jsonify({"error": "request body must be valid JSON"}), 400
+    try:
+        return jsonify(core.run_predict(body))
+    except core.InputValidationError as e:
+        return jsonify({"error": "invalid input", "details": e.errors}), 400
 
 
 if __name__ == "__main__":
