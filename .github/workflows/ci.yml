@@ -1,0 +1,29 @@
+name: CI
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          # Matches the Lambda container base image (python:3.12 / Amazon
+          # Linux 2023) -- see cloud/api/Dockerfile's comment on why 3.11's
+          # older glibc couldn't install these same pinned packages.
+          python-version: "3.12"
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt -r requirements-dev.txt
+
+      - name: Unit tests (webapp/core.py -- the shared brain both deployments call into)
+        run: pytest tests/ -v
+
+      - name: Gradient check (scripts/gqat_net_numpy.py's hand-derived backward pass)
+        run: python scripts/test_gqat_numpy_gradcheck.py

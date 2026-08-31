@@ -14,6 +14,13 @@ independently of the worker image.
 Event shape: the Map state's collected output, an array of the worker
 Lambda's return dicts. See cloud/infra for how Step Functions wires the Map
 state's result directly into this function's input.
+
+A trial that failed even after Step Functions' retries (see
+state_machine.asl.json.tpl's Catch on InvokeWorker) arrives here shaped
+{"trial_failed": true, "rho_target", "seed", "error"} instead of a normal
+result -- these are set aside rather than averaged in, and counted in the
+returned n_failed_trials so a partial failure is reported honestly instead
+of either silently skewing the aggregate or crashing the whole run.
 """
 import csv
 import io
@@ -49,6 +56,9 @@ def _to_csv_bytes(rows, fieldnames):
 def handler(event, context):
     trials = event if isinstance(event, list) else event.get("trials", event)
 
+    failed_trials = [t for t in trials if isinstance(t, dict) and t.get("trial_failed")]
+    trials = [t for t in trials if t not in failed_trials]
+
     by_rho = defaultdict(list)
     for t in trials:
         by_rho[t["rho_target"]].append(t)
@@ -73,9 +83,14 @@ def handler(event, context):
 
     result = {
         "n_trials": len(trials),
+        "n_failed_trials": len(failed_trials),
         "n_rho_values": len(aggregated),
         "aggregated": aggregated,
     }
+    if failed_trials:
+        result["failed_trials"] = [
+            {"rho_target": t.get("rho_target"), "seed": t.get("seed")} for t in failed_trials
+        ]
 
     if RESULT_BUCKET:
         import boto3  # imported lazily: not needed (or available) outside a real Lambda/AWS environment

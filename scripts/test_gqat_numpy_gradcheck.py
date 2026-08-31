@@ -10,6 +10,8 @@ estimate against the analytic gradient our backward() computed. Run with
 training=False everywhere so dropout's randomness doesn't add noise to the
 comparison.
 """
+import sys
+
 import numpy as np
 from gqat_net_numpy import GQATNetNumpy
 from numpy_nn import numerical_gradient_check
@@ -55,4 +57,9 @@ for name, layer, pname in checks:
     print(f"{name:45s} {err:12.6f}{flag}")
 
 print(f"\nWorst max-relative-error across all checked parameters: {worst:.6f}")
-print("PASS (gradients look correct)" if worst < 3e-2 else "FAIL (investigate the flagged layer(s))")
+ok = worst < 3e-2
+print("PASS (gradients look correct)" if ok else "FAIL (investigate the flagged layer(s))")
+# Previously this always exited 0 regardless of the PASS/FAIL text above --
+# harmless when a human is reading the output, but it means a CI step
+# running this script could never actually catch a real regression here.
+sys.exit(0 if ok else 1)

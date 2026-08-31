@@ -1,3 +1,31 @@
+# Explicit log groups for all three Lambdas, with a real retention period.
+# Without these, CloudWatch auto-creates a log group on first invocation
+# with retention set to "Never expire" -- every request this project has
+# already made (the curl tests, the 55-trial Step Functions run) has been
+# quietly accumulating logs that were never going to age out on their own.
+#
+# NOTE -- these functions have already been invoked, so AWS already
+# auto-created their log groups. Terraform will refuse to *create* a log
+# group that already exists, so import each one once before the next
+# apply:
+#   terraform import aws_cloudwatch_log_group.api /aws/lambda/${var.project_name}-api
+#   terraform import aws_cloudwatch_log_group.sim_worker /aws/lambda/${var.project_name}-sim-worker
+#   terraform import aws_cloudwatch_log_group.sim_aggregator /aws/lambda/${var.project_name}-sim-aggregator
+resource "aws_cloudwatch_log_group" "api" {
+  name              = "/aws/lambda/${var.project_name}-api"
+  retention_in_days = 14
+}
+
+resource "aws_cloudwatch_log_group" "sim_worker" {
+  name              = "/aws/lambda/${var.project_name}-sim-worker"
+  retention_in_days = 14
+}
+
+resource "aws_cloudwatch_log_group" "sim_aggregator" {
+  name              = "/aws/lambda/${var.project_name}-sim-aggregator"
+  retention_in_days = 14
+}
+
 # All three Lambdas are container images (package_type = "Image") rather
 # than zip uploads -- see cloud/README.md for why: pandas/scikit-learn/scipy
 # are notoriously painful to package as Lambda zips (manylinux wheel

@@ -8,8 +8,13 @@ resource "aws_apigatewayv2_api" "api" {
   protocol_type = "HTTP"
 
   cors_configuration {
-    allow_origins = ["*"] # the frontend's CloudFront domain isn't known until after this resource exists;
-                          # tighten to that exact domain once deployed if you want to lock this down further
+    # Scoped to the actual CloudFront frontend rather than "*" -- this is a
+    # live reference (not a hardcoded domain), so it can never drift: if the
+    # distribution is ever destroyed and recreated, its domain changes and
+    # this updates automatically on the next apply. Note this does make the
+    # API's CORS config depend on the CloudFront distribution existing --
+    # see s3_frontend.tf for that resource.
+    allow_origins = ["https://${aws_cloudfront_distribution.frontend.domain_name}"]
     allow_methods = ["GET", "POST", "OPTIONS"]
     allow_headers = ["content-type"]
   }
@@ -32,6 +37,16 @@ resource "aws_apigatewayv2_stage" "default" {
   api_id      = aws_apigatewayv2_api.api.id
   name        = "$default"
   auto_deploy = true
+
+  # Nothing stopped a runaway client loop (or plain abuse) from hammering
+  # this endpoint and running up the Lambda bill -- there was no ceiling
+  # of any kind. These numbers are generous for a demo (comfortably above
+  # what a few people clicking around the live calculator would ever hit)
+  # but stop the unbounded case. Tune upward if a real audience needs it.
+  default_route_settings {
+    throttling_burst_limit = 20
+    throttling_rate_limit  = 10
+  }
 }
 
 resource "aws_lambda_permission" "api_gateway_invoke" {

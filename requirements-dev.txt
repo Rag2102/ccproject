@@ -1,0 +1,4 @@
+# Dev/CI-only additions on top of requirements.txt -- never needed at
+# runtime by app.py or lambda_function.py, so kept out of the pins those
+# rely on (see requirements.txt's own comment on why those are exact).
+pytest==8.3.4

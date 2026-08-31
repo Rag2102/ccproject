@@ -17,6 +17,15 @@ cloud/infra/*.tfstate.*
 cloud/infra/*.tfplan
 cloud/infra/crash.log
 
+# The remote-state bootstrap (cloud/infra/bootstrap/) is its own tiny root
+# module with its own local state -- same reasoning as above.
+cloud/infra/bootstrap/.terraform/
+cloud/infra/bootstrap/.terraform.lock.hcl
+cloud/infra/bootstrap/*.tfstate
+cloud/infra/bootstrap/*.tfstate.*
+cloud/infra/bootstrap/*.tfplan
+cloud/infra/bootstrap/crash.log
+
 # Generated at `terraform apply` time from config.js.tpl -- never hand-edit
 # or commit a real one (see cloud/frontend/config.js.tpl).
 cloud/frontend/config.js
