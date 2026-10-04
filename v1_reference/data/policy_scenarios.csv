@@ -1,0 +1,6 @@
+name,p_fail,ttf_days,failure_cost,migration_cost,cost_sensitive_migrate,expected_cost_of_inaction,urgency_weight,threshold_migrate,policies_agree
+"Obvious migrate: high risk, imminent, critical, cheap to move",0.05,3,10.0,0.05,True,2.5,5.0,True,True
+"Obvious skip: negligible risk, distant, batch workload",0.0002,1500,3.0,0.03,False,0.0006,1.0,False,True
+TTF-awareness case: modest p_fail but failure is imminent,0.01,2,6.0,0.2,True,0.3,5.0,True,True
+"Cost-awareness case: p_fail just above a typical threshold, but VM is huge and low-criticality, failure is distant",0.006,200,3.0,1.5,False,0.018,1.0,True,False
+"Criticality-awareness case: same p_fail as above, but high-criticality + cheap to move",0.006,200,10.0,0.05,True,0.06,1.0,True,True

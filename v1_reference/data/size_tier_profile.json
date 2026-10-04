@@ -1,0 +1,17 @@
+{
+  "large": {
+    "memory_gb": 112.0,
+    "vcores": 16.0,
+    "avg_cpu": 0.06
+  },
+  "medium": {
+    "memory_gb": 14.0,
+    "vcores": 8.0,
+    "avg_cpu": 6.92
+  },
+  "small": {
+    "memory_gb": 1.75,
+    "vcores": 1.0,
+    "avg_cpu": 12.04
+  }
+}
