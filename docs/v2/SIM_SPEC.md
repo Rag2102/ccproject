@@ -150,7 +150,7 @@ At each arrival, choose among UP hosts with capacity:
 
 ## 13. Architecture and performance target
 
-- Package `vmmbench/sim/`: `state.py` (structure of arrays), `events.py` (heap), `failures.py`, `placement.py`, `migration.py`, `predictors.py`, `policies/`, `run.py`, `metrics.py`. The policies are pure functions of (state view, scores, budget, rng).
+- Package `vmsim/` (plan Part I section 6): `config.py`, `rng.py`, `entities.py` (structure of arrays), `placement.py`, `failure.py`, `predictor.py`, `migration.py`, `accounting.py`, `engine.py` (event heap), `policies/`. The policies are pure functions of (state view, scores, budget, rng).
 - Daily scoring is vectorised over hosts. The per-VM loop runs only inside a policy's plan, over hosts with p above a floor, and inside the event loop.
 - **Performance target, checked in Week 13:** one (policy, seed) run of 5,000 hosts × 365 days in **≤ 10 s on one core** of this Mac. The main matrix is about 16,000 such runs (n ≈ 30 seeds × about 15 regime cells × 4 budgets × 9 policies), about 45 core-hours, or about 6 hours on 8 cores. If the target is missed, the cut order is R3's: shrink hosts before cutting seeds.
 
