@@ -202,7 +202,8 @@ def run(
     cap = np.full(n_hosts, float(cfg.host_mem_gb))
     budget = bfrac * cap.sum()
     mc = cfg.migration
-    blend = float(prep.world.place_blend)
+    ab = cfg.placement.arrival_blend
+    blend = float(prep.world.place_blend) if ab is None else float(ab)
 
     state = np.full(n_hosts, UP, dtype=np.int8)
     used = np.zeros(n_hosts)
@@ -517,6 +518,9 @@ def run(
         "outcomes_sha256": h.hexdigest(),
         "wall_s": round(time.perf_counter() - t_wall, 3),
         "rho_tier_risk_mean": _nanmean([r["rho_tier_risk"] for r in ledger.daily]),
+        "rho_tier_risk_horizon": _nanmean(
+            [r["rho_tier_risk"] for r in ledger.daily if r["day"] >= W]
+        ),
     }
     if out_dir is not None:
         ledger.write(Path(out_dir), meta, summary, mg)

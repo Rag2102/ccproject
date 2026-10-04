@@ -46,6 +46,9 @@ class FailureConfig:
 class PlacementConfig:
     regime: str = "random"  # random | rho | trace | adversarial
     rho: float = 0.0  # target tie-corrected Spearman for regime "rho"
+    # blend weight for arrivals during the run (None: the world's initial blend). Calibrated per
+    # regime so the VMs present, not only the initial ones, hit the target (scenarios.py)
+    arrival_blend: float | None = None
     init_fill: float = 0.70
     capacity: str = "gb"  # "gb" (memory) or "slots" (v1: equal VM count per host)
 

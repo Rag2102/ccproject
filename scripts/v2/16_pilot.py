@@ -46,6 +46,7 @@ def main() -> None:
     ap.add_argument("--cells", nargs="+", default=["A1", "A3"])
     ap.add_argument("--budgets", nargs="+", type=float, default=[0.02])
     ap.add_argument("--dev-seeds", type=int, default=len(DEV_SEEDS))
+    ap.add_argument("--out", default="pilot_w14", help="output name in results/v2")
     args = ap.parse_args()
 
     base = SimConfig(n_hosts=args.hosts, horizon_days=args.horizon, name="pilot")
@@ -82,7 +83,7 @@ def main() -> None:
 
     runs = pd.DataFrame(rows)
     OUT.mkdir(parents=True, exist_ok=True)
-    runs.to_csv(OUT / "pilot_w14_runs.csv", index=False)
+    runs.to_csv(OUT / f"{args.out}_runs.csv", index=False)
     summary = {
         "hosts": args.hosts,
         "horizon": args.horizon,
@@ -105,7 +106,11 @@ def main() -> None:
             "benefit_captured_mean": {p: float(v.mean()) for p, v in captured.items()},
             "budget_utilisation": g.groupby("policy")["budget_utilisation"].mean().to_dict(),
             "wall_s_mean": g.groupby("policy")["wall_s"].mean().round(2).to_dict(),
-            "rho_tier_risk": float(g["rho_tier_risk_mean"].mean()),
+            # per policy: migrations move VMs to safer hosts and lower the correlation
+            "rho_tier_risk_horizon": g.groupby("policy")["rho_tier_risk_horizon"]
+            .mean()
+            .round(3)
+            .to_dict(),
             "p7_le_all": bool(all((c["P7"] <= c[p] + 1e-9).all() for p in c.columns)),
             "p8_ge_p2_mean": bool(c["P8"].mean() >= c["P2"].mean()),
         }
@@ -113,8 +118,8 @@ def main() -> None:
             f"{cell} @ {b:.1%}: SD(Delta P3 vs P2) = {np.std(delta['P3'], ddof=1):.4f}; "
             f"vs P2c = {np.std(delta_c['P3'], ddof=1):.4f}"
         )
-    (OUT / "pilot_w14.json").write_text(json.dumps(summary, indent=2, default=float))
-    log("wrote results/v2/pilot_w14.json")
+    (OUT / f"{args.out}.json").write_text(json.dumps(summary, indent=2, default=float))
+    log(f"wrote results/v2/{args.out}.json")
 
 
 if __name__ == "__main__":

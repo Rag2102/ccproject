@@ -72,4 +72,19 @@ def test_a3_world_hits_its_spearman_target():
 
 def test_unknown_regimes_are_refused():
     with pytest.raises(ValueError):
-        scenarios.regime(SimConfig(), "B1")
+        scenarios.regime(SimConfig(), "B2")
+
+
+def test_calibrated_a3_present_population_hits_target_on_a_fresh_seed():
+    """The arrival blend is calibrated on dev seed 101; a different seed lands near the target."""
+    cfg = scenarios.regime(SimConfig(n_hosts=1_000, horizon_days=90, name="t"), "A3")
+    assert cfg.placement.arrival_blend is not None
+    s = engine.run(engine.prepare(worlds.generate(cfg, 7), cfg), R.Never(), budget_frac=0.0)
+    assert abs(s["rho_tier_risk_horizon"] - cfg.placement.rho) < 0.04
+
+
+def test_b1_cells_follow_the_week8_measurement():
+    base = SimConfig(n_hosts=100, horizon_days=30)
+    assert scenarios.regime(base, "B1-low").placement.regime == "random"  # negative: random
+    hi = scenarios.regime(base, "B1-high").placement
+    assert hi.regime == "rho" and 0 < hi.rho < 0.06
