@@ -54,6 +54,8 @@ The Gini coefficient of the high-tier share across machines is 0.19-0.20 (a), 0.
 
 Platform rates of long removals range from 0.0001 to 0.016 per machine-day, a factor of about 100 between platforms. So the proxy does separate platforms; the null result is not a proxy with no spread.
 
+**But the proxy rests on few events.** Before the last window, each cell has about 10,000 removals (10,190-11,372), of which only 79-166 are long: 111 (a), 79 (b) and 166 (h), over about 210,000 machine-days per cell. The platform ranking is therefore estimated from about 100 events per cell. The bootstrap over machines carries this uncertainty, and the all-removals variant (about 10,000 events) agrees, but a reviewer will ask; it goes in the paper's threats.
+
 ## 5. What C0 means for the project (PROTOCOL section 7)
 
 - **Paper shape: measurement + safe policy + benchmark.** Real placement, as measured here, sits far below the correlation at which ranking by cost density gains over ranking by risk. The measurement is itself a headline result: critical work in Borg is neither protected onto low-risk platforms nor concentrated on risky ones. Rather than a "BAM pays off" claim, the paper's method claim is the safe guard P6, which must not lose to the tuned threshold, including on a pure-noise control.
@@ -66,7 +68,7 @@ Platform rates of long removals range from 0.0001 to 0.016 per machine-day, a fa
 | Threat | Status |
 | --- | --- |
 | Removals are not failures | Primary proxy uses long removals only; the all-removals variant agrees (magnitudes ≤ 0.053) |
-| Platform mix confounds age | **Not done:** the within-platform (stratified) τ-b. The platform proxy is constant within a platform, so it needs the per-machine proxy. Pooled per-machine values are ≤ 0.043 in magnitude; the stratified version is an open item |
+| Platform mix confounds age | Within-platform τ-b with the per-machine proxy, combined over platforms by placements (`scripts/v2/13b_trace_strata.py`, `results/v2/trace_strata.json`): a 0.011 [0.009, 0.013], b −0.003 [−0.007, 0.002], h −0.005 [−0.010, −0.001]. Negligible inside platforms too, so platform mix does not hide a correlation |
 | Scheduler policy | This is what we measure: where Borg runs critical work. It may not carry over to a scheduler without Borg's eviction protection |
 | Short trace (31 days) | The platform proxy is primary; the per-machine proxy is shrunk to its platform |
 | Dedicated machines | Excluded. Cell h has 5.4 million dedicated schedules hidden from the measurement; if those carry high-tier work on special hardware, cell h understates any correlation. To mention in the paper |
@@ -80,9 +82,8 @@ Platform rates of long removals range from 0.0001 to 0.016 per machine-day, a fa
 
 ## 8. Open before sign-off
 
-1. **Within-platform τ-b** with the per-machine proxy (the threats table promises it). It is a short addition to `13_trace_rho.py`; it cannot move any upper bound near 0.251 unless the within-platform association is large and opposite to the pooled one.
-2. **Long-removal counts per cell,** for the paper's data section (not stored in the run's JSON).
-3. **The second placement source** (Alibaba 2018 or the tier mix) is needed before claim 1 is called falsified overall, not before G1 is signed off.
-4. **Your sign-off.** After it, the class is final: record it in `LOG.md` and tag (suggested: `g1-c0`).
+1. Done 4 Oct: within-platform τ-b and removal counts (sections 4 and 6).
+2. **The second placement source** (Alibaba 2018 or the tier mix) is needed before claim 1 is called falsified overall, not before G1 is signed off.
+3. **Your sign-off.** After it, the class is final: record it in `LOG.md` and tag (suggested: `g1-c0`).
 
 Signed off: ______  Date: ______

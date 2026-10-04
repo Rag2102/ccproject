@@ -1,0 +1,50 @@
+{
+  "a": {
+    "tau_b_within_platform": 0.0108,
+    "ci95": [
+      0.0087,
+      0.0127
+    ],
+    "platforms_used": {
+      "2": 5,
+      "3": 5,
+      "4": 5
+    },
+    "machines": 9949,
+    "removals_before_last_window": 10796,
+    "long_removals_before_last_window": 111,
+    "machine_days_before_last_window": 206070.6
+  },
+  "b": {
+    "tau_b_within_platform": -0.0026,
+    "ci95": [
+      -0.0065,
+      0.0019
+    ],
+    "platforms_used": {
+      "2": 5,
+      "3": 5,
+      "4": 5
+    },
+    "machines": 10023,
+    "removals_before_last_window": 10190,
+    "long_removals_before_last_window": 79,
+    "machine_days_before_last_window": 209177.1
+  },
+  "h": {
+    "tau_b_within_platform": -0.0052,
+    "ci95": [
+      -0.0099,
+      -0.0011
+    ],
+    "platforms_used": {
+      "2": 5,
+      "3": 5,
+      "4": 5
+    },
+    "machines": 11511,
+    "removals_before_last_window": 11372,
+    "long_removals_before_last_window": 166,
+    "machine_days_before_last_window": 228786.9
+  }
+}
