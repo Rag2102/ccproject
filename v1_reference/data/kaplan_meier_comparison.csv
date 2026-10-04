@@ -1,0 +1,4 @@
+group,n_drives,n_failures,max_abs_survival_diff,mean_abs_survival_diff
+Fleet-wide (all drives),122618,6912,0.051,0.022
+ST3000DM001 (flagged bad batch),4707,1708,0.0482,0.0153
+ST12000NM0007 (most reliable),7242,17,0.0012,0.0007
