@@ -51,3 +51,18 @@ About 12 h.
 ## Week 9 (30 Nov-6 Dec): citable v1 report
 
 - [x] Decision: **skipped** (4 Oct). No application needs it before the v2 paper; the hours move to Week 10. Logged in `LOG.md` with the caveat that a revived report needs a correction for the -3.1% result.
+
+## Week 10 (7-13 Dec): simulator v2 design spec (started 4 Oct, using Week 9's hours)
+
+- [x] `docs/v2/SIM_SPEC.md` v0:
+  - entities and fields;
+  - time model and event tie order;
+  - six event types plus HOST_REPAIR, with state transitions;
+  - accounting with units, charging realised costs only, so v1's asymmetry cannot recur;
+  - migration model with v1's closed form for the regression;
+  - failure process and the common-random-numbers contract;
+  - placement per regime, predictor and policy interfaces;
+  - parameter table with sources;
+  - 9 invariants, architecture, performance target (≤ 10 s per policy-seed at 5,000 hosts × 365 days), G2 validation.
+- [~] Three open items with defaults (VM lifetime in BAM, initial fill, repair model): yours to confirm
+- [ ] Reader test: someone reads it for 30 minutes and lists their questions
