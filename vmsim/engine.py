@@ -46,7 +46,7 @@ from vmsim.accounting import (
 from vmsim.config import SimConfig, from_dict
 from vmsim.entities import MIN_MIGRATE_AGE_DAYS, azure_table, split, survival
 from vmsim.policies.base import Feedback, Observation, Policy, Truth
-from vmsim.predictor import Miscalibrated, Noisy, RenewalOracle
+from vmsim.predictor import Drifting, Miscalibrated, Noisy, RenewalOracle, Shuffled
 from vmsim.rng import Streams
 from vmsim.worlds import World, n_days
 
@@ -175,6 +175,12 @@ def make_predictor(prep: Prepared, kind: str = "oracle", sigma: float = 0.0, gam
         return Noisy(o, sigma, prep.streams)
     if kind == "miscal":
         return Miscalibrated(o, gamma)
+    if kind == "drift":  # regime D: gamma moves linearly from 1 to `gamma` over the 2nd half
+        c = prep.cfg
+        mid = c.warmup_days + c.horizon_days // 2
+        return Drifting(o, 1.0, gamma, mid, c.warmup_days + c.horizon_days)
+    if kind == "noise":  # pure-noise control: scores shuffled across hosts every day
+        return Shuffled(o, prep.streams)
     raise ValueError(f"predictor {kind!r} not available yet")
 
 
@@ -205,6 +211,7 @@ def run(
     policy.reset()
     ab = cfg.placement.arrival_blend
     blend = float(prep.world.place_blend) if ab is None else float(ab)
+    switch, blend_after = cfg.placement.switch_day, cfg.placement.arrival_blend_after
 
     state = np.full(n_hosts, UP, dtype=np.int8)
     used = np.zeros(n_hosts)
@@ -310,7 +317,7 @@ def run(
                 cap - used,
                 state == UP,
                 p_h,
-                blend,
+                blend if switch is None or d < switch else blend_after,
                 rng_arr,
                 V["u_place"][ids],
             )

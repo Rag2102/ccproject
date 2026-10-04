@@ -49,6 +49,9 @@ class PlacementConfig:
     # blend weight for arrivals during the run (None: the world's initial blend). Calibrated per
     # regime so the VMs present, not only the initial ones, hit the target (scenarios.py)
     arrival_blend: float | None = None
+    # regime D: from switch_day on, arrivals use arrival_blend_after (None: no switch)
+    arrival_blend_after: float | None = None
+    switch_day: int | None = None
     init_fill: float = 0.70
     capacity: str = "gb"  # "gb" (memory) or "slots" (v1: equal VM count per host)
 

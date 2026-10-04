@@ -4,7 +4,9 @@ A1-A7: latent Gaussian copula, rho_L in {0, .15, .3, .45, .6, .75, .9}, converte
        Spearman target of placement.rho_controlled under the simulator's margins (copula.py);
 B1:    rank copula at the Week 8 measurement (G1_decision.md): rho_L at the median over cells
        and at the lowest lower bound / highest upper bound (B1-low, B1, B1-high);
-C:     adversarial. B2, D and E come with their weeks.
+D:     non-stationary: rho_L 0.1 until mid-run, then 0.6, with calibration drift (gamma 1 to
+       0.7 over the second half: engine.make_predictor(prep, "drift", gamma=0.7));
+C:     adversarial. B2 and E come with their weeks.
 
 Daily batches of arrivals placed with the world's initial blend overshoot the target (A3: 0.475
 for the VMs present against 0.256), so each rho cell has its own arrival blend, calibrated on
@@ -27,10 +29,13 @@ A_LATENT = {f"A{i + 1}": r for i, r in enumerate((0.0, 0.15, 0.3, 0.45, 0.6, 0.7
 # Week 8, M1 and the platform proxy, latent axis (results/v2/trace_rho_table.csv): cells a, b, h
 # point -0.015 / 0.007 / 0.027 (median 0.007); lowest lower bound -0.019, highest upper 0.056
 B1_LATENT = {"B1-low": -0.019, "B1": 0.007, "B1-high": 0.056}
+D_LATENT = (0.1, 0.6)  # regime D: rho_L before and after mid-run (PROTOCOL section 3)
 CALIBRATION = Path(__file__).resolve().parents[1] / "results" / "v2" / "regime_calibration.json"
 
 
 def latent_of(cell: str) -> float | None:
+    if cell == "D0":  # calibration entry for regime D's first half
+        return D_LATENT[0]
     return A_LATENT.get(cell, B1_LATENT.get(cell))
 
 
@@ -54,6 +59,18 @@ def regime(base: SimConfig, cell: str, calibrated: bool = True) -> SimConfig:
         else:
             ab = _calibrated(cell, base.n_hosts) if calibrated else None
             p = replace(pc, regime="rho", rho=rho, arrival_blend=ab)
+    elif cell == "D":
+        # rho_L 0.1 until mid-run, then 0.6 (= A5); pair it with make_predictor(.., "drift")
+        rho0 = round(latent_to_spearman(D_LATENT[0]), 4)
+        mid = base.warmup_days + base.horizon_days // 2
+        p = replace(
+            pc,
+            regime="rho",
+            rho=rho0,
+            arrival_blend=_calibrated("D0", base.n_hosts) if calibrated else None,
+            arrival_blend_after=_calibrated("A5", base.n_hosts) if calibrated else None,
+            switch_day=mid,
+        )
     elif cell == "C":
         p = replace(pc, regime="adversarial", arrival_blend=None)
     else:

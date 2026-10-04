@@ -21,7 +21,7 @@ sys.path.insert(0, str(ROOT))
 from vmsim import scenarios  # noqa: E402
 from vmsim.config import SimConfig  # noqa: E402
 
-CELLS = ["A2", "A3", "A4", "A5", "A6", "A7", "B1", "B1-high"]
+CELLS = ["A2", "A3", "A4", "A5", "A6", "A7", "B1", "B1-high", "D0"]
 
 
 def main() -> None:

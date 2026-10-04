@@ -122,6 +122,34 @@ class Miscalibrated:
         return Scores(p_h=q[:, 0], e_ttf=s.e_ttf, p_interval=q)
 
 
+class Drifting:
+    """Calibration drift (regime D): Miscalibrated with gamma moving linearly from g0 at day d0
+    to g1 at day d1 (constant outside)."""
+
+    def __init__(self, oracle, g0: float, g1: float, d0: int, d1: int):
+        self.o, self.g0, self.g1, self.d0, self.d1 = oracle, g0, g1, d0, d1
+
+    def gamma(self, day: int) -> float:
+        f = min(max((day - self.d0) / max(self.d1 - self.d0, 1), 0.0), 1.0)
+        return self.g0 + f * (self.g1 - self.g0)
+
+    def score(self, day: int, life_start=None) -> Scores:
+        return Miscalibrated(self.o, self.gamma(day)).score(day, life_start)
+
+
+class Shuffled:
+    """Pure-noise control: each day the oracle's scores are permuted across hosts. The marginal
+    distribution is right, the information is gone (P6 must never switch on it)."""
+
+    def __init__(self, oracle, streams):
+        self.o, self.streams = oracle, streams
+
+    def score(self, day: int, life_start=None) -> Scores:
+        s = self.o.score(day, life_start)
+        perm = self.streams.gen("predictor", 7, day).permutation(len(s.p_h))
+        return Scores(p_h=s.p_h[perm], e_ttf=s.e_ttf[perm], p_interval=s.p_interval[perm])
+
+
 class TrainedModel:
     """The calibrated Week 7 model on replayed drive histories: plugged in after Week 7."""
 
