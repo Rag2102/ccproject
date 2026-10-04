@@ -145,7 +145,7 @@ def data_lines(path: Path) -> int:
     """Data lines after the header; a last line without a terminator counts, blank end lines do not.
 
     Lines end in LF (or CRLF), except a few files saved with old Mac CR-only endings
-    (2018-02-25.csv is one): those are counted by CR.
+    (2018-02-25.csv; 2019-06-17.csv has the same date format with normal line endings): those are counted by CR.
     """
     lf = cr = 0
     with path.open("rb") as f:

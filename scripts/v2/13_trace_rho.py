@@ -132,12 +132,23 @@ TIER5 = """CASE WHEN priority <= 99 THEN 1 WHEN priority <= 115 THEN 2 WHEN prio
                 WHEN priority <= 359 THEN 4 ELSE 5 END"""
 
 
+def _narrow(con: duckdb.DuckDBPyConnection, shards: str, tmp: Path) -> None:
+    con.execute(
+        f"""COPY (SELECT time, type, collection_id, instance_index, machine_id, priority,
+                         scheduling_class, hash(collection_id, instance_index) % 16 AS b
+                  FROM {shards} WHERE collection_type = 0 AND type BETWEEN 3 AND 8)
+            TO '{tmp}' (FORMAT PARQUET, PARTITION_BY (b))"""
+    )
+    (tmp / "DONE").write_text("")
+
+
 def placements(cell: str, raw: Path, out: Path) -> dict:
     """Aggregate placements per (window, machine, tier5, scheduling class)."""
     tmp = out / "_narrow"
-    shutil.rmtree(tmp, ignore_errors=True)
     con = duckdb.connect()
-    con.execute(f"SET temp_directory='{out / '_duckdb'}'; SET memory_limit='8GB'")
+    # 4 GB and 4 threads: this Mac has 17 GB, and other DuckDB jobs may run at the same time
+    # (the first run, at 8 GB next to two other jobs, was swapped out and stalled)
+    con.execute(f"SET temp_directory='{out / '_duckdb'}'; SET memory_limit='4GB'; SET threads=4")
     con.execute("SET preserve_insertion_order=false")
     shards = f"read_parquet('{raw}/instance_events-*.parquet')"
     stats = dict(
@@ -151,12 +162,10 @@ def placements(cell: str, raw: Path, out: Path) -> dict:
         )
     )
     # Narrow copy of task events, split into 16 buckets by task so each sort fits in memory.
-    con.execute(
-        f"""COPY (SELECT time, type, collection_id, instance_index, machine_id, priority,
-                         scheduling_class, hash(collection_id, instance_index) % 16 AS b
-                  FROM {shards} WHERE collection_type = 0 AND type BETWEEN 3 AND 8)
-            TO '{tmp}' (FORMAT PARQUET, PARTITION_BY (b))"""
-    )
+    # Reused if a previous run finished it (marker file).
+    if not (tmp / "DONE").exists():
+        shutil.rmtree(tmp, ignore_errors=True)
+        _narrow(con, shards, tmp)
     parts = []
     for b in range(16):
         src = f"read_parquet('{tmp}/b={b}/*.parquet')"
@@ -184,6 +193,7 @@ def placements(cell: str, raw: Path, out: Path) -> dict:
                     FROM s WHERE type = 3 AND machine_id IS NOT NULL AND machine_id <> -1)
                 {" UNION ALL ".join(overlaps)}"""
         parts.append(con.execute(q).df())
+        log(f"cell {cell}: bucket {b + 1}/16")
         ded = con.execute(
             f"SELECT count(*) FROM {src} WHERE type = 3 AND machine_id = -1"
         ).fetchone()
@@ -198,11 +208,17 @@ def placements(cell: str, raw: Path, out: Path) -> dict:
     return stats
 
 
-def stage1(cell: str, keep_raw: bool) -> None:
+def stage1(cell: str, keep_raw: bool, download_only: bool = False) -> None:
     out = GOOGLE / f"cell_{cell}"
     raw = out / "raw"
     t0 = time.time()
+    if (out / "stage1.json").exists():
+        log(f"cell {cell}: already aggregated")
+        return
     items = download(cell, raw)
+    if download_only:
+        log(f"cell {cell}: downloaded in {time.time() - t0:.0f}s (download only)")
+        return
     log(f"cell {cell}: downloaded in {time.time() - t0:.0f}s; aggregating")
     con = duckdb.connect()
     for t in ("machine_events", "machine_attributes"):
@@ -631,9 +647,10 @@ def main() -> None:
     g.add_argument("--cell", choices=CELLS)
     g.add_argument("--analyse", action="store_true")
     ap.add_argument("--keep-raw", action="store_true")
+    ap.add_argument("--download-only", action="store_true")
     args = ap.parse_args()
     if args.cell:
-        stage1(args.cell, args.keep_raw)
+        stage1(args.cell, args.keep_raw, args.download_only)
     else:
         analyse()
 

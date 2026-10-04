@@ -1,0 +1,77 @@
+% Problem formulation (draft, Week 11; written 4 Oct 2026).
+% Notation follows docs/v2/SIM_SPEC.md and PROTOCOL.md; numbers will come from numbers.tex.
+
+\section{Problem formulation}
+\label{sec:problem}
+
+A cluster of hosts runs virtual machines (VMs). A host fails when any of its components fails
+(drives, or other parts), and every VM on a host that fails is interrupted. Once a day an
+operator may live-migrate some VMs to other hosts~\cite{clark2005live}; a migration consumes
+network and host resources and causes a short blackout, so migrations are limited by a daily
+budget. The question is which VMs to move.
+
+\begin{table}[t]
+  \centering
+  \small
+  \begin{tabular}{@{}ll@{}}
+    \toprule
+    Symbol & Meaning \\
+    \midrule
+    $j$, $i$ & host; VM (on host $j(i)$) \\
+    $H$ & risk horizon in days (30 unless stated) \\
+    $p_j$ & probability that host $j$ fails within $H$ days, given it is up now \\
+    $c_i$ & cost if VM $i$ is interrupted: tier weight $\times$ recovery downtime, weighted by the
+            probability that $i$ is still running at the failure \\
+    $e_i$ & probability that $i$'s migration completes before its host fails (depends on $i$'s
+            position in the host's migration queue) \\
+    $m_i$ & cost of migrating $i$ (blackout and resource time, in the same units as $c_i$) \\
+    $w_i$ & resource $i$'s migration consumes from the budget (memory, GB) \\
+    $B$ & daily budget, in GB migrated per cluster \\
+    $x_i$ & decision: migrate $i$ today ($x_i \in \{0,1\}$) \\
+    \bottomrule
+  \end{tabular}
+  \caption{Notation.}
+  \label{tab:notation}
+\end{table}
+
+\paragraph{Decision problem.}
+Migrating VM $i$ changes the expected cost by the benefit
+\begin{equation}
+  b_i = p_{j(i)}\, c_i\, e_i - m_i ,
+  \label{eq:benefit}
+\end{equation}
+the expected interruption cost avoided minus the cost of moving. Each day the operator solves
+\begin{equation}
+  \max_{x}\ \sum_i b_i x_i
+  \quad \text{subject to} \quad \sum_i w_i x_i \le B,\quad x_i \in \{0,1\}.
+  \label{eq:knapsack}
+\end{equation}
+This is a 0--1 knapsack. Its fractional relaxation is solved exactly by ranking VMs by the
+density $b_i / w_i$ and filling the budget while $b_i > 0$; the integral problem differs from it
+by at most one item. Because $e_i$ depends on the position of $i$ in its host's queue, the plan
+is built greedily with $e$ recomputed after each pick. We call this rule \emph{budget-aware
+migration} (BAM). Cost-sensitive decision rules of this form are classical~\cite{elkan2001foundations};
+the questions this paper asks are when ranking by density beats the operational default of
+ranking by $p_j$ alone, and by how much.
+
+\paragraph{Baseline.}
+The threshold policy migrates VMs on hosts with $p_j \ge \tau$. At an equal budget it is the
+special case of~\eqref{eq:knapsack} that ranks by $p_j$ and ignores $c$, $m$, $e$ and $w$. We
+tune $\tau$ and the order in which a host's VMs are moved on held-out seeds, and give it exactly
+the same budget in GB as every other policy.
+
+\paragraph{Objective and accounting.}
+Policies are compared by the cost that actually occurs in simulation: the interruption cost of
+every VM that is on a host when it fails, plus the cost of every migration. No migration is
+credited with an averted failure; an interruption that does not happen simply does not appear.
+The horizon $H$ of the probability a policy uses is the horizon over which its consequences are
+observed. Our earlier course prototype credited migrations with failures months after a 30-day
+decision; that accounting, not the decision rule, explained most of its apparent loss to the
+threshold at zero correlation (Section~\ref{sec:v1}).
+
+\paragraph{When can density ranking help?}
+If $c_i e_i / w_i$ were the same for every VM, both rules would pick the same VMs. Density
+ranking can only gain when this ratio varies across VMs, and gains most when the VMs with a
+high ratio sit on the riskiest hosts. We therefore describe a cluster by the correlation between
+VM criticality and host risk, $\rho$, and by the spread of $\log(c e / w)$, and measure where real
+placement lies on that axis (Section~\ref{sec:rho}).

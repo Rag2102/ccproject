@@ -162,6 +162,11 @@ At each arrival, choose among UP hosts with capacity:
 3. **v1 regression:** v1 settings (static VMs, no departures, v1 migration formulas, random placement, host = one drive, v1's per-host decision) reproduce 442,701 and 456,533 within 1%.
 4. **Invariants and determinism:** section 12.
 5. **Shape check:** simulated host inter-failure times compared with LANL node logs (shape only).
+   - **First record** (4 Oct, `scripts/v2/14_shape_check.py`, `results/v2/shape_check.json`; 2,000 hosts, seeds 1-5, first lives only, v1 hazard source):
+     - cluster-wide gaps between failures fit a Weibull shape of 0.99-1.03 (coefficient of variation 0.96-1.06), close to exponential, as expected for many independent hosts pooled together;
+     - time to a host's first failure has shape 1.5-1.7 (rising hazard, from v1's age curves);
+     - 0.09, 0.14 and 0.23 failures per host-year at 0×, 1× and 3× non-disk hazard.
+   - **Still to do:** the comparison with node logs needs per-node times between failures, so repaired hosts must fail again. That arrives with the Week 13 engine.
 6. **Run time:** section 13.
 
 ## 15. Open items

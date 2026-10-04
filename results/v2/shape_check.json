@@ -1,0 +1,23 @@
+{
+  "non_disk_0x": {
+    "failures_per_host_year": 0.09240506329113925,
+    "gap_weibull_shape": 0.986,
+    "gap_cv": 1.056,
+    "first_failure_weibull_shape": 1.684,
+    "n_failures": 1000
+  },
+  "non_disk_1x": {
+    "failures_per_host_year": 0.13574303797468357,
+    "gap_weibull_shape": 1.03,
+    "gap_cv": 0.958,
+    "first_failure_weibull_shape": 1.61,
+    "n_failures": 1469
+  },
+  "non_disk_3x": {
+    "failures_per_host_year": 0.23452405063291143,
+    "gap_weibull_shape": 0.996,
+    "gap_cv": 1.01,
+    "first_failure_weibull_shape": 1.538,
+    "n_failures": 2538
+  }
+}
