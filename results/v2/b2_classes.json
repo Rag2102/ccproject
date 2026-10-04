@@ -1,0 +1,61 @@
+{
+  "source": "Google 2019 cells a, b, h; windows 2-4; M1 mapping; platform long-removal rate",
+  "min_machines": 30,
+  "classes": [
+    {
+      "platform": "Dza/U2s43vvYOOFCmkikwthqRcXXkIyR/WG6M23f67s=",
+      "machine_share": 0.431073,
+      "risk_per_machine_day": 0.0003196717431642775,
+      "tier_mix_low_med_high": [
+        0.696644,
+        0.146867,
+        0.156488
+      ],
+      "present_in": 9
+    },
+    {
+      "platform": "5dA1xC6vB4+Z2ucXfjwZMKPuxA/oUajDZReIcQV9WqE=",
+      "machine_share": 0.091549,
+      "risk_per_machine_day": 0.00034342323808070465,
+      "tier_mix_low_med_high": [
+        0.633669,
+        0.02281,
+        0.343521
+      ],
+      "present_in": 9
+    },
+    {
+      "platform": "ab11I4qQr/9Dkmo3M2CCSSHPkOU1S1Cb1p3rphUUjS8=",
+      "machine_share": 0.271808,
+      "risk_per_machine_day": 0.00043921872961261046,
+      "tier_mix_low_med_high": [
+        0.832472,
+        0.034771,
+        0.132757
+      ],
+      "present_in": 9
+    },
+    {
+      "platform": "No+NZu2jn50BnbQS9kENCZjWL1KEhNp67aYCqakF7Xk=",
+      "machine_share": 0.163318,
+      "risk_per_machine_day": 0.0007309709560226016,
+      "tier_mix_low_med_high": [
+        0.818374,
+        0.053071,
+        0.128555
+      ],
+      "present_in": 9
+    },
+    {
+      "platform": "JQ1tVQBMHBAIISU1gUNXk2powhYumYA+4cB3KzU29l8=",
+      "machine_share": 0.042251,
+      "risk_per_machine_day": 0.003645035723965998,
+      "tier_mix_low_med_high": [
+        0.647579,
+        0.155899,
+        0.196523
+      ],
+      "present_in": 9
+    }
+  ]
+}

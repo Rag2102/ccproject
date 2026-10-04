@@ -40,6 +40,7 @@ ARRAYS = (
     "host_risk0",
     "vm_age0",
     "place_blend",
+    "host_class",
 )
 
 
@@ -58,6 +59,7 @@ class World:
     host_risk0: np.ndarray  # oracle p_H at day 0, used by placement
     vm_age0: np.ndarray  # days each initial VM has already run at time 0
     place_blend: np.ndarray  # scalar: v1 blend weight that achieved the target rho (else 0 or 1)
+    host_class: np.ndarray  # regime B2: host class by risk rank (else all 0)
 
     def digest(self) -> str:
         h = hashlib.sha256(json.dumps(self.config, sort_keys=True).encode())
@@ -91,6 +93,7 @@ def generate(cfg: SimConfig, seed: int) -> World:
     rng = s.gen("placement", 0)
     tier = vms.tier
     blend = 0.0
+    host_class = np.zeros(cfg.n_hosts, dtype=np.int8)
     if pc.regime == "random":
         host = placement.random(vms, hosts.cap_gb, rng, pc.capacity)
     elif pc.regime == "rho":
@@ -100,6 +103,22 @@ def generate(cfg: SimConfig, seed: int) -> World:
     elif pc.regime == "adversarial":
         host = placement.adversarial(vms, hosts.cap_gb, risk0, rng, pc.capacity)
         blend = 1.0
+    elif pc.regime == "class":
+        host_class = placement.assign_classes(risk0, pc.class_shares)
+        n = len(vms)
+        host = placement.place_class(
+            vms.mem_gb,
+            tier,
+            hosts.cap_gb.astype(float),
+            np.ones(len(hosts.cap_gb), bool),
+            host_class,
+            np.asarray(pc.class_given_tier),
+            rng,
+            rng.uniform(size=n),
+            rng.uniform(size=n),
+        )
+        if (host < 0).any():
+            raise RuntimeError("regime B2: initial VMs do not fit")
     else:
         raise ValueError(f"placement regime {pc.regime!r} needs inputs the world cannot build yet")
     return World(
@@ -116,6 +135,7 @@ def generate(cfg: SimConfig, seed: int) -> World:
         host_risk0=risk0,
         vm_age0=age,
         place_blend=np.array(blend),
+        host_class=host_class,
     )
 
 

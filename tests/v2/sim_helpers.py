@@ -44,6 +44,7 @@ def constant_world(
         host_risk0=np.full(n_hosts, h_daily),
         vm_age0=np.full(n_hosts, 10.0),
         place_blend=np.array(0.0),
+        host_class=np.zeros(n_hosts, dtype=np.int8),
     )
     if sched is None:
         sched = failure.lives(w, cfg.failure, nd, s, new=hz)

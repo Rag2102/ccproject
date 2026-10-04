@@ -30,7 +30,9 @@ A_LATENT = {f"A{i + 1}": r for i, r in enumerate((0.0, 0.15, 0.3, 0.45, 0.6, 0.7
 # point -0.015 / 0.007 / 0.027 (median 0.007); lowest lower bound -0.019, highest upper 0.056
 B1_LATENT = {"B1-low": -0.019, "B1": 0.007, "B1-high": 0.056}
 D_LATENT = (0.1, 0.6)  # regime D: rho_L before and after mid-run (PROTOCOL section 3)
+E_SIGMA = {"E1": 0.25, "E2": 0.5, "E3": 1.0}  # regime E: SD of log kappa at rho = 0
 CALIBRATION = Path(__file__).resolve().parents[1] / "results" / "v2" / "regime_calibration.json"
+B2_CLASSES = CALIBRATION.with_name("b2_classes.json")
 
 
 def latent_of(cell: str) -> float | None:
@@ -73,8 +75,18 @@ def regime(base: SimConfig, cell: str, calibrated: bool = True) -> SimConfig:
         )
     elif cell == "C":
         p = replace(pc, regime="adversarial", arrival_blend=None)
+    elif cell == "B2":
+        shares, cgt = b2_tables()
+        p = replace(
+            pc, regime="class", arrival_blend=None, class_shares=shares, class_given_tier=cgt
+        )
+    elif cell in E_SIGMA:
+        # heterogeneity only: random placement, spread of log(c / w) set (PROTOCOL section 3)
+        p = replace(pc, regime="random", rho=0.0, arrival_blend=None)
+        cost = replace(base.cost, kappa_sigma=E_SIGMA[cell])
+        return replace(base, placement=p, cost=cost, name=f"{base.name}-{cell}")
     else:
-        raise ValueError(f"regime {cell!r} is not available yet (B2, D and E come later)")
+        raise ValueError(f"unknown regime {cell!r}")
     return replace(base, placement=p, name=f"{base.name}-{cell}")
 
 
@@ -110,3 +122,29 @@ def calibrate_arrival_blend(cfg: SimConfig, seed: int = 101, steps: int = 8, tol
 
 
 __all__ = ["A_LATENT", "B1_LATENT", "regime", "calibrate_arrival_blend", "latent_of", "np"]
+
+
+def ipf(seed: np.ndarray, rows: np.ndarray, cols: np.ndarray, iters: int = 200) -> np.ndarray:
+    """Iterative proportional fitting: scale seed to the row and column margins, keeping its
+    odds ratios."""
+    j = seed.astype(float).copy()
+    for _ in range(iters):
+        j *= (rows / j.sum(1))[:, None]
+        j *= cols / j.sum(0)
+    return j
+
+
+def b2_tables() -> tuple[tuple[float, ...], tuple[tuple[float, ...], ...]]:
+    """Regime B2 from results/v2/b2_classes.json (scripts/v2/23_b2_classes.py): machine shares of
+    the classes (lowest risk first) and P(class | tier). The trace's class x tier table is fitted
+    to the class shares and the simulator's resident tier shares, keeping the trace's odds ratios
+    (the association is replayed, not the trace's tier margin)."""
+    from vmsim.copula import resident_tier_shares
+
+    cl = json.loads(B2_CLASSES.read_text())["classes"]
+    m = np.array([c["machine_share"] for c in cl])
+    m = m / m.sum()
+    mix = np.array([c["tier_mix_low_med_high"] for c in cl])
+    j = ipf(m[:, None] * mix, m, np.asarray(resident_tier_shares(), float))
+    cgt = (j / j.sum(0)).T  # rows: tier; columns: class
+    return tuple(float(x) for x in m), tuple(tuple(float(x) for x in r) for r in cgt)

@@ -23,6 +23,7 @@ a host that fails is interrupted there.
 
 from __future__ import annotations
 
+import functools
 import hashlib
 import time
 from dataclasses import dataclass
@@ -77,6 +78,34 @@ class Prepared:
     surv_grid: np.ndarray
 
 
+@functools.lru_cache(maxsize=8)
+def _kappa_reference(tier_weights: tuple, d_fail_min: float) -> tuple[float, float]:
+    az = azure_table()
+    rows = split()["resident_rows"]
+    lk = np.log(
+        np.asarray(tier_weights)[az["tier"].to_numpy(np.int8)[rows]]
+        * d_fail_min
+        / az["memory_gb"].to_numpy(float)[rows]
+    )
+    return float(np.median(lk)), float(lk.std())
+
+
+def kappa_reference(cc) -> tuple[float, float]:
+    """Median and SD of log(c / w) over the resident Azure pool under the configured tier
+    weights: a fixed reference, the same for every world and seed."""
+    return _kappa_reference(tuple(cc.tier_weights), float(cc.d_fail_min))
+
+
+def kappa_rescale(fail_cost: np.ndarray, mem: np.ndarray, cc) -> np.ndarray:
+    """Regime E: scale the spread of log(c / w) to cc.kappa_sigma around the reference median,
+    keeping the order of c / w. No-op when cc.kappa_sigma is None."""
+    if cc.kappa_sigma is None:
+        return fail_cost
+    med, sd = kappa_reference(cc)
+    lk = np.log(fail_cost / mem)
+    return mem * np.exp(med + (cc.kappa_sigma / sd) * (lk - med))
+
+
 def prepare(world: World, cfg: SimConfig | None = None) -> Prepared:
     cfg = cfg or from_dict(world.config)
     s = Streams(world.seed)
@@ -105,6 +134,7 @@ def prepare(world: World, cfg: SimConfig | None = None) -> Prepared:
     res = sp["resident_rows"]
     rows_new = res[g.integers(0, len(res), len(t_arr))]
     u_place = s.gen("placement", 1).uniform(size=len(t_arr))
+    u_class = s.gen("placement", 4).uniform(size=len(t_arr))  # regime B2 only
 
     rows = np.concatenate([world.vm_rows, rows_new])
     life = az["lifetime_s"].to_numpy(float)[rows] / 86_400
@@ -125,11 +155,12 @@ def prepare(world: World, cfg: SimConfig | None = None) -> Prepared:
         "dirty": dirty,
         "t_arr": t_a,
         "t_dep": t_a + life,
-        "fail_cost": w * cc.d_fail_min,
+        "fail_cost": kappa_rescale(w * cc.d_fail_min, mem, cc),
         "mig_cost_est": migration.migration_cost_min(w, dur, blk, cc),
         "mig_s_est": dur,
         "host0": np.concatenate([world.vm_host, np.full(len(t_arr), -1)]),
         "u_place": np.concatenate([np.zeros(len(world.vm_rows)), u_place]),
+        "u_class": np.concatenate([np.zeros(len(world.vm_rows)), u_class]),
     }
     n0 = len(world.vm_rows)
     arr_day = np.floor(t_arr).astype(np.int64)
@@ -311,16 +342,29 @@ def run(
         rejected = 0
         if a1 > a0:
             ids = np.arange(a0, a1)
-            hs = placement.place_batch(
-                V["mem"][ids],
-                V["tier"][ids],
-                cap - used,
-                state == UP,
-                p_h,
-                blend if switch is None or d < switch else blend_after,
-                rng_arr,
-                V["u_place"][ids],
-            )
+            if cfg.placement.regime == "class":
+                hs = placement.place_class(
+                    V["mem"][ids],
+                    V["tier"][ids],
+                    cap - used,
+                    state == UP,
+                    prep.world.host_class,
+                    np.asarray(cfg.placement.class_given_tier),
+                    rng_arr,
+                    V["u_place"][ids],
+                    V["u_class"][ids],
+                )
+            else:
+                hs = placement.place_batch(
+                    V["mem"][ids],
+                    V["tier"][ids],
+                    cap - used,
+                    state == UP,
+                    p_h,
+                    blend if switch is None or d < switch else blend_after,
+                    rng_arr,
+                    V["u_place"][ids],
+                )
             ok = hs >= 0
             rejected = int((~ok).sum())
             vm_host[ids] = hs

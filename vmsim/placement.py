@@ -218,3 +218,48 @@ def place_batch(
             else:
                 host[v] = -1
     return host
+
+
+def assign_classes(host_risk: np.ndarray, shares) -> np.ndarray:
+    """Regime B2: host classes by risk rank, lowest risk first, with the given machine shares."""
+    n = len(host_risk)
+    order = np.lexsort((np.arange(n), host_risk))
+    bounds = np.round(np.cumsum(shares) * n).astype(np.int64)
+    cls = np.empty(n, dtype=np.int8)
+    cls[order] = np.searchsorted(bounds, np.arange(n), side="right").clip(max=len(shares) - 1)
+    return cls
+
+
+def place_class(
+    mem: np.ndarray,
+    tier: np.ndarray,
+    free: np.ndarray,
+    ok: np.ndarray,
+    host_class: np.ndarray,
+    class_given_tier: np.ndarray,
+    rng: np.random.Generator,
+    u: np.ndarray,
+    v: np.ndarray,
+) -> np.ndarray:
+    """Regime B2: each VM picks a class from P(class | its tier) with its pre-drawn uniform v,
+    then a host inside the class as place_batch does (first choice from u, overflow re-drawn).
+    VMs whose class has no room go to any host with room (-1 if none)."""
+    cum = np.cumsum(np.asarray(class_given_tier, float)[tier], axis=1)
+    cls = (v[:, None] > cum[:, :-1]).sum(1)
+    host = np.full(len(mem), -1, dtype=np.int64)
+    room = free.astype(float).copy()
+    for k in np.unique(cls):
+        idx = np.flatnonzero(cls == k)
+        hk = np.flatnonzero(host_class == k)
+        if len(hk) == 0:
+            continue
+        z = np.zeros(len(hk))
+        loc = place_batch(mem[idx], tier[idx], room[hk], ok[hk], z, 0.0, rng, u[idx])
+        good = loc >= 0
+        host[idx[good]] = hk[loc[good]]
+        np.subtract.at(room, hk[loc[good]], mem[idx[good]])
+    left = np.flatnonzero(host < 0)
+    if len(left):
+        h2 = place_batch(mem[left], tier[left], room, ok, np.zeros(len(room)), 0.0, rng, u[left])
+        host[left] = h2
+    return host

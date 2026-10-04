@@ -30,6 +30,10 @@ class CostConfig:
     d_fail_min: float = 10.0  # v1 UNMITIGATED_FAILURE_DOWNTIME_MIN
     tier_weights: tuple[float, float, float] = (0.3, 0.6, 1.0)  # low, medium, high (v1)
     lambda_bw: float = 1.0  # weight of migration resource minutes (v1 adds both)
+    # regime E: SD of log(c / w) over resident VMs (e = s = 1). None keeps v1's costs (natural
+    # spread about 1.06: tier 0.51, VM size the rest). Set: interruption costs are rescaled per VM,
+    # keeping the median and the order of c / w (engine.kappa_rescale)
+    kappa_sigma: float | None = None
 
 
 @dataclass(frozen=True)
@@ -44,7 +48,7 @@ class FailureConfig:
 
 @dataclass(frozen=True)
 class PlacementConfig:
-    regime: str = "random"  # random | rho | trace | adversarial
+    regime: str = "random"  # random | rho | class | adversarial
     rho: float = 0.0  # target tie-corrected Spearman for regime "rho"
     # blend weight for arrivals during the run (None: the world's initial blend). Calibrated per
     # regime so the VMs present, not only the initial ones, hit the target (scenarios.py)
@@ -52,6 +56,10 @@ class PlacementConfig:
     # regime D: from switch_day on, arrivals use arrival_blend_after (None: no switch)
     arrival_blend_after: float | None = None
     switch_day: int | None = None
+    # regime B2 ("class"): host classes by risk rank with these machine shares (lowest risk
+    # first), and P(class | tier) as rows per tier (3 x n_classes); built by scenarios.regime
+    class_shares: tuple[float, ...] | None = None
+    class_given_tier: tuple[tuple[float, ...], ...] | None = None
     init_fill: float = 0.70
     capacity: str = "gb"  # "gb" (memory) or "slots" (v1: equal VM count per host)
 
