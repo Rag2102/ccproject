@@ -67,6 +67,9 @@ class Policy:
     def decide(self, obs: Observation, budget_gb: float) -> np.ndarray:
         raise NotImplementedError
 
+    def reset(self) -> None:
+        """Called by the engine at the start of every run; stateful policies clear state."""
+
     def avoid(self, obs: Observation) -> np.ndarray | None:
         """Hosts to mark avoid-allocation from today (bool per host), or None for no change.
         Called after decide(). A marked host takes no new VMs and is never a destination; a

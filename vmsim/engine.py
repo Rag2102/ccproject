@@ -202,6 +202,7 @@ def run(
     cap = np.full(n_hosts, float(cfg.host_mem_gb))
     budget = bfrac * cap.sum()
     mc = cfg.migration
+    policy.reset()
     ab = cfg.placement.arrival_blend
     blend = float(prep.world.place_blend) if ab is None else float(ab)
 
