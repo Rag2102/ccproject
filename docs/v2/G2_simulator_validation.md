@@ -1,6 +1,6 @@
 # Gate G2: can the simulator be trusted? (Week 13)
 
-Status: **draft for sign-off**, 4 Oct 2026 (ahead of the calendar; the card is 28 Dec 2026 to 3 Jan 2027). All five criteria of `PROTOCOL.md` section 7 are met on the evidence below. Acceptance is the owner's, with the advisor; the tag `sim-v2.0` follows acceptance.
+Status: **accepted** (owner with advisor, recorded 4 Oct 2026; ahead of the calendar, the card is 28 Dec 2026 to 3 Jan 2027). All five criteria of `PROTOCOL.md` section 7 are met on the evidence below. Tag `sim-v2.0`.
 
 Code: `vmsim/` at f0b0df4 plus the Week 14 commit. Numbers: `results/v2/g2_validation.json` (`scripts/v2/15_g2_validation.py`), `results/v2/shape_check.json`, and the `tests/v2` suite.
 
@@ -34,7 +34,7 @@ These are in `SIM_SPEC.md` v0.2. None changes a protocol rule; items 1 and 2 cha
 4. **Destinations.** Power of two choices for every policy. The policy may rank the two candidates; all use p_H except the oracle, which takes the candidate that fails later.
 5. **Common random numbers in placement.** Each arrival has a pre-drawn uniform for its first-choice host, and the per-day generators are keyed by day. A difference between two policies on one day therefore does not shift later draws.
 
-## Open before sign-off
+## Open items at sign-off
 
-- The node-log shape value (0.7-0.8) is from memory of Schroeder and Gibson (2006) and must be checked against the paper.
-- Owner and advisor acceptance; then tag `sim-v2.0`.
+- The node-log shape value (0.7-0.8) is from memory of Schroeder and Gibson (2006) and must be checked against the paper. Not a gate criterion: it affects only the limitation's wording.
+- Done 4 Oct: owner and advisor acceptance; tag `sim-v2.0`.

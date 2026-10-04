@@ -5,7 +5,7 @@ Conditions (dev seeds 101-105, 2,000 hosts x 365 days + 30 warm-up, budget 2%):
           over the second half);
   noise   regime A3 with the pure-noise predictor (scores shuffled across hosts daily);
   A3      regime A3 with the oracle predictor (reference).
-Policies: P2 (cost-tuned threshold from the Week 14 pilot, A3 at 2%), P4 (BAM) and P6.
+Policies: P2 (budget-tuned threshold from the Week 14 pilot, A3 at 2%; ADR-005), P4 (BAM) and P6.
 Regret of P6 = its cost minus the better of P2 and P4 in hindsight, per seed.
 
 Done when (plan): P6 switches in the intended direction on D, never on the noise control.
@@ -34,7 +34,7 @@ CONDITIONS = {"D": ("D", "drift"), "noise": ("A3", "noise"), "A3": ("A3", "oracl
 
 def p2_from_pilot() -> tuple[float, str]:
     pilot = json.loads((ROOT / "results" / "v2" / "pilot_w14.json").read_text())
-    t = pilot["p2"]["A3@0.02"]["cost"]
+    t = pilot["p2"]["A3@0.02"]["budget"]  # ADR-005: the protocol's P2
     return float(t["tau"]), t["order"]
 
 

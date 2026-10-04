@@ -1,8 +1,8 @@
 # Gate G1: where does real placement sit? (Week 8)
 
-Status: **draft for your sign-off**, 4 Oct 2026 (ahead of the calendar; the card is 23-29 Nov 2026). Under `PROTOCOL.md` section 7, the class assigned here is final once you sign it off. The Week 17 break-even replaces pH for interpretation only, never for re-classification.
+Status: **signed off: class C0 is final** (owner with advisor, recorded 4 Oct 2026; ahead of the calendar, the card is 23-29 Nov 2026). Under `PROTOCOL.md` section 7 the class can no longer change. The Week 17 break-even replaces pH for interpretation only, never for re-classification.
 
-**Decision proposed: class C0 (below, negligible).** The class is C0 in each of the three cells, so the majority is C0.
+**Decision: class C0 (below, negligible).** The class is C0 in each of the three cells, so the majority is C0.
 
 **Sign change, reported first as `rho_definition.md` requires.** The sign of the correlation changes with the choice of tier mapping and risk proxy. In cell a it is −0.009 under the primary mapping M1 and +0.016 under M2; cell h's per-machine proxy gives negative values where its platform proxy gives positive ones. The magnitude does not change with any choice: across all 30 combinations of cell, mapping, proxy and weighting, |τ-b| ≤ 0.075 and the upper bound on the latent axis is ≤ 0.082. The conclusion, that critical work is essentially uncorrelated with machine risk, holds under every choice. Its direction does not.
 
@@ -80,10 +80,10 @@ Platform rates of long removals range from 0.0001 to 0.016 per machine-day, a fa
 - The analysis crashed when the per-machine proxy had different risk levels per window; those curves are now computed per window and averaged.
 - `lead()` now has a full tie-break. Before that, the group counts varied slightly between runs; the reported numbers are from the deterministic version.
 
-## 8. Open before sign-off
+## 8. Open items at sign-off
 
 1. Done 4 Oct: within-platform τ-b and removal counts (sections 4 and 6).
 2. **The second placement source** (Alibaba 2018 or the tier mix) is needed before claim 1 is called falsified overall, not before G1 is signed off.
-3. **Your sign-off.** After it, the class is final: record it in `LOG.md` and tag (suggested: `g1-c0`).
+3. Done 4 Oct: signed off, recorded in `LOG.md`; tag `g1-c0`.
 
-Signed off: ______  Date: ______
+Signed off: owner, with advisor  Date: 4 Oct 2026

@@ -34,12 +34,12 @@ From the v5 week cards for W11-W14. Built on 4 Oct 2026, ahead of the calendar (
 - [x] Budget in GB at 0.5/1/2/5%, filled in each policy's order (exact-budget rule); counts logged daily
 - [x] Sanity tests: zero budget = P0; P7 not worse than any policy on seeds, and not worse with more budget; P8 not better than P2 on 10 seeds (with P2 tuned on cost; see below)
 - [x] A regimes on the latent axis (`vmsim/copula.py`, `vmsim/scenarios.py`): A3 = Spearman 0.256 under the simulator's margins
-- [~] **Decision for you: how P2 is tuned.** The protocol says "tuned to use the budget". Tuned that way, P2 spends nearly the whole budget on unneeded migrations and costs more than never migrating; with smallest-first it even loses to random. Proposal: tune tau and order to the lowest cost on dev seeds (P2c), so the comparator is the strongest threshold policy. Both are in the pilot.
+- [x] **How P2 is tuned: decided 4 Oct, the protocol's rule (ADR-005).** P2 is tuned to use about 95% of the budget on dev seeds. The cost-tuned P2c (proposed after the pilot) is not a comparator; its pilot numbers below stay as recorded. Results tables show P0 and P3 next to P2.
 - [x] Pilot (4 Oct; seeds 201-205, 2,000 hosts × 365 days, A1 and A3 at 2%; `results/v2/pilot_w14.json`):
   - P2 tuned to use the budget (tau ≈ 0.013) costs about 3.9× never migrating (A1: 123,643 vs 31,906); migration cost dominates under v1's cost constants. P2c tuned on cost: tau = 0.32 at A1 (never migrates, = P0) and 0.10 at A3 (2.4% below P0)
   - SD of Delta, P3 vs P2c: 1.3% (A1), 3.8% (A3). Against the protocol's Bonferroni column (30 seeds: 1.6%; 100 seeds: 3.1%), A3 at this scale does not meet the bound: the design must grow (hosts or horizon), per the protocol's rule
-  - achieved correlation of the VMs present at A3: 0.217 against the 0.256 target (arrivals dilute it)
+  - achieved correlation of the VMs present at A3: 0.217 against the 0.256 target. Corrected diagnosis: under P0 alone, arrivals overshoot (0.475); the 0.217 is an average over policies that migrate, and migrations lower it. Fixed by calibrating the arrival blend under P0 (`scripts/v2/17_calibrate_regimes.py`)
   - P7 ≤ every policy and P8 ≥ P2 on every cell; per-run time 0.9-3.2 s
-- [ ] Scale ADR (`docs/v2/DECISIONS/ADR-005-scale.md`) from the pilot's SD of Delta: hosts, horizon and number of eval seeds (queued after the pilot, not started)
+- [ ] Scale ADR (`docs/v2/DECISIONS/ADR-007-scale.md`; ADR-005 and ADR-006 went to the P2 and model-choice decisions) from the SD of Delta **against budget-tuned P2** (ADR-005): hosts, horizon and number of eval seeds. Waits for pilot b (calibrated A3 and B1)
 - [ ] B1 pilot cell: after Week 8's rho
 - [ ] Smoke grid P0-P3, P7, P8 on 5 seeds in regime A: the pilot table doubles as the smoke grid
