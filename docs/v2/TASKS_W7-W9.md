@@ -46,6 +46,9 @@ About 12 h.
   - G1 class per cell and majority.
 - [x] Axis made precise before any estimate: pH = 0.30 is v1's tie-corrected Spearman under v1's margins, which is **0.375** on the latent axis (`rho_definition.md` step 6, `PROTOCOL.md` v0.2). Confirmed 4 Oct.
 - [ ] Run cells a, b and h, then `--analyse`; figure F3 draft (`v2_trace_rho.pdf`)
+  - **Dequeued 4 Oct, 17:35, by you; not started.** All three cells are downloaded (`data/v2/google/cell_{a,b,h}/raw`, about 60 GB on disk), and cell a's narrow copy is done and reused. To run, one job at a time with nothing else heavy running (each cell uses up to 4 GB):
+    `for c in a b h; do .venv/bin/python scripts/v2/13_trace_rho.py --cell $c; done && .venv/bin/python scripts/v2/13_trace_rho.py --analyse`
+    About 1.5-2 h. The first attempt on cell a hung in DuckDB on an uncapped connection; that connection is now capped like the others.
 - [ ] Mapping sensitivity (M2, M3) is in the table; if the sign changes, it goes in the first paragraph
 - [~] `docs/v2/G1_decision.md`: drafted from the result, **signed off by you**. The class is final under the protocol.
 
