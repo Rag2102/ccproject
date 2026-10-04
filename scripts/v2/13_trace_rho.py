@@ -45,6 +45,10 @@ ROOT = Path(__file__).resolve().parents[2]
 GOOGLE = ROOT / "data" / "v2" / "google"
 RES, FIG = ROOT / "results" / "v2", ROOT / "results" / "figures"
 CELLS = ["a", "b", "h"]  # chosen before any data: most production, most beb, most mid-tier work
+# Week 21 second placement source (owner, 5 Oct 2026): the smallest remaining cell by download
+# size, a rule fixed before any of its data was read (c 48.7, d 26.0, e 17.1, f 14.1, g 18.1 GB).
+# Analysed separately (--analyse-second); it never enters the G1 class, which is final.
+SECOND = ["f"]
 TABLES = ["machine_events", "machine_attributes", "instance_events"]
 
 US = 1_000_000
@@ -525,7 +529,7 @@ def classify(lo: float, hi: float, ph: float, c0: float) -> str:
 # --------------------------------------------------------------------------- stage 2: main
 
 
-def analyse() -> None:
+def analyse(cells: list[str] = CELLS, tag: str = "") -> None:
     rng = np.random.default_rng(SEED)
     RES.mkdir(parents=True, exist_ok=True)
     rows, extra = [], {}
@@ -537,7 +541,7 @@ def analyse() -> None:
     c0_latent = invert(g_v1, s_v1, P_C0)
     extra |= {"pH_latent": ph_latent, "c0_latent": c0_latent}
     log(f"pH = {P_H} (v1 Spearman) -> rho_L = {ph_latent:.3f}")
-    for cell in CELLS:
+    for cell in cells:
         out = GOOGLE / f"cell_{cell}"
         if not (out / "placements.parquet").exists():
             log(f"cell {cell}: not aggregated yet, skipped")
@@ -627,13 +631,18 @@ def analyse() -> None:
     counts = pd.Series(list(g1.values())).value_counts()
     majority = counts.index[0] if len(counts) and counts.iloc[0] > len(g1) / 2 else "B"
     extra |= {"g1_class_per_cell": g1, "g1_majority": majority if g1 else None}
-    tab.to_csv(RES / "trace_rho_table.csv", index=False)
-    (RES / "trace_rho.json").write_text(json.dumps(extra, indent=2, default=str))
-    figure(tab, ph_latent)
+    if tag:
+        extra["note"] = "second placement source (Week 21); not part of G1, which is final"
+        extra["g1_class_per_cell"] = {f"{c} (would-be class)": v for c, v in g1.items()}
+        extra.pop("g1_majority", None)
+    tab.to_csv(RES / f"trace_rho{tag}_table.csv", index=False)
+    (RES / f"trace_rho{tag}.json").write_text(json.dumps(extra, indent=2, default=str))
+    if not tag:
+        figure(tab, ph_latent)
     print(prim.round(3).to_string())
     print(
         json.dumps(
-            {k: extra[k] for k in ("pH_latent", "g1_class_per_cell", "g1_majority")}, indent=1
+            {k: extra.get(k) for k in ("pH_latent", "g1_class_per_cell", "g1_majority")}, indent=1
         )
     )
 
@@ -670,13 +679,16 @@ def figure(tab: pd.DataFrame, ph_latent: float) -> None:
 def main() -> None:
     ap = argparse.ArgumentParser(description=__doc__.splitlines()[0])
     g = ap.add_mutually_exclusive_group(required=True)
-    g.add_argument("--cell", choices=CELLS)
+    g.add_argument("--cell", choices=CELLS + SECOND)
     g.add_argument("--analyse", action="store_true")
+    g.add_argument("--analyse-second", action="store_true", help="the Week 21 second source")
     ap.add_argument("--keep-raw", action="store_true")
     ap.add_argument("--download-only", action="store_true")
     args = ap.parse_args()
     if args.cell:
         stage1(args.cell, args.keep_raw, args.download_only)
+    elif args.analyse_second:
+        analyse(SECOND, "_second")
     else:
         analyse()
 
