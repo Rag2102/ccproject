@@ -3,7 +3,8 @@
 The A regimes are defined by the latent correlation rho_L. The simulator's placement targets the
 tie-corrected Spearman between VM tier and host risk (v1's axis, placement.rho_controlled), so
 rho_L is converted under the simulator's own margins: the tier shares of resident VMs and a
-continuous host risk (n_levels equal-probability levels). Same formulas as
+continuous host risk (n_levels equal-probability levels). Tier shares are those of the VMs
+present (lifetime-weighted residents), which is what the engine measures. Same formulas as
 scripts/v2/13_trace_rho.py (copula_table, spearman), which are checked against SciPy there.
 """
 
@@ -51,8 +52,15 @@ def spearman(tab: np.ndarray) -> float:
 
 @lru_cache(maxsize=1)
 def resident_tier_shares() -> tuple[float, ...]:
-    tier = azure_table()["tier"].to_numpy()[split()["resident_rows"]]
-    return tuple(np.bincount(tier, minlength=3) / len(tier))
+    """Tier shares, by count, of the residents present at a random instant: the population the
+    engine's rho_tier_risk is computed on. Presence is length-biased (entities.
+    sample_present_residents), so each resident row is weighted by its lifetime. (Before 4 Oct
+    2026 this was the unweighted pool, 49/27/24%; the VMs present are about 61/4/35%.)"""
+    az = azure_table()
+    rows = split()["resident_rows"]
+    tier = az["tier"].to_numpy()[rows]
+    life = az["lifetime_s"].to_numpy(float)[rows]
+    return tuple(np.bincount(tier, weights=life, minlength=3) / life.sum())
 
 
 @lru_cache(maxsize=64)
