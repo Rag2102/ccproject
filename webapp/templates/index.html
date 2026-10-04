@@ -3,843 +3,1139 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>VM Mitigation Policy -- Live Demo</title>
+<title>VM Mitigation: move the right VMs before hardware fails</title>
+<meta name="description" content="A workload-aware, cost-sensitive VM mitigation policy: live model demo, course-project results, and the v2 research programme in progress.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@500&display=swap" rel="stylesheet">
-<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Cdefs%3E%3ClinearGradient id='g' x1='0' y1='0' x2='1' y2='1'%3E%3Cstop offset='0' stop-color='%237c5cff'/%3E%3Cstop offset='1' stop-color='%235ac8fa'/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect width='100' height='100' rx='22' fill='url(%23g)'/%3E%3C/svg%3E">
-<meta name="description" content="A workload-aware, cost-sensitive VM mitigation policy -- live demo, real trained models, two cloud deployments.">
+<link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%23111318'/%3E%3Crect x='7' y='7' width='8' height='8' rx='2' fill='%236f9bff'/%3E%3Crect x='17' y='7' width='8' height='8' rx='2' fill='%23ff8a5c'/%3E%3Crect x='7' y='17' width='8' height='8' rx='2' fill='%23ffffff' opacity='.35'/%3E%3Crect x='17' y='17' width='8' height='8' rx='2' fill='%236f9bff' opacity='.6'/%3E%3C/svg%3E">
+<script>
+  // theme before first paint: saved choice, else the system's
+  (function () {
+    var t = null;
+    try { t = localStorage.getItem('vm-theme'); } catch (e) {}
+    if (t === 'light' || t === 'dark') document.documentElement.setAttribute('data-theme', t);
+    document.documentElement.classList.add('js');
+  })();
+</script>
 <style>
   :root {
-    --bg: #0a0e17;
-    --bg-2: #0d1220;
-    --card: rgba(255,255,255,0.035);
-    --card-border: rgba(255,255,255,0.09);
-    --card-border-hover: rgba(255,255,255,0.16);
-    --ink: #eef1f8;
-    --muted: #8791a8;
-    --muted-2: #5c6779;
-    --cs: #6ea8ff;
-    --th: #ff8f6e;
-    --good: #4ade80;
-    --bad: #ff6b6b;
-    --grad-1: #7c5cff;
-    --grad-2: #5ac8fa;
-    --radius: 16px;
-    --shadow-lg: 0 20px 60px -20px rgba(0,0,0,0.6);
+    --bg: #f6f5f1; --bg-2: #efede7; --surface: #ffffff; --surface-2: #f9f8f5;
+    --line: rgba(20, 22, 28, 0.09); --line-2: rgba(20, 22, 28, 0.16);
+    --ink: #15171c; --ink-2: #4a505c; --ink-3: #7a808c;
+    --cs: #2f5bea; --cs-soft: rgba(47, 91, 234, 0.10);
+    --th: #d9531e; --th-soft: rgba(217, 83, 30, 0.10);
+    --good: #13865a; --good-soft: rgba(19, 134, 90, 0.10);
+    --bad: #c93a3a; --bad-soft: rgba(201, 58, 58, 0.10);
+    --amber: #a8730b; --amber-soft: rgba(168, 115, 11, 0.12);
+    --violet: #6d4ed8; --violet-soft: rgba(109, 78, 216, 0.10);
+    --shadow: 0 1px 2px rgba(20, 22, 28, 0.04), 0 8px 24px -12px rgba(20, 22, 28, 0.12);
+    --radius: 14px; --radius-sm: 9px;
+    --action: #0071e3; --action-hover: #0077ed; --link: #0066cc;
+    --serif: 'Instrument Serif', Georgia, 'Times New Roman', serif;
+    --sans: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    --mono: 'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, monospace;
+    color-scheme: light;
   }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --action: #0071e3; --action-hover: #147ce5; --link: #2997ff;
+      --bg: #0c0d10; --bg-2: #111318; --surface: #14161b; --surface-2: #181b21;
+      --line: rgba(255, 255, 255, 0.08); --line-2: rgba(255, 255, 255, 0.15);
+      --ink: #ecedf0; --ink-2: #a8adb8; --ink-3: #737986;
+      --cs: #7c9fff; --cs-soft: rgba(124, 159, 255, 0.13);
+      --th: #ff8f5e; --th-soft: rgba(255, 143, 94, 0.13);
+      --good: #45d39a; --good-soft: rgba(69, 211, 154, 0.12);
+      --bad: #ff6f6f; --bad-soft: rgba(255, 111, 111, 0.12);
+      --amber: #f0bf54; --amber-soft: rgba(240, 191, 84, 0.13);
+      --violet: #a993ff; --violet-soft: rgba(169, 147, 255, 0.13);
+      --shadow: 0 1px 2px rgba(0, 0, 0, 0.3), 0 12px 32px -16px rgba(0, 0, 0, 0.6);
+      color-scheme: dark;
+    }
+  }
+  :root[data-theme="dark"] {
+    --action: #0071e3; --action-hover: #147ce5; --link: #2997ff;
+    --bg: #0c0d10; --bg-2: #111318; --surface: #14161b; --surface-2: #181b21;
+    --line: rgba(255, 255, 255, 0.08); --line-2: rgba(255, 255, 255, 0.15);
+    --ink: #ecedf0; --ink-2: #a8adb8; --ink-3: #737986;
+    --cs: #7c9fff; --cs-soft: rgba(124, 159, 255, 0.13);
+    --th: #ff8f5e; --th-soft: rgba(255, 143, 94, 0.13);
+    --good: #45d39a; --good-soft: rgba(69, 211, 154, 0.12);
+    --bad: #ff6f6f; --bad-soft: rgba(255, 111, 111, 0.12);
+    --amber: #f0bf54; --amber-soft: rgba(240, 191, 84, 0.13);
+    --violet: #a993ff; --violet-soft: rgba(169, 147, 255, 0.13);
+    --shadow: 0 1px 2px rgba(0, 0, 0, 0.3), 0 12px 32px -16px rgba(0, 0, 0, 0.6);
+    color-scheme: dark;
+  }
+
   * { box-sizing: border-box; }
-  html { scroll-behavior: smooth; }
+  html { scroll-behavior: smooth; -webkit-text-size-adjust: 100%; }
+  @media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } *, *::before, *::after { animation: none !important; transition: none !important; } }
   body {
-    margin: 0;
-    font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-    color: var(--ink);
-    background:
-      radial-gradient(700px 420px at 12% -10%, rgba(124,92,255,0.22), transparent 60%),
-      radial-gradient(600px 400px at 92% 8%, rgba(90,200,250,0.14), transparent 55%),
-      radial-gradient(900px 600px at 50% 110%, rgba(255,143,110,0.08), transparent 60%),
-      linear-gradient(180deg, var(--bg-2), var(--bg) 40%);
-    background-attachment: fixed;
-    min-height: 100vh;
-    -webkit-font-smoothing: antialiased;
+    margin: 0; background: var(--bg); color: var(--ink); font-family: var(--sans);
+    font-size: 15px; line-height: 1.6; -webkit-font-smoothing: antialiased; overflow-x: hidden;
   }
-  h1, h2, h3 { font-family: 'Space Grotesk', 'Inter', sans-serif; letter-spacing: -0.01em; }
+  a { color: inherit; }
+  :focus-visible { outline: 2px solid var(--cs); outline-offset: 2px; border-radius: 4px; }
+  .wrap { max-width: 1160px; margin: 0 auto; padding: 0 24px; }
+  @media (max-width: 600px) { .wrap { padding: 0 16px; } }
+  .mono { font-family: var(--mono); }
+  .serif { font-family: var(--serif); font-weight: 400; }
 
-  header { padding: 56px 32px 40px; max-width: 1180px; margin: 0 auto; position: relative; }
-  .kicker {
-    display: inline-flex; align-items: center; gap: 8px;
-    font-size: 12px; font-weight: 600; letter-spacing: 0.06em; text-transform: uppercase;
-    color: var(--cs); background: rgba(110,168,255,0.1); border: 1px solid rgba(110,168,255,0.25);
-    padding: 6px 14px; border-radius: 999px; margin-bottom: 18px;
+  /* ---------- nav ---------- */
+  .nav {
+    position: sticky; top: 0; z-index: 40; border-bottom: 1px solid var(--line);
+    background: color-mix(in srgb, var(--bg) 82%, transparent);
+    backdrop-filter: saturate(1.4) blur(14px); -webkit-backdrop-filter: saturate(1.4) blur(14px);
   }
-  .kicker .dot { width: 6px; height: 6px; border-radius: 50%; background: var(--good); box-shadow: 0 0 8px var(--good); }
-  header h1 {
-    margin: 0 0 14px; font-size: clamp(26px, 4vw, 40px); font-weight: 700; line-height: 1.15;
-    max-width: 900px;
-    background: linear-gradient(120deg, #ffffff 30%, #b9c3e0 70%);
-    -webkit-background-clip: text; background-clip: text; color: transparent;
+  .nav .wrap { display: flex; align-items: center; gap: 20px; height: 60px; }
+  .brand { display: flex; align-items: center; gap: 10px; text-decoration: none; font-weight: 650; font-size: 14.5px; letter-spacing: -0.01em; white-space: nowrap; }
+  .brand-mark { display: grid; grid-template-columns: 1fr 1fr; gap: 2.5px; width: 22px; height: 22px; }
+  .brand-mark i { border-radius: 2.5px; background: var(--ink-3); opacity: .45; }
+  .brand-mark i:nth-child(1) { background: var(--cs); opacity: 1; }
+  .brand-mark i:nth-child(2) { background: var(--th); opacity: 1; }
+  .nav-links { display: flex; gap: 4px; margin-left: auto; }
+  .nav-links a {
+    text-decoration: none; color: var(--ink-2); font-size: 13.5px; font-weight: 500;
+    padding: 7px 11px; border-radius: 8px; transition: color .15s, background .15s;
   }
-  header p { margin: 0; color: var(--muted); font-size: 15px; max-width: 760px; line-height: 1.65; }
-
-  main { max-width: 1180px; margin: 0 auto; padding: 8px 20px 80px; display: grid; gap: 22px; }
-  .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 22px; align-items: start; }
-  @media (max-width: 900px) { .grid-2 { grid-template-columns: 1fr; } header { padding: 40px 20px 28px; } }
-
-  .card {
-    background: var(--card);
-    backdrop-filter: blur(20px);
-    -webkit-backdrop-filter: blur(20px);
-    border: 1px solid var(--card-border);
-    border-radius: var(--radius);
-    padding: 26px 28px;
-    box-shadow: var(--shadow-lg);
-    transition: border-color 0.25s ease;
+  .nav-links a:hover { color: var(--ink); background: var(--line); }
+  .nav-links a.active { color: var(--ink); background: var(--line); }
+  .nav-links a .new { font-size: 10px; font-weight: 700; color: var(--amber); margin-left: 5px; letter-spacing: .04em; }
+  .icon-btn {
+    display: inline-flex; align-items: center; justify-content: center; gap: 7px; height: 34px; min-width: 34px; padding: 0 10px;
+    border: 1px solid var(--line-2); border-radius: 980px; background: var(--surface); color: var(--ink);
+    font: 600 12.5px var(--sans); text-decoration: none; cursor: pointer; transition: border-color .15s, background .15s;
   }
-  .card:hover { border-color: var(--card-border-hover); }
-  .card h2 { margin: 0 0 6px; font-size: 17px; font-weight: 600; color: #fff; }
-  .card .sub { color: var(--muted); font-size: 13px; margin: 0 0 20px; line-height: 1.6; }
-
-  label { display: block; font-size: 12px; font-weight: 600; color: var(--muted); margin: 16px 0 6px; text-transform: uppercase; letter-spacing: 0.04em; }
-  select, input[type=number] {
-    width: 100%; padding: 11px 12px; border-radius: 10px;
-    border: 1px solid var(--card-border); font-size: 14px; font-family: inherit;
-    background: rgba(255,255,255,0.03); color: var(--ink);
-    transition: border-color 0.2s ease, box-shadow 0.2s ease;
-  }
-  select:focus, input:focus { outline: none; border-color: var(--cs); box-shadow: 0 0 0 4px rgba(110,168,255,0.15); }
-  select option { background: #10141f; color: var(--ink); }
-
-  input[type=range] {
-    width: 100%; -webkit-appearance: none; appearance: none; height: 6px; border-radius: 999px;
-    background: linear-gradient(90deg, var(--grad-1), var(--grad-2));
-    margin-top: 4px;
-  }
-  input[type=range]::-webkit-slider-thumb {
-    -webkit-appearance: none; width: 18px; height: 18px; border-radius: 50%;
-    background: #fff; box-shadow: 0 0 0 4px rgba(124,92,255,0.35), 0 2px 8px rgba(0,0,0,0.4);
-    cursor: pointer; transition: transform 0.15s ease;
-  }
-  input[type=range]::-webkit-slider-thumb:hover { transform: scale(1.15); }
-  input[type=range]::-moz-range-thumb {
-    width: 18px; height: 18px; border-radius: 50%; border: none;
-    background: #fff; box-shadow: 0 0 0 4px rgba(124,92,255,0.35); cursor: pointer;
+  .icon-btn:hover { border-color: var(--ink-3); }
+  .menu-btn { display: none; }
+  @media (max-width: 880px) {
+    .nav-links { display: none; position: absolute; top: 60px; left: 0; right: 0; flex-direction: column; gap: 0;
+      background: var(--bg); border-bottom: 1px solid var(--line); padding: 8px 16px 14px; }
+    .nav-links.open { display: flex; }
+    .nav-links a { padding: 11px 10px; }
+    .menu-btn { display: inline-flex; margin-left: auto; }
+    .nav .gh-label { display: none; }
   }
 
-  .radio-row { display: flex; gap: 10px; margin-top: 8px; flex-wrap: wrap; }
-  .radio-row label.opt {
-    display: flex; align-items: center; gap: 7px; font-weight: 500; color: var(--ink); font-size: 13px;
-    margin: 0; padding: 9px 13px; border-radius: 10px; border: 1px solid var(--card-border);
-    background: rgba(255,255,255,0.02); cursor: pointer; transition: all 0.2s ease; text-transform: none; letter-spacing: 0;
+  /* ---------- hero ---------- */
+  .hero { padding: 72px 0 56px; border-bottom: 1px solid var(--line); position: relative; overflow: hidden; }
+  .hero .wrap { display: grid; grid-template-columns: 1.15fr 0.85fr; gap: 56px; align-items: center; }
+  @media (max-width: 960px) { .hero .wrap { grid-template-columns: 1fr; gap: 36px; } .hero { padding: 48px 0 40px; } }
+  .eyebrow {
+    display: inline-flex; align-items: center; gap: 8px; font-size: 12px; font-weight: 600; letter-spacing: .02em;
+    color: var(--ink-2); border: 1px solid var(--line-2); border-radius: 999px; padding: 5px 12px 5px 8px; background: var(--surface);
   }
-  .radio-row label.opt:hover { border-color: var(--card-border-hover); background: rgba(255,255,255,0.05); }
-  .radio-row input[type=radio] { accent-color: var(--cs); }
+  .eyebrow .pulse { width: 7px; height: 7px; border-radius: 50%; background: var(--good); box-shadow: 0 0 0 0 var(--good); animation: pulse 2.4s infinite; }
+  @keyframes pulse { 0% { box-shadow: 0 0 0 0 color-mix(in srgb, var(--good) 55%, transparent); } 70% { box-shadow: 0 0 0 7px transparent; } 100% { box-shadow: 0 0 0 0 transparent; } }
+  .hero h1 {
+    font-family: var(--serif); font-weight: 400; font-size: clamp(40px, 6vw, 70px); line-height: 1.02;
+    letter-spacing: -0.02em; margin: 20px 0 18px;
+  }
+  .hero h1 em { font-style: italic; color: var(--cs); }
+  .hero .lede { font-size: 17px; color: var(--ink-2); max-width: 600px; margin: 0 0 28px; line-height: 1.65; }
+  .cta-row { display: flex; gap: 10px; flex-wrap: wrap; }
+  /* buttons: pill shapes and an action blue, in the style of Apple's product pages */
+  .btn {
+    display: inline-flex; align-items: center; justify-content: center; gap: 7px; padding: 11px 22px; border-radius: 980px;
+    font: 500 15px/1.2 var(--sans); letter-spacing: -0.01em; text-decoration: none; cursor: pointer; border: 1px solid transparent;
+    transition: background .2s ease, color .2s ease, border-color .2s ease, transform .1s ease; white-space: nowrap;
+  }
+  .btn:active { transform: scale(.98); }
+  .btn:disabled { opacity: .4; cursor: default; transform: none; }
+  .btn-primary { background: var(--action); color: #fff; }
+  .btn-primary:hover { background: var(--action-hover); }
+  .btn-ghost { border-color: var(--action); color: var(--action); background: transparent; }
+  :root[data-theme="dark"] .btn-ghost { color: var(--link); border-color: var(--link); }
+  @media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) .btn-ghost { color: var(--link); border-color: var(--link); } }
+  .btn-ghost:hover:not(:disabled) { background: var(--action); border-color: var(--action); color: #fff; }
+  .btn-sm { padding: 7px 15px; font-size: 13px; }
+  .btn-icon { padding: 0; width: 40px; height: 40px; }
+  .more { color: var(--link); text-decoration: none; font-weight: 500; white-space: nowrap; }
+  .more::after { content: ' ›'; font-size: 1.15em; line-height: 0; transition: margin-left .2s ease; }
+  .more:hover { text-decoration: underline; text-underline-offset: 3px; }
+  .more:hover::after { margin-left: 2px; }
+  .more-row { display: flex; gap: 26px; flex-wrap: wrap; align-items: center; }
+  .figures { display: grid; grid-template-columns: repeat(4, 1fr); gap: 0; margin-top: 40px; border-top: 1px solid var(--line); }
+  @media (max-width: 600px) { .figures { grid-template-columns: 1fr 1fr; } }
+  .fig { padding: 16px 16px 0 0; }
+  .fig .n { font-family: var(--serif); font-size: 32px; line-height: 1.1; letter-spacing: -0.01em; }
+  .fig .l { font-size: 12px; color: var(--ink-3); margin-top: 4px; line-height: 1.4; }
 
-  button.run {
-    margin-top: 22px; width: 100%; padding: 14px; border: none; border-radius: 12px;
-    background: linear-gradient(120deg, var(--grad-1), var(--grad-2));
-    color: #fff; font-size: 14.5px; font-weight: 700; cursor: pointer; font-family: inherit;
-    box-shadow: 0 8px 24px -8px rgba(124,92,255,0.6);
-    transition: transform 0.15s ease, box-shadow 0.15s ease, opacity 0.15s ease;
-    display: flex; align-items: center; justify-content: center; gap: 8px;
+  .fleet-card { background: var(--surface); border: 1px solid var(--line); border-radius: 18px; padding: 18px; box-shadow: var(--shadow); }
+  .fleet-head { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 12px; gap: 10px; }
+  .fleet-head b { font-size: 13px; font-weight: 600; }
+  .fleet-head span { font-size: 11.5px; color: var(--ink-3); font-family: var(--mono); }
+  #fleet { width: 100%; height: auto; display: block; }
+  .fleet-legend { display: flex; gap: 14px; flex-wrap: wrap; margin-top: 12px; font-size: 11.5px; color: var(--ink-3); }
+  .fleet-legend i { display: inline-block; width: 9px; height: 9px; border-radius: 2px; margin-right: 6px; vertical-align: -1px; }
+
+  /* ---------- sections ---------- */
+  section.block { padding: 88px 0; border-bottom: 1px solid var(--line); scroll-margin-top: 60px; }
+  @media (max-width: 600px) { section.block { padding: 60px 0; } }
+  .sec-head { display: grid; grid-template-columns: 220px 1fr; gap: 40px; margin-bottom: 40px; }
+  @media (max-width: 880px) { .sec-head { grid-template-columns: 1fr; gap: 10px; } }
+  .sec-num { font-family: var(--mono); font-size: 12px; color: var(--ink-3); letter-spacing: .04em; padding-top: 10px; }
+  .sec-num b { color: var(--ink); font-weight: 600; display: block; margin-top: 2px; font-family: var(--sans); font-size: 13px; letter-spacing: 0; }
+  .sec-head h2 { font-family: var(--serif); font-weight: 400; font-size: clamp(32px, 4.2vw, 48px); line-height: 1.06; letter-spacing: -0.015em; margin: 0 0 14px; }
+  .sec-head p { margin: 0; color: var(--ink-2); max-width: 720px; font-size: 16px; }
+  .panel { background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); box-shadow: var(--shadow); }
+  .pad { padding: 24px; }
+  @media (max-width: 600px) { .pad { padding: 18px; } }
+  .tag {
+    display: inline-flex; align-items: center; gap: 6px; font: 600 10.5px var(--mono); letter-spacing: .05em; text-transform: uppercase;
+    padding: 3px 8px; border-radius: 6px; white-space: nowrap;
   }
-  button.run:hover { transform: translateY(-1px); box-shadow: 0 12px 30px -8px rgba(124,92,255,0.75); }
-  button.run:active { transform: translateY(0); }
-  button.run:disabled { opacity: 0.65; cursor: default; transform: none; }
-  .spinner {
-    width: 14px; height: 14px; border-radius: 50%; border: 2px solid rgba(255,255,255,0.4);
-    border-top-color: #fff; animation: spin 0.7s linear infinite; display: none;
+  .tag.measured { color: var(--good); background: var(--good-soft); }
+  .tag.derived { color: var(--violet); background: var(--violet-soft); }
+  .tag.validated { color: var(--cs); background: var(--cs-soft); }
+  .tag.simulated { color: var(--th); background: var(--th-soft); }
+  .tag.illustrative { color: var(--amber); background: var(--amber-soft); }
+  .tag.v1 { color: var(--ink-2); background: var(--line); }
+
+  /* ---------- pipeline ---------- */
+  .pipeline { display: grid; grid-template-columns: repeat(4, 1fr); gap: 0; }
+  @media (max-width: 880px) { .pipeline { grid-template-columns: 1fr 1fr; } }
+  @media (max-width: 520px) { .pipeline { grid-template-columns: 1fr; } }
+  .step { padding: 22px 22px 24px; border-right: 1px solid var(--line); position: relative; }
+  .step:last-child { border-right: none; }
+  @media (max-width: 880px) { .step:nth-child(2) { border-right: none; } .step:nth-child(-n+2) { border-bottom: 1px solid var(--line); } }
+  @media (max-width: 520px) { .step { border-right: none; border-bottom: 1px solid var(--line); } .step:last-child { border-bottom: none; } }
+  .step .k { font: 600 11px var(--mono); color: var(--ink-3); letter-spacing: .05em; }
+  .step h3 { font-size: 16px; margin: 10px 0 6px; font-weight: 600; letter-spacing: -0.01em; }
+  .step p { margin: 0; font-size: 13.5px; color: var(--ink-2); line-height: 1.6; }
+  .step .src { margin-top: 12px; font-size: 11.5px; color: var(--ink-3); font-family: var(--mono); }
+  .step .ico { width: 34px; height: 34px; border-radius: 9px; display: grid; place-items: center; background: var(--surface-2); border: 1px solid var(--line); color: var(--ink); margin-top: 14px; }
+
+  /* ---------- demo ---------- */
+  .demo { display: grid; grid-template-columns: 380px 1fr; gap: 20px; align-items: start; }
+  @media (max-width: 960px) { .demo { grid-template-columns: 1fr; } }
+  .field { margin-bottom: 20px; }
+  .field:last-of-type { margin-bottom: 0; }
+  .field-label { display: flex; justify-content: space-between; align-items: baseline; font-size: 12.5px; font-weight: 600; color: var(--ink); margin-bottom: 8px; }
+  .field-label span { font-weight: 500; color: var(--ink-3); font-family: var(--mono); font-size: 12px; }
+  .seg { display: flex; padding: 3px; gap: 3px; border-radius: 10px; background: var(--bg-2); border: 1px solid var(--line); }
+  .seg input { position: absolute; opacity: 0; pointer-events: none; }
+  .seg label {
+    flex: 1; text-align: center; padding: 8px 6px; border-radius: 7px; font-size: 13px; font-weight: 500; color: var(--ink-2);
+    cursor: pointer; transition: background .15s, color .15s, box-shadow .15s; text-transform: capitalize; user-select: none;
   }
-  button.run.loading .spinner { display: inline-block; }
+  .seg input:checked + label { background: var(--surface); color: var(--ink); box-shadow: 0 1px 2px rgba(0,0,0,.08), 0 0 0 1px var(--line-2); font-weight: 600; }
+  .seg input:focus-visible + label { outline: 2px solid var(--cs); outline-offset: 1px; }
+  .seg label small { display: block; font-size: 10.5px; color: var(--ink-3); font-weight: 500; }
+  select {
+    width: 100%; appearance: none; -webkit-appearance: none; padding: 11px 36px 11px 12px; border-radius: 10px; border: 1px solid var(--line-2);
+    background: var(--surface) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%237a808c' stroke-width='2.5'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E") no-repeat right 12px center;
+    color: var(--ink); font: 500 14px var(--mono);
+  }
+  select:focus { outline: none; border-color: var(--cs); box-shadow: 0 0 0 3px var(--cs-soft); }
+  input[type=range] { width: 100%; -webkit-appearance: none; appearance: none; height: 4px; border-radius: 99px; background: var(--line-2); margin: 10px 0 4px; }
+  input[type=range]::-webkit-slider-thumb { -webkit-appearance: none; width: 18px; height: 18px; border-radius: 50%; background: var(--surface); border: 2px solid var(--ink); cursor: pointer; }
+  input[type=range]::-moz-range-thumb { width: 14px; height: 14px; border-radius: 50%; background: var(--surface); border: 2px solid var(--ink); cursor: pointer; }
+  .range-scale { display: flex; justify-content: space-between; font-size: 11px; color: var(--ink-3); font-family: var(--mono); }
+  .demo-actions { display: flex; gap: 8px; margin-top: 22px; align-items: center; }
+  .live-toggle { display: flex; align-items: center; gap: 8px; font-size: 12.5px; color: var(--ink-2); margin-right: auto; cursor: pointer; user-select: none; }
+  .live-toggle input { accent-color: var(--cs); width: 15px; height: 15px; }
+  .btn-run { background: var(--action); color: #fff; border: none; padding: 11px 24px; }
+  .btn-run:hover { background: var(--action-hover); }
+  .btn-run .spin { width: 13px; height: 13px; border-radius: 50%; border: 2px solid rgba(255,255,255,.4); border-top-color: #fff; display: none; animation: spin .7s linear infinite; }
+  .btn-run.loading .spin { display: inline-block; }
+  .btn-run.loading .play { display: none; }
   @keyframes spin { to { transform: rotate(360deg); } }
 
-  .range-val { font-size: 12px; color: var(--muted-2); text-align: right; text-transform: none; letter-spacing: 0; font-weight: 500; margin-top: 4px; }
+  .readouts { display: grid; grid-template-columns: 1.3fr 1fr 1fr; border-bottom: 1px solid var(--line); }
+  @media (max-width: 600px) { .readouts { grid-template-columns: 1fr 1fr; } .readouts .ro:first-child { grid-column: 1 / -1; border-right: none; border-bottom: 1px solid var(--line); } }
+  .ro { padding: 20px 22px; border-right: 1px solid var(--line); }
+  .ro:last-child { border-right: none; }
+  .ro .l { font-size: 12px; color: var(--ink-3); }
+  .ro .v { font-family: var(--serif); font-size: 36px; line-height: 1.15; letter-spacing: -0.01em; margin-top: 2px; }
+  .ro .v small { font-family: var(--sans); font-size: 13px; color: var(--ink-3); margin-left: 4px; }
+  .meter { position: relative; height: 8px; border-radius: 99px; background: var(--bg-2); margin-top: 12px; overflow: visible; }
+  .meter .fill { position: absolute; left: 0; top: 0; bottom: 0; border-radius: 99px; background: var(--ink-2); width: 0; transition: width .5s cubic-bezier(.2,.7,.2,1); }
+  .meter .tau { position: absolute; top: -5px; bottom: -5px; width: 2px; background: var(--th); border-radius: 2px; }
+  .meter .tau::after { content: 'τ'; position: absolute; top: -17px; left: -3px; font: 600 11px var(--mono); color: var(--th); }
+  .meter-scale { display: flex; justify-content: space-between; font: 500 10.5px var(--mono); color: var(--ink-3); margin-top: 6px; }
 
-  .result-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-top: 20px; }
-  @media (max-width: 520px) { .result-grid { grid-template-columns: 1fr; } }
-  .policy-box {
-    border-radius: 14px; padding: 18px; border: 1px solid var(--card-border);
-    background: rgba(255,255,255,0.02); transition: border-color 0.2s ease;
-  }
-  .policy-box.cs { border-color: rgba(110,168,255,0.35); }
-  .policy-box.th { border-color: rgba(255,143,110,0.3); }
-  .policy-box h3 { margin: 0 0 12px; font-size: 13px; font-weight: 600; color: var(--muted); text-transform: uppercase; letter-spacing: 0.04em; }
+  .decisions { display: grid; grid-template-columns: 1fr 1fr; }
+  @media (max-width: 760px) { .decisions { grid-template-columns: 1fr; } }
+  .dec { padding: 22px; }
+  .dec + .dec { border-left: 1px solid var(--line); }
+  @media (max-width: 760px) { .dec + .dec { border-left: none; border-top: 1px solid var(--line); } }
+  .dec-top { display: flex; justify-content: space-between; align-items: center; gap: 10px; margin-bottom: 14px; }
+  .dec-name { display: flex; align-items: center; gap: 8px; font-size: 13px; font-weight: 600; }
+  .dec-name i { width: 9px; height: 9px; border-radius: 3px; }
+  .verdict { font: 700 12px var(--mono); letter-spacing: .06em; padding: 5px 10px; border-radius: 7px; }
+  .verdict.migrate { color: var(--bad); background: var(--bad-soft); }
+  .verdict.wait { color: var(--good); background: var(--good-soft); }
+  .verdict.idle { color: var(--ink-3); background: var(--line); }
+  .why { font-size: 13.5px; color: var(--ink-2); margin: 0 0 16px; min-height: 44px; }
+  .bars { display: grid; gap: 10px; }
+  .bar-row { display: grid; grid-template-columns: 128px 1fr 74px; gap: 10px; align-items: center; font-size: 12px; color: var(--ink-2); }
+  @media (max-width: 420px) { .bar-row { grid-template-columns: 92px 1fr 64px; } }
+  .bar { height: 10px; border-radius: 99px; background: var(--bg-2); overflow: hidden; }
+  .bar span { display: block; height: 100%; border-radius: 99px; width: 0; transition: width .5s cubic-bezier(.2,.7,.2,1); }
+  .bar-row b { font: 600 12px var(--mono); color: var(--ink); text-align: right; }
+  .dec-foot { margin-top: 16px; padding-top: 14px; border-top: 1px dashed var(--line-2); display: grid; gap: 6px; }
+  .kv { display: flex; justify-content: space-between; font-size: 12.5px; color: var(--ink-3); gap: 10px; }
+  .kv b { font: 600 12px var(--mono); color: var(--ink); }
+  .result-foot { display: flex; justify-content: space-between; align-items: center; gap: 12px; padding: 14px 22px; border-top: 1px solid var(--line); flex-wrap: wrap; }
+  .result-foot p { margin: 0; font-size: 12.5px; color: var(--ink-3); flex: 1; min-width: 220px; }
+  .result-empty { padding: 60px 22px; text-align: center; color: var(--ink-3); font-size: 14px; }
+  .is-stale { opacity: .55; transition: opacity .2s; }
+  .err { color: var(--bad); font-size: 13px; padding: 10px 22px; display: none; }
 
-  .badge {
-    display: inline-flex; align-items: center; gap: 6px; padding: 5px 12px; border-radius: 999px;
-    font-size: 12px; font-weight: 700; letter-spacing: 0.02em; margin-bottom: 12px;
-  }
-  .badge.migrate { background: rgba(255,107,107,0.12); color: var(--bad); box-shadow: 0 0 0 1px rgba(255,107,107,0.25) inset; }
-  .badge.wait { background: rgba(74,222,128,0.12); color: var(--good); box-shadow: 0 0 0 1px rgba(74,222,128,0.25) inset; }
-  .badge::before { content: ''; width: 6px; height: 6px; border-radius: 50%; background: currentColor; }
-
-  .kv { display: flex; justify-content: space-between; gap: 12px; font-size: 12.5px; margin: 8px 0; color: var(--muted); }
-  .kv b { color: var(--ink); font-weight: 600; font-family: 'JetBrains Mono', monospace; font-size: 12px; }
-
-  .stat-row { display: flex; gap: 12px; margin-top: 18px; flex-wrap: wrap; }
-  .stat {
-    flex: 1; min-width: 130px; border-radius: 12px; padding: 14px 16px;
-    background: rgba(255,255,255,0.03); border: 1px solid var(--card-border);
-  }
-  .stat .n {
-    font-size: 22px; font-weight: 700; font-family: 'Space Grotesk', sans-serif;
-    background: linear-gradient(120deg, #fff, #b9c3e0); -webkit-background-clip: text; background-clip: text; color: transparent;
-  }
-  .stat .l { font-size: 11px; color: var(--muted-2); margin-top: 4px; text-transform: uppercase; letter-spacing: 0.04em; }
-
-  table { width: 100%; border-collapse: collapse; font-size: 12.5px; }
-  th, td { text-align: left; padding: 10px 10px; border-bottom: 1px solid var(--card-border); }
-  th { color: var(--muted); font-weight: 600; text-transform: uppercase; font-size: 11px; letter-spacing: 0.04em; }
-  td { color: var(--ink); font-family: 'JetBrains Mono', monospace; font-size: 12px; }
-  td:first-child { font-family: 'Inter', sans-serif; color: var(--muted); text-transform: capitalize; }
+  /* ---------- findings (v1) ---------- */
+  .two { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; align-items: start; }
+  @media (max-width: 960px) { .two { grid-template-columns: 1fr; } }
+  table { width: 100%; border-collapse: collapse; font-size: 13px; }
+  th, td { padding: 11px 12px; text-align: right; border-bottom: 1px solid var(--line); }
+  th:first-child, td:first-child { text-align: left; }
+  th { font-size: 11px; font-weight: 600; color: var(--ink-3); text-transform: uppercase; letter-spacing: .05em; vertical-align: bottom; }
+  td { font-family: var(--mono); font-size: 12.5px; font-variant-numeric: tabular-nums; }
+  td:first-child { font-family: var(--sans); color: var(--ink-2); text-transform: capitalize; font-size: 13px; }
   tr:last-child td { border-bottom: none; }
+  td.best { color: var(--good); font-weight: 600; }
+  .table-scroll { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+  .chart-box { position: relative; height: 300px; }
+  .panel-head { display: flex; justify-content: space-between; align-items: flex-start; gap: 12px; margin-bottom: 14px; }
+  .panel-head h3 { margin: 0; font-size: 15px; font-weight: 600; letter-spacing: -0.01em; }
+  .panel-head p { margin: 4px 0 0; font-size: 13px; color: var(--ink-3); }
+  .callout {
+    display: grid; grid-template-columns: auto 1fr; gap: 14px; margin-top: 20px; padding: 18px 20px; border-radius: var(--radius);
+    background: var(--amber-soft); border: 1px solid color-mix(in srgb, var(--amber) 30%, transparent);
+  }
+  .callout .ci { width: 28px; height: 28px; border-radius: 8px; display: grid; place-items: center; background: var(--amber); color: var(--bg); font: 700 12px var(--mono); }
+  .callout b { display: block; font-size: 14px; margin-bottom: 3px; }
+  .callout p { margin: 0; font-size: 13.5px; color: var(--ink-2); }
 
-  .note {
-    font-size: 12.5px; color: var(--muted); background: rgba(255,255,255,0.03);
-    border: 1px solid var(--card-border); border-radius: 10px; padding: 12px 14px; margin-top: 16px; line-height: 1.6;
-  }
-  .placeholder {
-    color: var(--muted-2); font-size: 13px; text-align: center; padding: 56px 0;
-    border: 1px dashed var(--card-border); border-radius: 12px;
-  }
-  .chart-panel {
-    background: rgba(255,255,255,0.02); border: 1px solid var(--card-border);
-    border-radius: 14px; padding: 18px 20px 16px; margin-top: 0;
-  }
-  .chart-panel .chart-eyebrow {
-    display: block; font-size: 11px; font-weight: 700; text-transform: uppercase;
-    letter-spacing: 0.06em; color: var(--grad-2); margin-bottom: 6px;
-  }
-  .chart-panel h3 { margin: 0 0 6px; font-size: 15px; font-weight: 600; color: #fff; line-height: 1.4; }
-  .chart-panel .chart-caption { margin: 0 0 14px; font-size: 12.5px; color: var(--muted); line-height: 1.55; }
-  .chart-wrap { position: relative; height: 260px; }
-  .chart-legend { display: flex; gap: 18px; margin-top: 14px; flex-wrap: wrap; }
-  .chart-legend span { display: flex; align-items: center; gap: 7px; font-size: 11.5px; color: var(--muted); }
-  .chart-legend i { width: 9px; height: 9px; border-radius: 3px; display: inline-block; }
-  .pill {
-    display: inline-block; background: rgba(124,92,255,0.12); color: #b9a8ff;
-    border: 1px solid rgba(124,92,255,0.3); border-radius: 999px; padding: 3px 11px; font-size: 11px; font-weight: 600;
-  }
+  .fine { font-size: 12.5px; color: var(--ink-3); margin: 14px 0 0; }
 
-  #result { animation: fadeUp 0.4s ease; }
-  @keyframes fadeUp { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+  /* ---------- v2 research ---------- */
+  .status { display: grid; grid-template-columns: 1fr auto; gap: 24px; align-items: center; }
+  @media (max-width: 760px) { .status { grid-template-columns: 1fr; } }
+  .status h3 { margin: 0 0 4px; font-size: 16px; font-weight: 600; }
+  .status p { margin: 0; font-size: 13.5px; color: var(--ink-2); }
+  .progress { height: 10px; border-radius: 99px; background: var(--bg-2); overflow: hidden; margin-top: 16px; display: flex; }
+  .progress span { display: block; height: 100%; }
+  .progress-scale { display: flex; justify-content: space-between; font: 500 11px var(--mono); color: var(--ink-3); margin-top: 6px; }
+  .status-num { text-align: right; }
+  @media (max-width: 760px) { .status-num { text-align: left; } }
+  .status-num .n { font-family: var(--serif); font-size: 52px; line-height: 1; }
+  .status-num .n small { font-size: 22px; color: var(--ink-3); }
+  .status-num .l { font-size: 12px; color: var(--ink-3); }
 
-  ::selection { background: rgba(124,92,255,0.35); }
+  .cards { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; margin-top: 20px; }
+  @media (max-width: 960px) { .cards { grid-template-columns: 1fr 1fr; } }
+  @media (max-width: 600px) { .cards { grid-template-columns: 1fr; } }
+  .fcard { padding: 22px; display: flex; flex-direction: column; gap: 10px; }
+  .fcard .big { font-family: var(--serif); font-size: 38px; line-height: 1.05; letter-spacing: -0.01em; }
+  .fcard .big small { font-family: var(--sans); font-size: 14px; color: var(--ink-3); }
+  .fcard h3 { margin: 0; font-size: 15px; font-weight: 600; line-height: 1.35; letter-spacing: -0.01em; }
+  .fcard p { margin: 0; font-size: 13.5px; color: var(--ink-2); flex: 1; }
+  .fcard .src { font: 500 11px var(--mono); color: var(--ink-3); border-top: 1px solid var(--line); padding-top: 10px; margin-top: 4px; }
+  .fcard .src .more { font-family: var(--sans); font-size: 13px; }
 
-  /* ---- nav bar ---- */
-  .navbar-outer {
-    position: sticky; top: 0; z-index: 50;
-    background: rgba(10,14,23,0.72); backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px);
-    border-bottom: 1px solid var(--card-border);
-  }
-  .navbar { max-width: 1180px; margin: 0 auto; padding: 13px 32px; display: flex; align-items: center; justify-content: space-between; gap: 16px; }
-  .navbar .brand { display: flex; align-items: center; gap: 9px; text-decoration: none; }
-  .navbar .brand .mark {
-    width: 26px; height: 26px; border-radius: 8px; flex-shrink: 0;
-    background: linear-gradient(120deg, var(--grad-1), var(--grad-2));
-    display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 800; color: #fff;
-    font-family: 'Space Grotesk', sans-serif;
-  }
-  .navbar .brand .name { font-family: 'Space Grotesk', sans-serif; font-weight: 700; font-size: 14px; color: #fff; }
-  .navbar .links { display: flex; align-items: center; gap: 24px; }
-  .navbar .links a { color: var(--muted); text-decoration: none; font-size: 13px; font-weight: 500; transition: color 0.15s ease; }
-  .navbar .links a:hover { color: #fff; }
-  .navbar .gh-btn {
-    display: flex; align-items: center; gap: 7px; padding: 7px 14px; border-radius: 9px;
-    border: 1px solid var(--card-border); color: var(--ink); text-decoration: none; font-size: 12.5px; font-weight: 600;
-    transition: all 0.2s ease; flex-shrink: 0;
-  }
-  .navbar .gh-btn:hover { border-color: var(--card-border-hover); background: rgba(255,255,255,0.05); }
-  @media (max-width: 760px) { .navbar .links { display: none; } }
+  .sandbox { display: grid; grid-template-columns: 300px 1fr; gap: 0; margin-top: 20px; }
+  @media (max-width: 880px) { .sandbox { grid-template-columns: 1fr; } }
+  .sandbox-ctrl { padding: 24px; border-right: 1px solid var(--line); }
+  @media (max-width: 880px) { .sandbox-ctrl { border-right: none; border-bottom: 1px solid var(--line); } }
+  .sandbox-ctrl h3 { margin: 10px 0 6px; font-size: 16px; font-weight: 600; }
+  .sandbox-ctrl > p { margin: 0 0 20px; font-size: 13px; color: var(--ink-2); }
+  .sandbox-out { padding: 24px; }
+  .sb-read { display: flex; gap: 22px; flex-wrap: wrap; margin-top: 14px; }
+  .sb-read div { font-size: 12px; color: var(--ink-3); }
+  .sb-read b { display: block; font-family: var(--serif); font-size: 26px; font-weight: 400; color: var(--ink); line-height: 1.2; }
 
-  section[id], main > .card[id] { scroll-margin-top: 84px; }
+  .timeline { margin-top: 20px; }
+  .tl-track { display: grid; grid-template-columns: repeat(60, 1fr); gap: 2px; margin: 0 0 8px; }
+  .tl-track i { height: 26px; border-radius: 3px; background: var(--bg-2); border: 1px solid var(--line); }
+  .tl-track i.done { background: var(--cs); border-color: transparent; }
+  .tl-track i.now { background: var(--amber); border-color: transparent; animation: blink 1.8s ease-in-out infinite; }
+  @keyframes blink { 50% { opacity: .45; } }
+  .tl-scale { display: flex; justify-content: space-between; font: 500 11px var(--mono); color: var(--ink-3); }
+  .phases { display: grid; grid-template-columns: repeat(auto-fill, minmax(210px, 1fr)); gap: 0; margin-top: 24px; border-top: 1px solid var(--line); }
+  .phase { padding: 16px 18px 16px 0; border-bottom: 1px solid var(--line); display: grid; grid-template-columns: 18px 1fr; gap: 10px; }
+  .phase .dot { width: 12px; height: 12px; border-radius: 50%; margin-top: 4px; border: 2px solid var(--line-2); }
+  .phase.done .dot { background: var(--cs); border-color: var(--cs); }
+  .phase.now .dot { background: var(--amber); border-color: var(--amber); }
+  .phase b { font-size: 13.5px; font-weight: 600; display: block; }
+  .phase span { font-size: 12px; color: var(--ink-3); }
+  .phase .w { font-family: var(--mono); font-size: 11px; color: var(--ink-3); }
 
-  /* ---- about section ---- */
-  .about-grid { display: grid; grid-template-columns: 1.3fr 1fr; gap: 30px; margin-top: 4px; }
-  @media (max-width: 900px) { .about-grid { grid-template-columns: 1fr; } }
-  .about-copy p { color: var(--muted); font-size: 13.5px; line-height: 1.75; margin: 0 0 14px; }
-  .about-copy p:last-child { margin-bottom: 0; }
-  .about-side { display: flex; flex-direction: column; gap: 18px; }
-  .about-side h4 {
-    margin: 0 0 10px; font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.06em; color: var(--muted-2);
-  }
-  .mini-stats { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
-  .mini-stat { background: rgba(255,255,255,0.03); border: 1px solid var(--card-border); border-radius: 12px; padding: 13px 14px; }
-  .mini-stat .n {
-    font-family: 'Space Grotesk', sans-serif; font-weight: 700; font-size: 19px;
-    background: linear-gradient(120deg, #fff, #b9c3e0); -webkit-background-clip: text; background-clip: text; color: transparent;
-  }
-  .mini-stat .l { font-size: 10.5px; color: var(--muted-2); margin-top: 3px; text-transform: uppercase; letter-spacing: 0.04em; }
-  .stack-chips { display: flex; flex-wrap: wrap; gap: 8px; }
-  .chip {
-    font-size: 11.5px; font-weight: 600; color: var(--muted); background: rgba(255,255,255,0.04);
-    border: 1px solid var(--card-border); padding: 6px 11px; border-radius: 8px; font-family: 'JetBrains Mono', monospace;
-  }
-  .about-links { display: flex; flex-direction: column; gap: 9px; }
-  .about-links a {
-    display: flex; align-items: center; gap: 9px; color: var(--ink); text-decoration: none; font-size: 13px; font-weight: 600;
-    padding: 11px 14px; border-radius: 10px; border: 1px solid var(--card-border); background: rgba(255,255,255,0.02);
-    transition: all 0.2s ease;
-  }
-  .about-links a:hover { border-color: var(--card-border-hover); background: rgba(255,255,255,0.05); transform: translateX(2px); }
-  .about-links a svg { flex-shrink: 0; color: var(--cs); }
-  .about-links a .arrow { margin-left: auto; color: var(--muted-2); }
+  .links-row { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 28px; }
 
-  /* ---- buttons ---- */
-  .btn-row { display: flex; gap: 10px; margin-top: 22px; }
-  button.run { margin-top: 0; flex: 1; }
-  .btn-reset {
-    padding: 14px 16px; border-radius: 12px; border: 1px solid var(--card-border); background: rgba(255,255,255,0.02);
-    color: var(--muted); font-weight: 600; font-size: 13.5px; cursor: pointer; font-family: inherit;
-    transition: all 0.2s ease; display: flex; align-items: center; justify-content: center; gap: 7px; flex-shrink: 0;
-  }
-  .btn-reset:hover { border-color: var(--card-border-hover); color: #fff; background: rgba(255,255,255,0.05); }
-  .btn-reset:active { transform: translateY(1px); }
-  .btn-download {
-    margin-top: 16px; width: 100%; padding: 12px; border-radius: 11px; border: 1px dashed var(--card-border);
-    background: rgba(255,255,255,0.015); color: var(--muted); font-weight: 600; font-size: 12.5px; cursor: pointer; font-family: inherit;
-    display: flex; align-items: center; justify-content: center; gap: 7px; transition: all 0.2s ease;
-  }
-  .btn-download:hover:not(:disabled) { border-color: var(--cs); color: #fff; background: rgba(110,168,255,0.07); border-style: solid; }
-  .btn-download:disabled { opacity: 0.45; cursor: not-allowed; }
+  footer { padding: 48px 0 64px; }
+  footer .wrap { display: flex; justify-content: space-between; gap: 24px; flex-wrap: wrap; align-items: flex-start; }
+  footer p { margin: 0; color: var(--ink-3); font-size: 13px; max-width: 520px; }
+  footer .chips { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 14px; }
+  footer .chips span { font: 500 11px var(--mono); color: var(--ink-2); border: 1px solid var(--line); border-radius: 6px; padding: 4px 8px; }
+  footer nav { display: flex; gap: 18px; flex-wrap: wrap; }
+  footer nav a { font-size: 13px; color: var(--ink-2); text-decoration: none; }
+  footer nav a:hover { color: var(--ink); }
 
-  /* ---- stat cards ---- */
-  .stat-cards { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin-top: 20px; }
-  @media (max-width: 560px) { .stat-cards { grid-template-columns: 1fr; } }
-  .stat-card {
-    background: rgba(255,255,255,0.03); border: 1px solid var(--card-border); border-radius: 14px;
-    padding: 15px 16px 14px; display: flex; flex-direction: column; gap: 11px; transition: border-color 0.2s ease;
-  }
-  .stat-card:hover { border-color: var(--card-border-hover); }
-  .stat-card .icon {
-    width: 28px; height: 28px; border-radius: 8px; display: flex; align-items: center; justify-content: center;
-    background: rgba(110,168,255,0.12); color: var(--cs);
-  }
-  .stat-card.m2 .icon { background: rgba(90,200,250,0.12); color: var(--grad-2); }
-  .stat-card.m3 .icon { background: rgba(124,92,255,0.12); color: var(--grad-1); }
-  .stat-card .n {
-    font-size: 23px; font-weight: 700; font-family: 'Space Grotesk', sans-serif;
-    background: linear-gradient(120deg, #fff, #b9c3e0); -webkit-background-clip: text; background-clip: text; color: transparent;
-  }
-  .stat-card .l { font-size: 11px; color: var(--muted-2); text-transform: uppercase; letter-spacing: 0.04em; }
-
-  /* ---- footer ---- */
-  footer { max-width: 1180px; margin: 0 auto; padding: 0 20px 70px; }
-  .footer-card {
-    background: rgba(255,255,255,0.02); border: 1px solid var(--card-border); border-radius: var(--radius);
-    padding: 28px 30px 24px; display: flex; flex-direction: column; gap: 18px;
-  }
-  .footer-top { display: flex; justify-content: space-between; align-items: flex-start; gap: 24px; flex-wrap: wrap; }
-  .footer-top h3 { margin: 0 0 6px; font-size: 14px; color: #fff; }
-  .footer-top p { margin: 0; color: var(--muted-2); font-size: 12px; max-width: 440px; line-height: 1.65; }
-  .footer-links { display: flex; gap: 10px; flex-wrap: wrap; }
-  .footer-links a {
-    color: var(--muted); text-decoration: none; font-size: 12.5px; font-weight: 600; padding: 8px 13px;
-    border: 1px solid var(--card-border); border-radius: 9px; transition: all 0.2s ease; display: flex; align-items: center; gap: 6px;
-  }
-  .footer-links a:hover { color: #fff; border-color: var(--card-border-hover); }
-  .footer-chips { display: flex; flex-wrap: wrap; gap: 8px; padding-top: 16px; border-top: 1px solid var(--card-border); }
-  .footer-bottom { font-size: 11px; color: var(--muted-2); text-align: center; }
+  .js .reveal { opacity: 0; transform: translateY(12px); transition: opacity .6s ease, transform .6s ease; }
+  .js .reveal.in { opacity: 1; transform: none; }
 </style>
 </head>
 <body>
 
-<div class="navbar-outer">
-  <nav class="navbar">
-    <a class="brand" href="#top">
-      <span class="mark">VM</span>
-      <span class="name">VM Mitigation Policy</span>
+<header class="nav">
+  <div class="wrap">
+    <a class="brand" href="#top" aria-label="VM Mitigation, back to top">
+      <span class="brand-mark" aria-hidden="true"><i></i><i></i><i></i><i></i></span>
+      VM Mitigation
     </a>
-    <div class="links">
-      <a href="#about">About</a>
-      <a href="#demo">Live demo</a>
-      <a href="#findings">Findings</a>
-      <a href="#comparison">Model comparison</a>
-    </div>
-    <a class="gh-btn" href="https://github.com/Rag2102/ccproject" target="_blank" rel="noopener">
+    <nav class="nav-links" id="navLinks" aria-label="Sections">
+      <a href="#how">How it works</a>
+      <a href="#demo">Live model</a>
+      <a href="#findings">v1 results</a>
+      <a href="#comparison">Models</a>
+      <a href="#research">Research<span class="new">V2</span></a>
+    </nav>
+    <button class="icon-btn menu-btn" id="menuBtn" aria-label="Open menu" aria-expanded="false" aria-controls="navLinks">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="4" y1="7" x2="20" y2="7"/><line x1="4" y1="12" x2="20" y2="12"/><line x1="4" y1="17" x2="20" y2="17"/></svg>
+    </button>
+    <button class="icon-btn" id="themeBtn" aria-label="Switch colour theme" title="Switch colour theme">
+      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="4.5"/><path d="M12 2v2.5M12 19.5V22M4.2 4.2l1.8 1.8M18 18l1.8 1.8M2 12h2.5M19.5 12H22M4.2 19.8 6 18M18 6l1.8-1.8"/></svg>
+    </button>
+    <a class="icon-btn" href="https://github.com/Rag2102/ccproject" target="_blank" rel="noopener">
       <svg width="15" height="15" viewBox="0 0 16 16" fill="currentColor"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.01 8.01 0 0 0 16 8c0-4.42-3.58-8-8-8z"/></svg>
-      GitHub
+      <span class="gh-label">GitHub</span>
     </a>
-  </nav>
-</div>
-
-<header id="top">
-  <div class="kicker"><span class="dot"></span> Live model inference -- not a lookup table</div>
-  <h1>A workload-aware, cost-sensitive VM mitigation policy</h1>
-  <p>Pick a real drive model, an age, and a workload profile below. The app runs the chosen failure-probability
-     model live, builds a survival curve, derives time-to-failure, computes real migration cost via the
-     Clark et al. pre-copy formula, and shows what the cost-sensitive policy and the plain probability-threshold
-     baseline each decide -- side by side, on the same inputs.</p>
+  </div>
 </header>
 
-<main>
+<main id="top">
 
-  <div class="card" id="about">
-    <h2>About this project</h2>
-    <p class="sub">A cloud-computing coursework project built into a working portfolio piece: a real decision policy over three learned/derived signals, deployed two different ways.</p>
-    <div class="about-grid">
-      <div class="about-copy">
-        <p>Cloud providers lose money two ways when a VM's underlying hardware is about to fail: wait too long and
-           a customer's workload goes down; migrate too eagerly and you burn compute and network capacity you
-           didn't need to. This project asks whether a mitigation policy that actually weighs failure probability,
-           estimated time-to-failure, workload criticality, and the real cost of migrating beats the simpler
-           industry-standard approach -- flag and migrate anything that crosses a fixed probability threshold, the
-           same baseline Microsoft's Narya system was built to improve on.</p>
-        <p>The pipeline runs on two real, independently-sourced datasets -- Microsoft's Azure Public Dataset
-           (2M+ real VMs over a 30-day trace) and Backblaze's published drive-failure telemetry (122K+ drives,
-           ~6.9K real failures) -- since no public dataset links real VM placement to real hardware outcomes
-           directly. A calibrated hazard model turns drive age and model into a failure probability and a
-           time-to-failure estimate; a cost model prices live migration using the Clark et al. pre-copy formula
-           against real VM memory/vCPU data; and a full historical replay simulation compares the two policies
-           honestly, at a matched migration budget rather than a flattering one. The headline result: the two
-           policies land close together under random workload placement, and the cost-sensitive policy's advantage
-           shows up cleanly once workload criticality correlates with real hardware risk -- the realistic case,
-           not the pessimistic one.</p>
-        <p>Both the pipeline above and this page share one prediction module, deployed two different ways to
-           demonstrate two different kinds of cloud engineering: a traditional server here on Render, and a fully
-           serverless AWS stack (S3 + CloudFront, API Gateway + Lambda, and a Step Functions fan-out across
-           independent Lambda workers for the correlation-sweep experiment). Both deployments run the exact same
-           trained models live on every request below -- not a lookup table.</p>
+<!-- ======================================================= hero -->
+<section class="hero">
+  <div class="wrap">
+    <div>
+      <span class="eyebrow"><span class="pulse"></span>Live model · v2 research in progress</span>
+      <h1>Move the <em>right</em> VMs before the hardware fails.</h1>
+      <p class="lede">When a server is likely to fail, a cloud can live-migrate its VMs away, but every migration
+        costs bandwidth and a short pause, and the budget is finite. This project asks which VMs are worth moving:
+        a policy that weighs failure probability, time to failure, workload criticality and migration cost,
+        against the industry habit of moving anything above a probability threshold.</p>
+      <div class="cta-row">
+        <a class="btn btn-primary" href="#demo">Try the live model
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg></a>
+        <a class="btn btn-ghost" href="#research">What v2 has found</a>
       </div>
-      <div class="about-side">
-        <div class="mini-stats">
-          <div class="mini-stat"><div class="n">+3.4%</div><div class="l">cost advantage at &rho;=0.9</div></div>
-          <div class="mini-stat"><div class="n">0.781</div><div class="l">ROC-AUC, calibrated model</div></div>
-          <div class="mini-stat"><div class="n">2.0M+</div><div class="l">real VMs (Azure trace)</div></div>
-          <div class="mini-stat"><div class="n">122K+</div><div class="l">real drives (Backblaze)</div></div>
-        </div>
-        <div>
-          <h4>Built with</h4>
-          <div class="stack-chips">
-            <span class="chip">Python</span><span class="chip">scikit-learn</span><span class="chip">NumPy</span>
-            <span class="chip">pandas</span><span class="chip">Flask</span><span class="chip">AWS Lambda</span>
-            <span class="chip">API Gateway</span><span class="chip">Step Functions</span><span class="chip">S3 + CloudFront</span>
-            <span class="chip">Terraform</span><span class="chip">Chart.js</span><span class="chip">GitHub Actions</span>
-          </div>
-        </div>
-        <div class="about-links">
-          <a href="https://github.com/Rag2102/ccproject" target="_blank" rel="noopener">
-            <svg width="15" height="15" viewBox="0 0 16 16" fill="currentColor"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.01 8.01 0 0 0 16 8c0-4.42-3.58-8-8-8z"/></svg>
-            Source code on GitHub
-            <span class="arrow">&rarr;</span>
-          </a>
-          <a href="https://github.com/Rag2102/ccproject/blob/main/docs/cloud_architecture.md" target="_blank" rel="noopener">
-            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path><polyline points="15 3 21 3 21 9"></polyline><line x1="10" y1="14" x2="21" y2="3"></line></svg>
-            AWS architecture writeup
-            <span class="arrow">&rarr;</span>
-          </a>
-          <a href="https://github.com/Rag2102/ccproject/blob/main/docs/VM_Mitigation_Policy_Report.docx" target="_blank" rel="noopener">
-            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline></svg>
-            Full written report
-            <span class="arrow">&rarr;</span>
-          </a>
-        </div>
+      <div class="figures">
+        <div class="fig"><div class="n">2.0M+</div><div class="l">real VMs, Azure public trace</div></div>
+        <div class="fig"><div class="n">744M</div><div class="l">drive-days of Backblaze telemetry, 2013–2026</div></div>
+        <div class="fig"><div class="n">3</div><div class="l">Google 2019 cluster cells measured</div></div>
+        <div class="fig"><div class="n">17<span style="font-size:18px;color:var(--ink-3)">/60</span></div><div class="l">weeks of the v2 plan built</div></div>
+      </div>
+    </div>
+    <div class="fleet-card" aria-label="Illustration: hosts coloured by failure risk; VMs move off risky hosts before they fail">
+      <div class="fleet-head"><b>A fleet, simulated</b><span id="fleetClock">day 0</span></div>
+      <svg id="fleet" viewBox="0 0 360 240" role="img" aria-label="Animated grid of hosts"></svg>
+      <div class="fleet-legend">
+        <span><i style="background:var(--cs)"></i>low risk</span>
+        <span><i style="background:var(--th)"></i>high risk</span>
+        <span><i style="background:var(--bad)"></i>failed</span>
+        <span><i style="background:var(--good)"></i>VM moved in time</span>
       </div>
     </div>
   </div>
+</section>
 
-  <div class="grid-2" id="demo">
-    <div class="card">
-      <h2>Try it: live policy calculator</h2>
-      <p class="sub">Every prediction below is a real forward pass through a trained model -- not a lookup into a precomputed table.</p>
-
-      <label>Failure-probability model</label>
-      <div class="radio-row">
-        <label class="opt"><input type="radio" name="which_model" value="histgbm" checked> Calibrated HistGBM (recommended)</label>
-        <label class="opt"><input type="radio" name="which_model" value="gqat"> GQAT-Net-inspired (experimental, NumPy)</label>
-      </div>
-
-      <label for="model_grp">Drive model</label>
-      <select id="model_grp">
-        {% for m in model_groups %}<option value="{{ m }}">{{ m }}</option>{% endfor %}
-      </select>
-
-      <label for="age_days">Current drive age (days)</label>
-      <input type="range" id="age_days" min="0" max="{{ max_age_days }}" step="{{ bin_days }}" value="900">
-      <div id="age_val" class="range-val"></div>
-
-      <label for="criticality_tier">Workload criticality</label>
-      <select id="criticality_tier">
-        {% for c in criticality_tiers %}<option value="{{ c }}">{{ c }}</option>{% endfor %}
-      </select>
-
-      <label for="size_tier">VM size tier</label>
-      <select id="size_tier">
-        {% for s in size_tiers %}<option value="{{ s }}">{{ s }}</option>{% endfor %}
-      </select>
-
-      <div class="btn-row">
-        <button class="run" onclick="runPredict()">
-          <span class="spinner"></span>
-          <svg class="play-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="5 3 19 12 5 21 5 3"></polygon></svg>
-          <span class="btn-label">Run live prediction</span>
-        </button>
-        <button class="btn-reset" type="button" onclick="resetForm()" title="Reset to defaults">
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="1 4 1 10 7 10"></polyline><polyline points="23 20 23 14 17 14"></polyline><path d="M20.49 9A9 9 0 0 0 5.64 5.64L1 10m22 4l-4.64 4.36A9 9 0 0 1 3.51 15"></path></svg>
-          Reset
-        </button>
-      </div>
-    </div>
-
-    <div class="card">
-      <h2>Result</h2>
-      <p class="sub">Both policies see the exact same p_fail, time-to-failure, migration cost and failure cost -- the threshold baseline just ignores everything except p_fail, by design (that's the comparison this project is about).</p>
-      <div id="result-placeholder" class="placeholder">Run a prediction to see both policies' decisions.</div>
-      <div id="result" style="display:none">
-        <div class="stat-cards">
-          <div class="stat-card m1">
-            <div class="icon"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path><line x1="12" y1="9" x2="12" y2="13"></line><line x1="12" y1="17" x2="12.01" y2="17"></line></svg></div>
-            <div class="n" id="stat-pfail">--</div><div class="l">P(fail within {{ lookahead_days }}d)</div>
-          </div>
-          <div class="stat-card m2">
-            <div class="icon"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg></div>
-            <div class="n" id="stat-ttf">--</div><div class="l">expected TTF (days)</div>
-          </div>
-          <div class="stat-card m3">
-            <div class="icon"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3v18h18"></path><path d="M18.7 8l-5.1 5.2-2.8-2.7L7 14.3"></path></svg></div>
-            <div class="n" id="stat-mediattf">--</div><div class="l">median TTF (days)</div>
-          </div>
-        </div>
-        <div class="result-grid">
-          <div class="policy-box cs">
-            <h3>Cost-sensitive policy</h3>
-            <div id="cs-badge"></div>
-            <div class="kv"><span>Expected cost of inaction</span><b id="cs-cost">--</b></div>
-            <div class="kv"><span>Migration cost</span><b id="cs-migcost">--</b></div>
-            <div class="kv"><span>Urgency weight</span><b id="cs-urgency">--</b></div>
-          </div>
-          <div class="policy-box th">
-            <h3>Threshold baseline</h3>
-            <div id="th-badge"></div>
-            <div class="kv"><span>Threshold (tau)</span><b>{{ tau_default }}</b></div>
-            <div class="kv"><span>Rule</span><b style="font-family:inherit; font-weight:500; color:var(--muted)">migrate iff p_fail &gt; tau</b></div>
-          </div>
-        </div>
-        <div class="note" id="model-note"></div>
-        <button class="btn-download" id="download-btn" type="button" onclick="downloadResult()" disabled>
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
-          Save this result to disk
-        </button>
-      </div>
-    </div>
-  </div>
-
-  <div class="card" id="findings">
-    <h2>The project's real findings <span class="pill">precomputed, from the actual experiments</span></h2>
-    <p class="sub">These numbers come from a full historical replay simulation and a follow-up correlation-sensitivity study over the real Backblaze + Azure datasets -- not from this demo's live calculator above.</p>
-    <div class="grid-2">
+<!-- ======================================================= how -->
+<section class="block" id="how">
+  <div class="wrap">
+    <div class="sec-head reveal">
+      <div class="sec-num">01<b>How it works</b></div>
       <div>
-        <table>
-          <tr><th>Metric</th><th>Cost-sensitive</th><th>Threshold (matched budget)</th><th>Threshold (naive, &tau; = 0.0073)</th></tr>
-          {% for metric, row in headline.items() %}
-          <tr><td>{{ metric.replace('_',' ') }}</td>
-              <td>{{ '%.4f'|format(row.cost_sensitive) if row.cost_sensitive is number and row.cost_sensitive < 5 else '%.0f'|format(row.cost_sensitive) }}</td>
-              <td>{% if row.threshold_matched is defined %}{{ '%.4f'|format(row.threshold_matched) if row.threshold_matched is number and row.threshold_matched < 5 else '%.0f'|format(row.threshold_matched) }}{% else %}n/a{% endif %}</td>
-              <td>{{ '%.4f'|format(row.threshold) if row.threshold is number and row.threshold < 5 else '%.0f'|format(row.threshold) }}</td></tr>
+        <h2>Four signals, one decision.</h2>
+        <p>Each signal comes from a model or a real dataset. The cost-sensitive policy uses all four; the threshold baseline uses only the first, which is the comparison this project is about.</p>
+      </div>
+    </div>
+    <div class="panel pipeline reveal">
+      <div class="step">
+        <div class="k">STEP 1</div>
+        <div class="ico"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10.3 3.9 1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12" y2="17"/></svg></div>
+        <h3>Failure probability</h3>
+        <p>A calibrated hazard model turns drive model and age into P(fail within {{ lookahead_days }} days).</p>
+        <div class="src">HistGBM · Backblaze</div>
+      </div>
+      <div class="step">
+        <div class="k">STEP 2</div>
+        <div class="ico"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><polyline points="12 7 12 12 15.5 14"/></svg></div>
+        <h3>Time to failure</h3>
+        <p>A survival curve gives the expected time left, which sets how urgent a move is.</p>
+        <div class="src">survival curve · urgency weight</div>
+      </div>
+      <div class="step">
+        <div class="k">STEP 3</div>
+        <div class="ico"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="17 1 21 5 17 9"/><path d="M3 11V9a4 4 0 0 1 4-4h14"/><polyline points="7 23 3 19 7 15"/><path d="M21 13v2a4 4 0 0 1-4 4H3"/></svg></div>
+        <h3>Migration cost</h3>
+        <p>Clark et al.'s pre-copy model prices a live migration from the VM's real memory and CPU profile.</p>
+        <div class="src">pre-copy · Azure VM sizes</div>
+      </div>
+      <div class="step">
+        <div class="k">STEP 4</div>
+        <div class="ico"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg></div>
+        <h3>Decision</h3>
+        <p>Migrate if the expected cost of waiting (probability × criticality × urgency) beats the migration cost.</p>
+        <div class="src">vs. threshold: p &gt; τ = {{ tau_default }}</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ======================================================= demo -->
+<section class="block" id="demo">
+  <div class="wrap">
+    <div class="sec-head reveal">
+      <div class="sec-num">02<b>Live model</b></div>
+      <div>
+        <h2>Ask the model about one VM.</h2>
+        <p>Every change runs a real forward pass through the trained model on the server. It is not a lookup table. Both policies see exactly the same inputs.</p>
+      </div>
+    </div>
+    <div class="demo">
+      <div class="panel pad reveal" id="controls">
+        <div class="field">
+          <div class="field-label">Failure model</div>
+          <div class="seg" role="radiogroup" aria-label="Failure model">
+            <input type="radio" name="which_model" id="m-hgb" value="histgbm" checked><label for="m-hgb">Calibrated HistGBM<small>recommended</small></label>
+            <input type="radio" name="which_model" id="m-gqat" value="gqat"><label for="m-gqat">GQAT-Net<small>experimental</small></label>
+          </div>
+        </div>
+        <div class="field">
+          <div class="field-label"><label for="model_grp">Drive model</label></div>
+          <select id="model_grp">
+            {% for m in model_groups %}<option value="{{ m }}" {% if m == 'ST4000DM000' %}selected{% endif %}>{{ m }}</option>{% endfor %}
+          </select>
+        </div>
+        <div class="field">
+          <div class="field-label"><label for="age_days">Drive age</label><span id="age_val"></span></div>
+          <input type="range" id="age_days" min="0" max="{{ max_age_days }}" step="{{ bin_days }}" value="900" aria-describedby="age_val">
+          <div class="range-scale"><span>new</span><span>{{ (max_age_days / 365) | round(1) }} yr</span></div>
+        </div>
+        <div class="field">
+          <div class="field-label">Workload criticality</div>
+          <div class="seg" role="radiogroup" aria-label="Workload criticality">
+            {% for c in criticality_tiers %}<input type="radio" name="criticality_tier" id="c-{{ c }}" value="{{ c }}" {% if loop.first %}checked{% endif %}><label for="c-{{ c }}">{{ c }}</label>{% endfor %}
+          </div>
+        </div>
+        <div class="field">
+          <div class="field-label">VM size</div>
+          <div class="seg" role="radiogroup" aria-label="VM size">
+            {% for s in ['small', 'medium', 'large'] if s in size_tiers %}<input type="radio" name="size_tier" id="s-{{ s }}" value="{{ s }}" {% if s == 'medium' %}checked{% endif %}><label for="s-{{ s }}">{{ s }}</label>{% endfor %}
+          </div>
+        </div>
+        <div class="demo-actions">
+          <label class="live-toggle"><input type="checkbox" id="autoRun" checked> Update as I change inputs</label>
+          <button class="btn btn-ghost btn-icon" type="button" onclick="resetForm()" title="Reset to defaults" aria-label="Reset to defaults">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="1 4 1 10 7 10"/><path d="M3.5 15a9 9 0 1 0 2.1-9.4L1 10"/></svg>
+          </button>
+          <button class="btn btn-run" type="button" id="runBtn" onclick="runPredict()">
+            <span class="spin"></span>
+            <svg class="play" width="12" height="12" viewBox="0 0 24 24" fill="currentColor"><polygon points="6 4 20 12 6 20"/></svg>
+            Run
+          </button>
+        </div>
+      </div>
+
+      <div class="panel reveal" id="resultPanel" aria-live="polite">
+        <div class="result-empty" id="resultEmpty">Loading the model…</div>
+        <div id="result" hidden>
+          <div class="readouts">
+            <div class="ro">
+              <div class="l">P(fail within {{ lookahead_days }} days)</div>
+              <div class="v" id="ro-p">–</div>
+              <div class="meter" aria-hidden="true"><div class="fill" id="pFill"></div><div class="tau" id="tauMark"></div></div>
+              <div class="meter-scale"><span>0</span><span id="meterMax">–</span></div>
+            </div>
+            <div class="ro"><div class="l">Expected time to failure</div><div class="v" id="ro-ttf">–</div></div>
+            <div class="ro"><div class="l">Median time to failure</div><div class="v" id="ro-med">–</div></div>
+          </div>
+          <div class="decisions">
+            <div class="dec">
+              <div class="dec-top"><span class="dec-name"><i style="background:var(--cs)"></i>Cost-sensitive policy</span><span class="verdict idle" id="cs-verdict">–</span></div>
+              <p class="why" id="cs-why"></p>
+              <div class="bars">
+                <div class="bar-row"><span>Cost of waiting</span><div class="bar"><span id="bar-wait" style="background:var(--th)"></span></div><b id="v-wait">–</b></div>
+                <div class="bar-row"><span>Cost of migrating</span><div class="bar"><span id="bar-mig" style="background:var(--cs)"></span></div><b id="v-mig">–</b></div>
+              </div>
+              <div class="dec-foot">
+                <div class="kv"><span>Urgency weight</span><b id="cs-urg">–</b></div>
+                <div class="kv"><span>Units</span><b>impact-minutes</b></div>
+              </div>
+            </div>
+            <div class="dec">
+              <div class="dec-top"><span class="dec-name"><i style="background:var(--th)"></i>Threshold baseline</span><span class="verdict idle" id="th-verdict">–</span></div>
+              <p class="why" id="th-why"></p>
+              <div class="bars">
+                <div class="bar-row"><span>p (this VM's host)</span><div class="bar"><span id="bar-p" style="background:var(--ink-2)"></span></div><b id="v-p">–</b></div>
+                <div class="bar-row"><span>τ (fixed threshold)</span><div class="bar"><span id="bar-tau" style="background:var(--th)"></span></div><b>{{ tau_default }}</b></div>
+              </div>
+              <div class="dec-foot">
+                <div class="kv"><span>Rule</span><b>migrate iff p &gt; τ</b></div>
+                <div class="kv"><span>Ignores</span><b>criticality, size, cost</b></div>
+              </div>
+            </div>
+          </div>
+          <div class="result-foot">
+            <p id="model-note"></p>
+            <button class="btn btn-ghost btn-sm" type="button" id="download-btn" onclick="downloadResult()" disabled>
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+              Save report
+            </button>
+          </div>
+        </div>
+        <div class="err" id="err"></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ======================================================= v1 findings -->
+<section class="block" id="findings">
+  <div class="wrap">
+    <div class="sec-head reveal">
+      <div class="sec-num">03<b>v1 results</b></div>
+      <div>
+        <h2>What the course project found.</h2>
+        <p>A full historical replay over the Backblaze and Azure datasets, at a matched migration budget. These are the frozen v1 numbers (tag <span class="mono">v1.0-course</span>); the box below says what v2 learned about them.</p>
+      </div>
+    </div>
+    <div class="two">
+      <div class="panel pad reveal">
+        <div class="panel-head"><div><h3>Headline replay</h3><p>Random workload placement</p></div><span class="tag v1">v1 · precomputed</span></div>
+        <div class="table-scroll">
+          <table>
+            <tr><th>Metric</th><th>Cost-sensitive</th><th>Threshold<br>matched budget</th><th>Threshold<br>naive τ</th></tr>
+            {% for metric, row in headline.items() %}
+            <tr><td>{{ metric.replace('_',' ') }}</td>
+                <td>{{ '%.4f'|format(row.cost_sensitive) if row.cost_sensitive is number and row.cost_sensitive < 5 else '{:,.0f}'.format(row.cost_sensitive) }}</td>
+                <td>{% if row.threshold_matched is defined %}{{ '%.4f'|format(row.threshold_matched) if row.threshold_matched is number and row.threshold_matched < 5 else '{:,.0f}'.format(row.threshold_matched) }}{% else %}n/a{% endif %}</td>
+                <td>{{ '%.4f'|format(row.threshold) if row.threshold is number and row.threshold < 5 else '{:,.0f}'.format(row.threshold) }}</td></tr>
+            {% endfor %}
+          </table>
+        </div>
+        <p class="fine">At nearly the same number of migrations (5,522 vs 5,116, the closest achievable match) the cost-sensitive policy cost about 3.1% more than the threshold. The naive column migrates far more and is not like-for-like.</p>
+      </div>
+      <div class="panel pad reveal">
+        <div class="panel-head"><div><h3>Correlation sensitivity</h3><p>Advantage as criticality and host risk become correlated</p></div><span class="tag v1">v1 · precomputed</span></div>
+        <div class="chart-box"><canvas id="corrChart" aria-label="v1 advantage of the cost-sensitive policy against correlation"></canvas></div>
+      </div>
+    </div>
+    <div class="callout reveal">
+      <div class="ci">v2</div>
+      <div>
+        <b>v2 re-examined the −3.1% at ρ = 0.</b>
+        <p>It was mostly a counting effect, not a weakness of cost-awareness: the threshold got 8% more migrations, and every migration was credited with failures a median 170 days later, while the decision used a 30-day probability. With the budget matched and credit limited to the decision's own window, the cost-sensitive rule is ahead by about 0.2%. The v2 theory also predicts no break-even near ρ ≈ 0.3 (see below). <a class="more" href="https://github.com/Rag2102/ccproject/blob/main/docs/v2/v1_anomaly.md" target="_blank" rel="noopener">Read the diagnosis</a></p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ======================================================= model comparison -->
+<section class="block" id="comparison">
+  <div class="wrap">
+    <div class="sec-head reveal">
+      <div class="sec-num">04<b>Models</b></div>
+      <div>
+        <h2>Does a deep attention model beat a calibrated tree model?</h2>
+        <p>Both scored on the same held-out test rows. The gradient-boosted hazard model wins on every metric, most clearly on calibration, which is what a decision rule needs from a probability.</p>
+      </div>
+    </div>
+    <div class="panel pad reveal">
+      <div class="table-scroll">
+        <table id="cmpTable">
+          <tr><th>Model</th><th>ROC-AUC ↑</th><th>PR-AUC ↑</th><th>Brier ↓</th><th>ECE ↓</th></tr>
+          {% for row in comparison %}
+          <tr><td>{{ row.model }}</td><td data-k="roc_auc" data-v="{{ row.roc_auc }}">{{ '%.4f'|format(row.roc_auc) }}</td><td data-k="pr_auc" data-v="{{ row.pr_auc }}">{{ '%.4f'|format(row.pr_auc) }}</td>
+              <td data-k="brier" data-v="{{ row.brier }}">{{ '%.5f'|format(row.brier) }}</td><td data-k="ece" data-v="{{ row.ece }}">{{ '%.5f'|format(row.ece) }}</td></tr>
           {% endfor %}
         </table>
-        <p class="note">Under random workload placement the fair comparison is the matched-budget column: with nearly the same number of
-          migrations (5,522 vs 5,116, the closest achievable match) the cost-sensitive policy costs about 3.1% more than the threshold
-          policy. The naive column (&tau; = 0.0073, the 95th percentile of host risk) migrates far more and the cost-sensitive policy costs
-          about 11.1% more than it, but that is not a like-for-like comparison. This is an honest, non-confirmatory baseline result; the follow-up experiment on the right
-          shows where the hypothesis <i>does</i> hold.</p>
       </div>
-      <div class="chart-panel">
-        <span class="chart-eyebrow">Correlation sensitivity</span>
-        <h3>Cost-sensitive policy overtakes the threshold near &rho; &approx; 0.3</h3>
-        <p class="chart-caption">As workload criticality and hardware failure risk become more correlated, cost-awareness starts paying off -- and keeps paying off as that correlation grows.</p>
-        <div class="chart-wrap"><canvas id="correlationChart"></canvas></div>
-        <div class="chart-legend">
-          <span><i style="background:var(--cs)"></i>Cost-sensitive policy wins</span>
-          <span><i style="background:var(--th)"></i>Threshold policy wins</span>
+      <p class="fine">Best value per column in green. Tree ensembles tend to match or beat deep architectures on small tabular problems, and a fancier architecture does not by itself produce a usable probability. In v2, adding SMART telemetry mattered far more than the model class (next section).</p>
+    </div>
+  </div>
+</section>
+
+<!-- ======================================================= v2 research -->
+<section class="block" id="research">
+  <div class="wrap">
+    <div class="sec-head reveal">
+      <div class="sec-num">05<b>v2 research</b></div>
+      <div>
+        <h2>Turning a course project into research.</h2>
+        <p>A 60-week plan (Oct 2026 to Nov 2027) asks whether the idea holds up under real data, a validated simulator, theory and pre-registered statistics. Everything below is work in progress; each number carries where it comes from.</p>
+      </div>
+    </div>
+
+    <div class="panel pad reveal">
+      <div class="status">
+        <div>
+          <h3>Weeks 1–17 built · Week 18 benchmark runs next</h3>
+          <p>Data, failure model, real-trace measurement, simulator (validated), policies, theory and a frozen protocol are done. The pre-registered benchmark runs start next, then the paper, an open benchmark and a results console.</p>
+          <div class="progress" aria-label="17 of 60 weeks built"><span style="width:28.3%;background:var(--cs)"></span><span style="width:1.7%;background:var(--amber)"></span></div>
+          <div class="progress-scale" style="position:relative;height:16px"><span style="position:absolute;left:0">Week 1</span><span style="position:absolute;left:66.7%;transform:translateX(-50%)">Paper A · W40</span><span style="position:absolute;right:0">Week 60</span></div>
+        </div>
+        <div class="status-num"><div class="n">17<small>/60</small></div><div class="l">weeks of work built</div></div>
+      </div>
+    </div>
+
+    <div class="cards">
+      <article class="panel fcard reveal">
+        <span class="tag measured">Measured</span>
+        <div class="big">ρ ≈ 0</div>
+        <h3>Real placement ignores hardware risk</h3>
+        <p>In three Google 2019 cluster cells, critical work is essentially uncorrelated with machine risk: |τ-b| ≤ 0.075 under every mapping and proxy tried (gate G1, class C0).</p>
+        <div class="src"><a class="more" href="https://github.com/Rag2102/ccproject/blob/main/docs/v2/G1_decision.md" target="_blank" rel="noopener">G1_decision.md</a></div>
+      </article>
+      <article class="panel fcard reveal">
+        <span class="tag derived">Derived</span>
+        <div class="big">−3.1% → +0.2%</div>
+        <h3>v1's loss was a counting artifact</h3>
+        <p>Matching the budget exactly and crediting migrations only within the 30-day decision window turns v1's loss at ρ = 0 into a small gain.</p>
+        <div class="src"><a class="more" href="https://github.com/Rag2102/ccproject/blob/main/docs/v2/v1_anomaly.md" target="_blank" rel="noopener">v1_anomaly.md</a></div>
+      </article>
+      <article class="panel fcard reveal">
+        <span class="tag derived">Derived · checked</span>
+        <div class="big">3,024<small> / 3,024</small></div>
+        <h3>Gains come from cost spread, not correlation</h3>
+        <p>A closed form, checked by Monte Carlo at every grid point: cost-aware selection never loses under calibrated probabilities, and gains most when VM costs vary, largest near ρ = 0.</p>
+        <div class="src"><a class="more" href="https://github.com/Rag2102/ccproject/blob/main/docs/v2/THEORY.md" target="_blank" rel="noopener">THEORY.md</a></div>
+      </article>
+      <article class="panel fcard reveal">
+        <span class="tag measured">Measured</span>
+        <div class="big">0.002 → 0.131</div>
+        <h3>SMART telemetry is what predicts failure</h3>
+        <p>PR-AUC on a forward-in-time test: v1's features (age, model) 0.0018; SMART features 0.074; a 20-model ensemble 0.131, chosen by a rule fixed before scoring.</p>
+        <div class="src"><a class="more" href="https://github.com/Rag2102/ccproject/blob/main/docs/v2/failure_model_v2.md" target="_blank" rel="noopener">failure_model_v2.md</a> · ADR-006</div>
+      </article>
+      <article class="panel fcard reveal">
+        <span class="tag validated">Validated</span>
+        <div class="big">6×10⁻⁷</div>
+        <h3>A simulator that reproduces v1 exactly</h3>
+        <p>A day-stepped fleet simulator with VM churn, live-migration queues and repairs reproduces v1's headline costs to a relative error of 6×10⁻⁷ and passes analytic, calibration and invariant checks (gate G2).</p>
+        <div class="src"><a class="more" href="https://github.com/Rag2102/ccproject/blob/main/docs/v2/G2_simulator_validation.md" target="_blank" rel="noopener">G2_simulator_validation.md</a></div>
+      </article>
+      <article class="panel fcard reveal">
+        <span class="tag simulated">Simulated</span>
+        <div class="big">0 / 5</div>
+        <h3>A safety guard that ignores noise</h3>
+        <p>The guard switches to budget-aware migration only when its evidence and a calibration audit agree. On a control where risk scores carry no information it never switched.</p>
+        <div class="src">P6 smoke test · dev seeds</div>
+      </article>
+    </div>
+
+    <div class="panel sandbox reveal">
+      <div class="sandbox-ctrl">
+        <span class="tag illustrative">Illustrative · theory</span>
+        <h3>Theory sandbox</h3>
+        <p>The closed form from THEORY.md (T3): advantage of budget-aware selection over a probability threshold, for a one-shot decision. Not simulator output.</p>
+        <div class="field">
+          <div class="field-label"><label for="sbSy">Spread of VM costs, σ<sub>log κ</sub></label><span id="sbSyV"></span></div>
+          <input type="range" id="sbSy" min="0.05" max="1.5" step="0.05" value="1.0">
+        </div>
+        <div class="field">
+          <div class="field-label"><label for="sbQ">Budget, share of VMs movable</label><span id="sbQV"></span></div>
+          <input type="range" id="sbQ" min="0" max="100" step="1" value="35">
+        </div>
+        <div class="field">
+          <div class="field-label"><label for="sbLam">Migration cost, λ</label><span id="sbLamV"></span></div>
+          <input type="range" id="sbLam" min="0" max="4" step="0.1" value="1">
+        </div>
+      </div>
+      <div class="sandbox-out">
+        <div class="chart-box"><canvas id="sbChart" aria-label="Theoretical advantage against correlation"></canvas></div>
+        <div class="sb-read">
+          <div><b id="sbAt0">–</b>advantage at ρ = 0</div>
+          <div><b id="sbPeak">–</b>peak, at ρ</div>
+          <div><b id="sbRange">–</b>range where Δ ≥ 1%</div>
         </div>
       </div>
     </div>
-  </div>
 
-  <div class="card" id="comparison">
-    <h2>Does a deep attention model beat the calibrated hazard model?</h2>
-    <p class="sub">Both models scored on the identical held-out test rows -- including why a deep attention architecture doesn't beat a well-calibrated gradient-boosted model here.</p>
-    <table>
-      <tr><th>Model</th><th>ROC-AUC</th><th>PR-AUC</th><th>Brier</th><th>ECE</th></tr>
-      {% for row in comparison %}
-      <tr><td>{{ row.model }}</td><td>{{ '%.4f'|format(row.roc_auc) }}</td><td>{{ '%.4f'|format(row.pr_auc) }}</td>
-          <td>{{ '%.5f'|format(row.brier) }}</td><td>{{ '%.5f'|format(row.ece) }}</td></tr>
-      {% endfor %}
-    </table>
-    <p class="note">The gradient-boosted hazard model wins on every metric, especially calibration -- consistent with
-      the well-known finding that tree-based models tend to match or beat deep architectures on small-feature-count
-      tabular problems, and a reminder that a fancier architecture doesn't automatically produce a usable probability.</p>
+    <div class="panel pad timeline reveal">
+      <div class="panel-head"><div><h3>The 60-week plan</h3><p>Each square is a week; built weeks in blue, the next one in amber.</p></div></div>
+      <div class="tl-track" id="tlTrack" aria-hidden="true"></div>
+      <div class="tl-scale"><span>Oct 2026</span><span>Apr 2027</span><span>Nov 2027</span></div>
+      <div class="phases">
+        <div class="phase done"><span class="dot"></span><div><b>Foundation and claim</b><span class="w">W1–3</span> <span>· v1 frozen, protocol</span></div></div>
+        <div class="phase done"><span class="dot"></span><div><b>Real data</b><span class="w">W4–8</span> <span>· Backblaze, Google trace</span></div></div>
+        <div class="phase done"><span class="dot"></span><div><b>Simulator</b><span class="w">W9–13</span> <span>· validated at G2</span></div></div>
+        <div class="phase done"><span class="dot"></span><div><b>Policies and theory</b><span class="w">W14–17</span> <span>· protocol frozen</span></div></div>
+        <div class="phase now"><span class="dot"></span><div><b>Benchmark runs</b><span class="w">W18–21</span> <span>· next</span></div></div>
+        <div class="phase"><span class="dot"></span><div><b>Paper, artifact, console</b><span class="w">W22–26</span></div></div>
+        <div class="phase"><span class="dot"></span><div><b>Polish and submit paper A</b><span class="w">W27–40</span></div></div>
+        <div class="phase"><span class="dot"></span><div><b>Ground the cost model</b><span class="w">W41–46</span></div></div>
+        <div class="phase"><span class="dot"></span><div><b>Failure physics</b><span class="w">W47–50</span></div></div>
+        <div class="phase"><span class="dot"></span><div><b>Open benchmark v1.0</b><span class="w">W51–54</span></div></div>
+        <div class="phase"><span class="dot"></span><div><b>Journal extension</b><span class="w">W55–60</span></div></div>
+      </div>
+      <div class="links-row more-row">
+        <a class="more" href="https://github.com/Rag2102/ccproject/blob/main/docs/v2/THEORY.md" target="_blank" rel="noopener">Read the theory</a>
+        <a class="more" href="https://github.com/Rag2102/ccproject/blob/main/docs/v2/PROTOCOL.md" target="_blank" rel="noopener">Pre-registered protocol</a>
+        <a class="more" href="https://github.com/Rag2102/ccproject/blob/main/docs/v2/LOG.md" target="_blank" rel="noopener">Weekly log</a>
+        <a class="more" href="https://github.com/Rag2102/ccproject/tree/main/docs/v2/DECISIONS" target="_blank" rel="noopener">Decision records</a>
+      </div>
+    </div>
   </div>
+</section>
 
 </main>
 
 <footer>
-  <div class="footer-card">
-    <div class="footer-top">
-      <div>
-        <h3>A workload-aware, cost-sensitive VM mitigation policy</h3>
-        <p>Coursework project turned working portfolio piece. Same prediction code, two deployments -- a Flask
-           server here on Render, and a fully serverless stack on AWS.</p>
-      </div>
-      <div class="footer-links">
-        <a href="https://github.com/Rag2102/ccproject" target="_blank" rel="noopener">
-          <svg width="14" height="14" viewBox="0 0 16 16" fill="currentColor"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.01 8.01 0 0 0 16 8c0-4.42-3.58-8-8-8z"/></svg>
-          Repository
-        </a>
-        <a href="https://github.com/Rag2102/ccproject/blob/main/docs/cloud_architecture.md" target="_blank" rel="noopener">
-          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path><polyline points="15 3 21 3 21 9"></polyline><line x1="10" y1="14" x2="21" y2="3"></line></svg>
-          Architecture docs
-        </a>
-        <a href="#top">
-          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="19" x2="12" y2="5"></line><polyline points="5 12 12 5 19 12"></polyline></svg>
-          Back to top
-        </a>
-      </div>
+  <div class="wrap">
+    <div>
+      <a class="brand" href="#top"><span class="brand-mark" aria-hidden="true"><i></i><i></i><i></i><i></i></span>VM Mitigation</a>
+      <p style="margin-top:12px">Started as a Cloud Computing course project; now a research programme. The same prediction code runs here on Render and on a serverless AWS stack. Every number on this page comes from real datasets, trained models or the cited documents.</p>
+      <div class="chips"><span>Python</span><span>scikit-learn</span><span>NumPy</span><span>DuckDB</span><span>Flask</span><span>AWS Lambda</span><span>Step Functions</span><span>Terraform</span><span>Chart.js</span></div>
     </div>
-    <div class="footer-chips">
-      <span class="chip">Python</span><span class="chip">scikit-learn</span><span class="chip">NumPy</span>
-      <span class="chip">pandas</span><span class="chip">Flask</span><span class="chip">AWS Lambda</span>
-      <span class="chip">API Gateway</span><span class="chip">Step Functions</span><span class="chip">S3 + CloudFront</span>
-      <span class="chip">Terraform</span><span class="chip">Chart.js</span><span class="chip">GitHub Actions</span>
-    </div>
-    <div class="footer-bottom">Built as a Cloud Computing coursework project -- every number on this page comes from real datasets and real trained models.</div>
+    <nav aria-label="Footer">
+      <a href="https://github.com/Rag2102/ccproject" target="_blank" rel="noopener">Repository</a>
+      <a href="https://github.com/Rag2102/ccproject/blob/main/docs/cloud_architecture.md" target="_blank" rel="noopener">AWS architecture</a>
+      <a href="https://github.com/Rag2102/ccproject/blob/main/docs/VM_Mitigation_Policy_Report.docx" target="_blank" rel="noopener">v1 report</a>
+      <a href="#top">Back to top ↑</a>
+    </nav>
   </div>
 </footer>
 
-<script>
-const ageInput = document.getElementById('age_days');
-const ageVal = document.getElementById('age_val');
-function updateAgeLabel() { ageVal.textContent = ageInput.value + ' days (~' + (ageInput.value/365).toFixed(1) + ' yr)'; }
-ageInput.addEventListener('input', updateAgeLabel);
-updateAgeLabel();
-
-let lastResult = null;
-let lastInputs = null;
-
-async function runPredict() {
-  const which_model = document.querySelector('input[name=which_model]:checked').value;
-  const payload = {
-    model_grp: document.getElementById('model_grp').value,
-    age_days: parseFloat(ageInput.value),
-    criticality_tier: document.getElementById('criticality_tier').value,
-    size_tier: document.getElementById('size_tier').value,
-    which_model: which_model,
-  };
-  const btn = document.querySelector('button.run');
-  const label = btn.querySelector('.btn-label');
-  btn.disabled = true; btn.classList.add('loading'); label.textContent = 'Running model...';
-  try {
-    const res = await fetch('/api/predict', {
-      method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify(payload)
-    });
-    const data = await res.json();
-    lastResult = data;
-    lastInputs = payload;
-    document.getElementById('result-placeholder').style.display = 'none';
-    const resultEl = document.getElementById('result');
-    resultEl.style.display = 'none';
-    void resultEl.offsetWidth; // restart fade-in animation on every run
-    resultEl.style.display = 'block';
-
-    document.getElementById('stat-pfail').textContent = (data.p_fail_within_window*100).toFixed(3) + '%';
-    document.getElementById('stat-ttf').textContent = data.expected_ttf_days;
-    document.getElementById('stat-mediattf').textContent = data.median_ttf_days ?? 'n/a (beyond horizon)';
-
-    const csBadge = document.getElementById('cs-badge');
-    csBadge.innerHTML = '<span class="badge ' + (data.cost_sensitive.migrate ? 'migrate">MIGRATE' : 'wait">WAIT') + '</span>';
-    document.getElementById('cs-cost').textContent = data.cost_sensitive.expected_cost_of_inaction + ' impact-min';
-    document.getElementById('cs-migcost').textContent = data.cost_sensitive.migration_cost + ' impact-min';
-    document.getElementById('cs-urgency').textContent = 'x' + data.cost_sensitive.urgency_weight;
-
-    const thBadge = document.getElementById('th-badge');
-    thBadge.innerHTML = '<span class="badge ' + (data.threshold.migrate ? 'migrate">MIGRATE' : 'wait">WAIT') + '</span>';
-
-    let note = 'Model used: ' + data.model_used + '. Migration: ' +
-      (data.costs.precopy_converges ? 'pre-copy converges' : 'forced stop-and-copy fallback') +
-      ' (' + data.costs.migration_time_s + 's, blackout ' + data.costs.migration_blackout_s + 's).';
-    if (data.mc_dropout_std !== null && data.mc_dropout_std !== undefined) {
-      note += ' MC-dropout uncertainty (std across 15 stochastic passes): ' + data.mc_dropout_std.toFixed(4) +
-              ' -- this model is NumPy-only and less well-calibrated than the HistGBM default.';
-    }
-    document.getElementById('model-note').textContent = note;
-
-    const dlBtn = document.getElementById('download-btn');
-    if (dlBtn) dlBtn.disabled = false;
-  } catch (e) {
-    alert('Prediction failed: ' + e);
-  } finally {
-    btn.disabled = false; btn.classList.remove('loading'); label.textContent = 'Run live prediction';
-  }
-}
-
-function resetForm() {
-  document.querySelector('input[name=which_model][value=histgbm]').checked = true;
-  const modelGrp = document.getElementById('model_grp'); if (modelGrp) modelGrp.selectedIndex = 0;
-  const crit = document.getElementById('criticality_tier'); if (crit) crit.selectedIndex = 0;
-  const size = document.getElementById('size_tier'); if (size) size.selectedIndex = 0;
-  ageInput.value = 900;
-  updateAgeLabel();
-  document.getElementById('result').style.display = 'none';
-  document.getElementById('result-placeholder').style.display = 'block';
-  const dlBtn = document.getElementById('download-btn');
-  if (dlBtn) dlBtn.disabled = true;
-  lastResult = null; lastInputs = null;
-}
-
-function downloadResult() {
-  if (!lastResult || !lastInputs) return;
-  const d = lastResult, p = lastInputs;
-  const lines = [
-    'VM Mitigation Policy -- Prediction Report',
-    'Generated: ' + new Date().toString(),
-    '='.repeat(50),
-    '',
-    'INPUTS',
-    '  Model used:               ' + d.model_used,
-    '  Drive model:              ' + p.model_grp,
-    '  Drive age:                ' + p.age_days + ' days',
-    '  Workload criticality:     ' + p.criticality_tier,
-    '  VM size tier:             ' + p.size_tier,
-    '',
-    'PREDICTION',
-    '  P(fail within window):    ' + (d.p_fail_within_window * 100).toFixed(3) + '%',
-    '  Expected TTF:             ' + d.expected_ttf_days + ' days',
-    '  Median TTF:               ' + (d.median_ttf_days ?? 'n/a (beyond horizon)') + (d.median_ttf_days != null ? ' days' : ''),
-  ];
-  if (d.mc_dropout_std !== null && d.mc_dropout_std !== undefined) {
-    lines.push('  MC-dropout std (15 passes): ' + d.mc_dropout_std.toFixed(4));
-  }
-  lines.push(
-    '',
-    'COST-SENSITIVE POLICY',
-    '  Decision:                 ' + (d.cost_sensitive.migrate ? 'MIGRATE' : 'WAIT'),
-    '  Expected cost of inaction: ' + d.cost_sensitive.expected_cost_of_inaction + ' impact-min',
-    '  Migration cost:            ' + d.cost_sensitive.migration_cost + ' impact-min',
-    '  Urgency weight:            x' + d.cost_sensitive.urgency_weight,
-    '',
-    'THRESHOLD BASELINE',
-    '  Decision:                 ' + (d.threshold.migrate ? 'MIGRATE' : 'WAIT'),
-    '',
-    'MIGRATION COST MODEL',
-    '  Pre-copy converges:        ' + (d.costs.precopy_converges ? 'yes' : 'no, forced stop-and-copy fallback'),
-    '  Migration time:            ' + d.costs.migration_time_s + 's',
-    '  Blackout time:             ' + d.costs.migration_blackout_s + 's',
-    '',
-    '-'.repeat(50),
-    'Generated by the VM Mitigation Policy live demo',
-    'https://github.com/Rag2102/ccproject'
-  );
-  const blob = new Blob([lines.join('\n')], { type: 'text/plain' });
-  const url = URL.createObjectURL(blob);
-  const a = document.createElement('a');
-  a.href = url;
-  a.download = 'vm_mitigation_result_' + Date.now() + '.txt';
-  document.body.appendChild(a);
-  a.click();
-  document.body.removeChild(a);
-  URL.revokeObjectURL(url);
-}
-</script>
-
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.4/dist/chart.umd.min.js"></script>
 <script>
-(function () {
-  var el = document.getElementById('correlationChart');
-  if (!el || typeof Chart === 'undefined') return;
+const TAU = {{ tau_default }};
+const LOOKAHEAD = {{ lookahead_days }};
+const CORR = {{ corr_sweep | tojson }};
+const $ = (id) => document.getElementById(id);
+const css = (v) => getComputedStyle(document.documentElement).getPropertyValue(v).trim();
 
-  var points = [
-    { x: 0.00, y: -3.12 },
-    { x: 0.31, y: 0.29 },
-    { x: 0.73, y: 1.95 },
-    { x: 0.86, y: 3.44 }
+/* ---------------- theme + nav ---------------- */
+function currentTheme() {
+  const set = document.documentElement.getAttribute('data-theme');
+  if (set) return set;
+  return matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+}
+$('themeBtn').addEventListener('click', () => {
+  const next = currentTheme() === 'dark' ? 'light' : 'dark';
+  document.documentElement.setAttribute('data-theme', next);
+  try { localStorage.setItem('vm-theme', next); } catch (e) {}
+  redrawCharts(); drawFleet(true);
+});
+matchMedia('(prefers-color-scheme: dark)').addEventListener('change', () => { redrawCharts(); drawFleet(true); });
+$('menuBtn').addEventListener('click', () => {
+  const open = $('navLinks').classList.toggle('open');
+  $('menuBtn').setAttribute('aria-expanded', open);
+});
+document.querySelectorAll('#navLinks a').forEach(a => a.addEventListener('click', () => $('navLinks').classList.remove('open')));
+
+// scroll spy: the last section whose top has passed 35% of the viewport
+const secs = [...document.querySelectorAll('section.block')];
+function spy() {
+  const y = window.innerHeight * 0.35;
+  let cur = null;
+  secs.forEach(s => { if (s.getBoundingClientRect().top <= y) cur = s.id; });
+  document.querySelectorAll('#navLinks a').forEach(a => a.classList.toggle('active', cur !== null && a.getAttribute('href') === '#' + cur));
+}
+addEventListener('scroll', spy, { passive: true }); spy();
+const rev = new IntersectionObserver((es) => es.forEach(e => { if (e.isIntersecting) { e.target.classList.add('in'); rev.unobserve(e.target); } }), { rootMargin: '0px 0px -8% 0px' });
+document.querySelectorAll('.reveal').forEach(el => rev.observe(el));
+
+/* ---------------- hero fleet ---------------- */
+const COLS = 12, ROWS = 8, W = 360, H = 240, GAP = 4;
+const cw = (W - GAP * (COLS + 1)) / COLS, ch = (H - GAP * (ROWS + 1)) / ROWS;
+let hosts = [], fleetDay = 0, fleetTimer = null;
+function seedFleet() {
+  hosts = [];
+  for (let i = 0; i < COLS * ROWS; i++) {
+    const r = Math.random();
+    hosts.push({ risk: r < 0.1 ? 0.6 + Math.random() * 0.4 : Math.random() * 0.35, state: 'up', vms: 2 + Math.floor(Math.random() * 3), saved: 0, t: 0 });
+  }
+}
+function hostColor(h) {
+  if (h.state === 'failed') return css('--bad');
+  if (h.saved > 0) return css('--good');
+  return h.risk > 0.55 ? css('--th') : css('--cs');
+}
+function drawFleet(force) {
+  const svg = $('fleet');
+  if (!svg) return;
+  if (!hosts.length || force === 'reseed') seedFleet();
+  let out = '';
+  hosts.forEach((h, i) => {
+    const x = GAP + (i % COLS) * (cw + GAP), y = GAP + Math.floor(i / COLS) * (ch + GAP);
+    const op = h.state === 'failed' ? 0.85 : h.saved ? 0.9 : 0.25 + h.risk * 0.75;
+    out += `<rect x="${x.toFixed(1)}" y="${y.toFixed(1)}" width="${cw.toFixed(1)}" height="${ch.toFixed(1)}" rx="4" fill="${hostColor(h)}" fill-opacity="${op.toFixed(2)}"/>`;
+    if (h.state !== 'failed') {
+      const step = Math.min(5.5, (cw - 12) / Math.max(1, h.vms - 1));
+      for (let k = 0; k < h.vms; k++) {
+        out += `<circle cx="${(x + 6 + k * step).toFixed(1)}" cy="${(y + ch - 6).toFixed(1)}" r="1.7" fill="${css('--ink')}" fill-opacity="0.55"/>`;
+      }
+    }
+  });
+  svg.innerHTML = out;
+  $('fleetClock').textContent = 'day ' + fleetDay;
+}
+function stepFleet() {
+  fleetDay += 1;
+  hosts.forEach(h => {
+    if (h.state === 'failed') { h.t -= 1; if (h.t <= 0) { h.state = 'up'; h.risk = Math.random() * 0.3; h.vms = 1; } return; }
+    if (h.saved) { h.saved -= 1; }
+    h.risk = Math.min(1, h.risk + Math.random() * 0.02);
+  });
+  // the policy moves VMs off the riskiest host (budget: one host per tick), then some risky host fails
+  const live = hosts.filter(h => h.state === 'up' && h.vms > 0);
+  live.sort((a, b) => b.risk - a.risk);
+  if (live[0] && live[0].risk > 0.6) {
+    const src = live[0], dst = hosts.filter(h => h.state === 'up').sort((a, b) => a.risk - b.risk)[Math.floor(Math.random() * 6)];
+    if (dst && dst !== src) { dst.vms = Math.min(5, dst.vms + src.vms); src.vms = 0; src.saved = 3; }
+  }
+  const cand = hosts.filter(h => h.state === 'up' && h.risk > 0.75);
+  if (cand.length && Math.random() < 0.55) { const f = cand[Math.floor(Math.random() * cand.length)]; f.state = 'failed'; f.t = 4; f.saved = 0; }
+  drawFleet();
+}
+drawFleet('reseed');
+if (!matchMedia('(prefers-reduced-motion: reduce)').matches) fleetTimer = setInterval(stepFleet, 900);
+
+/* ---------------- live demo ---------------- */
+const age = $('age_days');
+function ageLabel() { $('age_val').textContent = age.value + ' days · ' + (age.value / 365).toFixed(1) + ' yr'; }
+ageLabel();
+const radio = (n) => document.querySelector(`input[name=${n}]:checked`).value;
+let lastResult = null, lastInputs = null, debounce = null, inflight = 0;
+function inputs() {
+  return { model_grp: $('model_grp').value, age_days: parseFloat(age.value), criticality_tier: radio('criticality_tier'), size_tier: radio('size_tier'), which_model: radio('which_model') };
+}
+function changed() {
+  ageLabel();
+  if (!$('autoRun').checked) { $('result').classList.add('is-stale'); return; }
+  clearTimeout(debounce); debounce = setTimeout(runPredict, 260);
+}
+['model_grp', 'age_days'].forEach(id => $(id).addEventListener('input', changed));
+document.querySelectorAll('#controls input[type=radio]').forEach(r => r.addEventListener('change', changed));
+
+const fmtMin = (x) => (x >= 10 ? x.toFixed(1) : x >= 1 ? x.toFixed(2) : x.toFixed(3));
+const fmtDays = (d) => d == null ? null : d >= 730 ? (d / 365).toFixed(1) + '<small>years</small>' : Math.round(d) + '<small>days</small>';
+
+async function runPredict() {
+  const payload = inputs();
+  const btn = $('runBtn'); const my = ++inflight;
+  btn.classList.add('loading'); btn.disabled = true;
+  try {
+    const res = await fetch('/api/predict', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) });
+    const d = await res.json();
+    if (my !== inflight) return;            // a newer request is on its way
+    if (!res.ok) throw new Error(d.error || res.statusText);
+    lastResult = d; lastInputs = payload;
+    render(d);
+    $('err').style.display = 'none';
+  } catch (e) {
+    $('err').textContent = 'The prediction failed: ' + e.message;
+    $('err').style.display = 'block';
+  } finally {
+    if (my === inflight) { btn.classList.remove('loading'); btn.disabled = false; }
+  }
+}
+
+function render(d) {
+  $('resultEmpty').hidden = true;
+  const r = $('result'); r.hidden = false; r.classList.remove('is-stale');
+  const p = d.p_fail_within_window;
+  $('ro-p').innerHTML = (p * 100).toFixed(p < 0.001 ? 3 : 2) + '<small>%</small>';
+  $('ro-ttf').innerHTML = fmtDays(d.expected_ttf_days) || '–';
+  $('ro-med').innerHTML = fmtDays(d.median_ttf_days) || '<span style="font-size:20px">beyond horizon</span>';
+  const scale = Math.max(p, TAU) * 1.6;
+  $('pFill').style.width = (100 * p / scale) + '%';
+  $('pFill').style.background = p > TAU ? css('--th') : css('--ink-2');
+  $('tauMark').style.left = (100 * TAU / scale) + '%';
+  $('meterMax').textContent = (scale * 100).toFixed(2) + '%';
+
+  const cs = d.cost_sensitive, wait = cs.expected_cost_of_inaction, mig = cs.migration_cost;
+  const m = Math.max(wait, mig) || 1;
+  $('bar-wait').style.width = (100 * wait / m) + '%';
+  $('bar-mig').style.width = (100 * mig / m) + '%';
+  $('v-wait').textContent = fmtMin(wait);
+  $('v-mig').textContent = fmtMin(mig);
+  $('cs-urg').textContent = '×' + cs.urgency_weight;
+  setVerdict('cs-verdict', cs.migrate);
+  const ratio = mig > 0 ? wait / mig : Infinity;
+  $('cs-why').textContent = cs.migrate
+    ? `Waiting is expected to cost ${ratio.toFixed(1)}× more than migrating, so it moves the VM.`
+    : `Migrating would cost ${(1 / Math.max(ratio, 1e-9)).toFixed(1)}× the expected cost of waiting, so it leaves the VM where it is.`;
+
+  const th = d.threshold;
+  const pm = Math.max(p, TAU) * 1.15;
+  $('bar-p').style.width = (100 * p / pm) + '%';
+  $('bar-tau').style.width = (100 * TAU / pm) + '%';
+  $('v-p').textContent = p.toFixed(5);
+  setVerdict('th-verdict', th.migrate);
+  $('th-why').textContent = th.migrate
+    ? `p is above τ, so it migrates, whatever the workload or the cost.`
+    : `p is below τ, so it waits, whatever the workload or the cost.`;
+
+  let note = d.model_used + ' · migration ' + (d.costs.precopy_converges ? 'pre-copy converges' : 'falls back to stop-and-copy') +
+    ` in ${d.costs.migration_time_s}s, blackout ${d.costs.migration_blackout_s}s · VM ${d.costs.size_tier_profile.memory_gb} GB, ${d.costs.size_tier_profile.vcores} vCPU.`;
+  if (d.mc_dropout_std != null) note += ` MC-dropout std ${d.mc_dropout_std.toFixed(4)} (experimental model, less well calibrated).`;
+  $('model-note').textContent = note;
+  $('download-btn').disabled = false;
+}
+function setVerdict(id, migrate) {
+  const el = $(id); el.className = 'verdict ' + (migrate ? 'migrate' : 'wait'); el.textContent = migrate ? 'MIGRATE' : 'WAIT';
+}
+function resetForm() {
+  $('m-hgb').checked = true;
+  $('model_grp').value = [...$('model_grp').options].some(o => o.value === 'ST4000DM000') ? 'ST4000DM000' : $('model_grp').options[0].value;
+  document.querySelector('input[name=criticality_tier]').checked = true;
+  const med = $('s-medium'); if (med) med.checked = true;
+  age.value = 900; ageLabel(); runPredict();
+}
+function downloadResult() {
+  if (!lastResult) return;
+  const d = lastResult, p = lastInputs;
+  const L = [
+    'VM Mitigation Policy: prediction report', 'Generated: ' + new Date().toString(), '='.repeat(50), '',
+    'INPUTS', '  Model used:                 ' + d.model_used, '  Drive model:                ' + p.model_grp,
+    '  Drive age:                  ' + p.age_days + ' days', '  Workload criticality:       ' + p.criticality_tier, '  VM size tier:               ' + p.size_tier, '',
+    'PREDICTION', '  P(fail within ' + LOOKAHEAD + ' days):     ' + (d.p_fail_within_window * 100).toFixed(3) + '%',
+    '  Expected TTF:               ' + d.expected_ttf_days + ' days',
+    '  Median TTF:                 ' + (d.median_ttf_days != null ? d.median_ttf_days + ' days' : 'beyond horizon'),
   ];
+  if (d.mc_dropout_std != null) L.push('  MC-dropout std (15 passes): ' + d.mc_dropout_std.toFixed(4));
+  L.push('', 'COST-SENSITIVE POLICY', '  Decision:                   ' + (d.cost_sensitive.migrate ? 'MIGRATE' : 'WAIT'),
+    '  Expected cost of inaction:  ' + d.cost_sensitive.expected_cost_of_inaction + ' impact-min',
+    '  Migration cost:             ' + d.cost_sensitive.migration_cost + ' impact-min',
+    '  Urgency weight:             x' + d.cost_sensitive.urgency_weight, '',
+    'THRESHOLD BASELINE (tau = ' + TAU + ')', '  Decision:                   ' + (d.threshold.migrate ? 'MIGRATE' : 'WAIT'), '',
+    'MIGRATION COST MODEL', '  Pre-copy converges:         ' + (d.costs.precopy_converges ? 'yes' : 'no, stop-and-copy fallback'),
+    '  Migration time:             ' + d.costs.migration_time_s + ' s', '  Blackout time:              ' + d.costs.migration_blackout_s + ' s',
+    '', '-'.repeat(50), 'https://github.com/Rag2102/ccproject');
+  const url = URL.createObjectURL(new Blob([L.join('\n')], { type: 'text/plain' }));
+  const a = document.createElement('a'); a.href = url; a.download = 'vm_mitigation_result_' + Date.now() + '.txt';
+  document.body.appendChild(a); a.click(); a.remove(); URL.revokeObjectURL(url);
+}
+runPredict();
 
-  var css = getComputedStyle(document.documentElement);
-  var csColor = (css.getPropertyValue('--cs') || '#6ea8ff').trim();
-  var thColor = (css.getPropertyValue('--th') || '#ff8f6e').trim();
-  var mutedColor = (css.getPropertyValue('--muted') || '#8791a8').trim();
-  var gridColor = 'rgba(255,255,255,0.06)';
+/* ---------------- theory (vmsim/theory.py, T3) ---------------- */
+function erf(x) { const s = Math.sign(x); x = Math.abs(x); const t = 1 / (1 + 0.3275911 * x);
+  const y = 1 - (((((1.061405429 * t - 1.453152027) * t) + 1.421413741) * t - 0.284496736) * t + 0.254829592) * t * Math.exp(-x * x); return s * y; }
+const Phi = (x) => 0.5 * (1 + erf(x / Math.SQRT2));
+function PhiInv(p) { // Acklam
+  const a = [-3.969683028665376e+01, 2.209460984245205e+02, -2.759285104469687e+02, 1.383577518672690e+02, -3.066479806614716e+01, 2.506628277459239e+00];
+  const b = [-5.447609879822406e+01, 1.615858368580409e+02, -1.556989798598866e+02, 6.680131188771972e+01, -1.328068155288572e+01];
+  const c = [-7.784894002430293e-03, -3.223964580411365e-01, -2.400758277161838e+00, -2.549732539343734e+00, 4.374664141464968e+00, 2.938163982698783e+00];
+  const d = [7.784695709041462e-03, 3.224671290700398e-01, 2.445134137142996e+00, 3.754408661907416e+00];
+  const pl = 0.02425; let q, r;
+  if (p < pl) { q = Math.sqrt(-2 * Math.log(p)); return (((((c[0]*q+c[1])*q+c[2])*q+c[3])*q+c[4])*q+c[5]) / ((((d[0]*q+d[1])*q+d[2])*q+d[3])*q+1); }
+  if (p > 1 - pl) { q = Math.sqrt(-2 * Math.log(1 - p)); return -(((((c[0]*q+c[1])*q+c[2])*q+c[3])*q+c[4])*q+c[5]) / ((((d[0]*q+d[1])*q+d[2])*q+d[3])*q+1); }
+  q = p - 0.5; r = q * q;
+  return (((((a[0]*r+a[1])*r+a[2])*r+a[3])*r+a[4])*r+a[5])*q / (((((b[0]*r+b[1])*r+b[2])*r+b[3])*r+b[4])*r+1);
+}
+function theoryDelta(rho, sy, q, lam) {
+  const sx = 1, mux = Math.log(0.01);
+  const varz = sx*sx + 2*rho*sx*sy + sy*sy, M = Math.exp(mux + varz / 2), mu = lam * M;
+  function sel(a, b, stop) {
+    const mean = a * mux, sd = Math.sqrt(a*a*sx*sx + 2*a*b*rho*sx*sy + b*b*sy*sy), cov = a*sx*sx + (a+b)*rho*sx*sy + b*sy*sy;
+    let t = mean - sd * PhiInv(q); if (stop !== null) t = Math.max(t, stop);
+    return M * Phi((mean + cov - t) / sd) - mu * Phi((mean - t) / sd);
+  }
+  const b2 = sel(1, 0, null), bb = sel(1, 1, mu > 0 ? Math.log(mu) : null);
+  return (bb - b2) / (M - b2);
+}
+const qFromSlider = (v) => Math.pow(10, -2.3 + 2.3 * v / 100);   // 0.5% .. 100%
+let sbChart = null, corrChart = null;
+function updateSandbox() {
+  const sy = +$('sbSy').value, q = Math.min(0.999, qFromSlider(+$('sbQ').value)), lam = +$('sbLam').value;
+  $('sbSyV').textContent = sy.toFixed(2); $('sbQV').textContent = (q * 100).toFixed(q < 0.1 ? 1 : 0) + '%'; $('sbLamV').textContent = lam.toFixed(1);
+  const xs = []; for (let r = -0.95; r <= 0.951; r += 0.025) xs.push(+r.toFixed(3));
+  const ys = xs.map(r => 100 * theoryDelta(r, sy, q, lam));
+  const i0 = xs.findIndex(r => Math.abs(r) < 1e-9);
+  $('sbAt0').textContent = (ys[i0] >= 0 ? '+' : '') + ys[i0].toFixed(1) + '%';
+  let k = 0; ys.forEach((y, i) => { if (y > ys[k]) k = i; });
+  $('sbPeak').textContent = (ys[k] >= 0 ? '+' : '') + ys[k].toFixed(1) + '% · ' + xs[k].toFixed(2);
+  const above = xs.filter((r, i) => ys[i] >= 1);
+  $('sbRange').textContent = above.length ? (above.length === xs.length ? 'all ρ' : above[0].toFixed(2) + ' to ' + above[above.length - 1].toFixed(2)) : 'nowhere';
+  const pts = xs.map((x, i) => ({ x, y: ys[i] }));
+  if (sbChart) { sbChart.data.datasets[0].data = pts; sbChart.options.scales.y.suggestedMax = Math.max(5, ...ys) * 1.1; sbChart.update('none'); }
+  else sbChart = makeChart($('sbChart'), [{ data: pts, color: '--violet', fill: true, points: false }], { xLabel: 'ρ, correlation of log p and log κ', yLabel: 'Advantage over threshold (%)', xMin: -0.95, xMax: 0.95, refLine: 1, refLabel: 'δ = 1%' });
+}
+['sbSy', 'sbQ', 'sbLam'].forEach(id => $(id).addEventListener('input', updateSandbox));
 
-  var zonesAndLabels = {
-    id: 'zonesAndLabels',
-    beforeDraw: function (chart) {
-      var ctx = chart.ctx, area = chart.chartArea, y = chart.scales.y;
-      var zeroY = y.getPixelForValue(0);
-      ctx.save();
-      ctx.fillStyle = 'rgba(110,168,255,0.06)';
-      ctx.fillRect(area.left, area.top, area.right - area.left, zeroY - area.top);
-      ctx.fillStyle = 'rgba(255,143,110,0.06)';
-      ctx.fillRect(area.left, zeroY, area.right - area.left, area.bottom - zeroY);
-
-      ctx.setLineDash([4, 4]);
-      ctx.strokeStyle = 'rgba(255,255,255,0.18)';
-      ctx.beginPath();
-      ctx.moveTo(area.left, zeroY);
-      ctx.lineTo(area.right, zeroY);
-      ctx.stroke();
-      ctx.setLineDash([]);
-
-      ctx.font = "600 10.5px Inter, sans-serif";
-      ctx.textAlign = 'left';
-      ctx.fillStyle = csColor;
-      ctx.fillText('COST-SENSITIVE POLICY WINS', area.left + 6, area.top + 14);
-      ctx.fillStyle = thColor;
-      ctx.textBaseline = 'bottom';
-      ctx.fillText('THRESHOLD POLICY WINS', area.left + 6, area.bottom - 6);
+/* ---------------- charts ---------------- */
+function makeChart(canvas, sets, o) {
+  if (typeof Chart === 'undefined' || !canvas) return null;
+  const ink2 = css('--ink-3'), grid = css('--line');
+  const zones = {
+    id: 'zones', beforeDraw(c) {
+      if (o.refLine === undefined && !o.zero) return;
+      const { ctx, chartArea: a, scales: { y } } = c; ctx.save();
+      if (o.zero) {
+        const z = y.getPixelForValue(0);
+        ctx.fillStyle = css('--cs-soft'); ctx.fillRect(a.left, a.top, a.right - a.left, Math.max(0, z - a.top));
+        ctx.fillStyle = css('--th-soft'); ctx.fillRect(a.left, z, a.right - a.left, Math.max(0, a.bottom - z));
+        ctx.font = "600 10.5px " + css('--mono'); ctx.fillStyle = css('--cs'); ctx.fillText('COST-SENSITIVE AHEAD', a.left + 8, a.top + 15);
+        ctx.fillStyle = css('--th'); ctx.fillText('THRESHOLD AHEAD', a.left + 8, a.bottom - 8);
+      }
+      if (o.refLine !== undefined) {
+        const r = y.getPixelForValue(o.refLine); ctx.setLineDash([4, 4]); ctx.strokeStyle = css('--ink-3'); ctx.beginPath(); ctx.moveTo(a.left, r); ctx.lineTo(a.right, r); ctx.stroke(); ctx.setLineDash([]);
+        ctx.font = "600 10.5px " + css('--mono'); ctx.fillStyle = css('--ink-3'); ctx.fillText(o.refLabel, a.right - 52, r - 6);
+      }
       ctx.restore();
     },
-    afterDatasetsDraw: function (chart) {
-      var ctx = chart.ctx;
-      var meta = chart.getDatasetMeta(0);
-      ctx.save();
-      ctx.font = "700 12px 'JetBrains Mono', monospace";
-      ctx.textAlign = 'center';
-      meta.data.forEach(function (point, i) {
-        var v = points[i].y;
-        var label = (v > 0 ? '+' : '') + v.toFixed(1) + '%';
-        ctx.fillStyle = v >= 0 ? csColor : thColor;
-        ctx.fillText(label, point.x, point.y - 14);
-      });
+    afterDatasetsDraw(c) {
+      if (!o.labels) return;
+      const { ctx } = c, meta = c.getDatasetMeta(0); ctx.save(); ctx.font = "600 11.5px " + css('--mono'); ctx.textAlign = 'center';
+      meta.data.forEach((pt, i) => { const v = sets[0].data[i].y; ctx.fillStyle = v >= 0 ? css('--cs') : css('--th'); ctx.fillText((v > 0 ? '+' : '') + v.toFixed(1) + '%', pt.x, pt.y - 13); });
       ctx.restore();
     }
   };
-
-  new Chart(el.getContext('2d'), {
+  return new Chart(canvas.getContext('2d'), {
     type: 'line',
-    data: {
-      datasets: [{
-        data: points,
-        borderColor: csColor,
-        borderWidth: 2.5,
-        pointRadius: 5,
-        pointHoverRadius: 7,
-        pointBackgroundColor: '#0a0e17',
-        pointBorderColor: csColor,
-        pointBorderWidth: 2.5,
-        tension: 0,
-        fill: false
-      }]
-    },
+    data: { datasets: sets.map(s => ({ data: s.data, borderColor: css(s.color), backgroundColor: css(s.color + '-soft') || 'transparent',
+      fill: s.fill ? 'origin' : false, borderWidth: 2.4, tension: s.points ? 0 : 0.25,
+      pointRadius: s.points ? 5 : 0, pointHoverRadius: s.points ? 7 : 4, pointBackgroundColor: css('--surface'), pointBorderColor: css(s.color), pointBorderWidth: 2.4 })) },
     options: {
-      responsive: true,
-      maintainAspectRatio: false,
-      layout: { padding: { top: 24, right: 14, bottom: 4, left: 2 } },
-      plugins: {
-        legend: { display: false },
-        tooltip: {
-          backgroundColor: '#161c2e',
-          borderColor: 'rgba(255,255,255,0.12)',
-          borderWidth: 1,
-          padding: 10,
-          titleFont: { family: 'Inter', size: 12, weight: '600' },
-          bodyFont: { family: 'JetBrains Mono', size: 11.5 },
-          callbacks: {
-            title: function (items) { return 'ρ ≈ ' + items[0].parsed.x.toFixed(2); },
-            label: function (item) { return (item.parsed.y > 0 ? '+' : '') + item.parsed.y.toFixed(2) + '% advantage'; }
-          }
-        }
-      },
+      responsive: true, maintainAspectRatio: false, animation: { duration: 350 },
+      layout: { padding: { top: o.labels ? 22 : 8, right: 8 } },
+      interaction: { mode: 'nearest', intersect: false },
+      plugins: { legend: { display: false }, tooltip: { backgroundColor: css('--surface'), titleColor: css('--ink'), bodyColor: css('--ink-2'), borderColor: css('--line-2'), borderWidth: 1,
+        titleFont: { family: 'Inter', weight: '600' }, bodyFont: { family: 'JetBrains Mono' }, padding: 10,
+        callbacks: { title: (it) => 'ρ = ' + it[0].parsed.x.toFixed(2), label: (it) => (it.parsed.y > 0 ? '+' : '') + it.parsed.y.toFixed(2) + '%' } } },
       scales: {
-        x: {
-          type: 'linear', min: 0, max: 0.95,
-          title: { display: true, text: 'Achieved rank-correlation (ρ) between workload criticality and host risk', color: mutedColor, font: { family: 'Inter', size: 11 } },
-          ticks: { color: mutedColor, font: { family: 'Inter', size: 10.5 }, stepSize: 0.2 },
-          grid: { color: gridColor },
-          border: { color: 'rgba(255,255,255,0.12)' }
-        },
-        y: {
-          min: -5, max: 5,
-          title: { display: true, text: 'Cost-sensitive advantage on total cost', color: mutedColor, font: { family: 'Inter', size: 11 } },
-          ticks: { color: mutedColor, font: { family: 'Inter', size: 10.5 }, callback: function (v) { return (v > 0 ? '+' : '') + v + '%'; } },
-          grid: { color: gridColor },
-          border: { display: false }
-        }
+        x: { type: 'linear', min: o.xMin, max: o.xMax, title: { display: true, text: o.xLabel, color: ink2, font: { family: 'Inter', size: 11.5 } },
+             ticks: { color: ink2, font: { family: 'JetBrains Mono', size: 10.5 } }, grid: { color: grid }, border: { color: grid } },
+        y: { min: o.yMin, max: o.yMax, suggestedMax: o.suggestedMax, title: { display: true, text: o.yLabel, color: ink2, font: { family: 'Inter', size: 11.5 } },
+             ticks: { color: ink2, font: { family: 'JetBrains Mono', size: 10.5 }, callback: (v) => (v > 0 ? '+' : '') + v + '%' }, grid: { color: grid }, border: { display: false } }
       }
     },
-    plugins: [zonesAndLabels]
+    plugins: [zones]
   });
+}
+function drawCorr() {
+  const pts = CORR.map(r => ({ x: r.rho_achieved, y: 100 * r.cost_sensitive_advantage_pct })).sort((a, b) => a.x - b.x);
+  corrChart = makeChart($('corrChart'), [{ data: pts, color: '--cs', points: true }], { xLabel: 'Achieved ρ between workload criticality and host risk', yLabel: 'Cost-sensitive advantage', xMin: -0.02, xMax: 0.95, yMin: -5, yMax: 5, zero: true, labels: true });
+}
+function redrawCharts() {
+  if (corrChart) { corrChart.destroy(); corrChart = null; }
+  if (sbChart) { sbChart.destroy(); sbChart = null; }
+  drawCorr(); updateSandbox();
+}
+function initCharts() {
+  if (typeof Chart === 'undefined') return;
+  Chart.defaults.font.family = 'Inter';
+  drawCorr(); updateSandbox();
+  // best value per column in the model table
+  const rows = [...document.querySelectorAll('#cmpTable tr')].slice(1);
+  ['roc_auc', 'pr_auc', 'brier', 'ece'].forEach(k => {
+    const cells = rows.map(r => r.querySelector(`td[data-k=${k}]`)).filter(Boolean);
+    const vals = cells.map(c => +c.dataset.v), best = (k === 'brier' || k === 'ece') ? Math.min(...vals) : Math.max(...vals);
+    cells.forEach(c => { if (+c.dataset.v === best) c.classList.add('best'); });
+  });
+}
+initCharts();
+
+/* ---------------- timeline ---------------- */
+(function () {
+  let h = ''; for (let w = 1; w <= 60; w++) h += `<i class="${w <= 17 ? 'done' : w === 18 ? 'now' : ''}" title="Week ${w}"></i>`;
+  $('tlTrack').innerHTML = h;
 })();
 </script>
-
 </body>
 </html>
