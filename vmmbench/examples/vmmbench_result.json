@@ -1,0 +1,44 @@
+{
+ "schema": "vmmbench/1",
+ "scenario": {
+  "id": "A3",
+  "version": 1,
+  "card_sha256": "d63634e34bdf469864907abfdca746bc59794b64bd8fd02416f0ca1b019b279d",
+  "calibration": "point"
+ },
+ "world": {
+  "seed": 1,
+  "family": "eval",
+  "world_sha256": "e5eb5aead9b4b973a6211d99514f8f9e358dec6526862100f01f5133bb3ba691"
+ },
+ "policy": {
+  "id": "P4",
+  "version": "2.0.0",
+  "predictor": "oracle",
+  "params": {}
+ },
+ "budget": {
+  "resource": "gb",
+  "pct": 2.0,
+  "utilisation": 0.044885250190258755,
+  "overspend": false
+ },
+ "metrics": {
+  "total_cost": 37337.932562923466,
+  "interruption_cost": 31580.0,
+  "migration_cost": 5757.93256292347,
+  "missed_failures": 5443,
+  "unnecessary_migrations": 38036,
+  "realised_failures": 317,
+  "migrations": 39535,
+  "rejected_arrivals": 55,
+  "rho_tier_risk_horizon": 0.09097731662033469
+ },
+ "run": {
+  "git_sha": "f8f2fb06c2cc14a5312f0882edb87b4a7d880e5e+dirty",
+  "config_hash": "e24eadce0784d17f",
+  "lockfile_sha256": "dededaa2c88b0244bd4cb917eda6686c4d0641edc9f6993b1942acd925905f56",
+  "seconds": 4.461,
+  "outcomes_sha256": "765ada8721a032b3a96441e3c2d82de691a21c540dd8c507562189d4d73d3c3f"
+ }
+}

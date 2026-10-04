@@ -1,0 +1,83 @@
+{
+ "schema": "vmconsole/1",
+ "run": {
+  "git_sha": "f8f2fb06c2cc14a5312f0882edb87b4a7d880e5e+dirty",
+  "config_hash": "",
+  "protocol_tag": "protocol-v1.0",
+  "seeds": [
+   1,
+   2
+  ]
+ },
+ "cells": [
+  {
+   "regime": "A3",
+   "budget_pct": 2.0,
+   "policy": "P1",
+   "n_seeds": 2,
+   "delta_mean": -0.0024344082873568413,
+   "delta_adjusted": -0.0024344082873568413,
+   "ci_bca": [
+    -0.0024344082873568413,
+    -0.0024344082873568413
+   ],
+   "holm_p": null,
+   "wilcoxon_p": 1.0,
+   "win": null,
+   "family": "exploratory",
+   "provenance": "SIMULATED"
+  },
+  {
+   "regime": "A3",
+   "budget_pct": 2.0,
+   "policy": "P3",
+   "n_seeds": 2,
+   "delta_mean": 0.7170633746332236,
+   "delta_adjusted": 0.7170633746332236,
+   "ci_bca": [
+    0.7170633746332236,
+    0.7170633746332236
+   ],
+   "holm_p": null,
+   "wilcoxon_p": 0.25,
+   "win": null,
+   "family": "exploratory",
+   "provenance": "SIMULATED"
+  },
+  {
+   "regime": "A3",
+   "budget_pct": 2.0,
+   "policy": "P4",
+   "n_seeds": 2,
+   "delta_mean": 0.7267522600532065,
+   "delta_adjusted": 0.7267522600532065,
+   "ci_bca": [
+    0.7267522600532065,
+    0.7267522600532065
+   ],
+   "holm_p": 1.0,
+   "wilcoxon_p": 0.25,
+   "win": false,
+   "family": "confirmatory",
+   "provenance": "SIMULATED"
+  },
+  {
+   "regime": "A3",
+   "budget_pct": 2.0,
+   "policy": "P5",
+   "n_seeds": 2,
+   "delta_mean": 0.733727516331498,
+   "delta_adjusted": 0.733727516331498,
+   "ci_bca": [
+    0.733727516331498,
+    0.733727516331498
+   ],
+   "holm_p": 1.0,
+   "wilcoxon_p": 0.25,
+   "win": false,
+   "family": "confirmatory",
+   "provenance": "SIMULATED"
+  }
+ ],
+ "note": "example only: dry run (2 seeds), not a result"
+}

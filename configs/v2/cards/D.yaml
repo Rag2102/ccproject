@@ -1,0 +1,40 @@
+id: D
+version: 1
+placement:
+  kind: nonstationary
+  rho_latent: null
+  target_spearman: 0.0779
+  arrival_blend: 0.0781
+  kappa_sigma: null
+  calibrations:
+  - point
+hosts:
+  n: 2000
+  drives_per_host: 4
+  non_disk_hazard_x: 1.0
+horizon_days: 365
+warmup_days: 30
+predictor:
+  kind: drift
+migration:
+  model: precopy
+  nic_gbps: 10.0
+  usable_frac: 0.5
+  max_concurrent: 2
+budget:
+  resource: gb
+  pct_cluster_mem_per_day:
+  - 0.5
+  - 1
+  - 2
+  - 5
+seeds:
+  dev: 101-110
+  eval: 1-30
+  replication: 1001-1030
+provenance:
+  rho: ASSUMED
+  hazard: DERIVED
+  migration: ASSUMED
+  costs: DERIVED
+config_hash: 3789b936b6bf7b53

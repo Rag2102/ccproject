@@ -1,0 +1,73 @@
+{
+  "splits": {
+    "train": [
+      "2023-07-01",
+      "2025-08-05"
+    ],
+    "val": [
+      "2025-08-06",
+      "2026-01-16"
+    ],
+    "test": [
+      "2026-01-17",
+      "2026-06-30"
+    ]
+  },
+  "h30": {
+    "n_train": 4452262,
+    "n_val": 930869,
+    "n_test": 983756,
+    "train_positives": 264900,
+    "test_positives": 55606,
+    "test_drives": 328041
+  },
+  "h14": {
+    "n_train": 4567262,
+    "n_val": 1040588,
+    "n_test": 1097667,
+    "train_positives": 123644,
+    "test_positives": 26577,
+    "test_drives": 336636
+  },
+  "h7": {
+    "n_train": 4618708,
+    "n_val": 1089044,
+    "n_test": 1147868,
+    "train_positives": 61317,
+    "test_positives": 13357,
+    "test_drives": 339808
+  },
+  "rolling_origin": [
+    {
+      "fold_test": "2025-04-17..2025-07-16",
+      "roc_auc": 0.8762125168113197,
+      "pr_auc": 0.11436202431111686
+    },
+    {
+      "fold_test": "2025-07-17..2025-10-16",
+      "roc_auc": 0.87029252158891,
+      "pr_auc": 0.11464256234180425
+    },
+    {
+      "fold_test": "2025-10-17..2026-01-16",
+      "roc_auc": 0.8494764397395178,
+      "pr_auc": 0.043782032141986095
+    }
+  ],
+  "leakage_audit": {
+    "h30": {
+      "train_drives_failing_in_test": 0,
+      "train_labels_past_train_end": 0
+    },
+    "h14": {
+      "train_drives_failing_in_test": 0,
+      "train_labels_past_train_end": 0
+    },
+    "h7": {
+      "train_drives_failing_in_test": 0,
+      "train_labels_past_train_end": 0
+    },
+    "windows": "all feature windows are RANGE ... PRECEDING AND CURRENT ROW (11_features.py)",
+    "first_nonzero_dates": "used only when on or before the prediction day"
+  }
+}

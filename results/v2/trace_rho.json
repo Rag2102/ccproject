@@ -1,0 +1,120 @@
+{
+  "pH_latent": 0.3750524868428311,
+  "c0_latent": 0.2512164591914626,
+  "a": {
+    "gini_high_share": {
+      "2": 0.20252084986907282,
+      "3": 0.19657796401451932,
+      "4": 0.18775288043035754
+    },
+    "stage1": {
+      "events": 1717317922,
+      "task_events_3_to_8": 612680557,
+      "alloc_events": 219924230,
+      "dedicated_schedules": 26514,
+      "placement_rows": 514224,
+      "placements_by_window": {
+        "2": 70964175,
+        "3": 63633541,
+        "4": 69361317
+      },
+      "cell": "a",
+      "files": 1720,
+      "bytes": 21207210982,
+      "md5": {
+        "machine_attributes-000000000000.parquet.gz": "nM0i2cW9EhS2jwNWDeOLWw==",
+        "machine_events-000000000000.parquet.gz": "Tnqlq8jfmO1FMmA+u3ik8w=="
+      },
+      "seconds": 139,
+      "finished": "2026-10-04T20:00:24"
+    },
+    "platform_long_removal_rate_per_machine_day": {
+      "5dA1xC6vB4+Z2ucXfjwZMKPuxA/oUajDZReIcQV9WqE=": 0.00041,
+      "Dza/U2s43vvYOOFCmkikwthqRcXXkIyR/WG6M23f67s=": 0.00019,
+      "JQ1tVQBMHBAIISU1gUNXk2powhYumYA+4cB3KzU29l8=": 0.00106,
+      "No+NZu2jn50BnbQS9kENCZjWL1KEhNp67aYCqakF7Xk=": 0.00126,
+      "ab11I4qQr/9Dkmo3M2CCSSHPkOU1S1Cb1p3rphUUjS8=": 0.00035
+    }
+  },
+  "b": {
+    "gini_high_share": {
+      "2": 0.23103101892023548,
+      "3": 0.37408285847010125,
+      "4": 0.2468570272312608
+    },
+    "stage1": {
+      "events": 1426967066,
+      "task_events_3_to_8": 563473021,
+      "alloc_events": 73787827,
+      "dedicated_schedules": 623,
+      "placement_rows": 446750,
+      "placements_by_window": {
+        "2": 61033269,
+        "3": 64307105,
+        "4": 70475645
+      },
+      "cell": "b",
+      "files": 1429,
+      "bytes": 17616163871,
+      "md5": {
+        "machine_attributes-000000000000.parquet.gz": "1cIxCRrkoBHf3oG6IeJW4A==",
+        "machine_events-000000000000.parquet.gz": "yyNSAn+Tb8Dog1RFBjA1MQ=="
+      },
+      "seconds": 148,
+      "finished": "2026-10-04T20:02:53"
+    },
+    "platform_long_removal_rate_per_machine_day": {
+      "5dA1xC6vB4+Z2ucXfjwZMKPuxA/oUajDZReIcQV9WqE=": 0.00053,
+      "Dza/U2s43vvYOOFCmkikwthqRcXXkIyR/WG6M23f67s=": 0.00012,
+      "JQ1tVQBMHBAIISU1gUNXk2powhYumYA+4cB3KzU29l8=": 0.01631,
+      "No+NZu2jn50BnbQS9kENCZjWL1KEhNp67aYCqakF7Xk=": 0.00037,
+      "ab11I4qQr/9Dkmo3M2CCSSHPkOU1S1Cb1p3rphUUjS8=": 0.00034
+    }
+  },
+  "h": {
+    "gini_high_share": {
+      "2": 0.24617862348481834,
+      "3": 0.14119388807179956,
+      "4": 0.13628704068475184
+    },
+    "stage1": {
+      "events": 1209602850,
+      "task_events_3_to_8": 546860803,
+      "alloc_events": 40475622,
+      "dedicated_schedules": 5445590,
+      "placement_rows": 518636,
+      "placements_by_window": {
+        "2": 57065026,
+        "3": 57917711,
+        "4": 61787336
+      },
+      "cell": "h",
+      "files": 1212,
+      "bytes": 12970913919,
+      "md5": {
+        "machine_attributes-000000000000.parquet.gz": "dDIORS2S+YOuqszG9pD6/w==",
+        "machine_events-000000000000.parquet.gz": "Kq5CfEOX9AfifScl6o2ztQ=="
+      },
+      "seconds": 156,
+      "finished": "2026-10-04T20:05:29"
+    },
+    "platform_long_removal_rate_per_machine_day": {
+      "5dA1xC6vB4+Z2ucXfjwZMKPuxA/oUajDZReIcQV9WqE=": 0.00017,
+      "Dza/U2s43vvYOOFCmkikwthqRcXXkIyR/WG6M23f67s=": 0.0003,
+      "JQ1tVQBMHBAIISU1gUNXk2powhYumYA+4cB3KzU29l8=": 0.00908,
+      "No+NZu2jn50BnbQS9kENCZjWL1KEhNp67aYCqakF7Xk=": 0.00083,
+      "ab11I4qQr/9Dkmo3M2CCSSHPkOU1S1Cb1p3rphUUjS8=": 0.00125
+    }
+  },
+  "direct_spearman_class": {
+    "a": "C0",
+    "b": "C0",
+    "h": "C0"
+  },
+  "g1_class_per_cell": {
+    "a": "C0",
+    "b": "C0",
+    "h": "C0"
+  },
+  "g1_majority": "C0"
+}

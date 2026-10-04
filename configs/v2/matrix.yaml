@@ -1,0 +1,45 @@
+# Experiment matrix, PROTOCOL.md v1.0 section 10 (frozen in Week 17). Read by
+# scripts/v2/24_run_matrix.py. Changing anything here after the freeze goes to
+# docs/v2/CHANGES_AFTER_FREEZE.md and makes the affected results exploratory.
+version: 1
+scale:                       # ADR-007
+  n_hosts: 2000
+  horizon_days: 365
+  warmup_days: 30
+  risk_h_days: 30
+budgets_pct: [0.5, 1, 2, 5]  # GB per day, % of cluster memory
+seeds:
+  dev: [101, 110]            # P2 tuning only
+  eval: [1, 30]              # extension to [1, 50] by the SD rule (ADR-007)
+  replication: [1001, 1030]
+predictor: oracle            # ADR-008
+regimes:                     # groups: results/raw/<group>/
+  A: [A1, A2, A3, A4, A5, A6, A7]
+  E: [E1, E2, E3]
+  B: [B1-low, B1, B1-high, B2]
+  C: [C]
+  D: [D]
+policies:                    # PROTOCOL section 2; P4-time and P4-cost are Week 20 ablations
+  - P0                       # run once per world (budget-independent), budget 0
+  - P1
+  - P2                       # tuned per (regime, budget) on dev seeds, criterion "budget" (ADR-005)
+  - P3
+  - P4                       # BAM-GB
+  - P5                       # Narya-inspired, faithful variant (lower dev-seed cost, Week 15 smoke)
+  - P6                       # guard over P2, fallback P2
+  - P7
+  - P8
+predictor_by_regime:         # where the protocol pairs a regime with a predictor
+  D: drift                   # gamma 1 -> 0.7 over the second half (SIM_SPEC section 8)
+p6:
+  look_every: 7
+  alpha: 0.05
+  n_boot: 500
+  slope_band: [0.8, 1.25]
+  min_events: 30
+  audit_window: 90
+  passes_needed: 2
+confirmatory:                # 30 comparisons, each against P2 (PROTOCOL section 5)
+  policies: [P4, P5, P6]
+  regimes: [A3, A5, B1, B2, C]
+  budgets_pct: [1, 2]

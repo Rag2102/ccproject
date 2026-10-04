@@ -1,0 +1,54 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "vmmbench/scenario_card/1",
+  "title": "Scenario card (YAML, versioned)",
+  "type": "object",
+  "required": ["id", "version", "placement", "hosts", "horizon_days", "predictor", "migration",
+               "budget", "seeds", "provenance"],
+  "properties": {
+    "id": {"type": "string"},
+    "version": {"type": "integer"},
+    "placement": {
+      "type": "object",
+      "required": ["kind"],
+      "properties": {
+        "kind": {"enum": ["random", "latent_copula", "rank_copula", "class_conditional",
+                          "adversarial", "nonstationary", "heterogeneity_only"]},
+        "rho_latent": {"type": ["number", "null"]},
+        "rho_from": {"type": "string"},
+        "calibrations": {"type": "array", "items": {"type": "string"}},
+        "kappa_sigma": {"type": ["number", "null"]}
+      }
+    },
+    "hosts": {
+      "type": "object",
+      "required": ["n", "drives_per_host", "non_disk_hazard_x"],
+      "properties": {
+        "n": {"type": "integer"},
+        "drives_per_host": {"type": "integer"},
+        "non_disk_hazard_x": {"type": "number"}
+      }
+    },
+    "horizon_days": {"type": "integer"},
+    "warmup_days": {"type": "integer"},
+    "predictor": {
+      "type": "object",
+      "required": ["kind"],
+      "properties": {"kind": {"type": "string"}, "calibration": {"type": "string"}}
+    },
+    "migration": {"type": "object"},
+    "budget": {
+      "type": "object",
+      "required": ["resource", "pct_cluster_mem_per_day"],
+      "properties": {
+        "resource": {"enum": ["gb", "nic_seconds"]},
+        "pct_cluster_mem_per_day": {"type": "array", "items": {"type": "number"}}
+      }
+    },
+    "seeds": {"type": "object"},
+    "provenance": {
+      "type": "object",
+      "additionalProperties": {"enum": ["MEASURED", "ASSUMED", "DERIVED", "SIMULATED"]}
+    }
+  }
+}

@@ -1,0 +1,220 @@
+{
+  "by_policy": {
+    "P4": {
+      "budget_utilisation": 0.0456,
+      "migrations_per_day": 109.0411,
+      "share_days_budget_binds": 0.0,
+      "share_days_no_migration": 0.0,
+      "rejected_arrivals": 69.0,
+      "cost_total": 35552.7972
+    },
+    "P4-cost": {
+      "budget_utilisation": 0.0456,
+      "migrations_per_day": 108.9874,
+      "share_days_budget_binds": 0.0,
+      "share_days_no_migration": 0.0,
+      "rejected_arrivals": 79.2,
+      "cost_total": 35893.5945
+    },
+    "P4-time": {
+      "budget_utilisation": 0.0455,
+      "migrations_per_day": 108.9414,
+      "share_days_budget_binds": 0.0,
+      "share_days_no_migration": 0.0,
+      "rejected_arrivals": 76.4,
+      "cost_total": 35343.0681
+    },
+    "P5": {
+      "budget_utilisation": 0.0208,
+      "migrations_per_day": 22.8044,
+      "share_days_budget_binds": 0.0,
+      "share_days_no_migration": 0.0055,
+      "rejected_arrivals": 79.0,
+      "cost_total": 36938.4108
+    },
+    "P5-faithful": {
+      "budget_utilisation": 0.0067,
+      "migrations_per_day": 9.7463,
+      "share_days_budget_binds": 0.0,
+      "share_days_no_migration": 0.4625,
+      "rejected_arrivals": 157.2,
+      "cost_total": 33677.1085
+    }
+  },
+  "p5_actions": {
+    "P5": [
+      {
+        "bucket0": {
+          "migrate": 60,
+          "nothing": 29,
+          "avoid": 95
+        },
+        "bucket1": {
+          "migrate": 46,
+          "nothing": 98,
+          "avoid": 37
+        },
+        "bucket2": {
+          "migrate": 77,
+          "avoid": 55,
+          "nothing": 152
+        }
+      },
+      {
+        "bucket0": {
+          "nothing": 39,
+          "migrate": 31,
+          "avoid": 112
+        },
+        "bucket1": {
+          "avoid": 97,
+          "migrate": 37,
+          "nothing": 46
+        },
+        "bucket2": {
+          "avoid": 53,
+          "migrate": 122,
+          "nothing": 104
+        }
+      },
+      {
+        "bucket0": {
+          "nothing": 50,
+          "avoid": 33,
+          "migrate": 111
+        },
+        "bucket1": {
+          "migrate": 29,
+          "avoid": 32,
+          "nothing": 94
+        },
+        "bucket2": {
+          "nothing": 51,
+          "migrate": 76,
+          "avoid": 163
+        }
+      },
+      {
+        "bucket0": {
+          "migrate": 7,
+          "nothing": 179,
+          "avoid": 11
+        },
+        "bucket1": {
+          "nothing": 43,
+          "migrate": 33,
+          "avoid": 94
+        },
+        "bucket2": {
+          "migrate": 64,
+          "nothing": 73,
+          "avoid": 134
+        }
+      },
+      {
+        "bucket0": {
+          "avoid": 121,
+          "nothing": 43,
+          "migrate": 23
+        },
+        "bucket1": {
+          "avoid": 81,
+          "nothing": 23,
+          "migrate": 70
+        },
+        "bucket2": {
+          "avoid": 176,
+          "migrate": 51,
+          "nothing": 66
+        }
+      }
+    ],
+    "P5-faithful": [
+      {
+        "bucket0": {
+          "ua": 126,
+          "ua-lm": 224,
+          "noop": 51
+        },
+        "bucket1": {
+          "ua-lm": 275,
+          "ua": 32,
+          "noop": 61
+        },
+        "bucket2": {
+          "noop": 26,
+          "ua-lm": 31,
+          "ua": 427
+        }
+      },
+      {
+        "bucket0": {
+          "ua-lm": 13,
+          "ua": 376,
+          "noop": 19
+        },
+        "bucket1": {
+          "ua": 254,
+          "ua-lm": 22,
+          "noop": 98
+        },
+        "bucket2": {
+          "ua-lm": 104,
+          "ua": 281,
+          "noop": 79
+        }
+      },
+      {
+        "bucket0": {
+          "ua": 168,
+          "noop": 67,
+          "ua-lm": 174
+        },
+        "bucket1": {
+          "ua": 14,
+          "noop": 73,
+          "ua-lm": 285
+        },
+        "bucket2": {
+          "noop": 23,
+          "ua": 48,
+          "ua-lm": 407
+        }
+      },
+      {
+        "bucket0": {
+          "noop": 19,
+          "ua": 16,
+          "ua-lm": 368
+        },
+        "bucket1": {
+          "ua-lm": 24,
+          "noop": 224,
+          "ua": 119
+        },
+        "bucket2": {
+          "noop": 304,
+          "ua": 128,
+          "ua-lm": 25
+        }
+      },
+      {
+        "bucket0": {
+          "ua": 16,
+          "ua-lm": 341,
+          "noop": 43
+        },
+        "bucket1": {
+          "ua-lm": 21,
+          "ua": 291,
+          "noop": 67
+        },
+        "bucket2": {
+          "ua": 67,
+          "ua-lm": 336,
+          "noop": 81
+        }
+      }
+    ]
+  }
+}

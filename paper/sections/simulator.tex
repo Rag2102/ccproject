@@ -1,0 +1,73 @@
+% Simulator (draft, Week 13; written 4 Oct 2026 from docs/v2/SIM_SPEC.md v0.2 and
+% docs/v2/G2_simulator_validation.md). Numbers from results/v2/g2_validation.json.
+% TODO before submission: cite the node-log shape source once verified (G2 doc, open items).
+
+\section{Simulator}
+\label{sec:sim}
+
+We evaluate policies in a purpose-built simulator rather than a general cloud simulator, because
+the question needs exactly three things modelled faithfully: which VMs are on a host when it fails,
+what a migration costs and how long it takes, and a budget shared by all migrations of a day.
+
+\paragraph{Failures.}
+A host has $d \in \{1, 4, 12\}$ drives drawn from the Backblaze population with their models and
+ages. Its daily hazard is $1 - \prod_k (1 - h_k)\,(1 - h_{\text{other}})$, where $h_k$ is drive $k$'s
+hazard and $h_{\text{other}}$ is a Weibull term (shape $0.7$) for non-disk causes, scaled to be
+$0\times$, $1\times$ or $3\times$ as likely over a year as disk failures. That multiplier is an
+assumption and is swept. Failure times are drawn by inverse transform before any policy runs. A
+failed host is repaired after a log-normal time (median two days) and returns empty, with new
+drives, to fail again later. Policies can move VMs off a host; they cannot change when it fails.
+
+\paragraph{VMs and placement.}
+VMs arrive as a Poisson process and keep the size, CPU utilisation, tier and lifetime of a
+resampled Azure VM~\cite{cortez2017resource}. VMs that live at least a day are simulated
+individually: they are 12\% of VMs but 92\% of memory-time. Shorter ones are charged at each
+host failure as a Poisson draw. No policy may migrate a VM younger than a day, so this
+simplification hides nothing a real operator would see, and it costs every policy the same.
+Arrivals are placed by the regime under study: uniformly at random, or with a target correlation
+between tier and host risk on the latent axis of Section~\ref{sec:rho}.
+
+\paragraph{Migration and accounting.}
+A migration is pre-copy~\cite{clark2005live}: memory is sent in rounds until the remainder is
+small, then the VM pauses for the last copy. A VM that dirties memory faster than 90\% of the
+link does not converge and takes a 60\,s pause. A host's link is shared by its concurrent
+migrations, and a failure of the source during a migration interrupts the VM. Costs follow
+Section~\ref{sec:problem}: every interruption and every migration that starts is charged, in
+customer-impact minutes, and nothing is credited for failures that did not happen. Each day the
+policy ranks VMs; the simulator fills the budget in that order, picks each destination as the
+less risky of two random hosts with room, and times the migrations.
+
+\paragraph{Common random numbers and time.}
+For a given seed, every policy sees the same hosts, failure and repair times, arrivals and
+lifetimes. All comparisons are therefore paired. The simulator advances one day at a time and
+resolves each day's failures at their exact times against that day's arrivals, departures and
+migrations. One policy run of 5{,}000 hosts over 365 days takes 2--5\,s on one laptop core.
+
+\paragraph{Validation.}
+Before any policy comparison we required five checks (Table~\ref{tab:g2}). Under a constant
+hazard, simulated interruptions match the closed form, both without migration and when every VM
+is moved once. Simulated 30-day failure counts match the predicted probabilities across repairs.
+Run in our earlier prototype's setting, the simulator's components reproduce that prototype's
+two headline costs to within $10^{-6}$ and its migration counts exactly. Property-based tests
+check conservation of VMs, capacity, budget and determinism on every simulated day. One check
+fails to match the literature. The simulated time between a node's failures has a Weibull shape
+near~1, whereas node logs show a more strongly decreasing hazard. We report this as a limitation.
+
+\begin{table}[t]
+  \centering
+  \small
+  \begin{tabular}{@{}lll@{}}
+    \toprule
+    Check & Result & Pass \\
+    \midrule
+    Analytic, no migration ($N = 20{,}000$, 5 seeds) & $|z| \le 2.6$ & yes \\
+    Analytic, migrate all once & $|z| \le 2.3$ & yes \\
+    Self-calibration across repairs & $z = -0.28$; deciles $|z| \le 0.93$ & yes \\
+    Prototype regression & $456{,}533$ and $442{,}701$ to $<10^{-6}$ & yes \\
+    Invariants and determinism & all property tests pass & yes \\
+    Run time (5{,}000 hosts, 1 year) & $\le 4.8$\,s (target 10\,s) & yes \\
+    \bottomrule
+  \end{tabular}
+  \caption{Simulator validation (gate G2).}
+  \label{tab:g2}
+\end{table}

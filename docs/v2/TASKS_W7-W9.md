@@ -1,0 +1,71 @@
+# Tasks for Weeks 7-9 (16 Nov - 6 Dec 2026)
+
+Taken from the v5 week cards for W7, W8 and W9 (plan pages 17-18). Started 4 Oct 2026, ahead of the calendar, while the Backblaze ingest was still running. `[x]` = done and checked; `[~]` = done, needs you; `[ ]` = not done.
+
+## Week 7 (16-22 Nov): temporal hazard model v2
+
+About 12 h.
+
+- [x] Features: `scripts/v2/11_features.py`.
+  - log1p of SMART 5, 187, 188, 197 and 198, with 7- and 30-day deltas and 30-day maxima;
+  - age as the 30-day running maximum of power-on hours;
+  - temperature and its 30-day maximum;
+  - days since SMART 5 and 197 first became non-zero;
+  - model, capacity, and missing flags.
+
+  Every window is trailing.
+- [x] Labels for H = 7, 14 and 30 with the Week 5 censoring rule. Drive-days far from a failure are sampled at 2%, with inverse-probability weights; the weights check out against the full counts (within 0.03% on 2018 Q2).
+- [x] Splits: 70/15/15 by calendar time over the last three years. A point whose label is not decided inside its split is dropped, and drives that fail in the test period are excluded from training. Rolling origin with three 3-month folds.
+- [x] Models (`scripts/v2/12_train.py`):
+  - HistGradientBoosting;
+  - logistic regression as a sanity check;
+  - **v1's features refitted on the same temporal data** (model group, capacity, age). v1's own model was trained on a random split, so refitting isolates the effect of the features.
+  - LightGBM was not installable (needs the system library `libomp`), which the plan allows.
+- [x] Isotonic calibration on the validation period; reliability diagram; ECE (20 equal-count bins).
+- [x] Test-period metrics: ROC-AUC, PR-AUC, Brier, ECE, precision in the top 1% and 5%. 95% CIs come from 1,000 Poisson bootstrap replicates over drives, plus a paired PR-AUC difference against v1. The fast metric code is checked against scikit-learn on every run.
+- [x] Leakage audit, programmatic: no training row from a drive that fails in the test period; no training label that looks past the end of training; trailing windows by construction.
+- [x] Final run on 2023-2026 data (4 Oct; the per-drive table was moved to one quarter at a time after the first attempt ran out of memory) and `docs/v2/failure_model_v2.md`. At H = 30: PR-AUC 0.074 against 0.0018 for v1's features (paired difference 0.065 to 0.082), ROC-AUC 0.884, ECE 2.3 × 10⁻⁴; leakage audit clean; rolling-origin PR-AUC 0.114 / 0.115 / 0.044
+- [~] Decision for you: the logistic regression beats gradient boosting on test PR-AUC (0.091 vs 0.074). Proposal: choose by validation PR-AUC, rule written before looking (`failure_model_v2.md`)
+
+## Week 8 (23-29 Nov): empirical rho; Gate G1
+
+About 12 h.
+
+- [x] Cells a, b and h, chosen before any data was read. Tirmazi et al. name them as the cells with the most production, best-effort batch and mid-tier work respectively. 51.8 GB of `instance_events` in all, downloaded one cell at a time from the public buckets (MD5-checked) and deleted after aggregation.
+- [x] Pilot on cell a's machine table and first shard:
+  - event codes confirmed (ADD at time 0 for 9,526 of 10,001 machines; dedicated machines are −1);
+  - 5 platforms;
+  - about 1.8 removals per machine per month, mostly maintenance, as expected.
+- [x] `scripts/v2/13_trace_rho.py`:
+  - placements → counts per (window, machine, tier, scheduling class);
+  - three risk proxies;
+  - τ-b and tie-corrected Spearman from contingency tables (checked against SciPy);
+  - 2,000-resample machine bootstrap (BCa);
+  - Gini dispersion;
+  - mapping to the latent axis;
+  - G1 class per cell and majority.
+- [x] Axis made precise before any estimate: pH = 0.30 is v1's tie-corrected Spearman under v1's margins, which is **0.375** on the latent axis (`rho_definition.md` step 6, `PROTOCOL.md` v0.2). Confirmed 4 Oct.
+- [x] Run cells a, b and h, then `--analyse` (4 Oct, 19:57-20:07, after the owner re-queued it); figure F3 draft `results/figures/v2_trace_rho.pdf`; numbers in `results/v2/trace_rho.json` and `trace_rho_table.csv`.
+  - Two bugs fixed on the way: DuckDB 1.5.6 stalled at 0% CPU on the per-bucket query (a CTE shared by a UNION ALL of the three windows; each window now runs on its own, 16 buckets in about 50 s), and the analysis crashed when a per-machine proxy had different risk levels in each window (one latent curve per window, averaged). `lead()` now has a full tie-break, so results no longer vary between runs.
+  - **Primary result (M1, platform long-removal proxy, tau-b):** a -0.009 [-0.011, -0.007], b 0.003 [-0.004, 0.010], h 0.015 [0.007, 0.032]; on the latent axis the highest upper bound is 0.056, against pH_L = 0.375 and the C0 boundary 0.251. **Class C0 in all three cells; G1 majority C0.** The direct Spearman comparison gives C0 too.
+- [x] Mapping sensitivity (M2, M3) and the two other proxies are in the table. **The sign does change** (cell a: -0.009 under M1, +0.016 under M2; cell h's per-machine proxy is negative), so it goes in the first paragraph of `G1_decision.md`. Every estimate under every mapping, proxy and weight has \|tau-b\| ≤ 0.075, and every latent upper bound is ≤ 0.082: the conclusion (negligible correlation) does not depend on the choice.
+- [~] `docs/v2/G1_decision.md`: drafted from the result, **signed off by you**. The class is final under the protocol.
+
+## Week 9 (30 Nov-6 Dec): citable v1 report
+
+- [x] Decision: **skipped** (4 Oct). No application needs it before the v2 paper; the hours move to Week 10. Logged in `LOG.md` with the caveat that a revived report needs a correction for the -3.1% result.
+
+## Week 10 (7-13 Dec): simulator v2 design spec (started 4 Oct, using Week 9's hours)
+
+- [x] `docs/v2/SIM_SPEC.md` v0:
+  - entities and fields;
+  - time model and event tie order;
+  - six event types plus HOST_REPAIR, with state transitions;
+  - accounting with units, charging realised costs only, so v1's asymmetry cannot recur;
+  - migration model with v1's closed form for the regression;
+  - failure process and the common-random-numbers contract;
+  - placement per regime, predictor and policy interfaces;
+  - parameter table with sources;
+  - 9 invariants, architecture, performance target (≤ 10 s per policy-seed at 5,000 hosts × 365 days), G2 validation.
+- [x] Three open items confirmed with their defaults (4 Oct): survival-weighted interruption cost, 70% initial fill, repaired host returns empty
+- [ ] Reader test: someone reads it for 30 minutes and lists their questions

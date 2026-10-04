@@ -1,0 +1,60 @@
+% Datasets (draft, Week 12; written 4 Oct 2026 from docs/v2/data_sources.md).
+% Counts marked %N are to be replaced by macros from numbers.tex when it exists.
+
+\section{Datasets}
+\label{sec:data}
+
+We use three public datasets and no proprietary data. Each is used under its published terms;
+Table~\ref{tab:data} summarises them.
+
+\begin{table}[t]
+  \centering
+  \small
+  \begin{tabular}{@{}llll@{}}
+    \toprule
+    Dataset & Period & Size & Used for \\
+    \midrule
+    Backblaze Drive Stats~\cite{backblaze2026drivestats} & Apr 2013--Jun 2026 & 744.3M drive-days, 512{,}600 drives & failure model \\
+    Google cluster trace~\cite{googleclusterdata2019,tirmazi2020borg} & May 2019 & 3 of 8 cells, about 12k machines each & empirical $\rho$ \\
+    Azure Public Dataset V1~\cite{azurepublicdataset,cortez2017resource} & 2017 & 2{,}013{,}767 VMs & VM size, tier, lifetime \\
+    \bottomrule
+  \end{tabular}
+  \caption{Datasets. Counts are after cleaning (Section~\ref{sec:data}).}
+  \label{tab:data}
+\end{table}
+
+\paragraph{Drive failures.}
+Backblaze publishes one record per drive per day, with the drive's model, capacity, a failure
+flag and its SMART attributes~\cite{backblaze2026drivestats}. We converted all 45 published
+archives (35.1\,GB compressed) to columnar files and checked every archive's row count against
+its CSV files. Two problems in the source were found and handled: two daily files use a
+different date format (2018-02-25 and 2019-06-17; the first also uses old Mac line endings), and the file named
+2022-12-10 contains an exact copy of the next day, so that day is missing and the duplicate is
+dropped. A drive fails on its first record with the failure flag; later records are discarded.
+Drives that stop reporting without a failure flag are censored. Restricted to 2013--2017 and to
+drives of at least 1.5\,TB, our rebuild reproduces the per-drive table used by our earlier
+prototype: 122{,}620 drives against 122{,}619, and 6{,}907 failures against 6{,}913, with the
+remaining differences traced to individual drives. Labels for the failure model mark a
+drive-day positive if the drive fails within $H$ days, and exclude drive-days whose outcome is
+censored (Section~\ref{sec:model}). A drive is a proxy for a host: a host's failure probability is
+composed from its drives and a separately assumed non-disk term (Section~\ref{sec:sim}).
+
+\paragraph{Placement.}
+Google's 2019 trace records eight Borg cells for 31 days, including every task's priority and
+scheduling class and every machine's add, remove and update events~\cite{tirmazi2020borg}. We
+use three cells chosen before any data was read, the ones Tirmazi et al.\ report as having the
+most production, best-effort batch and mid-tier work, to span the range of workload mixes. We
+map priority tiers to the three criticality tiers of the Azure data (production and monitoring
+to high, mid-tier to medium, free and best-effort batch to low) and test two alternative
+mappings. The trace has no hardware-failure labels. Our risk proxy is a machine platform's rate
+of \emph{long} removals (a removal not followed by re-addition within 24 hours), because short
+removals are dominated by routine maintenance~\cite{tirmazi2020borg}; this is a proxy, not a
+failure rate, and every figure that uses it says so.
+
+\paragraph{Virtual machines.}
+The Azure Public Dataset V1 gives, for about two million VMs observed over 30 days in 2017,
+their category (interactive, delay-insensitive or unknown), size and CPU
+utilisation~\cite{cortez2017resource}. We use the category as the criticality tier and sample
+VM size, CPU, tier and lifetime jointly from it. VMs in this trace are short-lived (median
+lifetime 40 minutes), which matters for what a migration can protect
+(Section~\ref{sec:problem}).

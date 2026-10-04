@@ -1,0 +1,41 @@
+{
+  "v1_drives": 122619,
+  "v1_failures": 6913,
+  "v2_drives_2013_2017": 125863,
+  "v2_failures_2013_2017": 7321,
+  "drives_gap_pct": 2.646,
+  "failures_gap_pct": 5.902,
+  "serials_in_both": 122619,
+  "serials_only_v1": 0,
+  "serials_only_v2": 3244,
+  "failed_agree_share": 0.99995,
+  "failed_v1_not_v2": 6,
+  "failed_v2_not_v1": 0,
+  "model_agree_share": 1.0,
+  "start_equals_first_seen_share": 1.0,
+  "age_days_vs_calendar_days_2017_median_abs_diff": 7.125,
+  "age_days_vs_calendar_days_2017_within_1d_share": 0.07385,
+  "age_days_vs_age_exit_days_median_abs_diff": 0.0,
+  "age_days_vs_age_exit_days_within_1d_share": 0.99982,
+  "v1_filter": "first seen by 2017-12-31, capacity >= 1.5 TB",
+  "v2_drives_v1_filter": 122620,
+  "v2_failures_v1_filter": 6907,
+  "v2_only_after_filter": [
+    {
+      "serial_number": "PL1331LAGTGMVH",
+      "model": "HGST HMS5C4040ALE640",
+      "capacity_bytes": "4000787030016",
+      "failed_by_2017": "0"
+    }
+  ],
+  "failed_v1_not_v2_filtered": [
+    "PL1331LAGYH4SH",
+    "Z300GZ1B",
+    "Z300GZCV",
+    "Z303VDR4",
+    "Z305AGS0",
+    "ZA10Z42B"
+  ],
+  "v2_only_below_filter_drives": 3243,
+  "v2_only_below_filter_failures": 414
+}

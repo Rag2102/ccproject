@@ -3,3 +3,7 @@
 # rely on (see requirements.txt's own comment on why those are exact).
 pytest==8.3.4
 requests==2.33.1  # scripts/load_test.py only
+# v2 simulator tests (tests/v2): same pins as pyproject.toml's dev and research groups
+pyyaml==6.0.2
+hypothesis==6.122.3
+pyarrow==25.0.1

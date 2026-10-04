@@ -1,0 +1,100 @@
+tune done 22:47:07
+run done 23:00:42
+collect done 23:00:43
+22:21:35 tuned A1 @ 0.5%: tau 1.334e-02 largest (69s)
+22:21:55 tuned A3 @ 0.5%: tau 1.000e-06 smallest (20s)
+22:22:20 tuned A5 @ 0.5%: tau 1.000e-06 largest (25s)
+22:22:54 tuned A7 @ 0.5%: tau 1.000e-06 random (34s)
+22:25:01 tuned E2 @ 0.5%: tau 1.334e-02 largest (127s)
+22:27:09 tuned B1-low @ 0.5%: tau 1.334e-02 largest (128s)
+22:27:42 tuned B1-high @ 0.5%: tau 1.000e-06 largest (33s)
+22:30:09 tuned C @ 0.5%: tau 1.334e-02 random (147s)
+22:21:42 tuned A1 @ 1%: tau 1.334e-02 smallest (76s)
+22:24:22 tuned A3 @ 1%: tau 1.334e-02 largest (160s)
+22:27:24 tuned A5 @ 1%: tau 1.334e-02 random (182s)
+22:30:19 tuned A7 @ 1%: tau 1.334e-02 largest (175s)
+22:32:20 tuned E2 @ 1%: tau 1.334e-02 smallest (121s)
+22:34:17 tuned B1-low @ 1%: tau 1.334e-02 smallest (117s)
+22:36:51 tuned B1-high @ 1%: tau 1.334e-02 smallest (154s)
+22:39:36 tuned C @ 1%: tau 1.334e-02 largest (164s)
+22:21:59 tuned A1 @ 2%: tau 1.334e-02 largest (94s)
+22:25:31 tuned A3 @ 2%: tau 1.334e-02 largest (211s)
+22:29:12 tuned A5 @ 2%: tau 1.334e-02 smallest (221s)
+22:32:29 tuned A7 @ 2%: tau 1.334e-02 smallest (197s)
+22:34:52 tuned E2 @ 2%: tau 1.334e-02 largest (143s)
+22:37:18 tuned B1-low @ 2%: tau 1.334e-02 largest (145s)
+22:40:13 tuned B1-high @ 2%: tau 1.334e-02 random (175s)
+22:42:42 tuned C @ 2%: tau 5.623e-03 smallest (149s)
+22:23:04 tuned A1 @ 5%: tau 5.623e-03 random (159s)
+22:28:17 tuned A3 @ 5%: tau 5.623e-03 smallest (313s)
+22:32:54 tuned A5 @ 5%: tau 5.623e-03 largest (277s)
+22:37:25 tuned A7 @ 5%: tau 5.623e-03 random (270s)
+22:40:36 tuned E2 @ 5%: tau 5.623e-03 random (191s)
+22:43:00 tuned B1-low @ 5%: tau 5.623e-03 random (144s)
+22:44:56 tuned B1-high @ 5%: tau 5.623e-03 smallest (116s)
+22:46:51 tuned C @ 5%: tau 5.623e-03 smallest (115s)
+22:20:44 tuned A2 @ 0.5%: tau 1.000e-06 random (18s)
+22:21:01 tuned A4 @ 0.5%: tau 1.000e-06 smallest (17s)
+22:21:21 tuned A6 @ 0.5%: tau 1.000e-06 smallest (20s)
+22:22:52 tuned E1 @ 0.5%: tau 1.334e-02 largest (91s)
+22:24:59 tuned E3 @ 0.5%: tau 1.334e-02 largest (126s)
+22:25:32 tuned B1 @ 0.5%: tau 1.000e-06 largest (33s)
+22:28:23 tuned B2 @ 0.5%: tau 1.334e-02 largest (171s)
+22:28:56 tuned D @ 0.5%: tau 1.000e-06 smallest (33s)
+22:22:07 tuned A2 @ 1%: tau 1.334e-02 largest (101s)
+22:25:01 tuned A4 @ 1%: tau 1.334e-02 largest (174s)
+22:28:06 tuned A6 @ 1%: tau 1.334e-02 random (185s)
+22:30:13 tuned E1 @ 1%: tau 1.334e-02 smallest (128s)
+22:32:14 tuned E3 @ 1%: tau 1.334e-02 smallest (121s)
+22:34:45 tuned B1 @ 1%: tau 1.334e-02 largest (151s)
+22:37:23 tuned B2 @ 1%: tau 1.334e-02 random (158s)
+22:39:53 tuned D @ 1%: tau 1.334e-02 smallest (150s)
+22:22:37 tuned A2 @ 2%: tau 1.334e-02 largest (132s)
+22:26:15 tuned A4 @ 2%: tau 1.334e-02 smallest (218s)
+22:29:49 tuned A6 @ 2%: tau 1.334e-02 largest (214s)
+22:32:15 tuned E1 @ 2%: tau 1.334e-02 largest (145s)
+22:34:35 tuned E3 @ 2%: tau 1.334e-02 largest (141s)
+22:37:42 tuned B1 @ 2%: tau 1.334e-02 random (187s)
+22:40:31 tuned B2 @ 2%: tau 5.623e-03 largest (169s)
+22:42:48 tuned D @ 2%: tau 1.334e-02 random (138s)
+22:24:12 tuned A2 @ 5%: tau 5.623e-03 smallest (226s)
+22:29:23 tuned A4 @ 5%: tau 5.623e-03 smallest (311s)
+22:33:56 tuned A6 @ 5%: tau 5.623e-03 smallest (272s)
+22:37:27 tuned E1 @ 5%: tau 5.623e-03 random (211s)
+22:40:38 tuned E3 @ 5%: tau 5.623e-03 random (191s)
+22:43:27 tuned B1 @ 5%: tau 5.623e-03 smallest (169s)
+22:45:15 tuned B2 @ 5%: tau 5.623e-03 smallest (108s)
+22:47:07 tuned D @ 5%: tau 5.623e-03 random (111s)
+22:50:09 A1 seed 1: 33 runs in 180s
+22:53:40 A5 seed 1: 33 runs in 211s
+22:56:54 E2 seed 1: 33 runs in 194s
+23:00:05 B1-high seed 1: 33 runs in 191s
+22:50:08 A1 seed 2: 33 runs in 179s
+22:53:37 A5 seed 2: 33 runs in 210s
+22:56:51 E2 seed 2: 33 runs in 193s
+23:00:02 B1-high seed 2: 33 runs in 191s
+22:50:34 A2 seed 1: 33 runs in 206s
+22:54:09 A6 seed 1: 33 runs in 215s
+22:57:20 E3 seed 1: 33 runs in 191s
+23:00:41 B2 seed 1: 33 runs in 201s
+22:50:35 A2 seed 2: 33 runs in 206s
+22:54:11 A6 seed 2: 33 runs in 216s
+22:57:22 E3 seed 2: 33 runs in 191s
+23:00:41 B2 seed 2: 33 runs in 199s
+22:50:36 A3 seed 1: 33 runs in 207s
+22:54:15 A7 seed 1: 33 runs in 218s
+22:57:26 B1-low seed 1: 33 runs in 191s
+23:00:36 C seed 1: 33 runs in 190s
+22:50:36 A3 seed 2: 33 runs in 208s
+22:54:14 A7 seed 2: 33 runs in 218s
+22:57:25 B1-low seed 2: 33 runs in 191s
+23:00:36 C seed 2: 33 runs in 190s
+22:50:39 A4 seed 1: 33 runs in 210s
+22:53:38 E1 seed 1: 33 runs in 179s
+22:57:16 B1 seed 1: 33 runs in 218s
+23:00:29 D seed 1: 33 runs in 193s
+22:50:38 A4 seed 2: 33 runs in 210s
+22:53:38 E1 seed 2: 33 runs in 180s
+22:57:16 B1 seed 2: 33 runs in 218s
+23:00:29 D seed 2: 33 runs in 193s
+23:00:43 cells complete: 528 of 528; runs missing: 0
