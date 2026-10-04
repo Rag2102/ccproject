@@ -7,7 +7,7 @@
 <meta name="description" content="A workload-aware, cost-sensitive VM mitigation policy: live model demo, course-project results, and the v2 research programme in progress.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&family=Nunito:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%23111318'/%3E%3Crect x='7' y='7' width='8' height='8' rx='2' fill='%236f9bff'/%3E%3Crect x='17' y='7' width='8' height='8' rx='2' fill='%23ff8a5c'/%3E%3Crect x='7' y='17' width='8' height='8' rx='2' fill='%23ffffff' opacity='.35'/%3E%3Crect x='17' y='17' width='8' height='8' rx='2' fill='%236f9bff' opacity='.6'/%3E%3C/svg%3E">
 <script>
   // theme before first paint: saved choice, else the system's
@@ -20,50 +20,51 @@
 </script>
 <style>
   :root {
-    --bg: #f6f5f1; --bg-2: #efede7; --surface: #ffffff; --surface-2: #f9f8f5;
-    --line: rgba(20, 22, 28, 0.09); --line-2: rgba(20, 22, 28, 0.16);
-    --ink: #15171c; --ink-2: #4a505c; --ink-3: #7a808c;
-    --cs: #2f5bea; --cs-soft: rgba(47, 91, 234, 0.10);
-    --th: #d9531e; --th-soft: rgba(217, 83, 30, 0.10);
-    --good: #13865a; --good-soft: rgba(19, 134, 90, 0.10);
-    --bad: #c93a3a; --bad-soft: rgba(201, 58, 58, 0.10);
+    --bg: #f1f6f3; --bg-2: #e5eee9; --surface: #ffffff; --surface-2: #f6faf8;
+    --line: rgba(10, 40, 25, 0.09); --line-2: rgba(10, 40, 25, 0.17);
+    --ink: #0c1912; --ink-2: #3f5248; --ink-3: #6d7f75;
+    --cs: #2563eb; --cs-soft: rgba(37, 99, 235, 0.10);
+    --th: #e0571f; --th-soft: rgba(224, 87, 31, 0.10);
+    --good: #0f8a52; --good-soft: rgba(15, 138, 82, 0.11);
+    --bad: #cc3636; --bad-soft: rgba(204, 54, 54, 0.10);
     --amber: #a8730b; --amber-soft: rgba(168, 115, 11, 0.12);
-    --violet: #6d4ed8; --violet-soft: rgba(109, 78, 216, 0.10);
+    --violet: #0e9f6e; --violet-soft: rgba(14, 159, 110, 0.12);
+    --glow-1: rgba(34, 197, 94, 0.16); --glow-2: rgba(16, 185, 129, 0.10);
     --shadow: 0 1px 2px rgba(20, 22, 28, 0.04), 0 8px 24px -12px rgba(20, 22, 28, 0.12);
-    --radius: 14px; --radius-sm: 9px;
-    --action: #0071e3; --action-hover: #0077ed; --link: #0066cc;
-    --serif: 'Instrument Serif', Georgia, 'Times New Roman', serif;
-    --sans: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    --radius: 26px; --radius-sm: 16px;
+    --action: #12a150; --action-hover: #0f8a44; --link: #0f8a44; --on-action: #ffffff;
+    --serif: 'Fredoka', 'Nunito', system-ui, sans-serif;
+    --sans: 'Nunito', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
     --mono: 'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, monospace;
     color-scheme: light;
   }
   @media (prefers-color-scheme: dark) {
     :root:not([data-theme="light"]) {
-      --action: #0071e3; --action-hover: #147ce5; --link: #2997ff;
-      --bg: #0c0d10; --bg-2: #111318; --surface: #14161b; --surface-2: #181b21;
-      --line: rgba(255, 255, 255, 0.08); --line-2: rgba(255, 255, 255, 0.15);
-      --ink: #ecedf0; --ink-2: #a8adb8; --ink-3: #737986;
-      --cs: #7c9fff; --cs-soft: rgba(124, 159, 255, 0.13);
-      --th: #ff8f5e; --th-soft: rgba(255, 143, 94, 0.13);
-      --good: #45d39a; --good-soft: rgba(69, 211, 154, 0.12);
-      --bad: #ff6f6f; --bad-soft: rgba(255, 111, 111, 0.12);
-      --amber: #f0bf54; --amber-soft: rgba(240, 191, 84, 0.13);
-      --violet: #a993ff; --violet-soft: rgba(169, 147, 255, 0.13);
+      --bg: #040806; --bg-2: #0a120e; --surface: #0b1410; --surface-2: #101b16;
+      --line: rgba(140, 255, 195, 0.08); --line-2: rgba(140, 255, 195, 0.16);
+      --ink: #e7f3ec; --ink-2: #a2b8ad; --ink-3: #6c8579;
+      --cs: #7cc4ff; --cs-soft: rgba(124, 196, 255, 0.13);
+      --th: #ff9a66; --th-soft: rgba(255, 154, 102, 0.13);
+      --good: #4ee597; --good-soft: rgba(78, 229, 151, 0.12);
+      --bad: #ff7272; --bad-soft: rgba(255, 114, 114, 0.12);
+      --amber: #f2c25a; --amber-soft: rgba(242, 194, 90, 0.13);
+      --violet: #4ee597; --violet-soft: rgba(78, 229, 151, 0.14);
+      --glow-1: rgba(34, 197, 94, 0.20); --glow-2: rgba(16, 185, 129, 0.12);
       --shadow: 0 1px 2px rgba(0, 0, 0, 0.3), 0 12px 32px -16px rgba(0, 0, 0, 0.6);
       color-scheme: dark;
     }
   }
   :root[data-theme="dark"] {
-    --action: #0071e3; --action-hover: #147ce5; --link: #2997ff;
-    --bg: #0c0d10; --bg-2: #111318; --surface: #14161b; --surface-2: #181b21;
-    --line: rgba(255, 255, 255, 0.08); --line-2: rgba(255, 255, 255, 0.15);
-    --ink: #ecedf0; --ink-2: #a8adb8; --ink-3: #737986;
-    --cs: #7c9fff; --cs-soft: rgba(124, 159, 255, 0.13);
-    --th: #ff8f5e; --th-soft: rgba(255, 143, 94, 0.13);
-    --good: #45d39a; --good-soft: rgba(69, 211, 154, 0.12);
-    --bad: #ff6f6f; --bad-soft: rgba(255, 111, 111, 0.12);
-    --amber: #f0bf54; --amber-soft: rgba(240, 191, 84, 0.13);
-    --violet: #a993ff; --violet-soft: rgba(169, 147, 255, 0.13);
+    --bg: #040806; --bg-2: #0a120e; --surface: #0b1410; --surface-2: #101b16;
+    --line: rgba(140, 255, 195, 0.08); --line-2: rgba(140, 255, 195, 0.16);
+    --ink: #e7f3ec; --ink-2: #a2b8ad; --ink-3: #6c8579;
+    --cs: #7cc4ff; --cs-soft: rgba(124, 196, 255, 0.13);
+    --th: #ff9a66; --th-soft: rgba(255, 154, 102, 0.13);
+    --good: #4ee597; --good-soft: rgba(78, 229, 151, 0.12);
+    --bad: #ff7272; --bad-soft: rgba(255, 114, 114, 0.12);
+    --amber: #f2c25a; --amber-soft: rgba(242, 194, 90, 0.13);
+    --violet: #4ee597; --violet-soft: rgba(78, 229, 151, 0.14);
+    --glow-1: rgba(34, 197, 94, 0.20); --glow-2: rgba(16, 185, 129, 0.12);
     --shadow: 0 1px 2px rgba(0, 0, 0, 0.3), 0 12px 32px -16px rgba(0, 0, 0, 0.6);
     color-scheme: dark;
   }
@@ -72,12 +73,17 @@
   html { scroll-behavior: smooth; -webkit-text-size-adjust: 100%; }
   @media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } *, *::before, *::after { animation: none !important; transition: none !important; } }
   body {
-    margin: 0; background: var(--bg); color: var(--ink); font-family: var(--sans);
-    font-size: 15px; line-height: 1.6; -webkit-font-smoothing: antialiased; overflow-x: hidden;
+    margin: 0; color: var(--ink); font-family: var(--sans);
+    background: radial-gradient(1100px 620px at 8% -8%, var(--glow-1), transparent 62%),
+                radial-gradient(900px 560px at 100% 4%, var(--glow-2), transparent 58%),
+                radial-gradient(1200px 700px at 50% 112%, var(--glow-2), transparent 60%), var(--bg);
+    background-attachment: fixed;
+    font-size: 16px; line-height: 1.6; -webkit-font-smoothing: antialiased; overflow-x: hidden;
   }
   a { color: inherit; }
   :focus-visible { outline: 2px solid var(--cs); outline-offset: 2px; border-radius: 4px; }
-  .wrap { max-width: 1160px; margin: 0 auto; padding: 0 24px; }
+  .wrap { max-width: 1400px; margin: 0 auto; padding: 0 40px; }
+  @media (max-width: 1100px) { .wrap { padding: 0 28px; } }
   @media (max-width: 600px) { .wrap { padding: 0 16px; } }
   .mono { font-family: var(--mono); }
   .serif { font-family: var(--serif); font-weight: 400; }
@@ -85,19 +91,20 @@
   /* ---------- nav ---------- */
   .nav {
     position: sticky; top: 0; z-index: 40; border-bottom: 1px solid var(--line);
-    background: color-mix(in srgb, var(--bg) 82%, transparent);
+    background: color-mix(in srgb, var(--bg) 70%, transparent);
     backdrop-filter: saturate(1.4) blur(14px); -webkit-backdrop-filter: saturate(1.4) blur(14px);
   }
-  .nav .wrap { display: flex; align-items: center; gap: 20px; height: 60px; }
-  .brand { display: flex; align-items: center; gap: 10px; text-decoration: none; font-weight: 650; font-size: 14.5px; letter-spacing: -0.01em; white-space: nowrap; }
-  .brand-mark { display: grid; grid-template-columns: 1fr 1fr; gap: 2.5px; width: 22px; height: 22px; }
-  .brand-mark i { border-radius: 2.5px; background: var(--ink-3); opacity: .45; }
-  .brand-mark i:nth-child(1) { background: var(--cs); opacity: 1; }
+  .nav .wrap { display: flex; align-items: center; gap: 14px; height: 66px; max-width: none; padding: 0 32px; }
+  @media (max-width: 600px) { .nav .wrap { padding: 0 16px; } }
+  .brand { display: flex; align-items: center; gap: 11px; text-decoration: none; font: 600 18px var(--serif); letter-spacing: -0.01em; white-space: nowrap; margin-right: auto; }
+  .brand-mark { display: grid; grid-template-columns: 1fr 1fr; gap: 3px; width: 26px; height: 26px; }
+  .brand-mark i { border-radius: 50%; background: var(--ink-3); opacity: .45; }
+  .brand-mark i:nth-child(1) { background: var(--action); opacity: 1; }
   .brand-mark i:nth-child(2) { background: var(--th); opacity: 1; }
-  .nav-links { display: flex; gap: 4px; margin-left: auto; }
+  .nav-links { display: flex; gap: 4px; }
   .nav-links a {
-    text-decoration: none; color: var(--ink-2); font-size: 13.5px; font-weight: 500;
-    padding: 7px 11px; border-radius: 8px; transition: color .15s, background .15s;
+    text-decoration: none; color: var(--ink-2); font-size: 14px; font-weight: 600;
+    padding: 8px 14px; border-radius: 999px; transition: color .15s, background .15s;
   }
   .nav-links a:hover { color: var(--ink); background: var(--line); }
   .nav-links a.active { color: var(--ink); background: var(--line); }
@@ -119,8 +126,8 @@
   }
 
   /* ---------- hero ---------- */
-  .hero { padding: 72px 0 56px; border-bottom: 1px solid var(--line); position: relative; overflow: hidden; }
-  .hero .wrap { display: grid; grid-template-columns: 1.15fr 0.85fr; gap: 56px; align-items: center; }
+  .hero { padding: 84px 0 64px; border-bottom: 1px solid var(--line); position: relative; overflow: hidden; }
+  .hero .wrap { display: grid; grid-template-columns: 1.1fr 0.9fr; gap: 64px; align-items: center; }
   @media (max-width: 960px) { .hero .wrap { grid-template-columns: 1fr; gap: 36px; } .hero { padding: 48px 0 40px; } }
   .eyebrow {
     display: inline-flex; align-items: center; gap: 8px; font-size: 12px; font-weight: 600; letter-spacing: .02em;
@@ -129,10 +136,10 @@
   .eyebrow .pulse { width: 7px; height: 7px; border-radius: 50%; background: var(--good); box-shadow: 0 0 0 0 var(--good); animation: pulse 2.4s infinite; }
   @keyframes pulse { 0% { box-shadow: 0 0 0 0 color-mix(in srgb, var(--good) 55%, transparent); } 70% { box-shadow: 0 0 0 7px transparent; } 100% { box-shadow: 0 0 0 0 transparent; } }
   .hero h1 {
-    font-family: var(--serif); font-weight: 400; font-size: clamp(40px, 6vw, 70px); line-height: 1.02;
-    letter-spacing: -0.02em; margin: 20px 0 18px;
+    font-family: var(--serif); font-weight: 600; font-size: clamp(40px, 5.6vw, 76px); line-height: 1.02;
+    letter-spacing: -0.025em; margin: 22px 0 20px;
   }
-  .hero h1 em { font-style: italic; color: var(--cs); }
+  .hero h1 em { font-style: normal; background: linear-gradient(100deg, var(--action), var(--cs)); -webkit-background-clip: text; background-clip: text; color: transparent; }
   .hero .lede { font-size: 17px; color: var(--ink-2); max-width: 600px; margin: 0 0 28px; line-height: 1.65; }
   .cta-row { display: flex; gap: 10px; flex-wrap: wrap; }
   /* buttons: pill shapes and an action blue, in the style of Apple's product pages */
@@ -143,12 +150,12 @@
   }
   .btn:active { transform: scale(.98); }
   .btn:disabled { opacity: .4; cursor: default; transform: none; }
-  .btn-primary { background: var(--action); color: #fff; }
+  .btn-primary { background: var(--action); color: var(--on-action); box-shadow: 0 8px 28px -10px var(--action); }
   .btn-primary:hover { background: var(--action-hover); }
   .btn-ghost { border-color: var(--action); color: var(--action); background: transparent; }
   :root[data-theme="dark"] .btn-ghost { color: var(--link); border-color: var(--link); }
   @media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) .btn-ghost { color: var(--link); border-color: var(--link); } }
-  .btn-ghost:hover:not(:disabled) { background: var(--action); border-color: var(--action); color: #fff; }
+  .btn-ghost:hover:not(:disabled) { background: var(--action); border-color: var(--action); color: var(--on-action); }
   .btn-sm { padding: 7px 15px; font-size: 13px; }
   .btn-icon { padding: 0; width: 40px; height: 40px; }
   .more { color: var(--link); text-decoration: none; font-weight: 500; white-space: nowrap; }
@@ -159,10 +166,10 @@
   .figures { display: grid; grid-template-columns: repeat(4, 1fr); gap: 0; margin-top: 40px; border-top: 1px solid var(--line); }
   @media (max-width: 600px) { .figures { grid-template-columns: 1fr 1fr; } }
   .fig { padding: 16px 16px 0 0; }
-  .fig .n { font-family: var(--serif); font-size: 32px; line-height: 1.1; letter-spacing: -0.01em; }
+  .fig .n { font-family: var(--serif); font-weight: 600; font-size: 34px; line-height: 1.1; letter-spacing: -0.01em; }
   .fig .l { font-size: 12px; color: var(--ink-3); margin-top: 4px; line-height: 1.4; }
 
-  .fleet-card { background: var(--surface); border: 1px solid var(--line); border-radius: 18px; padding: 18px; box-shadow: var(--shadow); }
+  .fleet-card { background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); padding: 18px; box-shadow: var(--shadow); }
   .fleet-head { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 12px; gap: 10px; }
   .fleet-head b { font-size: 13px; font-weight: 600; }
   .fleet-head span { font-size: 11.5px; color: var(--ink-3); font-family: var(--mono); }
@@ -176,15 +183,15 @@
   .sec-head { display: grid; grid-template-columns: 220px 1fr; gap: 40px; margin-bottom: 40px; }
   @media (max-width: 880px) { .sec-head { grid-template-columns: 1fr; gap: 10px; } }
   .sec-num { font-family: var(--mono); font-size: 12px; color: var(--ink-3); letter-spacing: .04em; padding-top: 10px; }
-  .sec-num b { color: var(--ink); font-weight: 600; display: block; margin-top: 2px; font-family: var(--sans); font-size: 13px; letter-spacing: 0; }
-  .sec-head h2 { font-family: var(--serif); font-weight: 400; font-size: clamp(32px, 4.2vw, 48px); line-height: 1.06; letter-spacing: -0.015em; margin: 0 0 14px; }
+  .sec-num b { color: var(--ink); font-weight: 700; display: block; margin-top: 2px; font-family: var(--sans); font-size: 14px; letter-spacing: 0; }
+  .sec-head h2 { font-family: var(--serif); font-weight: 600; font-size: clamp(32px, 4.2vw, 48px); line-height: 1.06; letter-spacing: -0.015em; margin: 0 0 14px; }
   .sec-head p { margin: 0; color: var(--ink-2); max-width: 720px; font-size: 16px; }
   .panel { background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); box-shadow: var(--shadow); }
   .pad { padding: 24px; }
   @media (max-width: 600px) { .pad { padding: 18px; } }
   .tag {
-    display: inline-flex; align-items: center; gap: 6px; font: 600 10.5px var(--mono); letter-spacing: .05em; text-transform: uppercase;
-    padding: 3px 8px; border-radius: 6px; white-space: nowrap;
+    display: inline-flex; align-items: center; gap: 6px; font: 700 10.5px var(--sans); letter-spacing: .08em; text-transform: uppercase;
+    padding: 4px 11px; border-radius: 999px; align-self: flex-start; white-space: nowrap;
   }
   .tag.measured { color: var(--good); background: var(--good-soft); }
   .tag.derived { color: var(--violet); background: var(--violet-soft); }
@@ -205,7 +212,7 @@
   .step h3 { font-size: 16px; margin: 10px 0 6px; font-weight: 600; letter-spacing: -0.01em; }
   .step p { margin: 0; font-size: 13.5px; color: var(--ink-2); line-height: 1.6; }
   .step .src { margin-top: 12px; font-size: 11.5px; color: var(--ink-3); font-family: var(--mono); }
-  .step .ico { width: 34px; height: 34px; border-radius: 9px; display: grid; place-items: center; background: var(--surface-2); border: 1px solid var(--line); color: var(--ink); margin-top: 14px; }
+  .step .ico { width: 40px; height: 40px; border-radius: 14px; display: grid; place-items: center; background: var(--surface-2); border: 1px solid var(--line); color: var(--ink); margin-top: 14px; }
 
   /* ---------- demo ---------- */
   .demo { display: grid; grid-template-columns: 380px 1fr; gap: 20px; align-items: start; }
@@ -214,17 +221,17 @@
   .field:last-of-type { margin-bottom: 0; }
   .field-label { display: flex; justify-content: space-between; align-items: baseline; font-size: 12.5px; font-weight: 600; color: var(--ink); margin-bottom: 8px; }
   .field-label span { font-weight: 500; color: var(--ink-3); font-family: var(--mono); font-size: 12px; }
-  .seg { display: flex; padding: 3px; gap: 3px; border-radius: 10px; background: var(--bg-2); border: 1px solid var(--line); }
+  .seg { display: flex; padding: 4px; gap: 4px; border-radius: 999px; background: var(--bg-2); border: 1px solid var(--line); }
   .seg input { position: absolute; opacity: 0; pointer-events: none; }
   .seg label {
-    flex: 1; text-align: center; padding: 8px 6px; border-radius: 7px; font-size: 13px; font-weight: 500; color: var(--ink-2);
-    cursor: pointer; transition: background .15s, color .15s, box-shadow .15s; text-transform: capitalize; user-select: none;
+    flex: 1; text-align: center; padding: 9px 8px; border-radius: 999px; font-size: 13px; font-weight: 500; color: var(--ink-2);
+    cursor: pointer; transition: background .15s, color .15s, box-shadow .15s; user-select: none;
   }
   .seg input:checked + label { background: var(--surface); color: var(--ink); box-shadow: 0 1px 2px rgba(0,0,0,.08), 0 0 0 1px var(--line-2); font-weight: 600; }
   .seg input:focus-visible + label { outline: 2px solid var(--cs); outline-offset: 1px; }
   .seg label small { display: block; font-size: 10.5px; color: var(--ink-3); font-weight: 500; }
   select {
-    width: 100%; appearance: none; -webkit-appearance: none; padding: 11px 36px 11px 12px; border-radius: 10px; border: 1px solid var(--line-2);
+    width: 100%; appearance: none; -webkit-appearance: none; padding: 12px 40px 12px 18px; border-radius: 999px; border: 1px solid var(--line-2);
     background: var(--surface) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%237a808c' stroke-width='2.5'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E") no-repeat right 12px center;
     color: var(--ink); font: 500 14px var(--mono);
   }
@@ -232,13 +239,23 @@
   input[type=range] { width: 100%; -webkit-appearance: none; appearance: none; height: 4px; border-radius: 99px; background: var(--line-2); margin: 10px 0 4px; }
   input[type=range]::-webkit-slider-thumb { -webkit-appearance: none; width: 18px; height: 18px; border-radius: 50%; background: var(--surface); border: 2px solid var(--ink); cursor: pointer; }
   input[type=range]::-moz-range-thumb { width: 14px; height: 14px; border-radius: 50%; background: var(--surface); border: 2px solid var(--ink); cursor: pointer; }
+  .seg-models label { font-size: 12.5px; }
+  .smart-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 10px; }
+  @media (max-width: 420px) { .smart-grid { grid-template-columns: 1fr; } }
+  .smart { display: flex; flex-direction: column; gap: 6px; padding: 10px 12px; border: 1px solid var(--line); border-radius: var(--radius-sm); background: var(--surface-2); cursor: text; }
+  .smart span { font-size: 12px; font-weight: 700; color: var(--ink-2); line-height: 1.25; }
+  .smart small { display: block; font-weight: 600; color: var(--ink-3); font-size: 10.5px; }
+  .smart input { width: 100%; border: none; background: transparent; color: var(--ink); font: 600 18px var(--serif); padding: 0; outline: none; }
+  .smart:focus-within { border-color: var(--action); box-shadow: 0 0 0 3px color-mix(in srgb, var(--action) 18%, transparent); }
+  .ro .band { font-size: 11.5px; color: var(--ink-3); margin-top: 8px; font-family: var(--mono); }
+  .meter .band { position: absolute; top: 1px; bottom: 1px; border-radius: 99px; background: color-mix(in srgb, var(--ink-2) 28%, transparent); }
   .range-scale { display: flex; justify-content: space-between; font-size: 11px; color: var(--ink-3); font-family: var(--mono); }
   .demo-actions { display: flex; gap: 8px; margin-top: 22px; align-items: center; }
   .live-toggle { display: flex; align-items: center; gap: 8px; font-size: 12.5px; color: var(--ink-2); margin-right: auto; cursor: pointer; user-select: none; }
   .live-toggle input { accent-color: var(--cs); width: 15px; height: 15px; }
-  .btn-run { background: var(--action); color: #fff; border: none; padding: 11px 24px; }
+  .btn-run { background: var(--action); color: var(--on-action); border: none; padding: 11px 24px; box-shadow: 0 8px 28px -10px var(--action); }
   .btn-run:hover { background: var(--action-hover); }
-  .btn-run .spin { width: 13px; height: 13px; border-radius: 50%; border: 2px solid rgba(255,255,255,.4); border-top-color: #fff; display: none; animation: spin .7s linear infinite; }
+  .btn-run .spin { width: 13px; height: 13px; border-radius: 50%; border: 2px solid color-mix(in srgb, var(--on-action) 35%, transparent); border-top-color: var(--on-action); display: none; animation: spin .7s linear infinite; }
   .btn-run.loading .spin { display: inline-block; }
   .btn-run.loading .play { display: none; }
   @keyframes spin { to { transform: rotate(360deg); } }
@@ -248,7 +265,7 @@
   .ro { padding: 20px 22px; border-right: 1px solid var(--line); }
   .ro:last-child { border-right: none; }
   .ro .l { font-size: 12px; color: var(--ink-3); }
-  .ro .v { font-family: var(--serif); font-size: 36px; line-height: 1.15; letter-spacing: -0.01em; margin-top: 2px; }
+  .ro .v { font-family: var(--serif); font-weight: 600; font-size: 36px; line-height: 1.15; letter-spacing: -0.01em; margin-top: 2px; }
   .ro .v small { font-family: var(--sans); font-size: 13px; color: var(--ink-3); margin-left: 4px; }
   .meter { position: relative; height: 8px; border-radius: 99px; background: var(--bg-2); margin-top: 12px; overflow: visible; }
   .meter .fill { position: absolute; left: 0; top: 0; bottom: 0; border-radius: 99px; background: var(--ink-2); width: 0; transition: width .5s cubic-bezier(.2,.7,.2,1); }
@@ -264,7 +281,7 @@
   .dec-top { display: flex; justify-content: space-between; align-items: center; gap: 10px; margin-bottom: 14px; }
   .dec-name { display: flex; align-items: center; gap: 8px; font-size: 13px; font-weight: 600; }
   .dec-name i { width: 9px; height: 9px; border-radius: 3px; }
-  .verdict { font: 700 12px var(--mono); letter-spacing: .06em; padding: 5px 10px; border-radius: 7px; }
+  .verdict { font: 700 12.5px var(--sans); letter-spacing: .08em; padding: 6px 14px; border-radius: 999px; }
   .verdict.migrate { color: var(--bad); background: var(--bad-soft); }
   .verdict.wait { color: var(--good); background: var(--good-soft); }
   .verdict.idle { color: var(--ink-3); background: var(--line); }
@@ -296,7 +313,7 @@
   tr:last-child td { border-bottom: none; }
   td.best { color: var(--good); font-weight: 600; }
   .table-scroll { overflow-x: auto; -webkit-overflow-scrolling: touch; }
-  .chart-box { position: relative; height: 300px; }
+  .chart-box { position: relative; height: 340px; }
   .panel-head { display: flex; justify-content: space-between; align-items: flex-start; gap: 12px; margin-bottom: 14px; }
   .panel-head h3 { margin: 0; font-size: 15px; font-weight: 600; letter-spacing: -0.01em; }
   .panel-head p { margin: 4px 0 0; font-size: 13px; color: var(--ink-3); }
@@ -304,7 +321,7 @@
     display: grid; grid-template-columns: auto 1fr; gap: 14px; margin-top: 20px; padding: 18px 20px; border-radius: var(--radius);
     background: var(--amber-soft); border: 1px solid color-mix(in srgb, var(--amber) 30%, transparent);
   }
-  .callout .ci { width: 28px; height: 28px; border-radius: 8px; display: grid; place-items: center; background: var(--amber); color: var(--bg); font: 700 12px var(--mono); }
+  .callout .ci { width: 34px; height: 34px; border-radius: 12px; display: grid; place-items: center; background: var(--amber); color: var(--bg); font: 700 12px var(--mono); }
   .callout b { display: block; font-size: 14px; margin-bottom: 3px; }
   .callout p { margin: 0; font-size: 13.5px; color: var(--ink-2); }
 
@@ -320,7 +337,7 @@
   .progress-scale { display: flex; justify-content: space-between; font: 500 11px var(--mono); color: var(--ink-3); margin-top: 6px; }
   .status-num { text-align: right; }
   @media (max-width: 760px) { .status-num { text-align: left; } }
-  .status-num .n { font-family: var(--serif); font-size: 52px; line-height: 1; }
+  .status-num .n { font-family: var(--serif); font-weight: 600; font-size: 52px; line-height: 1; }
   .status-num .n small { font-size: 22px; color: var(--ink-3); }
   .status-num .l { font-size: 12px; color: var(--ink-3); }
 
@@ -328,7 +345,7 @@
   @media (max-width: 960px) { .cards { grid-template-columns: 1fr 1fr; } }
   @media (max-width: 600px) { .cards { grid-template-columns: 1fr; } }
   .fcard { padding: 22px; display: flex; flex-direction: column; gap: 10px; }
-  .fcard .big { font-family: var(--serif); font-size: 38px; line-height: 1.05; letter-spacing: -0.01em; }
+  .fcard .big { font-family: var(--serif); font-weight: 600; font-size: 38px; line-height: 1.05; letter-spacing: -0.01em; }
   .fcard .big small { font-family: var(--sans); font-size: 14px; color: var(--ink-3); }
   .fcard h3 { margin: 0; font-size: 15px; font-weight: 600; line-height: 1.35; letter-spacing: -0.01em; }
   .fcard p { margin: 0; font-size: 13.5px; color: var(--ink-2); flex: 1; }
@@ -344,11 +361,11 @@
   .sandbox-out { padding: 24px; }
   .sb-read { display: flex; gap: 22px; flex-wrap: wrap; margin-top: 14px; }
   .sb-read div { font-size: 12px; color: var(--ink-3); }
-  .sb-read b { display: block; font-family: var(--serif); font-size: 26px; font-weight: 400; color: var(--ink); line-height: 1.2; }
+  .sb-read b { display: block; font-family: var(--serif); font-size: 26px; font-weight: 600; color: var(--ink); line-height: 1.2; }
 
   .timeline { margin-top: 20px; }
   .tl-track { display: grid; grid-template-columns: repeat(60, 1fr); gap: 2px; margin: 0 0 8px; }
-  .tl-track i { height: 26px; border-radius: 3px; background: var(--bg-2); border: 1px solid var(--line); }
+  .tl-track i { height: 26px; border-radius: 7px; background: var(--bg-2); border: 1px solid var(--line); }
   .tl-track i.done { background: var(--cs); border-color: transparent; }
   .tl-track i.now { background: var(--amber); border-color: transparent; animation: blink 1.8s ease-in-out infinite; }
   @keyframes blink { 50% { opacity: .45; } }
@@ -368,7 +385,7 @@
   footer .wrap { display: flex; justify-content: space-between; gap: 24px; flex-wrap: wrap; align-items: flex-start; }
   footer p { margin: 0; color: var(--ink-3); font-size: 13px; max-width: 520px; }
   footer .chips { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 14px; }
-  footer .chips span { font: 500 11px var(--mono); color: var(--ink-2); border: 1px solid var(--line); border-radius: 6px; padding: 4px 8px; }
+  footer .chips span { font: 600 11.5px var(--sans); color: var(--ink-2); border: 1px solid var(--line); border-radius: 999px; padding: 5px 11px; }
   footer nav { display: flex; gap: 18px; flex-wrap: wrap; }
   footer nav a { font-size: 13px; color: var(--ink-2); text-decoration: none; }
   footer nav a:hover { color: var(--ink); }
@@ -492,24 +509,61 @@
       <div class="sec-num">02<b>Live model</b></div>
       <div>
         <h2>Ask the model about one VM.</h2>
-        <p>Every change runs a real forward pass through the trained model on the server. It is not a lookup table. Both policies see exactly the same inputs.</p>
+        <p>Every change runs a real forward pass on the server: the v1 course-project models, or the v2 ensemble trained on SMART telemetry (the model chosen in ADR-006). Both policies always see exactly the same inputs.</p>
       </div>
     </div>
     <div class="demo">
       <div class="panel pad reveal" id="controls">
         <div class="field">
           <div class="field-label">Failure model</div>
-          <div class="seg" role="radiogroup" aria-label="Failure model">
-            <input type="radio" name="which_model" id="m-hgb" value="histgbm" checked><label for="m-hgb">Calibrated HistGBM<small>recommended</small></label>
-            <input type="radio" name="which_model" id="m-gqat" value="gqat"><label for="m-gqat">GQAT-Net<small>experimental</small></label>
+          <div class="seg seg-models" role="radiogroup" aria-label="Failure model">
+            {% if v2 %}<input type="radio" name="which_model" id="m-v2" value="v2" checked><label for="m-v2">v2 Ensemble<small>SMART · 20 models</small></label>{% endif %}
+            <input type="radio" name="which_model" id="m-hgb" value="histgbm" {% if not v2 %}checked{% endif %}><label for="m-hgb">v1 HistGBM<small>age · model</small></label>
+            <input type="radio" name="which_model" id="m-gqat" value="gqat"><label for="m-gqat">v1 GQAT-Net<small>experimental</small></label>
           </div>
         </div>
-        <div class="field">
-          <div class="field-label"><label for="model_grp">Drive model</label></div>
+        <div class="field" id="v1Fields">
+          <div class="field-label"><label for="model_grp">Drive model</label><span>2013–2017 models</span></div>
           <select id="model_grp">
             {% for m in model_groups %}<option value="{{ m }}" {% if m == 'ST4000DM000' %}selected{% endif %}>{{ m }}</option>{% endfor %}
           </select>
         </div>
+        {% if v2 %}
+        <div id="v2Fields">
+          <div class="field">
+            <div class="field-label"><label for="v2_model">Drive model</label><span>2023–2026 fleet</span></div>
+            <select id="v2_model">
+              {% for m in v2.drive_models %}<option value="{{ m }}" {% if m == v2.default_drive_model %}selected{% endif %}>{{ m }}</option>{% endfor %}
+              <option value="OTHER">other model</option>
+            </select>
+          </div>
+          <div class="field">
+            <div class="field-label">SMART health</div>
+            <div class="seg" role="radiogroup" aria-label="SMART preset">
+              <input type="radio" name="preset" id="p-ok" value="healthy" checked><label for="p-ok">Healthy</label>
+              <input type="radio" name="preset" id="p-warn" value="warning"><label for="p-warn">Warning</label>
+              <input type="radio" name="preset" id="p-fail" value="failing"><label for="p-fail">Failing</label>
+            </div>
+            <div class="smart-grid">
+              {% for k, name in v2.smart.items() %}
+              <label class="smart" for="{{ k }}"><span>{{ name }}<small>SMART {{ k[1:] }}</small></span>
+                <input type="number" id="{{ k }}" min="0" max="1000000" step="1" value="0" inputmode="numeric"></label>
+              {% endfor %}
+            </div>
+          </div>
+          <div class="field">
+            <div class="field-label">Counters</div>
+            <div class="seg" role="radiogroup" aria-label="Counter trend">
+              <input type="radio" name="trend" id="t-stable" value="stable" checked><label for="t-stable">Stable for a month</label>
+              <input type="radio" name="trend" id="t-rising" value="rising"><label for="t-rising">New this week</label>
+            </div>
+          </div>
+          <div class="field">
+            <div class="field-label"><label for="temp">Drive temperature</label><span id="temp_val"></span></div>
+            <input type="range" id="temp" min="18" max="60" step="1" value="30">
+          </div>
+        </div>
+        {% endif %}
         <div class="field">
           <div class="field-label"><label for="age_days">Drive age</label><span id="age_val"></span></div>
           <input type="range" id="age_days" min="0" max="{{ max_age_days }}" step="{{ bin_days }}" value="900" aria-describedby="age_val">
@@ -518,13 +572,13 @@
         <div class="field">
           <div class="field-label">Workload criticality</div>
           <div class="seg" role="radiogroup" aria-label="Workload criticality">
-            {% for c in criticality_tiers %}<input type="radio" name="criticality_tier" id="c-{{ c }}" value="{{ c }}" {% if loop.first %}checked{% endif %}><label for="c-{{ c }}">{{ c }}</label>{% endfor %}
+            {% for c in criticality_tiers %}<input type="radio" name="criticality_tier" id="c-{{ c }}" value="{{ c }}" {% if loop.first %}checked{% endif %}><label for="c-{{ c }}">{{ c | capitalize }}</label>{% endfor %}
           </div>
         </div>
         <div class="field">
           <div class="field-label">VM size</div>
           <div class="seg" role="radiogroup" aria-label="VM size">
-            {% for s in ['small', 'medium', 'large'] if s in size_tiers %}<input type="radio" name="size_tier" id="s-{{ s }}" value="{{ s }}" {% if s == 'medium' %}checked{% endif %}><label for="s-{{ s }}">{{ s }}</label>{% endfor %}
+            {% for s in ['small', 'medium', 'large'] if s in size_tiers %}<input type="radio" name="size_tier" id="s-{{ s }}" value="{{ s }}" {% if s == 'medium' %}checked{% endif %}><label for="s-{{ s }}">{{ s | capitalize }}</label>{% endfor %}
           </div>
         </div>
         <div class="demo-actions">
@@ -547,8 +601,9 @@
             <div class="ro">
               <div class="l">P(fail within {{ lookahead_days }} days)</div>
               <div class="v" id="ro-p">–</div>
-              <div class="meter" aria-hidden="true"><div class="fill" id="pFill"></div><div class="tau" id="tauMark"></div></div>
+              <div class="meter" aria-hidden="true"><div class="band" id="pBand" hidden></div><div class="fill" id="pFill"></div><div class="tau" id="tauMark"></div></div>
               <div class="meter-scale"><span>0</span><span id="meterMax">–</span></div>
+              <div class="band" id="ro-int" hidden></div>
             </div>
             <div class="ro"><div class="l">Expected time to failure</div><div class="v" id="ro-ttf">–</div></div>
             <div class="ro"><div class="l">Median time to failure</div><div class="v" id="ro-med">–</div></div>
@@ -706,9 +761,9 @@
       </article>
       <article class="panel fcard reveal">
         <span class="tag measured">Measured</span>
-        <div class="big">0.002 → 0.131</div>
+        <div class="big">0.002 → 0.10</div>
         <h3>SMART telemetry is what predicts failure</h3>
-        <p>PR-AUC on a forward-in-time test: v1's features (age, model) 0.0018; SMART features 0.074; a 20-model ensemble 0.131, chosen by a rule fixed before scoring.</p>
+        <p>PR-AUC on a forward-in-time test: v1's features (age, model) 0.0018; SMART features 0.074; the 20-model ensemble now in the live demo 0.103, chosen by a rule fixed before scoring.</p>
         <div class="src"><a class="more" href="https://github.com/Rag2102/ccproject/blob/main/docs/v2/failure_model_v2.md" target="_blank" rel="noopener">failure_model_v2.md</a> · ADR-006</div>
       </article>
       <article class="panel fcard reveal">
@@ -901,9 +956,41 @@ function ageLabel() { $('age_val').textContent = age.value + ' days · ' + (age.
 ageLabel();
 const radio = (n) => document.querySelector(`input[name=${n}]:checked`).value;
 let lastResult = null, lastInputs = null, debounce = null, inflight = 0;
+const HAS_V2 = !!document.getElementById('v2Fields');
+const SMART = ['s5', 's187', 's188', 's197', 's198'];
+const PRESETS = {
+  healthy: { s5: 0, s187: 0, s188: 0, s197: 0, s198: 0, trend: 'stable' },
+  warning: { s5: 0, s187: 0, s188: 0, s197: 8, s198: 0, trend: 'stable' },
+  failing: { s5: 240, s187: 4, s188: 0, s197: 24, s198: 24, trend: 'rising' },
+};
 function inputs() {
-  return { model_grp: $('model_grp').value, age_days: parseFloat(age.value), criticality_tier: radio('criticality_tier'), size_tier: radio('size_tier'), which_model: radio('which_model') };
+  const which = radio('which_model');
+  const base = { age_days: parseFloat(age.value), criticality_tier: radio('criticality_tier'), size_tier: radio('size_tier'), which_model: which };
+  if (which !== 'v2') return { ...base, model_grp: $('model_grp').value };
+  const out = { ...base, drive_model: $('v2_model').value, trend: radio('trend'), temp: parseFloat($('temp').value) };
+  SMART.forEach(k => { out[k] = Math.max(0, Math.min(1e6, parseInt($(k).value || '0', 10) || 0)); });
+  return out;
 }
+function syncModelFields() {
+  const v2 = radio('which_model') === 'v2';
+  $('v1Fields').hidden = v2;
+  if (HAS_V2) $('v2Fields').hidden = !v2;
+}
+function applyPreset(name) {
+  const pr = PRESETS[name]; if (!pr) return;
+  SMART.forEach(k => { $(k).value = pr[k]; });
+  $(pr.trend === 'rising' ? 't-rising' : 't-stable').checked = true;
+}
+if (HAS_V2) {
+  document.querySelectorAll('input[name=preset]').forEach(r => r.addEventListener('change', () => { applyPreset(r.value); changed(); }));
+  SMART.forEach(k => $(k).addEventListener('input', () => { document.querySelectorAll('input[name=preset]').forEach(r => r.checked = false); changed(); }));
+  $('v2_model').addEventListener('input', changed);
+  $('temp').addEventListener('input', () => { tempLabel(); changed(); });
+}
+function tempLabel() { if (HAS_V2) $('temp_val').textContent = $('temp').value + ' °C'; }
+tempLabel();
+document.querySelectorAll('input[name=which_model]').forEach(r => r.addEventListener('change', syncModelFields));
+syncModelFields();
 function changed() {
   ageLabel();
   if (!$('autoRun').checked) { $('result').classList.add('is-stale'); return; }
@@ -942,11 +1029,19 @@ function render(d) {
   $('ro-p').innerHTML = (p * 100).toFixed(p < 0.001 ? 3 : 2) + '<small>%</small>';
   $('ro-ttf').innerHTML = fmtDays(d.expected_ttf_days) || '–';
   $('ro-med').innerHTML = fmtDays(d.median_ttf_days) || '<span style="font-size:20px">beyond horizon</span>';
-  const scale = Math.max(p, TAU) * 1.6;
+  const scale = Math.min(1, Math.max(p, TAU) * 1.6);
   $('pFill').style.width = (100 * p / scale) + '%';
   $('pFill').style.background = p > TAU ? css('--th') : css('--ink-2');
   $('tauMark').style.left = (100 * TAU / scale) + '%';
-  $('meterMax').textContent = (scale * 100).toFixed(2) + '%';
+  $('meterMax').textContent = (scale * 100).toFixed(scale < 0.1 ? 2 : 0) + '%';
+  const iv = d.p_interval_5_95;
+  if (iv) {
+    $('pBand').hidden = false;
+    $('pBand').style.left = (100 * iv[0] / scale) + '%';
+    $('pBand').style.width = Math.max(0.6, 100 * (Math.min(iv[1], scale) - iv[0]) / scale) + '%';
+    $('ro-int').hidden = false;
+    $('ro-int').textContent = 'Spread of the 20 models (5–95%): ' + (iv[0] * 100).toFixed(2) + '% – ' + (iv[1] * 100).toFixed(2) + '%';
+  } else { $('pBand').hidden = true; $('ro-int').hidden = true; }
 
   const cs = d.cost_sensitive, wait = cs.expected_cost_of_inaction, mig = cs.migration_cost;
   const m = Math.max(wait, mig) || 1;
@@ -974,6 +1069,7 @@ function render(d) {
   let note = d.model_used + ' · migration ' + (d.costs.precopy_converges ? 'pre-copy converges' : 'falls back to stop-and-copy') +
     ` in ${d.costs.migration_time_s}s, blackout ${d.costs.migration_blackout_s}s · VM ${d.costs.size_tier_profile.memory_gb} GB, ${d.costs.size_tier_profile.vcores} vCPU.`;
   if (d.mc_dropout_std != null) note += ` MC-dropout std ${d.mc_dropout_std.toFixed(4)} (experimental model, less well calibrated).`;
+  if (d.assumptions) note += ' Assumes: ' + d.assumptions + '.';
   $('model-note').textContent = note;
   $('download-btn').disabled = false;
 }
@@ -985,6 +1081,8 @@ function resetForm() {
   $('model_grp').value = [...$('model_grp').options].some(o => o.value === 'ST4000DM000') ? 'ST4000DM000' : $('model_grp').options[0].value;
   document.querySelector('input[name=criticality_tier]').checked = true;
   const med = $('s-medium'); if (med) med.checked = true;
+  if (HAS_V2) { $('m-v2').checked = true; $('v2_model').value = '{{ v2.default_drive_model if v2 else '' }}'; $('p-ok').checked = true; applyPreset('healthy'); $('temp').value = 30; tempLabel(); }
+  syncModelFields();
   age.value = 900; ageLabel(); runPredict();
 }
 function downloadResult() {
@@ -992,13 +1090,18 @@ function downloadResult() {
   const d = lastResult, p = lastInputs;
   const L = [
     'VM Mitigation Policy: prediction report', 'Generated: ' + new Date().toString(), '='.repeat(50), '',
-    'INPUTS', '  Model used:                 ' + d.model_used, '  Drive model:                ' + p.model_grp,
+    'INPUTS', '  Model used:                 ' + d.model_used, '  Drive model:                ' + (p.model_grp || p.drive_model),
     '  Drive age:                  ' + p.age_days + ' days', '  Workload criticality:       ' + p.criticality_tier, '  VM size tier:               ' + p.size_tier, '',
     'PREDICTION', '  P(fail within ' + LOOKAHEAD + ' days):     ' + (d.p_fail_within_window * 100).toFixed(3) + '%',
-    '  Expected TTF:               ' + d.expected_ttf_days + ' days',
+    '  Expected TTF:               ' + (d.expected_ttf_days != null ? d.expected_ttf_days + ' days' : 'n/a'),
     '  Median TTF:                 ' + (d.median_ttf_days != null ? d.median_ttf_days + ' days' : 'beyond horizon'),
   ];
   if (d.mc_dropout_std != null) L.push('  MC-dropout std (15 passes): ' + d.mc_dropout_std.toFixed(4));
+  if (p.which_model === 'v2') {
+    L.push('  SMART 5/187/188/197/198:    ' + [p.s5, p.s187, p.s188, p.s197, p.s198].join(' / ') + ' (' + p.trend + ')', '  Temperature:                ' + p.temp + ' C');
+    if (d.p_interval_5_95) L.push('  5-95% across 20 models:     ' + (d.p_interval_5_95[0] * 100).toFixed(3) + '% - ' + (d.p_interval_5_95[1] * 100).toFixed(3) + '%');
+    L.push('  Assumptions:                ' + d.assumptions);
+  }
   L.push('', 'COST-SENSITIVE POLICY', '  Decision:                   ' + (d.cost_sensitive.migrate ? 'MIGRATE' : 'WAIT'),
     '  Expected cost of inaction:  ' + d.cost_sensitive.expected_cost_of_inaction + ' impact-min',
     '  Migration cost:             ' + d.cost_sensitive.migration_cost + ' impact-min',
@@ -1054,63 +1157,108 @@ function updateSandbox() {
   $('sbRange').textContent = above.length ? (above.length === xs.length ? 'all ρ' : above[0].toFixed(2) + ' to ' + above[above.length - 1].toFixed(2)) : 'nowhere';
   const pts = xs.map((x, i) => ({ x, y: ys[i] }));
   if (sbChart) { sbChart.data.datasets[0].data = pts; sbChart.options.scales.y.suggestedMax = Math.max(5, ...ys) * 1.1; sbChart.update('none'); }
-  else sbChart = makeChart($('sbChart'), [{ data: pts, color: '--violet', fill: true, points: false }], { xLabel: 'ρ, correlation of log p and log κ', yLabel: 'Advantage over threshold (%)', xMin: -0.95, xMax: 0.95, refLine: 1, refLabel: 'δ = 1%' });
+  else sbChart = makeChart($('sbChart'), [{ data: pts, points: false }], { xLabel: 'Correlation ρ of log p and log κ', yLabel: 'Advantage over threshold', xMin: -0.95, xMax: 0.95, refLine: 1, refLabel: 'δ = 1% materiality', unit: 'advantage' });
 }
 ['sbSy', 'sbQ', 'sbLam'].forEach(id => $(id).addEventListener('input', updateSandbox));
 
 /* ---------------- charts ---------------- */
+const FONT = "'Nunito', system-ui, sans-serif", FONT_NUM = "'Fredoka', 'Nunito', sans-serif";
+function rgba(hex, a) {               // css colour (#rrggbb) with alpha
+  const h = hex.replace('#', ''); const n = parseInt(h.length === 3 ? h.split('').map(c => c + c).join('') : h, 16);
+  return `rgba(${(n >> 16) & 255},${(n >> 8) & 255},${n & 255},${a})`;
+}
+function roundRect(ctx, x, y, w, h, r) {
+  ctx.beginPath(); ctx.moveTo(x + r, y); ctx.arcTo(x + w, y, x + w, y + h, r); ctx.arcTo(x + w, y + h, x, y + h, r);
+  ctx.arcTo(x, y + h, x, y, r); ctx.arcTo(x, y, x + w, y, r); ctx.closePath();
+}
 function makeChart(canvas, sets, o) {
   if (typeof Chart === 'undefined' || !canvas) return null;
-  const ink2 = css('--ink-3'), grid = css('--line');
-  const zones = {
-    id: 'zones', beforeDraw(c) {
-      if (o.refLine === undefined && !o.zero) return;
+  const ink3 = css('--ink-3'), grid = css('--line'), good = css('--good'), th = css('--th'), surface = css('--surface');
+  // the line runs coral below zero and green above it; the area fades to nothing at the zero line
+  const lineGrad = (sc) => {
+    const c = sc.chart, { ctx, chartArea: a } = c, y = c.scales && c.scales.y; if (!a || !y) return good;
+    if (!o.zero) { const g = ctx.createLinearGradient(a.left, 0, a.right, 0); g.addColorStop(0, css('--cs')); g.addColorStop(1, good); return g; }
+    const z = Math.min(Math.max((y.getPixelForValue(0) - a.top) / (a.bottom - a.top), 0), 1);
+    const g = ctx.createLinearGradient(0, a.top, 0, a.bottom);
+    g.addColorStop(0, good); g.addColorStop(Math.max(0, z - 0.001), good); g.addColorStop(Math.min(1, z + 0.001), th); g.addColorStop(1, th);
+    return g;
+  };
+  const fillGrad = (sc) => {
+    const c = sc.chart, { ctx, chartArea: a } = c, y = c.scales && c.scales.y; if (!a || !y) return 'transparent';
+    const g = ctx.createLinearGradient(0, a.top, 0, a.bottom);
+    if (!o.zero) { g.addColorStop(0, rgba(good, 0.28)); g.addColorStop(1, rgba(good, 0)); return g; }
+    const z = Math.min(Math.max((y.getPixelForValue(0) - a.top) / (a.bottom - a.top), 0), 1);
+    g.addColorStop(0, rgba(good, 0.30)); g.addColorStop(z, rgba(good, 0.0)); g.addColorStop(z, rgba(th, 0.0)); g.addColorStop(1, rgba(th, 0.30));
+    return g;
+  };
+  const deco = {
+    id: 'deco',
+    beforeDatasetsDraw(c) {
       const { ctx, chartArea: a, scales: { y } } = c; ctx.save();
+      const line = (v, label, color) => {
+        const r = y.getPixelForValue(v); if (r < a.top || r > a.bottom) return;
+        ctx.setLineDash([5, 5]); ctx.lineWidth = 1.2; ctx.strokeStyle = color; ctx.beginPath(); ctx.moveTo(a.left, r); ctx.lineTo(a.right, r); ctx.stroke(); ctx.setLineDash([]);
+        if (label) { ctx.font = `700 11px ${FONT}`; ctx.fillStyle = color; ctx.textAlign = 'right'; ctx.fillText(label, a.right - 4, r - 7); }
+      };
       if (o.zero) {
-        const z = y.getPixelForValue(0);
-        ctx.fillStyle = css('--cs-soft'); ctx.fillRect(a.left, a.top, a.right - a.left, Math.max(0, z - a.top));
-        ctx.fillStyle = css('--th-soft'); ctx.fillRect(a.left, z, a.right - a.left, Math.max(0, a.bottom - z));
-        ctx.font = "600 10.5px " + css('--mono'); ctx.fillStyle = css('--cs'); ctx.fillText('COST-SENSITIVE AHEAD', a.left + 8, a.top + 15);
-        ctx.fillStyle = css('--th'); ctx.fillText('THRESHOLD AHEAD', a.left + 8, a.bottom - 8);
+        line(0, '', rgba(css('--ink-2').startsWith('#') ? css('--ink-2') : '#888888', 0.55));
+        ctx.font = `800 10.5px ${FONT}`; ctx.letterSpacing = '0.08em'; ctx.textAlign = 'left';
+        ctx.fillStyle = good; ctx.fillText('COST-SENSITIVE AHEAD ↑', a.left + 10, a.top + 16);
+        ctx.textAlign = 'right'; ctx.fillStyle = th; ctx.fillText('THRESHOLD AHEAD ↓', a.right - 10, a.bottom - 10);
       }
-      if (o.refLine !== undefined) {
-        const r = y.getPixelForValue(o.refLine); ctx.setLineDash([4, 4]); ctx.strokeStyle = css('--ink-3'); ctx.beginPath(); ctx.moveTo(a.left, r); ctx.lineTo(a.right, r); ctx.stroke(); ctx.setLineDash([]);
-        ctx.font = "600 10.5px " + css('--mono'); ctx.fillStyle = css('--ink-3'); ctx.fillText(o.refLabel, a.right - 52, r - 6);
-      }
+      if (o.refLine !== undefined) line(o.refLine, o.refLabel, ink3);
       ctx.restore();
     },
     afterDatasetsDraw(c) {
       if (!o.labels) return;
-      const { ctx } = c, meta = c.getDatasetMeta(0); ctx.save(); ctx.font = "600 11.5px " + css('--mono'); ctx.textAlign = 'center';
-      meta.data.forEach((pt, i) => { const v = sets[0].data[i].y; ctx.fillStyle = v >= 0 ? css('--cs') : css('--th'); ctx.fillText((v > 0 ? '+' : '') + v.toFixed(1) + '%', pt.x, pt.y - 13); });
+      const { ctx } = c, meta = c.getDatasetMeta(0); ctx.save();
+      ctx.font = `600 12.5px ${FONT_NUM}`; ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+      meta.data.forEach((pt, i) => {
+        const v = sets[0].data[i].y, txt = (v > 0 ? '+' : '') + v.toFixed(1) + '%';
+        const w = ctx.measureText(txt).width + 16, h = 22, yy = pt.y - 24;
+        const col = v >= 0 ? good : th;
+        const ar = c.chartArea, px = Math.max(ar.left + w / 2 + 4, Math.min(ar.right - w / 2 - 4, pt.x));
+        roundRect(ctx, px - w / 2, yy - h / 2, w, h, 11); ctx.fillStyle = rgba(col, 0.16); ctx.fill();
+        ctx.lineWidth = 1; ctx.strokeStyle = rgba(col, 0.45); ctx.stroke();
+        ctx.fillStyle = col; ctx.fillText(txt, px, yy + 0.5);
+      });
       ctx.restore();
     }
   };
   return new Chart(canvas.getContext('2d'), {
     type: 'line',
-    data: { datasets: sets.map(s => ({ data: s.data, borderColor: css(s.color), backgroundColor: css(s.color + '-soft') || 'transparent',
-      fill: s.fill ? 'origin' : false, borderWidth: 2.4, tension: s.points ? 0 : 0.25,
-      pointRadius: s.points ? 5 : 0, pointHoverRadius: s.points ? 7 : 4, pointBackgroundColor: css('--surface'), pointBorderColor: css(s.color), pointBorderWidth: 2.4 })) },
+    data: { datasets: sets.map(s => ({
+      data: s.data, borderColor: lineGrad, backgroundColor: fillGrad, fill: 'origin',
+      borderWidth: 3, tension: 0.38, cubicInterpolationMode: 'monotone', borderCapStyle: 'round', borderJoinStyle: 'round',
+      pointRadius: s.points ? 6 : 0, pointHoverRadius: s.points ? 8 : 5, pointBackgroundColor: surface,
+      pointBorderColor: (ctx) => (ctx.raw && ctx.raw.y < 0 ? th : good), pointBorderWidth: 3, pointHoverBorderWidth: 3,
+      pointHoverBackgroundColor: surface })) },
     options: {
-      responsive: true, maintainAspectRatio: false, animation: { duration: 350 },
-      layout: { padding: { top: o.labels ? 22 : 8, right: 8 } },
-      interaction: { mode: 'nearest', intersect: false },
-      plugins: { legend: { display: false }, tooltip: { backgroundColor: css('--surface'), titleColor: css('--ink'), bodyColor: css('--ink-2'), borderColor: css('--line-2'), borderWidth: 1,
-        titleFont: { family: 'Inter', weight: '600' }, bodyFont: { family: 'JetBrains Mono' }, padding: 10,
-        callbacks: { title: (it) => 'ρ = ' + it[0].parsed.x.toFixed(2), label: (it) => (it.parsed.y > 0 ? '+' : '') + it.parsed.y.toFixed(2) + '%' } } },
+      responsive: true, maintainAspectRatio: false, devicePixelRatio: Math.max(2, window.devicePixelRatio || 1),
+      animation: { duration: 500, easing: 'easeOutQuart' }, layout: { padding: { top: o.labels ? 26 : 10, right: 12, left: 4, bottom: 2 } },
+      interaction: { mode: 'nearest', axis: 'x', intersect: false },
+      plugins: { legend: { display: false }, tooltip: {
+        backgroundColor: surface, titleColor: css('--ink'), bodyColor: css('--ink-2'), borderColor: css('--line-2'), borderWidth: 1,
+        cornerRadius: 14, padding: { x: 14, y: 10 }, displayColors: false, caretSize: 6,
+        titleFont: { family: FONT, weight: '800', size: 12.5 }, bodyFont: { family: FONT_NUM, size: 13, weight: '500' },
+        callbacks: { title: (it) => 'ρ = ' + it[0].parsed.x.toFixed(2), label: (it) => (it.parsed.y > 0 ? '+' : '') + it.parsed.y.toFixed(2) + '% ' + (o.unit || '') } } },
       scales: {
-        x: { type: 'linear', min: o.xMin, max: o.xMax, title: { display: true, text: o.xLabel, color: ink2, font: { family: 'Inter', size: 11.5 } },
-             ticks: { color: ink2, font: { family: 'JetBrains Mono', size: 10.5 } }, grid: { color: grid }, border: { color: grid } },
-        y: { min: o.yMin, max: o.yMax, suggestedMax: o.suggestedMax, title: { display: true, text: o.yLabel, color: ink2, font: { family: 'Inter', size: 11.5 } },
-             ticks: { color: ink2, font: { family: 'JetBrains Mono', size: 10.5 }, callback: (v) => (v > 0 ? '+' : '') + v + '%' }, grid: { color: grid }, border: { display: false } }
+        x: { type: 'linear', min: o.xMin, max: o.xMax,
+             title: { display: true, text: o.xLabel, color: ink3, font: { family: FONT, size: 12.5, weight: '700' }, padding: { top: 10 } },
+             ticks: { color: ink3, font: { family: FONT_NUM, size: 12 }, maxTicksLimit: 7, padding: 6, callback: (v) => (Math.abs(v) < 1e-9 ? 0 : v).toFixed(1).replace('-', '−') },
+             grid: { display: false }, border: { color: grid } },
+        y: { min: o.yMin, max: o.yMax, suggestedMax: o.suggestedMax, grace: o.yMin === undefined ? '6%' : 0,
+             title: { display: true, text: o.yLabel, color: ink3, font: { family: FONT, size: 12.5, weight: '700' }, padding: { bottom: 8 } },
+             ticks: { color: ink3, font: { family: FONT_NUM, size: 12 }, stepSize: o.yStep, maxTicksLimit: o.yStep ? 12 : 7, padding: 8, callback: (v) => (v > 0 ? '+' : v < 0 ? '−' : '') + Math.abs(v) + '%' },
+             grid: { color: grid, drawTicks: false, lineWidth: 1 }, border: { display: false } }
       }
     },
-    plugins: [zones]
+    plugins: [deco]
   });
 }
 function drawCorr() {
-  const pts = CORR.map(r => ({ x: r.rho_achieved, y: 100 * r.cost_sensitive_advantage_pct })).sort((a, b) => a.x - b.x);
-  corrChart = makeChart($('corrChart'), [{ data: pts, color: '--cs', points: true }], { xLabel: 'Achieved ρ between workload criticality and host risk', yLabel: 'Cost-sensitive advantage', xMin: -0.02, xMax: 0.95, yMin: -5, yMax: 5, zero: true, labels: true });
+  const pts = CORR.map(r => ({ x: Math.max(0, r.rho_achieved), y: 100 * r.cost_sensitive_advantage_pct })).sort((a, b) => a.x - b.x);
+  corrChart = makeChart($('corrChart'), [{ data: pts, points: true }], { xLabel: 'Achieved correlation ρ between workload criticality and host risk', yLabel: 'Cost-sensitive advantage', xMin: 0, xMax: 1, yMin: -5, yMax: 5, yStep: 1, zero: true, labels: true, unit: 'vs threshold' });
 }
 function redrawCharts() {
   if (corrChart) { corrChart.destroy(); corrChart = null; }
@@ -1119,7 +1267,7 @@ function redrawCharts() {
 }
 function initCharts() {
   if (typeof Chart === 'undefined') return;
-  Chart.defaults.font.family = 'Inter';
+  Chart.defaults.font.family = FONT;
   drawCorr(); updateSandbox();
   // best value per column in the model table
   const rows = [...document.querySelectorAll('#cmpTable tr')].slice(1);
@@ -1130,6 +1278,8 @@ function initCharts() {
   });
 }
 initCharts();
+// canvas text uses whatever font is loaded at draw time: redraw once the web fonts arrive
+if (document.fonts && document.fonts.ready) document.fonts.ready.then(() => redrawCharts());
 
 /* ---------------- timeline ---------------- */
 (function () {

@@ -100,7 +100,27 @@ SIZE_TIERS = sorted(SIZE_TIER_PROFILE.keys())  # real categories only (the Azure
 print(f"Loaded. {len(MODEL_GROUPS)} drive model groups, tau_default={TAU_DEFAULT:.5f}, "
       f"size-tier profiles: {SIZE_TIER_PROFILE}")
 
-WHICH_MODELS = ("histgbm", "gqat")
+# ---------------------------------------------------------------------------
+# v2 ensemble (docs/v2/DECISIONS/ADR-006): 20 gradient-boosted models trained on
+# SMART telemetry, exported by scripts/v2/25_export_ensemble.py. Optional: if
+# models/v2_ensemble/ is absent the demo simply offers the two v1 models.
+# ---------------------------------------------------------------------------
+V2_DIR = MODELS_DIR / "v2_ensemble"
+V2 = None
+if (V2_DIR / "meta.joblib").exists():
+    V2 = joblib.load(V2_DIR / "meta.joblib")
+    V2["members"] = [joblib.load(V2_DIR / f"member_{k:02d}.joblib") for k in range(V2["n_members"])]
+    V2["drive_models"] = sorted(V2["categories"])
+    print(f"Loaded v2 ensemble: {V2['n_members']} members, {len(V2['drive_models'])} drive models, "
+          f"test PR-AUC {V2['test_pr_auc']:.3f}")
+SMART_IDS = (5, 187, 188, 197, 198)
+SMART_NAMES = {
+    5: "Reallocated sectors", 187: "Reported uncorrectable errors", 188: "Command timeouts",
+    197: "Pending sectors", 198: "Offline uncorrectable sectors",
+}
+MAX_SMART = 1_000_000
+
+WHICH_MODELS = ("histgbm", "gqat") + (("v2",) if V2 else ())
 MAX_VALID_AGE_DAYS = 20_000  # ~55 years -- generous but bounded; also rejects NaN/inf,
                               # since pydantic's ge/le comparisons are always False for NaN
 
@@ -160,6 +180,53 @@ class InputValidationError(Exception):
     def __init__(self, errors):
         self.errors = errors
         super().__init__("; ".join(errors))
+
+
+class PredictRequestV2(BaseModel):
+    """The v2 ensemble's inputs: the drive's model and age plus its current SMART counters.
+    Counters are taken as the drive's current raw values; `trend` says whether they appeared
+    within the last week ("rising") or have been stable for at least a month ("stable")."""
+    drive_model: str
+    age_days: float = Field(ge=0, le=MAX_VALID_AGE_DAYS)
+    s5: int = Field(default=0, ge=0, le=MAX_SMART)
+    s187: int = Field(default=0, ge=0, le=MAX_SMART)
+    s188: int = Field(default=0, ge=0, le=MAX_SMART)
+    s197: int = Field(default=0, ge=0, le=MAX_SMART)
+    s198: int = Field(default=0, ge=0, le=MAX_SMART)
+    temp: float = Field(default=30.0, ge=0, le=90)
+    trend: str = "stable"
+    criticality_tier: str
+    size_tier: str
+    which_model: str = "v2"
+
+    @field_validator("drive_model")
+    @classmethod
+    def _check_drive_model(cls, v):
+        if V2 is None or v not in V2["drive_models"] + ["OTHER"]:
+            raise ValueError("must be one of the v2 ensemble's drive models (see /api/meta)")
+        return v
+
+    @field_validator("trend")
+    @classmethod
+    def _check_trend(cls, v):
+        if v not in ("stable", "rising"):
+            raise ValueError("must be 'stable' or 'rising'")
+        return v
+
+    @field_validator("criticality_tier")
+    @classmethod
+    def _check_criticality_tier(cls, v):
+        allowed = sorted(CRITICALITY_MAP.keys())
+        if v not in allowed:
+            raise ValueError(f"must be one of {allowed}")
+        return v
+
+    @field_validator("size_tier")
+    @classmethod
+    def _check_size_tier(cls, v):
+        if v not in SIZE_TIERS:
+            raise ValueError(f"must be one of {SIZE_TIERS}")
+        return v
 
 
 def validate_predict_request(raw_body):
@@ -302,6 +369,15 @@ def get_meta():
         "max_age_days": MAX_AGE_DAYS,
         "bin_days": BIN_DAYS,
         "lookahead_days": LOOKAHEAD_DAYS,
+        "v2": None if V2 is None else {
+            "drive_models": V2["drive_models"],
+            "default_drive_model": V2["categories"][0],
+            "smart": {f"s{i}": SMART_NAMES[i] for i in SMART_IDS},
+            "n_members": V2["n_members"],
+            "test_pr_auc": round(V2["test_pr_auc"], 4),
+            "test_roc_auc": round(V2["test_roc_auc"], 4),
+            "h_days": V2["h_days"],
+        },
     }
 
 
@@ -311,6 +387,8 @@ def run_predict(body):
     /api/predict has always returned. Raises InputValidationError (caught by
     both deployments' routes and turned into a clean HTTP 400) if body is
     malformed, has an out-of-range value, or names an unknown category."""
+    if isinstance(body, dict) and body.get("which_model") == "v2":
+        return run_predict_v2(body)
     request_start = time.perf_counter()
     try:
         req = validate_predict_request(body)
@@ -380,6 +458,94 @@ def run_predict(body):
         # end-to-end request latency -- this excludes cold start and
         # anything Flask/API Gateway/CloudFront add around it, which is
         # exactly the piece lambda.tf's memory-sizing comment is about.
+        duration_ms=round((time.perf_counter() - request_start) * 1000, 2),
+    )
+    return result
+
+
+def _v2_features(req):
+    """One feature row in the exact column order the ensemble was trained on
+    (scripts/v2/11_features.py). Counters are the current raw values; 'rising' means
+    they appeared within the last 7 days, 'stable' that they have not changed in 30."""
+    rising = req.trend == "rising"
+    row = {}
+    for i in SMART_IDS:
+        v = float(getattr(req, f"s{i}"))
+        row[f"s{i}"] = v
+        row[f"s{i}_d7"] = v if rising else 0.0
+        row[f"s{i}_d30"] = v if rising else 0.0
+        row[f"s{i}_max30"] = v
+        row[f"s{i}_missing"] = 0
+    row.update({
+        "age_days": float(req.age_days), "temp": float(req.temp), "temp_max30": float(req.temp),
+        "days_since_nz5": (3.0 if rising else 120.0) if req.s5 > 0 else np.nan,
+        "days_since_nz197": (3.0 if rising else 120.0) if req.s197 > 0 else np.nan,
+        "capacity_tb": V2["capacity_by_model"].get(req.drive_model, float(np.median(list(V2["capacity_by_model"].values())))),
+        "s9_missing": 0, "s194_missing": 0,
+    })
+    x = pd.DataFrame([row])[V2["numeric"]].astype(float)
+    x["model_grp"] = pd.Categorical([req.drive_model], categories=[*V2["categories"], "OTHER"])
+    return x[V2["features"]]
+
+
+def run_predict_v2(body):
+    """The v2 ensemble's 30-day failure probability for one drive, then the same cost
+    model and the same two decision rules as v1. Time to failure assumes a constant
+    hazard over the next months (the ensemble predicts a 30-day probability, not a curve)."""
+    request_start = time.perf_counter()
+    if not isinstance(body, dict):
+        raise InputValidationError(["request body must be a JSON object"])
+    if V2 is None:
+        raise InputValidationError(["which_model: the v2 ensemble is not installed on this server"])
+    try:
+        req = PredictRequestV2(**body)
+    except PydanticValidationError as exc:
+        errors = [f"{'.'.join(str(p) for p in e['loc']) or '(body)'}: {e['msg']}" for e in exc.errors()]
+        _log_event("predict_rejected", errors=errors)
+        raise InputValidationError(errors) from None
+
+    x = _v2_features(req)
+    raw = np.array([m.predict_proba(x)[0, 1] for m in V2["members"]])
+    iso = V2["isotonic"]
+    p = float(iso.predict([raw.mean()])[0])
+    # spread of the 20 models, as a relative band around the calibrated mean (the isotonic map is
+    # fitted to the mean, so applying it to single members would overstate the spread)
+    rel = np.quantile(raw, [0.05, 0.95]) / max(raw.mean(), 1e-12)
+    lo, hi = float(p * rel[0]), float(min(1.0, p * rel[1]))
+    h = V2["h_days"]
+    daily = -np.log1p(-min(p, 0.999999)) / h if p > 0 else 0.0
+    expected_ttf = float(1 / daily) if daily > 0 else float("inf")
+    median_ttf = float(np.log(2) / daily) if daily > 0 else None
+
+    costs = migration_and_failure_cost(req.size_tier, req.criticality_tier)
+    cs = policy.cost_sensitive_decision(
+        p, expected_ttf, costs["failure_customer_cost_min"], costs["total_migration_cost_min"],
+        lookahead_days=LOOKAHEAD_DAYS,
+    )
+    result = {
+        "model_used": f"v2 ensemble ({V2['n_members']} models, SMART telemetry)",
+        "p_fail_within_window": p,
+        "p_interval_5_95": [lo, hi],
+        "expected_ttf_days": round(expected_ttf, 1) if np.isfinite(expected_ttf) else None,
+        "median_ttf_days": round(median_ttf, 1) if median_ttf is not None and median_ttf <= 3650 else None,
+        "mc_dropout_std": None,
+        "capacity_tb_used": float(x["capacity_tb"].iloc[0]),
+        "costs": costs,
+        "cost_sensitive": {
+            "migrate": bool(cs["migrate"]),
+            "expected_cost_of_inaction": round(float(cs["expected_cost_of_inaction"]), 5),
+            "migration_cost": round(float(costs["total_migration_cost_min"]), 5),
+            "urgency_weight": round(float(cs["urgency_weight"]), 3),
+        },
+        "threshold": {"migrate": bool(policy.threshold_decision(p, TAU_DEFAULT)), "tau": TAU_DEFAULT},
+        "assumptions": "TTF from a constant hazard matching the 30-day probability; "
+                       "'stable' counters unchanged for 30 days, 'rising' ones new this week",
+    }
+    _log_event(
+        "predict_served", which_model="v2", drive_model=req.drive_model, age_days=req.age_days,
+        criticality_tier=req.criticality_tier, size_tier=req.size_tier,
+        p_fail_within_window=round(p, 6), cost_sensitive_migrate=result["cost_sensitive"]["migrate"],
+        threshold_migrate=result["threshold"]["migrate"],
         duration_ms=round((time.perf_counter() - request_start) * 1000, 2),
     )
     return result

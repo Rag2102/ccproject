@@ -304,3 +304,49 @@ def test_run_predict_valid_request_unaffected_by_validation():
     result_float = core.run_predict(dict(GOLDEN_PAYLOAD, age_days=900.0))
     assert result_int["p_fail_within_window"] == result_float["p_fail_within_window"]
     assert result_int["expected_ttf_days"] == result_float["expected_ttf_days"]
+
+
+# --------------------------------------------------------------------------- v2 ensemble
+v2 = pytest.mark.skipif(core.V2 is None, reason="models/v2_ensemble not installed")
+
+
+@v2
+def test_v2_meta_and_prediction_shape():
+    meta = core.get_meta()["v2"]
+    assert meta["n_members"] == 20 and meta["default_drive_model"] in meta["drive_models"]
+    r = core.run_predict({"which_model": "v2", "drive_model": meta["default_drive_model"], "age_days": 900,
+                          "criticality_tier": "high", "size_tier": "medium"})
+    lo, hi = r["p_interval_5_95"]
+    assert 0 <= lo <= r["p_fail_within_window"] <= hi <= 1
+    assert set(r) >= {"cost_sensitive", "threshold", "costs", "assumptions"}
+
+
+@v2
+def test_v2_risk_rises_with_bad_smart_counters():
+    base = {"which_model": "v2", "drive_model": core.get_meta()["v2"]["default_drive_model"], "age_days": 900,
+            "criticality_tier": "high", "size_tier": "medium"}
+    healthy = core.run_predict(base)["p_fail_within_window"]
+    failing = core.run_predict({**base, "s5": 240, "s197": 24, "s198": 24, "s187": 4, "trend": "rising"})
+    assert failing["p_fail_within_window"] > 50 * healthy
+    assert failing["cost_sensitive"]["migrate"] and failing["threshold"]["migrate"]
+
+
+@v2
+def test_v2_criticality_changes_the_cost_sensitive_decision_only():
+    """8 pending sectors: p is a few percent, above tau, so the threshold always migrates; the
+    cost-sensitive rule migrates a high-criticality VM and leaves a low-criticality one."""
+    base = {"which_model": "v2", "drive_model": core.get_meta()["v2"]["default_drive_model"], "age_days": 900,
+            "size_tier": "medium", "s197": 8}
+    hi = core.run_predict({**base, "criticality_tier": "high"})
+    lo = core.run_predict({**base, "criticality_tier": "low"})
+    assert hi["threshold"]["migrate"] and lo["threshold"]["migrate"]
+    assert hi["cost_sensitive"]["migrate"] and not lo["cost_sensitive"]["migrate"]
+
+
+@v2
+@pytest.mark.parametrize("bad", [{"drive_model": "NOPE"}, {"s5": -1}, {"trend": "falling"}, {"temp": 500}])
+def test_v2_rejects_bad_input(bad):
+    body = {"which_model": "v2", "drive_model": core.get_meta()["v2"]["default_drive_model"], "age_days": 900,
+            "criticality_tier": "high", "size_tier": "medium", **bad}
+    with pytest.raises(core.InputValidationError):
+        core.run_predict(body)
