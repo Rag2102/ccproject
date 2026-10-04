@@ -24,7 +24,8 @@ About 12 h.
 - [x] Isotonic calibration on the validation period; reliability diagram; ECE (20 equal-count bins).
 - [x] Test-period metrics: ROC-AUC, PR-AUC, Brier, ECE, precision in the top 1% and 5%. 95% CIs come from 1,000 Poisson bootstrap replicates over drives, plus a paired PR-AUC difference against v1. The fast metric code is checked against scikit-learn on every run.
 - [x] Leakage audit, programmatic: no training row from a drive that fails in the test period; no training label that looks past the end of training; trailing windows by construction.
-- [ ] Final run on 2023-2026 data (waits for the ingest), then `docs/v2/failure_model_v2.md`
+- [x] Final run on 2023-2026 data (4 Oct; the per-drive table was moved to one quarter at a time after the first attempt ran out of memory) and `docs/v2/failure_model_v2.md`. At H = 30: PR-AUC 0.074 against 0.0018 for v1's features (paired difference 0.065 to 0.082), ROC-AUC 0.884, ECE 2.3 × 10⁻⁴; leakage audit clean; rolling-origin PR-AUC 0.114 / 0.115 / 0.044
+- [~] Decision for you: the logistic regression beats gradient boosting on test PR-AUC (0.091 vs 0.074). Proposal: choose by validation PR-AUC, rule written before looking (`failure_model_v2.md`)
 
 ## Week 8 (23-29 Nov): empirical rho; Gate G1
 

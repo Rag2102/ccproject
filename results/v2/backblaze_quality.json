@@ -1,0 +1,239 @@
+{
+  "quarters": 53,
+  "drive_days": 744290066,
+  "drives": 512600,
+  "failures": 33565,
+  "archives_not_ok": [],
+  "unparseable_dates": 0,
+  "serials_multi_model": 10,
+  "drives_multi_failure_rows": 57,
+  "drives_report_after_failure": 1212,
+  "drives_report_after_failure_gt30d": 490,
+  "validity": {
+    "rows": 744290066,
+    "dup_keys": 0,
+    "null_serial": 7,
+    "null_model": 0,
+    "bad_capacity": 137180,
+    "bad_failure": 0,
+    "poh_negative": 0,
+    "poh_decrease": 121439,
+    "poh_decrease_gt_24h": 121049,
+    "poh_pairs": 734848574
+  },
+  "dates": {
+    "first_day": "2013-04-10",
+    "last_day": "2026-06-30",
+    "days_present": 4826,
+    "days_missing": 4,
+    "missing_days": [
+      "2014-11-02",
+      "2015-11-01",
+      "2017-01-30",
+      "2022-12-10"
+    ],
+    "days_below_80pct_of_rolling_median": [
+      {
+        "date": "2013-08-20",
+        "drives": 315
+      },
+      {
+        "date": "2013-08-21",
+        "drives": 315
+      },
+      {
+        "date": "2014-06-20",
+        "drives": 27087
+      },
+      {
+        "date": "2014-06-21",
+        "drives": 23960
+      },
+      {
+        "date": "2014-06-22",
+        "drives": 23540
+      },
+      {
+        "date": "2015-10-28",
+        "drives": 23644
+      },
+      {
+        "date": "2017-01-28",
+        "drives": 46
+      },
+      {
+        "date": "2017-01-29",
+        "drives": 46
+      },
+      {
+        "date": "2017-01-31",
+        "drives": 61
+      },
+      {
+        "date": "2017-11-14",
+        "drives": 33644
+      },
+      {
+        "date": "2018-10-24",
+        "drives": 28878
+      },
+      {
+        "date": "2019-11-05",
+        "drives": 55980
+      },
+      {
+        "date": "2022-06-06",
+        "drives": 68287
+      },
+      {
+        "date": "2023-03-19",
+        "drives": 151793
+      },
+      {
+        "date": "2023-04-13",
+        "drives": 72268
+      },
+      {
+        "date": "2023-04-16",
+        "drives": 72261
+      },
+      {
+        "date": "2023-07-05",
+        "drives": 153328
+      },
+      {
+        "date": "2023-12-18",
+        "drives": 207751
+      },
+      {
+        "date": "2025-05-12",
+        "drives": 245997
+      }
+    ]
+  },
+  "group_columns": {
+    "cluster_id": {
+      "archives": 12,
+      "first": "data_Q1_2024",
+      "last": "data_Q4_2025"
+    },
+    "datacenter": {
+      "archives": 12,
+      "first": "data_Q1_2024",
+      "last": "data_Q4_2025"
+    },
+    "is_legacy_format": {
+      "archives": 13,
+      "first": "data_Q1_2024",
+      "last": "data_Q4_2025"
+    },
+    "pod_id": {
+      "archives": 13,
+      "first": "data_Q1_2024",
+      "last": "data_Q4_2025"
+    },
+    "pod_slot_num": {
+      "archives": 12,
+      "first": "data_Q1_2024",
+      "last": "data_Q4_2025"
+    },
+    "vault_id": {
+      "archives": 13,
+      "first": "data_Q1_2024",
+      "last": "data_Q4_2025"
+    }
+  },
+  "km": {
+    "WUH722222ALE6L4": {
+      "n": 46039,
+      "s_1y": 0.9925768793467002,
+      "s_3y": 0.966660204294799
+    },
+    "MG08ACA16TA": {
+      "n": 41061,
+      "s_1y": 0.9911130172328169,
+      "s_3y": 0.968814673205641
+    },
+    "MG07ACA14TA": {
+      "n": 39387,
+      "s_1y": 0.9896498664830087,
+      "s_3y": 0.9733708800728067
+    },
+    "ST12000NM0007": {
+      "n": 38839,
+      "s_1y": 0.981514678374947,
+      "s_3y": 0.9400862025733565
+    },
+    "ST4000DM000": {
+      "n": 37038,
+      "s_1y": 0.9748423624071033,
+      "s_3y": 0.9250585721582869
+    },
+    "ST16000NM001G": {
+      "n": 36022,
+      "s_1y": 0.9925119694343488,
+      "s_3y": 0.9798818184034455
+    },
+    "WUH721816ALE6L4": {
+      "n": 27308,
+      "s_1y": 0.9907139320403282,
+      "s_3y": 0.9821873985736626
+    },
+    "MG10ACA20TE": {
+      "n": 25410,
+      "s_1y": 0.993685435875701,
+      "s_3y": 0.9768149556644734
+    },
+    "ST12000NM0008": {
+      "n": 21036,
+      "s_1y": 0.9855766235300988,
+      "s_3y": 0.951323501831529
+    },
+    "HMS5C4040BLE640": {
+      "n": 16342,
+      "s_1y": 0.9827671339494237,
+      "s_3y": 0.9756648750602642
+    }
+  },
+  "v1_sanity": {
+    "v1_drives": 122619,
+    "v1_failures": 6913,
+    "v2_drives_2013_2017": 125863,
+    "v2_failures_2013_2017": 7321,
+    "drives_gap_pct": 2.646,
+    "failures_gap_pct": 5.902,
+    "serials_in_both": 122619,
+    "serials_only_v1": 0,
+    "serials_only_v2": 3244,
+    "failed_agree_share": 0.99995,
+    "failed_v1_not_v2": 6,
+    "failed_v2_not_v1": 0,
+    "model_agree_share": 1.0,
+    "start_equals_first_seen_share": 1.0,
+    "age_days_vs_calendar_days_2017_median_abs_diff": 7.125,
+    "age_days_vs_calendar_days_2017_within_1d_share": 0.07385,
+    "age_days_vs_age_exit_days_median_abs_diff": 0.0,
+    "age_days_vs_age_exit_days_within_1d_share": 0.99982,
+    "v1_filter": "first seen by 2017-12-31, capacity >= 1.5 TB",
+    "v2_drives_v1_filter": 122620,
+    "v2_failures_v1_filter": 6907,
+    "v2_only_after_filter": [
+      {
+        "serial_number": "PL1331LAGTGMVH",
+        "model": "HGST HMS5C4040ALE640",
+        "capacity_bytes": "4000787030016",
+        "failed_by_2017": "0"
+      }
+    ],
+    "failed_v1_not_v2_filtered": [
+      "PL1331LAGYH4SH",
+      "Z300GZ1B",
+      "Z300GZCV",
+      "Z303VDR4",
+      "Z305AGS0",
+      "ZA10Z42B"
+    ],
+    "v2_only_below_filter_drives": 3243,
+    "v2_only_below_filter_failures": 414
+  }
+}
