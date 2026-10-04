@@ -1,0 +1,40 @@
+id: B1-low
+version: 1
+placement:
+  kind: rank_copula
+  rho_latent: -0.019
+  target_spearman: 0.0
+  arrival_blend: null
+  kappa_sigma: null
+  calibrations:
+  - low
+hosts:
+  n: 2000
+  drives_per_host: 4
+  non_disk_hazard_x: 1.0
+horizon_days: 365
+warmup_days: 30
+predictor:
+  kind: oracle
+migration:
+  model: precopy
+  nic_gbps: 10.0
+  usable_frac: 0.5
+  max_concurrent: 2
+budget:
+  resource: gb
+  pct_cluster_mem_per_day:
+  - 0.5
+  - 1
+  - 2
+  - 5
+seeds:
+  dev: 101-110
+  eval: 1-30
+  replication: 1001-1030
+provenance:
+  rho: MEASURED
+  hazard: DERIVED
+  migration: ASSUMED
+  costs: DERIVED
+config_hash: b34001f3b1ea1067

@@ -147,3 +147,17 @@ Each pre-written outcome is kept in the JSON (`pre_written_rule_*`) next to the 
 | H1: calibration out of sample, with intervals, after a temporal split | Week 7 (R2) |
 | H3: exact GB matching in v5's daily-budget simulator | Week 13 (v1 regression, G2) |
 | Final verdicts combined with theory | Week 17 (THEORY.md, task 3) |
+
+## Closed with the theory (Week 17, 4 Oct 2026)
+
+`THEORY.md` section 5. At rho = 0, T2 says that under calibrated p, the same budget and accounting over the decision's own horizon, cost-aware selection cannot lose in expectation. v1 broke two of those conditions:
+- the budget (H3: the threshold got 8% more hosts and 21% more GB);
+- the accounting (H6: credit for failures a median 170 days after a 30-day decision).
+
+With both repaired, the v1 rule is ahead by +0.19% (same GB) and +0.22% (exact count). T3 explains that size. At v1-like spreads (sigma of log F/M 0.37-0.56, H4) and v1's budget share (4.2%), the closed form gives 3-6% of the 30-day expected cost. A 30-day decision can touch only about 3.4% of the 6,912 failures v1 charges over its whole run (Σp ≈ 237 at decision time). So the theory predicts about 0.1-0.2% of total cost, in line with the measurement.
+
+Final verdicts:
+- **H3 and H6: confirmed as the causes.** H3 stays "inconclusive" under its pre-written rule; its substance is confirmed by the theory.
+- **H1, H2, H4, H5, H7, H8: rejected as explanations.** H1's residual miscalibration is not needed to explain the sign. H7 and H8 get a second look in regime E (Week 18).
+
+**In two sentences:** the threshold won at rho = 0 because v1 gave it a larger budget and credited migrations with failures months after the 30-day decision, breaking the two assumptions under which cost-aware selection cannot lose. With the budget matched and the accounting aligned to the decision horizon, the cost-aware rule is ahead by about 0.2%, which is what the closed form predicts once the gain is diluted by the share of v1's total cost that a 30-day decision can affect.

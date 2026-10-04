@@ -1,0 +1,56 @@
+% Approach (draft, Week 17; written 4 Oct 2026 from docs/v2/THEORY.md, PROTOCOL.md v1.0 and
+% vmsim/policies/{bam,guard}.py). Numbers from results/v2/theory_check.json.
+% Only statements that survived the numerical check are here (THEORY.md section 2).
+
+\section{Approach}
+\label{sec:approach}
+
+\paragraph{The decision.}
+Each day the operator may move VMs off hosts it expects to fail, within a budget $B$ of memory
+moved per day. Moving VM $i$ off host $j$ averts an interruption of cost $c_i$ if $j$ fails within
+the horizon $H$ and the migration finishes first, and costs $m_i$ either way. With $p_j$ the
+probability that $j$ fails within $H$ and $e_i$ the probability that the migration finishes in time,
+the expected benefit is $b_i = p_j c_i e_i - m_i$ and the weight is $w_i$, the VM's memory.
+
+\paragraph{Budget-aware migration (BAM).}
+BAM ranks VMs by density $b_i / w_i$ and moves them while $b_i > 0$ and the budget lasts. Two
+details matter in practice. The interruption cost is weighted by the probability that the VM is
+still running $H$ days ahead given its age, since most VMs leave long before their host fails. And
+$e_i$ depends on the VM's place in its host's migration queue, so it is recomputed after every
+pick. For fixed $e$, choosing what to move is a knapsack, and density order is optimal for its
+relaxation and within one item of the integer optimum~\cite{dantzig1957discrete}. On simulator
+snapshots the greedy is within 0.05\% of an exact solver on average.
+
+\paragraph{What the theory does and does not promise.}
+Under four assumptions (calibrated $p$, failures independent given $p$, the same budget for every
+policy, additive costs) and accounting over the horizon the decision used, BAM is never worse in
+expectation than a threshold on $p$ given the same budget. That accounting rule is not a detail. v1
+credited migrations with failures months later and found the opposite sign.
+
+Under a Gaussian copula on $(\log p, \log\kappa)$ with $\kappa = c e / w$, the advantage has a
+closed form, which a Monte Carlo confirms at all 3,024 points of our grid. Its main term is
+$\Phi(z_q + \sigma_z) - \Phi(z_q + \sigma_p + \rho\,\sigma_\kappa)$, which is never negative and is
+zero only when costs do not vary or are perfectly aligned with risk. The advantage is therefore
+driven by the spread of costs, and is largest near $\rho = 0$, not above a break-even correlation.
+
+Two cautions come from the same analysis.
+\begin{itemize}
+  \item Noise in $p$ does not by itself make BAM lose when costs are not anti-aligned with risk.
+  \item Flattening miscalibration ($p^{\gamma}$ with $\gamma < 1$) can make BAM lose, because its
+  stopping rule compares a distorted $p\,c$ with $m$.
+\end{itemize}
+
+\paragraph{Safe-adaptive guard (P6).}
+Because the promise rests on calibration, P6 runs the threshold policy unless two conditions hold
+at two consecutive weekly looks.
+\begin{enumerate}
+  \item \emph{Model-based advantage.} The model-based advantage of BAM's plan over the threshold's
+  plan has a positive lower confidence bound. The bound comes from a host bootstrap, with the
+  error budget spent as $\alpha_k = 6\alpha/(\pi^2 k^2)$ so that repeated looks stay valid.
+  \item \emph{Calibration audit.} A reliability slope fitted on the outcomes that matured in the
+  last 90 days lies in $[0.8, 1.25]$.
+\end{enumerate}
+P6 returns to the threshold policy at the first look that fails either test, and logs every switch
+with its evidence. The plug-in advantage uses BAM's own benefit formula, so it is optimistic by
+construction. The audit is what protects the operator: on a control whose scores carry no
+information, P6 never switched.

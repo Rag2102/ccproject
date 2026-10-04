@@ -1,0 +1,35 @@
+{
+  "criterion": "budget",
+  "tau": 0.01333521432163324,
+  "order": "largest",
+  "budget_frac": 0.01,
+  "table": [
+    {
+      "order": "smallest",
+      "tau": 0.01333521432163324,
+      "util": 0.9999254423515982,
+      "cost": 88790.94281608735,
+      "reached": true
+    },
+    {
+      "order": "largest",
+      "tau": 0.01333521432163324,
+      "util": 0.999927701674277,
+      "cost": 88463.89308362865,
+      "reached": true
+    },
+    {
+      "order": "random",
+      "tau": 0.01333521432163324,
+      "util": 0.999925680175038,
+      "cost": 88525.91684159328,
+      "reached": true
+    }
+  ],
+  "regime": "C",
+  "budget_pct": 1,
+  "dev_seeds": [
+    101,
+    102
+  ]
+}

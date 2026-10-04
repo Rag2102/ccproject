@@ -1,5 +1,5 @@
 # ADR-007: scale of the evaluation runs (hosts, horizon, eval seeds)
-Status: **proposed**. The decision is the owner's, at the Week 17 freeze.
+Status: **accepted** (owner, 4 Oct 2026): the recommendation below, 2,000 hosts × 365 days, n = 30 with the SD-triggered extension to 50.
 Date: 2026-10-04
 
 Context: `PROTOCOL.md` section 6. The pilot (seeds 201-205; cells A3 and B1 at a 2% budget; 2,000 hosts × 365 days + 30 warm-up) measures SD(Delta) of P3 vs P2 as a proxy. n, hosts and horizon are chosen so that this SD is below the Bonferroni column (30 seeds: 1.6%; 50: 2.1%; 100: 3.1%). delta = 1% never moves. Under ADR-005, P2 is the budget-tuned threshold.
