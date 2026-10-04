@@ -53,17 +53,33 @@ def quarter_range(p: Path) -> tuple[date, date]:
 
 
 def drive_table(con: duckdb.DuckDBPyConnection) -> None:
-    """Per drive: first failure day, last day, first non-zero SMART 5 and 197 (all data)."""
+    """Per drive: first failure day, last day, first non-zero SMART 5 and 197 (all data).
+
+    Aggregated one quarter at a time and then merged: a single pass over all 45 quarters
+    exceeds the memory cap on this machine.
+    """
     con.execute(
-        f"""CREATE OR REPLACE TABLE drives AS
-            SELECT serial_number,
-                   min(date) FILTER (failure = 1) AS fail_date,
-                   max(date) AS last_seen,
-                   min(date) FILTER (smart_5_raw > 0) AS first_nz5,
-                   min(date) FILTER (smart_197_raw > 0) AS first_nz197
-            FROM read_parquet({[str(p) for p in quarter_files()]!r}, union_by_name=true)
-            GROUP BY serial_number"""
+        "CREATE OR REPLACE TABLE dq (serial_number VARCHAR, fail_date DATE, last_seen DATE, "
+        "first_nz5 DATE, first_nz197 DATE)"
     )
+    for p in quarter_files():
+        con.execute(
+            f"""INSERT INTO dq
+                SELECT serial_number,
+                       min(date) FILTER (failure = 1),
+                       max(date),
+                       min(date) FILTER (smart_5_raw > 0),
+                       min(date) FILTER (smart_197_raw > 0)
+                FROM read_parquet('{p}')
+                GROUP BY serial_number"""
+        )
+    con.execute(
+        """CREATE OR REPLACE TABLE drives AS
+           SELECT serial_number, min(fail_date) AS fail_date, max(last_seen) AS last_seen,
+                  min(first_nz5) AS first_nz5, min(first_nz197) AS first_nz197
+           FROM dq GROUP BY serial_number"""
+    )
+    con.execute("DROP TABLE dq")
     # a drive that fails: its record ends at the failure (rows after it are dropped)
     con.execute(
         "UPDATE drives SET last_seen = fail_date "
@@ -129,7 +145,7 @@ def main() -> None:
     args = ap.parse_args()
     OUT.mkdir(parents=True, exist_ok=True)
     con = duckdb.connect()
-    con.execute(f"SET temp_directory='{OUT / '_duckdb'}'; SET memory_limit='8GB'")
+    con.execute(f"SET temp_directory='{OUT / '_duckdb'}'; SET memory_limit='8GB'; SET threads=4")
     con.execute("SET preserve_insertion_order=false")
     t0 = time.time()
     drive_table(con)

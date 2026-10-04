@@ -136,3 +136,85 @@ def trace(
     cum = np.cumsum(p[host_class[host]], axis=1)
     tier = (rng.uniform(size=len(vms))[:, None] > cum[:, :-1]).sum(1).astype(np.int8)
     return host, tier
+
+
+def place_batch(
+    mem: np.ndarray,
+    tier: np.ndarray,
+    free: np.ndarray,
+    ok: np.ndarray,
+    risk: np.ndarray,
+    blend: float,
+    rng: np.random.Generator,
+    u: np.ndarray | None = None,
+) -> np.ndarray:
+    """Hosts for one day's arrivals, in arrival order (-1 = rejected: no host has room).
+
+    blend = 0: each VM to a uniformly random host that can take VMs (ok) and has room. With u
+    (one pre-drawn uniform per VM, SIM_SPEC section 7) the first choice is host floor(u x n), so
+    two runs place a VM on the same host unless that host's state differs between them.
+    blend > 0: v1's mechanism on the day's batch (rho_blend): VMs ordered by blend x tier-rank +
+    (1 - blend) x U, paired with the free memory of hosts in ascending risk order, so blend = 1
+    is adversarial. Overflow is re-drawn uniformly among hosts with room.
+    """
+    n = len(mem)
+    host = np.full(n, -1, dtype=np.int64)
+    cand = np.flatnonzero(ok & (free > 0))
+    if n == 0 or len(cand) == 0:
+        return host
+    if blend > 0:
+        tie = rng.permutation(n)
+        pct = np.empty(n)
+        pct[np.lexsort((tie, tier))] = (np.arange(n) + 1) / n
+        order = np.argsort(blend * pct + (1 - blend) * rng.uniform(size=n), kind="stable")
+        hord = cand[np.lexsort((rng.permutation(len(cand)), risk[cand]))]
+        bounds = np.cumsum(free[hord])
+        fill = min(1.0, mem.sum() / bounds[-1])
+        mid = (np.cumsum(mem[order]) - mem[order] / 2) / fill
+        pos = np.minimum(np.searchsorted(bounds, mid), len(hord) - 1)
+        host[order] = hord[pos]
+    elif u is not None:
+        first = np.minimum((u * len(free)).astype(np.int64), len(free) - 1)
+        good = ok[first] & (free[first] > 0)
+        host[good] = first[good]
+        host[~good] = cand[rng.integers(0, len(cand), int((~good).sum()))]
+    else:
+        host[:] = cand[rng.integers(0, len(cand), n)]
+    room = free.astype(float).copy()
+    bad = np.zeros(0, dtype=np.int64)
+    load = np.bincount(host, weights=mem, minlength=len(free))
+    if (load <= room + 1e-9).all():
+        return host
+    for _ in range(30):
+        # on each over-full host keep the VMs (in arrival order) that fit; re-draw the rest
+        over = np.flatnonzero(load > room + 1e-9)
+        if len(over) == 0:
+            bad = np.zeros(0, dtype=np.int64)
+            break
+        idx = np.flatnonzero(np.isin(host, over))
+        o = idx[np.lexsort((idx, host[idx]))]
+        h = host[o]
+        cum = np.cumsum(mem[o])
+        start = np.r_[0, np.flatnonzero(np.diff(h)) + 1]
+        base = np.repeat(cum[start] - mem[o][start], np.diff(np.r_[start, len(o)]))
+        fits = (cum - base) <= room[h] + 1e-9
+        bad = o[~fits]
+        np.subtract.at(load, host[bad], mem[bad])
+        c2 = cand[room[cand] - load[cand] > 0]
+        if len(c2) == 0:
+            host[bad] = -1
+            break
+        host[bad] = c2[rng.integers(0, len(c2), len(bad))]
+        np.add.at(load, host[bad], mem[bad])
+    if len(bad):  # last resort, one at a time: any host with room, else rejected
+        idx = np.flatnonzero(host >= 0)
+        idx = idx[~np.isin(idx, bad)]
+        left = room - np.bincount(host[idx], weights=mem[idx], minlength=len(free))
+        for v in bad:
+            r = cand[left[cand] >= mem[v]]
+            if len(r):
+                j = rng.choice(r)
+                host[v], left[j] = j, left[j] - mem[v]
+            else:
+                host[v] = -1
+    return host

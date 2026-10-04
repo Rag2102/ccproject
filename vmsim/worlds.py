@@ -1,7 +1,8 @@
 """Failure worlds: everything random that must be identical across policies (plan Week 12).
 
 A world fixes, for one (config, seed): the hosts and their drives, drive ages, the daily host
-hazard matrix, each host's first failure time, the initial VMs and their placement. Policies
+hazard matrix, each host's first failure time, the initial VMs (residents present at time 0,
+with their elapsed ages) and their placement. Policies
 only read it. Worlds are saved as .npz with a SHA-256 over their arrays and listed in
 worlds/manifest.csv; the arrays themselves stay out of Git (plan: DVC).
 
@@ -21,7 +22,7 @@ import numpy as np
 
 from vmsim import failure, placement
 from vmsim.config import SimConfig
-from vmsim.entities import Hosts, VMs, azure_table, make_hosts, sample_vms
+from vmsim.entities import Hosts, make_hosts, sample_present_residents, split
 from vmsim.predictor import Oracle
 from vmsim.rng import Streams
 
@@ -37,6 +38,8 @@ ARRAYS = (
     "vm_host",
     "vm_tier",
     "host_risk0",
+    "vm_age0",
+    "place_blend",
 )
 
 
@@ -53,6 +56,8 @@ class World:
     vm_host: np.ndarray
     vm_tier: np.ndarray
     host_risk0: np.ndarray  # oracle p_H at day 0, used by placement
+    vm_age0: np.ndarray  # days each initial VM has already run at time 0
+    place_blend: np.ndarray  # scalar: v1 blend weight that achieved the target rho (else 0 or 1)
 
     def digest(self) -> str:
         h = hashlib.sha256(json.dumps(self.config, sort_keys=True).encode())
@@ -80,21 +85,21 @@ def generate(cfg: SimConfig, seed: int) -> World:
     risk0 = Oracle(hz, cfg.risk_h_days).score(0).p_h
 
     pc = cfg.placement
-    target_gb = pc.init_fill * hosts.cap_gb.sum()
-    n_vms = int(
-        1.5 * target_gb / azure_table()["memory_gb"].mean()
-    )  # enough; cut to the target below
-    vms: VMs = sample_vms(n_vms, s.gen("arrivals", 0))
-    keep = np.cumsum(vms.mem_gb) <= target_gb
-    vms = VMs(**{k: getattr(vms, k)[keep] for k in vms.__dataclass_fields__})
+    # residents present at time 0, filling init_fill of memory net of the transients' share
+    target_gb = pc.init_fill * split()["resident_mem_share"] * hosts.cap_gb.sum()
+    vms, age = sample_present_residents(target_gb, s.gen("arrivals", 0))
     rng = s.gen("placement", 0)
     tier = vms.tier
+    blend = 0.0
     if pc.regime == "random":
         host = placement.random(vms, hosts.cap_gb, rng, pc.capacity)
     elif pc.regime == "rho":
-        host, _, _ = placement.rho_controlled(vms, hosts.cap_gb, risk0, pc.rho, rng, pc.capacity)
+        host, blend, _ = placement.rho_controlled(
+            vms, hosts.cap_gb, risk0, pc.rho, rng, pc.capacity
+        )
     elif pc.regime == "adversarial":
         host = placement.adversarial(vms, hosts.cap_gb, risk0, rng, pc.capacity)
+        blend = 1.0
     else:
         raise ValueError(f"placement regime {pc.regime!r} needs inputs the world cannot build yet")
     return World(
@@ -109,6 +114,8 @@ def generate(cfg: SimConfig, seed: int) -> World:
         vm_host=host,
         vm_tier=tier,
         host_risk0=risk0,
+        vm_age0=age,
+        place_blend=np.array(blend),
     )
 
 

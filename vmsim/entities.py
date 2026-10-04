@@ -96,3 +96,77 @@ def make_hosts(
         drives=idx.reshape(n, drives_per_host),
         rack=np.arange(n) // hosts_per_rack,
     )
+
+
+# --- residents and transients (SIM_SPEC section 3, VM churn) -----------------------------------
+# A VM that lives at least a day is a resident and is simulated individually; a shorter one is a
+# transient. Transients are 88% of Azure VMs but 8% of memory-time; they are charged at each host
+# failure from the failure stream and are never eligible for migration (MIN_MIGRATE_AGE_DAYS),
+# so they cost every policy the same.
+RESIDENT_MIN_S = 86_400.0
+MIN_MIGRATE_AGE_DAYS = 1.0
+
+
+@lru_cache(maxsize=1)
+def split() -> dict:
+    t = azure_table()
+    life = t["lifetime_s"].to_numpy(float)
+    mem = t["memory_gb"].to_numpy(float)
+    res = life >= RESIDENT_MIN_S
+    mt = mem * life / 86_400
+    return {
+        "resident_rows": np.flatnonzero(res),
+        "transient_rows": np.flatnonzero(~res),
+        "resident_mem_share": float(mt[res].sum() / mt.sum()),
+        "resident_mem_days_mean": float(mt[res].mean()),  # E[mem x lifetime] per resident, GB-days
+        "transients_per_resident": float((~res).sum() / res.sum()),
+        "transient_life_mean_days": float(life[~res].mean() / 86_400),
+    }
+
+
+@lru_cache(maxsize=1)
+def _lifetimes_sorted() -> np.ndarray:
+    return np.sort(azure_table()["lifetime_s"].to_numpy(float) / 86_400)
+
+
+def survival(age_days: np.ndarray, ahead_days: float) -> np.ndarray:
+    """P(lifetime > age + ahead | lifetime > age), from the empirical Azure distribution."""
+    s = _lifetimes_sorted()
+    n = len(s)
+    a = np.asarray(age_days, float)
+    alive_now = n - np.searchsorted(s, a, side="right")
+    alive_then = n - np.searchsorted(s, a + ahead_days, side="right")
+    return np.where(alive_now > 0, alive_then / np.maximum(alive_now, 1), 0.0)
+
+
+def take(vms: VMs, idx: np.ndarray) -> VMs:
+    return VMs(**{k: getattr(vms, k)[idx] for k in vms.__dataclass_fields__})
+
+
+def rows_to_vms(rows: np.ndarray) -> VMs:
+    t = azure_table()
+    s = t.iloc[rows]
+    return VMs(
+        mem_gb=s["memory_gb"].to_numpy(float),
+        vcores=s["vcores"].to_numpy(float),
+        avg_cpu=s["avg_cpu"].to_numpy(float),
+        tier=s["tier"].to_numpy(np.int8),
+        lifetime_s=s["lifetime_s"].to_numpy(float),
+        source_row=np.asarray(rows),
+    )
+
+
+def sample_present_residents(target_gb: float, rng: np.random.Generator) -> tuple[VMs, np.ndarray]:
+    """Residents present at a random instant, filling target_gb: drawn with probability
+    proportional to lifetime (length bias) and a uniform elapsed age. Returns (vms, age_days)."""
+    sp = split()
+    rows = sp["resident_rows"]
+    life = azure_table()["lifetime_s"].to_numpy(float)[rows]
+    mean_mem = azure_table()["memory_gb"].to_numpy(float)[rows].mean()
+    n = int(2 * target_gb / mean_mem) + 10
+    pick = rows[rng.choice(len(rows), n, p=life / life.sum())]
+    vms = rows_to_vms(pick)
+    keep = np.cumsum(vms.mem_gb) <= target_gb
+    vms = take(vms, np.flatnonzero(keep))
+    age = rng.uniform(size=len(vms)) * vms.lifetime_s / 86_400
+    return vms, age

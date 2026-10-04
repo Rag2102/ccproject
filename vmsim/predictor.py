@@ -33,21 +33,48 @@ class Oracle:
         last = np.clip(hazard[:, -1], 1e-12, 1)
         self.tail = surv[:, -1] * (1 - last) / last  # geometric tail beyond the matrix
 
-    def _p(self, day: int, a: int, b: int) -> np.ndarray:
+    def _p(self, day: np.ndarray, a: int, b: int) -> np.ndarray:
         n = self.cum.shape[1] - 1
-        lo, hi = min(day + a, n), min(day + b, n)
-        return np.exp(self.cum[:, lo] - self.cum[:, day]) - np.exp(
-            self.cum[:, hi] - self.cum[:, day]
-        )
+        r = np.arange(len(day))
+        lo, hi = np.minimum(day + a, n), np.minimum(day + b, n)
+        c0 = self.cum[r, day]
+        return np.exp(self.cum[r, lo] - c0) - np.exp(self.cum[r, hi] - c0)
 
-    def score(self, day: int) -> Scores:
-        h = self.h
+    def score_at(self, day: np.ndarray) -> Scores:
+        """Scores with a separate day index per host (ages differ after a repair)."""
+        h, n = self.h, self.hazard.shape[1]
+        day = np.minimum(np.asarray(day, dtype=np.int64), n)
+        r = np.arange(len(day))
         p_int = np.stack([self._p(day, k * h, (k + 1) * h) for k in range(3)], axis=1)
-        n = self.hazard.shape[1]
-        rest = (self.rev_surv[:, day] if day < n else 0.0) + self.tail
+        rev = np.where(day < n, self.rev_surv[r, np.minimum(day, n - 1)], 0.0)
         # mid-day convention: a failure within day d counts as half a day
-        e_ttf = 0.5 + rest / np.exp(self.cum[:, day])
+        e_ttf = 0.5 + (rev + self.tail) / np.exp(self.cum[r, day])
         return Scores(p_h=p_int[:, 0], e_ttf=e_ttf, p_interval=p_int)
+
+    def score(self, day: int, life_start=None) -> Scores:
+        return self.score_at(np.full(len(self.hazard), int(day)))
+
+
+class RenewalOracle:
+    """Oracle across repairs: a host in its first life is scored from the world's hazard at the
+    run day; a repaired host from the renewal hazard at its days since the repair. It uses only
+    when the current life started, never when it will end."""
+
+    def __init__(self, first: np.ndarray, renewed: np.ndarray, h_days: int = 30):
+        self.first, self.renewed = Oracle(first, h_days), Oracle(renewed, h_days)
+        self.h = h_days
+
+    def score(self, day: int, life_start=None) -> Scores:
+        a = self.first.score(day)
+        if life_start is None or not np.any(life_start >= 0):
+            return a
+        b = self.renewed.score_at(np.maximum(day - life_start, 0))
+        m = life_start >= 0
+        return Scores(
+            p_h=np.where(m, b.p_h, a.p_h),
+            e_ttf=np.where(m, b.e_ttf, a.e_ttf),
+            p_interval=np.where(m[:, None], b.p_interval, a.p_interval),
+        )
 
 
 def _logit(p):
@@ -65,8 +92,8 @@ class Noisy:
     def __init__(self, oracle: Oracle, sigma: float, streams, h_days: int = 30):
         self.o, self.sigma, self.streams = oracle, sigma, streams
 
-    def score(self, day: int) -> Scores:
-        s = self.o.score(day)
+    def score(self, day: int, life_start=None) -> Scores:
+        s = self.o.score(day, life_start)
         if self.sigma == 0:
             return s
         z = self.streams.gen("predictor", day).normal(size=len(s.p_h))
@@ -84,8 +111,8 @@ class Miscalibrated:
     def __init__(self, oracle: Oracle, gamma: float):
         self.o, self.gamma = oracle, gamma
 
-    def score(self, day: int) -> Scores:
-        s = self.o.score(day)
+    def score(self, day: int, life_start=None) -> Scores:
+        s = self.o.score(day, life_start)
         if self.gamma == 1:
             return s
         q = s.p_interval**self.gamma
