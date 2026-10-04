@@ -11,7 +11,13 @@ test:
 diag:
 	$(PY) scripts/v2/diag_v1_anomaly.py
 
-data train worlds bench stats numbers figures paper console reproduce-small reproduce release:
+# Weeks 4-5: Backblaze archives -> Parquet (resumable; hours on first run, 35 GB download),
+# then quality report, AFR, life table, Kaplan-Meier and the v1 check (about 5 min)
+data:
+	$(PY) scripts/v2/10_backblaze_ingest.py --all
+	$(PY) scripts/v2/10a_backblaze_summaries.py
+
+train worlds bench stats numbers figures paper console reproduce-small reproduce release:
 	@echo "make $@: not yet (see docs/plan, Part I section 6 for the week it first works)"
 
 sim: worlds bench

@@ -58,7 +58,7 @@ For each cell c and window w, over all placements i in that window:
   - ties dominate, and τ-b is the statistic designed for that.
 - Weighting: with w_i = 1, every placement counts once. The time-weighted variant uses weighted ranks.
 
-Pooled estimate per cell: the mean over windows 8-14, 15-21 and 22-28. Across cells: report each cell, then the median over cells. **G1 uses the per-cell values:** a class holds only if it holds in the majority of cells analysed, and all cells are shown. This combination rule is not in `PROTOCOL.md` v0. I propose it here; once you confirm it, it goes into section 7 before Week 8.
+Pooled estimate per cell: the mean over windows 8-14, 15-21 and 22-28. Across cells: report each cell, then the median over cells. **G1 uses the per-cell values:** a class holds only if it holds in the majority of cells analysed, and all cells are shown. The rule, including what happens without a majority (class B), is in `PROTOCOL.md` section 7 (v0.1, confirmed 4 Oct 2026).
 
 Also report a **dispersion** measure: the Gini coefficient of the share of high-tier placements across machines (0 means spread evenly). The plan asks for it because ρ ≈ 0 can hide strong clustering.
 

@@ -145,7 +145,7 @@ About 5 h. Light week. Done on 4 Oct, ahead of the calendar; nothing was downloa
   - Alternative: Alibaba 2018.
 - [x] Read the trace paper and schema: `reading/tirmazi2020borg.md`; the v3 documentation and the format file give tiers, event codes, alloc sets and dedicated machines. DOI added to `paper/refs.bib`
 - [x] `docs/v2/criticality_mapping.md`: M1 (priority tier, primary), M2 (scheduling class), M3 (strict joint); tasks only, dedicated machines excluded
-- [x] `docs/v2/rho_definition.md`: placements, 7-day windows, risk proxies (platform long-removal rate primary), Kendall tau-b and tie-corrected Spearman, cluster bootstrap over machines, mapping to rho_L, threats. One rule needs your confirmation: G1 combines cells by majority (not yet in `PROTOCOL.md`)
+- [x] `docs/v2/rho_definition.md`: placements, 7-day windows, risk proxies (platform long-removal rate primary), Kendall tau-b and tie-corrected Spearman, cluster bootstrap over machines, mapping to rho_L, threats. G1 combines cells by majority: confirmed and added to `PROTOCOL.md` section 7 (v0.1)
 - [x] `data_sources.md` entries for the Google trace, Azure V1 (CC-BY-4.0 and MIT), LANL, and Alibaba as the fallback
 - [x] Reading: Resource Central was done in Week 2 (`reading/resource_central2017.md`, pages 1-8 of 15)
 

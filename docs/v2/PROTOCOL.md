@@ -1,4 +1,4 @@
-# Protocol v0 (4 Oct 2026; tag `protocol-v0`)
+# Protocol v0.1 (4 Oct 2026; v0 tagged `protocol-v0`)
 
 This protocol fixes every decision rule before any v2 data is seen. Version 0 is the draft sent to the advisor in Week 3. Version 1.0 is frozen in Week 17 (tags `protocol-v1.0` and `v2.0-rc1`); after that, every change goes to `CHANGES_AFTER_FREEZE.md` and its results are exploratory.
 
@@ -108,6 +108,8 @@ The measured correlation (Kendall tau-b and tie-corrected Spearman, 95% cluster 
 | C0, below (negligible) | CI upper bound < 0.20 | Measurement + safe policy + benchmark |
 | D, no trace | No usable risk proxy after the Week 8 fallback (Alibaba 2018 or tier mix) | Synthetic and adversarial regimes only; venue ceiling drops |
 
+**Combining cells (confirmed 4 Oct 2026).** Each cell analysed gets its own class from the table above, using mapping M1 and the primary proxy (`rho_definition.md`). The G1 class is the class held by a strict majority of those cells. If no class has a majority, the G1 class is B (unresolved): a split across cells is treated the same way as a CI that straddles pH. A cell with no usable risk proxy counts as D. Every cell's class and interval is shown in `G1_decision.md`, not only the majority.
+
 The class assigned at G1 is final. The Week 17 break-even replaces pH for interpretation only, never for re-classification. I read the C0 boundary as "CI upper bound < 0.20" (the source writes "C0 if < 0.20"); confirm.
 
 ### G2 (Week 13): can the simulator be trusted?
@@ -134,6 +136,7 @@ Record: `G3_decision.md`, tag `results-frozen`.
 
 ## 8. Change control
 
-- `protocol-v0` (this file): sent to the advisor in Week 3.
+- `protocol-v0`: sent to the advisor in Week 3.
+- v0.1 (4 Oct 2026): G1 cell-combination rule added (section 7), confirmed by the owner. Still before any trace data is read, so not a post-freeze change.
 - `protocol-v1.0`: frozen in Week 17 with the matrix, n from the pilot, budgets, ablations, robustness and sensitivity grids, confirmatory family, analysis scripts and Console schema.
 - After the freeze: `CHANGES_AFTER_FREEZE.md`; results produced under a change are exploratory.
