@@ -73,10 +73,16 @@ def log(msg: str) -> None:
 # --------------------------------------------------------------------------- data
 
 
-def load() -> pd.DataFrame:
+def load(years: int | None = 3) -> pd.DataFrame:
+    """Feature rows of the last `years` years (Week 7's period; None = every file). Pinned
+    because older quarters were added later for the Week 16 drift study, and they must not
+    change Week 7's split."""
     df = duckdb.sql(f"SELECT * FROM read_parquet('{FEAT}/*.parquet')").df()
     df["date"] = pd.to_datetime(df["date"])
     df["fail_date"] = pd.to_datetime(df["fail_date"])
+    if years is not None:
+        last = df["date"].max()
+        df = df[df["date"] > last - pd.DateOffset(years=years)].reset_index(drop=True)
     return df
 
 
