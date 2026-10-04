@@ -1,0 +1,37 @@
+{
+  "members": 20,
+  "test_rows": 983756,
+  "single_model": {
+    "pr_auc": 0.07432024457463113,
+    "roc_auc": 0.8844125555985145,
+    "ece": 0.00023247518233795208,
+    "slope": 0.9988332809866711,
+    "mean_p": 0.0013515058410058193,
+    "base_rate": 0.0011967775034238994
+  },
+  "ensemble_mean": {
+    "pr_auc": 0.13083453778601975,
+    "roc_auc": 0.8975885518305678,
+    "ece": 0.00037657039417633616,
+    "slope": 1.1590655224605522,
+    "mean_p": 0.0013358380925420888,
+    "base_rate": 0.0011967775034238994
+  },
+  "rel_width_median": 0.48274011844465853,
+  "rel_width_by_decile_of_p": {
+    "0": 0.34151599484983913,
+    "1": 0.4708189081432909,
+    "2": 0.5541030549268127,
+    "3": 0.3264138885427508,
+    "4": 0.2983248309817747,
+    "5": 0.5249755307894272,
+    "6": 2.155363757794333,
+    "7": 0.8272568612899734,
+    "8": 1.8136985918646022
+  },
+  "single_outside_interval_share": 0.0862927392564823,
+  "drive_day_tau_cost_tuned": 0.1,
+  "note": "tau is a 30-day host threshold from the simulator; drive-level p is smaller, so the straddle share is reported at tau / 4 (four drives per host) too",
+  "straddle_tau_share": 0.02295487905537552,
+  "straddle_tau_over_4_share": 0.04535270941168339
+}
