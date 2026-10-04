@@ -45,11 +45,10 @@ About 12 h.
   - mapping to the latent axis;
   - G1 class per cell and majority.
 - [x] Axis made precise before any estimate: pH = 0.30 is v1's tie-corrected Spearman under v1's margins, which is **0.375** on the latent axis (`rho_definition.md` step 6, `PROTOCOL.md` v0.2). Confirmed 4 Oct.
-- [ ] Run cells a, b and h, then `--analyse`; figure F3 draft (`v2_trace_rho.pdf`)
-  - **Dequeued 4 Oct, 17:35, by you; not started.** All three cells are downloaded (`data/v2/google/cell_{a,b,h}/raw`, about 60 GB on disk), and cell a's narrow copy is done and reused. To run, one job at a time with nothing else heavy running (each cell uses up to 4 GB):
-    `for c in a b h; do .venv/bin/python scripts/v2/13_trace_rho.py --cell $c; done && .venv/bin/python scripts/v2/13_trace_rho.py --analyse`
-    About 1.5-2 h. The first attempt on cell a hung in DuckDB on an uncapped connection; that connection is now capped like the others.
-- [ ] Mapping sensitivity (M2, M3) is in the table; if the sign changes, it goes in the first paragraph
+- [x] Run cells a, b and h, then `--analyse` (4 Oct, 19:57-20:07, after the owner re-queued it); figure F3 draft `results/figures/v2_trace_rho.pdf`; numbers in `results/v2/trace_rho.json` and `trace_rho_table.csv`.
+  - Two bugs fixed on the way: DuckDB 1.5.6 stalled at 0% CPU on the per-bucket query (a CTE shared by a UNION ALL of the three windows; each window now runs on its own, 16 buckets in about 50 s), and the analysis crashed when a per-machine proxy had different risk levels in each window (one latent curve per window, averaged). `lead()` now has a full tie-break, so results no longer vary between runs.
+  - **Primary result (M1, platform long-removal proxy, tau-b):** a -0.009 [-0.011, -0.007], b 0.003 [-0.004, 0.010], h 0.015 [0.007, 0.032]; on the latent axis the highest upper bound is 0.056, against pH_L = 0.375 and the C0 boundary 0.251. **Class C0 in all three cells; G1 majority C0.** The direct Spearman comparison gives C0 too.
+- [x] Mapping sensitivity (M2, M3) and the two other proxies are in the table. **The sign does change** (cell a: -0.009 under M1, +0.016 under M2; cell h's per-machine proxy is negative), so it goes in the first paragraph of `G1_decision.md`. Every estimate under every mapping, proxy and weight has \|tau-b\| ≤ 0.075, and every latent upper bound is ≤ 0.082: the conclusion (negligible correlation) does not depend on the choice.
 - [~] `docs/v2/G1_decision.md`: drafted from the result, **signed off by you**. The class is final under the protocol.
 
 ## Week 9 (30 Nov-6 Dec): citable v1 report

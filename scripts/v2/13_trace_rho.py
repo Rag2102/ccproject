@@ -500,6 +500,17 @@ def v1_margins(n_levels: int = 40) -> tuple[np.ndarray, np.ndarray]:
     return p_row, p_col
 
 
+def _col_margin(tab: np.ndarray, max_levels: int = 60, bins: int = 40) -> np.ndarray:
+    """Column margin of a table; many risk levels are binned to `bins` equal-mass bins."""
+    p_col = tab.sum(0) / tab.sum()
+    if len(p_col) > max_levels:
+        edges = np.linspace(0, 1, bins + 1)
+        cum = np.cumsum(p_col)
+        p_col = np.diff(np.interp(edges, np.r_[0, cum], np.r_[0, cum]))
+        p_col = p_col[p_col > 0]
+    return p_col
+
+
 def classify(lo: float, hi: float, ph: float, c0: float) -> str:
     """PROTOCOL.md section 7: A above, B straddle or too wide, C1 below, C0 below c0."""
     if hi - lo > 0.30:
@@ -550,14 +561,17 @@ def analyse() -> None:
                             )
                             for c, i, k, _ in cd.windows.values()
                         ]
-                        tab = sum(t / t.sum() for t in tabs)
-                        p_row, p_col = tab.sum(1) / tab.sum(), tab.sum(0) / tab.sum()
-                        if len(p_col) > 60:  # bin many risk levels for the copula curve
-                            edges = np.linspace(0, 1, 41)
-                            cum = np.cumsum(p_col)
-                            p_col = np.diff(np.interp(edges, np.r_[0, cum], np.r_[0, cum]))
-                            p_col = p_col[p_col > 0]
-                        g, v = curve(fn, p_row, p_col)
+                        if len({t.shape for t in tabs}) == 1:  # same risk levels in each window
+                            tab = sum(t / t.sum() for t in tabs)
+                            p_row = tab.sum(1) / tab.sum()
+                            g, v = curve(fn, p_row, _col_margin(tab))
+                        else:
+                            # levels differ by window (per-machine proxies): one curve per
+                            # window's margins, averaged over windows
+                            cs = [curve(fn, t.sum(1) / t.sum(), _col_margin(t))[1] for t in tabs]
+                            g, v = LATENT_GRID, np.mean(cs, axis=0)
+                            tab = sum(t.sum(1) / t.sum() for t in tabs)[:, None]
+                            p_row = tab[:, 0] / tab.sum()
                         lat = [invert(g, v, x) for x in (est, lo, hi)]
                         rows.append(
                             dict(
