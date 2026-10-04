@@ -221,11 +221,15 @@ def stage1(cell: str, keep_raw: bool, download_only: bool = False) -> None:
         return
     log(f"cell {cell}: downloaded in {time.time() - t0:.0f}s; aggregating")
     con = duckdb.connect()
+    # same caps as placements(): an uncapped connection hung here once (4 Oct, cell a)
+    con.execute(f"SET temp_directory='{out / '_duckdb'}'; SET memory_limit='4GB'; SET threads=4")
     for t in ("machine_events", "machine_attributes"):
         con.execute(
             f"COPY (SELECT * FROM read_parquet('{raw}/{t}-*.parquet')) TO '{out / t}.parquet' "
             "(FORMAT PARQUET)"
         )
+    con.close()
+    log(f"cell {cell}: machine tables copied")
     stats = placements(cell, raw, out)
     stats |= {
         "cell": cell,

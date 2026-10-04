@@ -2,9 +2,10 @@
 
 Each day the engine builds an Observation and calls `policy.decide(obs, budget_gb)`, which
 returns the VMs to migrate in priority order. The engine, not the policy, enforces the budget
-(it takes VMs in that order while their GB fit, stopping at the first that does not: the
-exact-budget rule, within one VM), picks each destination (power of two choices on p_H) and
-times the migrations. So every policy gets the same budget rule and the same destinations rule.
+(it takes VMs in that order, skipping any whose GB no longer fit and filling the remainder in
+order: the protocol's exact-budget rule, within one VM), picks each destination (power of two
+choices; the policy may rank the two candidates, by default on p_H) and times the migrations.
+So every policy gets the same budget rule and the same destinations rule.
 
 A policy sees only the Observation: scores, host state and the eligible VMs' attributes. It
 never sees failure times or VM departure times, except the oracle (P7), which declares

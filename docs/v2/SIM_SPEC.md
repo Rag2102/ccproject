@@ -1,6 +1,6 @@
 # Simulator v2: design specification (Week 10)
 
-Status: v0.1, 4 Oct 2026 (ahead of the calendar); the three open defaults were confirmed by the owner on 4 Oct. Source: v5 plan Part I section 7 (architecture, parameters, validation), v3 section 3.1 (BAM), `PROTOCOL.md` v0.2 (policies, regimes, accounting), v1's code for the regression values. The test for this document (Week 10 card): someone can implement from it without asking a question. Items left open are listed in section 15.
+Status: v0.2, 4 Oct 2026 (ahead of the calendar). v0.1's three open defaults were confirmed by the owner on 4 Oct. v0.2 records how Week 13 built it (sections 2, 3, 5, 10, 13 and 14; the change list is at the end). Source: v5 plan Part I section 7 (architecture, parameters, validation), v3 section 3.1 (BAM), `PROTOCOL.md` v0.2 (policies, regimes, accounting), v1's code for the regression values. The test for this document (Week 10 card): someone can implement from it without asking a question. Items left open are listed in section 15.
 
 ## 1. What the simulator must do
 
@@ -10,8 +10,9 @@ Status: v0.1, 4 Oct 2026 (ahead of the calendar); the three open defaults were c
 
 ## 2. Time model
 
-- Time t is in seconds from the start of the run, stored as float64; day d = floor(t / 86,400).
-- **Hybrid.** At the start of each day a SCORE_TICK scores every host at once (vectorised). Within the day, a heap of timed events (failures, migration ends, VM arrivals and departures) is processed in time order.
+- Time t is in days from the start of the warm-up, stored as float64; day d = floor(t). Durations (migrations, blackouts) are in seconds.
+- **Day-stepped, exact within the day (v0.2).** At each daily tick, in order: settle migrations that ended before the tick; free the memory of VMs that departed during the previous day; repair hosts due; score every host; place the day's arrivals; take the policy's plan and time its migrations. Then the day's host failures are resolved one by one in time order, each against the exact times of that day's arrivals, departures and migrations. v0.1 planned one heap of per-VM events; at about 16 million arrivals per run that misses the run-time target by an order of magnitude, and the batch gives the same outcomes at the resolution that matters (who is on a host when it fails).
+- **Conservative capacity.** An arrival reserves memory from its day's tick; a departed VM's memory is freed at the next tick; a migration holds memory on both hosts until it is settled. Capacity is never over-committed.
 - **Tie order** at equal t: HOST_FAIL, then MIG_END, VM_DEPART, VM_ARRIVE, MIG_START. A failure at the same instant as a migration end therefore interrupts the VM: the conservative choice, and the one a property test checks.
 - Horizon T ∈ {180, 365} days plus a 30-day warm-up whose costs are not counted (it fills the cluster to its steady state).
 
@@ -21,7 +22,7 @@ Status: v0.1, 4 Oct 2026 (ahead of the calendar); the three open defaults were c
 | --- | --- | --- |
 | Host | `id`, `state` (UP, AVOID, DOWN), `cap_gb`, `used_gb`, `nic_gbps`, `n_active_mig`, `drives[d]` (indices), `fail_t` (pre-drawn), `repair_t`, `rack` | AVOID = no new allocations. DOWN from failure until repair; on repair the host returns empty, with new drives (age 0) |
 | Drive | `id`, `host`, `model`, `cap_tb`, `age0_days`, `fail_t` (or +inf), `source_serial` | Replayed: a real Backblaze drive (life table + daily scores) re-timed onto the run's clock. Sampled: drawn from the hazard model |
-| VM | `id`, `host`, `state` (RUNNING, MIGRATING, DONE, INTERRUPTED), `mem_gb`, `vcores`, `tier`, `w_tier`, `dirty_mbps`, `t_arrive`, `t_depart`, `crit_latent` | `t_depart` is pre-drawn from the lifetime distribution, so it is the same for every policy |
+| VM | `id`, `host`, `state` (RUNNING, MIGRATING, DONE, INTERRUPTED), `mem_gb`, `vcores`, `tier`, `w_tier`, `dirty_mbps`, `t_arrive`, `t_depart`, `crit_latent` | `t_depart` is pre-drawn from the lifetime distribution, so it is the same for every policy. **Residents and transients (v0.2):** VMs living at least a day are simulated individually (12% of Azure VMs, 92% of memory-time). Shorter ones are charged at each host failure: their number is Poisson with the mean present per host, and they are drawn length-biased from the short-lived VMs, both from the `failures` stream. No policy may migrate a VM younger than 24 h, which every real operator could also see, so this is no information leak, and transients cost every policy the same. Arrivals are Poisson, with the rate set so residents fill `init_fill` × their share of memory-time |
 | Migration | `vm`, `src`, `dst`, `t_start`, `t_end`, `gb`, `blackout_s`, `status` (RUNNING, DONE, FAILED) | FAILED = the source failed before `t_end`: the VM is interrupted |
 | Event | heap of (t, kind, payload), with kind order as in section 2 | `HOST_FAIL`, `SCORE_TICK`, `MIG_START`, `MIG_END`, `VM_ARRIVE`, `VM_DEPART`, plus `HOST_REPAIR` |
 
@@ -52,7 +53,9 @@ All costs are in customer-impact minutes (v1's unit), split into two reported co
 | Unnecessary migration | Every other completed migration | Metric only |
 | Failed in-flight migration | Interruption cost and migration cost both charged | |
 
-The **budget** is GB migrated per cluster per day: B = b × (cluster memory), with b ∈ {0.5, 1, 2, 5}%. A migration's GB is charged when it starts. A run that exceeds the budget on any day is invalid (property test). Counts are reported next to GB.
+The **budget** is GB migrated per cluster per day: B = b × (cluster memory), with b ∈ {0.5, 1, 2, 5}%. The engine fills it in the policy's order, skipping any VM that no longer fits (the protocol's exact-budget rule, within one VM). A migration's GB is charged when it is planned and refunded if it never starts. A run that exceeds the budget on any day is invalid (property test). Counts are reported next to GB.
+
+**Transient cost** is reported separately (`cost_interrupt_transient`). It is identical for every policy in a seed, so it changes no paired difference, but it is part of the total that Delta divides by.
 
 ## 6. Migration model
 
@@ -112,7 +115,9 @@ At each arrival, choose among UP hosts with capacity:
 - **Default:** BAM and P3 use c_i × s_i, where s_i is the probability that VM i is still running H days ahead given its current age, from the empirical Azure lifetime distribution. A policy may know a VM's age; it may not know `t_depart`.
 - Both versions are run as an ablation in Week 20.
 
-**Destination:** power of two choices. Draw two random UP hosts with capacity and pick the one with lower p_H.
+**Destination:** power of two choices. Draw two random UP hosts with capacity and pick the one with lower p_H. (v0.2) A policy may rank the two candidates with its own key; every policy uses p_H except the oracle P7, which takes the candidate that fails later.
+
+**Interface as built (v0.2):** `Policy.decide(obs, budget_gb) -> VM ids in priority order`. The engine applies the budget rule, chooses destinations and times the migrations, so every policy gets the same rules. The `Observation` carries scores, host state and the eligible VMs' size, tier, age, c_i, s_i and m_i. Only the oracle (P7) also gets failure and departure times.
 
 ## 11. Parameters
 
@@ -153,7 +158,7 @@ At each arrival, choose among UP hosts with capacity:
 
 - Package `vmsim/` (plan Part I section 6): `config.py`, `rng.py`, `entities.py` (structure of arrays), `placement.py`, `failure.py`, `predictor.py`, `migration.py`, `accounting.py`, `engine.py` (event heap), `policies/`. The policies are pure functions of (state view, scores, budget, rng).
 - Daily scoring is vectorised over hosts. The per-VM loop runs only inside a policy's plan, over hosts with p above a floor, and inside the event loop.
-- **Performance target, checked in Week 13:** one (policy, seed) run of 5,000 hosts × 365 days in **≤ 10 s on one core** of this Mac. The main matrix is about 16,000 such runs (n ≈ 30 seeds × about 15 regime cells × 4 budgets × 9 policies), about 45 core-hours, or about 6 hours on 8 cores. If the target is missed, the cut order is R3's: shrink hosts before cutting seeds.
+- **Performance target, checked in Week 13:** one (policy, seed) run of 5,000 hosts × 365 days in **≤ 10 s on one core** of this Mac. **Met (4 Oct):** 2.0-4.8 s across the reference policies, peak memory 1.8 GB (`results/v2/g2_validation.json`). The main matrix is about 16,000 such runs (n ≈ 30 seeds × about 15 regime cells × 4 budgets × 9 policies), about 45 core-hours, or about 6 hours on 8 cores. If the target is missed, the cut order is R3's: shrink hosts before cutting seeds.
 
 ## 14. Validation (gate G2)
 
@@ -166,13 +171,23 @@ At each arrival, choose among UP hosts with capacity:
      - cluster-wide gaps between failures fit a Weibull shape of 0.99-1.03 (coefficient of variation 0.96-1.06), close to exponential, as expected for many independent hosts pooled together;
      - time to a host's first failure has shape 1.5-1.7 (rising hazard, from v1's age curves);
      - 0.09, 0.14 and 0.23 failures per host-year at 0×, 1× and 3× non-disk hazard.
-   - **Still to do:** the comparison with node logs needs per-node times between failures, so repaired hosts must fail again. That arrives with the Week 13 engine.
+   - **With repairs** (Week 13): per-node uptime between failures has Weibull shape 0.94 (1× non-disk) and 0.98 (3×), median 73-91 days. Node logs are reported with a decreasing hazard (shape about 0.7-0.8, Schroeder and Gibson 2006; **to verify against the paper**). The simulated hazard decreases less: recorded as a limitation.
 6. **Run time:** section 13.
 
 ## 15. Open items
 
 - Confirmed 4 Oct: survival-weighted c_i in BAM and P3, with the unweighted version as an ablation; initial fill 70%; a repaired host returns empty with new drives.
 - To verify against sources: Narya's scoring cadence; Clark et al.'s round and stop thresholds.
-- Week 11 calibrates the A-regime placement's ρ_L to the achieved τ-b, using the same contingency code as `scripts/v2/13_trace_rho.py`.
+- Week 11 calibrates the A-regime placement's ρ_L to the achieved τ-b, using the same contingency code as `scripts/v2/13_trace_rho.py`. **As built (Week 14):** `vmsim/copula.py` converts ρ_L to the tie-corrected Spearman under the simulator's margins (resident tier shares 49/27/24% low/medium/high; continuous host risk). The placement targets that value; `scenarios.regime` gives A1-A7 and C. Arrivals during the run use the world's blend weight in daily batches, and the achieved correlation of the VMs present is logged every 30 days (`rho_tier_risk`).
+
+## Changes in v0.2 (Week 13, 4 Oct 2026)
+
+1. Day-stepped engine with exact times inside each day (section 2), instead of one event heap: needed for the run-time target.
+2. Residents and transients, and the 24-hour minimum age for migration (section 3).
+3. Budget filled in the policy's order, skipping VMs that no longer fit (section 5).
+4. A policy may rank the two destination candidates; only the oracle uses another key than p_H (section 10).
+5. CRN in placement: one pre-drawn uniform per arrival for its first-choice host, and per-day generators keyed by day (section 7's contract, now also for placement).
+6. The initial population is the residents present at a random instant: drawn length-biased, with uniform elapsed ages.
+7. Repairs: a host returns at the first daily tick after its repair time, with new drives (age 0) of the same models and the first life's non-disk scale; the oracle scores it by days since the repair, never by its next failure time.
 
 Reader test (Week 10 card): ask someone to read this for 30 minutes and list every question they would have to ask before implementing. Each question is an edit to this file.

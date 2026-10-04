@@ -6,7 +6,8 @@ Day-stepped with exact times inside the day. Each daily tick, in this order:
      so capacity is never over-committed);
   3. repairs due by this tick (the host comes back empty, with new drives);
   4. score every host (predictor) and place the day's arrivals (placement regime);
-  5. the policy's plan: the engine takes its VMs in order within the GB budget, picks each
+  5. the policy's plan: the engine takes its VMs in order while their GB fit the budget
+     (skipping any VM that does not fit and filling the remainder in order), picks each
      destination by power of two choices on p_H and times the migrations (migration.py);
   6. host failures during the day, in time order, each resolved at its exact time against
      arrivals, departures and migrations (a failure at the same instant as a migration's end
@@ -349,10 +350,13 @@ def run(
         left = budget
         free = cap - used
         up_hosts = np.flatnonzero(state == UP)
+        min_mem = float(V["mem"][plan].min()) if len(plan) else 0.0
         for v in plan:
+            if left < min_mem - 1e-9:
+                break
             mem = V["mem"][v]
             if mem > left + 1e-9:
-                break  # exact-budget rule: stop at the first VM that does not fit
+                continue  # exact-budget rule: fill the remainder in the policy's order
             src = vm_host[v]
             best = -1
             got = 0

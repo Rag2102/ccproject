@@ -2,11 +2,28 @@
 
 Sunday ritual (15 minutes): update this log, tick the week's "done when", log any cut as an ADR, re-read the next gate's criteria, update `CAPACITY.md` for the coming month, write Monday's first task. Newest week first. Hours are yours to fill; nothing here is estimated.
 
+## Weeks 11-14 (14 Dec 2026-10 Jan 2027)
+- planned hours: 12 × 4   actual hours: __
+- done (4 Oct, ahead of the weeks): the simulator `vmsim/` end to end. Engine, migration, accounting, repairs, reference policies P0-P3, P7 and P8, P2 tuning, A regimes on the latent axis. G2 evidence: analytic, self-calibration, exact v1 regression, invariants, run time 2-5 s per run (target 10 s). Weeks 11-12 code was committed earlier the same day (see `TASKS_W11-W14.md`)
+- slipped (and why): `TrainedModel` and worlds for eval seeds 1-30 (wait for the model choice); B1 pilot cell (waits for Week 8); G2 sign-off and tag `sim-v2.0` (yours, with the advisor)
+- decisions made:
+  - engine is day-stepped with exact times inside the day, and VMs shorter than a day are charged as transients (`SIM_SPEC.md` v0.2; needed for the run-time target)
+  - budget filled in each policy's order, skipping VMs that no longer fit (the protocol's wording; the first version stopped at the first misfit and left about 10% unspent)
+- decisions for you:
+  - P2 tuning criterion: the protocol's "use the budget" makes P2 worse than never migrating; proposal: tune to lowest cost on dev seeds (P2c). Both are in the pilot
+  - which Week 7 model the simulator uses (proposal: by validation PR-AUC)
+- found: the earlier "v1 accounting mode" idea is unnecessary. With static VMs, realised accounting is v1's accounting; what changes v1's result is VM churn
+- risks changed: R3 (compute) eased: the full matrix is about 2 h on 8 cores at 5,000 hosts
+- next task: read the pilot's SD of Delta and draft the scale ADR
+
 ## Week 9 (30 Nov-6 Dec 2026)
 - decision (4 Oct 2026): **skipped.** The citable v1 report is optional in the plan, and no application needs it before the v2 paper exists. The week's hours move to Week 10 (simulator spec). If it is revived later, it needs a dated correction section: the report presents the -3.1% at rho = 0 as a real result, and Week 3 showed it is mostly an accounting artifact (`v1_anomaly.md`)
 
 ## Weeks 7-8 (16-29 Nov 2026)
-- started 4 Oct, ahead of the calendar, in parallel with the Week 4 ingest; entries completed when the runs finish
+- started 4 Oct, ahead of the calendar, in parallel with the Week 4 ingest
+- Week 7 done (4 Oct): model v2 at H = 30, PR-AUC 0.074 against 0.0018 for v1's features on the same temporal split; ROC-AUC 0.884; ECE 2.3 × 10⁻⁴; leakage audit clean. The features step first ran out of memory (one pass over all 45 quarters) and now builds its drive table one quarter at a time
+- found: logistic regression has a higher test PR-AUC than boosting (0.091 vs 0.074); rolling-origin PR-AUC drops to 0.044 in the last fold
+- Week 8: all three cells downloaded; cell a's aggregation hung in DuckDB on an uncapped connection (fixed, restarted after the Week 14 pilot)
 
 ## Weeks 4-6 (26 Oct-15 Nov 2026)
 - planned hours: 12 + 5 + 5   actual hours: __

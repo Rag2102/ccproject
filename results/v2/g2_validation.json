@@ -1,0 +1,156 @@
+{
+  "analytic": {
+    "hosts": 20000,
+    "daily_hazard": 0.01,
+    "days": 30,
+    "p_T": 0.2602996266117198,
+    "expected": 5205.992532234396,
+    "never": {
+      "z_by_seed": [
+        0.1,
+        -1.29,
+        0.44,
+        -0.92,
+        2.61
+      ],
+      "max_abs_z": 2.6106902337335036
+    },
+    "move_all_day0": {
+      "z_by_seed": [
+        0.76,
+        -2.24,
+        -0.06,
+        -0.23,
+        2.1
+      ],
+      "max_abs_z": 2.2398130868339385
+    }
+  },
+  "self_calibration": {
+    "host_windows": 8992,
+    "observed": 109,
+    "expected": 111.9,
+    "z": -0.28,
+    "deciles": [
+      {
+        "decile": 1,
+        "observed": 5,
+        "expected": 5.7,
+        "z": -0.28
+      },
+      {
+        "decile": 2,
+        "observed": 8,
+        "expected": 6.8,
+        "z": 0.45
+      },
+      {
+        "decile": 3,
+        "observed": 5,
+        "expected": 7.6,
+        "z": -0.93
+      },
+      {
+        "decile": 4,
+        "observed": 8,
+        "expected": 8.1,
+        "z": -0.04
+      },
+      {
+        "decile": 5,
+        "observed": 6,
+        "expected": 8.7,
+        "z": -0.92
+      },
+      {
+        "decile": 6,
+        "observed": 12,
+        "expected": 9.3,
+        "z": 0.9
+      },
+      {
+        "decile": 7,
+        "observed": 9,
+        "expected": 9.9,
+        "z": -0.3
+      },
+      {
+        "decile": 8,
+        "observed": 12,
+        "expected": 10.9,
+        "z": 0.35
+      },
+      {
+        "decile": 9,
+        "observed": 10,
+        "expected": 12.4,
+        "z": -0.68
+      },
+      {
+        "decile": 10,
+        "observed": 34,
+        "expected": 32.6,
+        "z": 0.24
+      }
+    ],
+    "max_abs_decile_z": 0.93
+  },
+  "v1_regression": {
+    "hosts": 122618,
+    "vms": 2013767,
+    "tau95": 0.007307951948433355,
+    "cost_sensitive": {
+      "cost": 456532.73059018864,
+      "migrations": 5116,
+      "necessary": 1419,
+      "missed_failures": 5493,
+      "v1_cost": 456533,
+      "rel_diff": -5.901212208891948e-07,
+      "v1_migrations": 5116
+    },
+    "threshold_naive": {
+      "cost": 410866.9487854554,
+      "migrations": 7980,
+      "necessary": 2040,
+      "missed_failures": 4872
+    },
+    "threshold_matched": {
+      "cost": 442700.7434314229,
+      "migrations": 5522,
+      "necessary": 1601,
+      "missed_failures": 5311,
+      "v1_cost": 442701,
+      "rel_diff": -5.795527389107491e-07,
+      "v1_migrations": 5522
+    },
+    "delta_cs_vs_matched": -0.031244553717150885,
+    "pass": true
+  },
+  "run_time": {
+    "hosts": 5000,
+    "days": 395,
+    "target_s": 10.0,
+    "machine": "macOS-26.5.1-arm64-arm-64bit",
+    "P0": {
+      "wall_s": 2.02,
+      "migrations": 0
+    },
+    "P1": {
+      "wall_s": 3.45,
+      "migrations": 192487
+    },
+    "P3": {
+      "wall_s": 2.22,
+      "migrations": 12585
+    },
+    "P7": {
+      "wall_s": 2.18,
+      "migrations": 12821
+    },
+    "P8": {
+      "wall_s": 4.81,
+      "migrations": 548857
+    },
+    "max_s": 4.81
+  }
+}
