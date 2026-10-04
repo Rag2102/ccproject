@@ -48,6 +48,7 @@ dev = [
     { name = "ruff" },
 ]
 research = [
+    { name = "certifi" },
     { name = "duckdb" },
     { name = "pyarrow" },
 ]
@@ -72,6 +73,7 @@ dev = [
     { name = "ruff", specifier = "==0.8.6" },
 ]
 research = [
+    { name = "certifi", specifier = "==2026.7.22" },
     { name = "duckdb", specifier = "==1.5.6" },
     { name = "pyarrow", specifier = "==25.0.1" },
 ]

@@ -68,9 +68,28 @@ Also report a **dispersion** measure: the Gini coefficient of the share of high-
 - **Interval:** BCa, falling back to the percentile interval if the acceleration estimate is unstable; say which one was used.
 - Placements on the same machine share the same risk value and are not independent, so resampling placements would make the interval too narrow.
 
-## Step 6: from ρ̂ to the simulator's axis
+## Step 6: from ρ̂ to the simulator's axis (made precise 4 Oct 2026, before any estimate)
 
-v1's sweep uses a latent Gaussian-copula ρ_L, not a rank correlation of a three-level score. Week 11 builds the provisional curve: simulate placements at each ρ_L with the measured tier shares and number of risk levels, measure τ-b the same way, and invert. G1 compares the mapped ρ_L interval with pH = 0.30, as in `PROTOCOL.md` section 7.
+**What 0.30 means.** v1's sweep (`scripts/07_correlated_assignment_experiment.py`) reports its achieved correlation as the tie-corrected Spearman between VM criticality weight (3 levels) and host risk score (16 levels), across VMs. The break-even pH = 0.30 is therefore a Spearman value **under v1's margins**:
+- tier shares 38.8 / 58.2 / 3.0% (low / medium / high);
+- v1's distribution of host risk.
+
+A rank correlation's range depends on its margins, so the same statistic computed on Google placements is not on the same scale.
+
+**Common axis.** Both are put on the latent Gaussian-copula ρ_L:
+- **The threshold:** pH_L is the ρ_L at which a Gaussian copula with v1's margins gives Spearman 0.30. It is computed exactly from bivariate normal cell probabilities, without simulation noise. **pH_L = 0.375.**
+- **The C0/C1 boundary:** 0.20 is converted the same way.
+- **Each cell:** ρ̂_L is the ρ_L at which a Gaussian copula with **that cell's** margins (placement-weighted tier shares and risk distribution) gives the observed τ-b. The CI endpoints are mapped the same way; the curve is monotone.
+- **G1** compares ρ̂_L's interval with pH_L.
+
+The curve replaces the "provisional curve (W11)" for G1. Week 11 may refine it for the simulator but cannot re-classify (`PROTOCOL.md` section 7).
+
+**Also reported:** the direct reading, Google's tie-corrected Spearman against 0.30. It ignores the margin difference and is shown for transparency only.
+
+**Details fixed with this step:**
+- A removal counts towards window w's proxy only if its 24-hour follow-up ends before the window starts, so whether it is long is known by then.
+- BCa acceleration uses a grouped jackknife over 100 random machine groups, because a full jackknife over about 12,000 machines is too slow. If the bias correction is not finite, or |a| > 0.25, the percentile interval is used, and the table says which interval each row uses.
+- Risk proxy (b) uses gamma-Poisson shrinkage with the prior strength set by the method of moments within each platform.
 
 ## Threats to validity
 
