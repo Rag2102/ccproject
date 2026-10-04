@@ -27,8 +27,16 @@ ORDERS = ("smallest", "largest", "random")
 COST_GRID = tuple(np.round(10 ** np.linspace(-3.5, 0, 15), 8)) + (2.0,)  # 2.0: never migrate
 
 
-def _evaluate(preps, budget_frac, tau, order):
-    rs = [engine.run(p, Threshold(tau, order, "P2"), budget_frac=budget_frac) for p in preps]
+def _evaluate(preps, budget_frac, tau, order, predictor=None):
+    rs = [
+        engine.run(
+            p,
+            Threshold(tau, order, "P2"),
+            predictor=None if predictor is None else predictor(p),
+            budget_frac=budget_frac,
+        )
+        for p in preps
+    ]
     return (
         float(np.mean([r["budget_utilisation"] for r in rs])),
         float(np.mean([r["cost_total"] for r in rs])),
@@ -45,26 +53,29 @@ def tune_p2(
     hi: float = 0.0,
     steps: int = 12,
     grid=COST_GRID,
+    predictor=None,
 ) -> dict:
-    """preps: engine.Prepared for each dev seed. Returns tau, order and the per-order table."""
+    """preps: engine.Prepared for each dev seed. Returns tau, order and the per-order table.
+    predictor: optional callable prep -> predictor (Week 20 robustness: P2 is tuned on the scores
+    it will see); None is the oracle, as in the frozen matrix."""
     table = []
     for order in orders:
         if criterion == "cost":
-            res = [(t, *_evaluate(preps, budget_frac, t, order)) for t in grid]
+            res = [(t, *_evaluate(preps, budget_frac, t, order, predictor)) for t in grid]
             t, u, c = min(res, key=lambda r: r[2])
             table.append({"order": order, "tau": t, "util": u, "cost": c, "reached": True})
             continue
         if criterion != "budget":
             raise ValueError(f"unknown criterion {criterion!r}")
         a, b = lo, hi  # utilisation is non-increasing in tau
-        ua, ca = _evaluate(preps, budget_frac, 10**a, order)
+        ua, ca = _evaluate(preps, budget_frac, 10**a, order, predictor)
         if ua < target_util:
             table.append({"order": order, "tau": 10**a, "util": ua, "cost": ca, "reached": False})
             continue
         best = (10**a, ua, ca)
         for _ in range(steps):
             mid = (a + b) / 2
-            u, c = _evaluate(preps, budget_frac, 10**mid, order)
+            u, c = _evaluate(preps, budget_frac, 10**mid, order, predictor)
             if u >= target_util:
                 a, best = mid, (10**mid, u, c)
             else:

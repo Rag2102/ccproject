@@ -26,7 +26,7 @@ from __future__ import annotations
 import functools
 import hashlib
 import time
-from dataclasses import dataclass
+from dataclasses import dataclass, replace
 from pathlib import Path
 
 import numpy as np
@@ -239,6 +239,11 @@ def run(
     cap = np.full(n_hosts, float(cfg.host_mem_gb))
     budget = bfrac * cap.sum()
     mc = cfg.migration
+    # realised migrations (Week 20 cost-model error); identical to mc when both factors are 1
+    mc_true = (
+        mc if mc.true_bw_factor == 1.0 else replace(mc, nic_gbps=mc.nic_gbps * mc.true_bw_factor)
+    )
+    dirty_true = mc.true_dirty_factor
     policy.reset()
     ab = cfg.placement.arrival_blend
     blend = float(prep.world.place_blend) if ab is None else float(ab)
@@ -448,9 +453,8 @@ def run(
             src = vm_host[sel]
             if check and (state[dsts] != UP).any():
                 raise InvariantError(f"day {d}: migration to a host that is not up")
-            ts, te, dur, blk, _ = migration.schedule(
-                src, V["mem"][sel], V["dirty"][sel], float(d), mc
-            )
+            dirty = V["dirty"][sel] if dirty_true == 1.0 else V["dirty"][sel] * dirty_true
+            ts, te, dur, blk, _ = migration.schedule(src, V["mem"][sel], dirty, float(d), mc_true)
             cost = migration.migration_cost_min(V["w"][sel], dur, blk, cfg.cost)
             np.add.at(fb_mcost, src, cost)
             np.add.at(fb_gb, src, V["mem"][sel])

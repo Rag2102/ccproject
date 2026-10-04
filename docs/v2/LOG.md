@@ -2,6 +2,34 @@
 
 Sunday ritual (15 minutes): update this log, tick the week's "done when", log any cut as an ADR, re-read the next gate's criteria, update `CAPACITY.md` for the coming month, write Monday's first task. Newest week first. Hours are yours to fill; nothing here is estimated.
 
+## Weeks 17-20 (25 Jan-21 Feb 2027)
+- planned hours: 12 × 4   actual hours: __
+- done (4-5 Oct, ahead of the weeks):
+  - Week 17:
+    - THEORY.md (T1-T4; T4 partly false as stated), with a Monte Carlo check at 3,024 points, all in tolerance;
+    - the break-even surface, and the v1 anomaly closed;
+    - PROTOCOL v1.0 frozen with the matrix and scenario cards (tags `protocol-v1.0`, `v2.0-rc1`, `v2.0-rc2`);
+    - the runner, statistics and F4 scripts, and a full dry run (528 of 528 cells);
+    - the Approach section of the paper.
+  - Earlier gaps closed: the benchmark schemas, regimes E and B2, and the tier-margin bug in the latent axis (regimes recalibrated).
+  - Week 18: the launcher is ready. The P2 pre-filter bug was found in tuning and fixed before any evaluation run (CHANGES_AFTER_FREEZE).
+  - Weeks 19-20: every script and runner built and smoke-tested (`TASKS_W19-W20.md`).
+  - Site: redesign, a v2 research section, and the v2 ensemble in the live demo (`ui-redesign` branch).
+- slipped (and why): the evaluation runs for Weeks 18-20. They take about 12 h of compute and run overnight on your machine (`scripts/v2/run_overnight.sh`).
+- decisions made:
+  - ADR-007: 2,000 hosts × 365 days, n = 30, with an SD-triggered extension;
+  - ADR-008: the oracle for the main matrix;
+  - natural cost spread in A;
+  - P5 = faithful variant;
+  - Week 20: P2 retuned per robustness setting, Morris in the repo, model-based worlds deferred past Week 21.
+- found:
+  - the advantage of cost-aware selection is driven by cost spread and is largest near ρ = 0 (theory);
+  - flattening miscalibration is the dangerous direction for BAM;
+  - v1's +0.2% under consistent accounting matches the closed form;
+  - the deployed ensemble's test PR-AUC is 0.103 (one calibration on the mean), not Week 16's 0.131.
+- risks changed: R3 (compute): the full matrix plus Week 20 is about 12 h on 8 cores, run overnight
+- next task: run `scripts/v2/run_overnight.sh`; then statistics and the A and E paragraph before opening B and C
+
 ## Weeks 15-16 (11-24 Jan 2027)
 - planned hours: 12 × 2   actual hours: __
 - done (4 Oct, ahead of the weeks):
