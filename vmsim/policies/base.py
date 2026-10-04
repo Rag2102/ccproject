@@ -7,9 +7,10 @@ order: the protocol's exact-budget rule, within one VM), picks each destination 
 choices; the policy may rank the two candidates, by default on p_H) and times the migrations.
 So every policy gets the same budget rule and the same destinations rule.
 
-A policy sees only the Observation: scores, host state and the eligible VMs' attributes. It
-never sees failure times or VM departure times, except the oracle (P7), which declares
-`oracle = True` and gets `obs.truth`.
+A policy sees only the Observation: scores, host state, the eligible VMs' attributes and
+yesterday's outcomes (Feedback: which hosts failed and what was charged, as an operator would
+see them). It never sees future failure times or VM departure times, except the oracle (P7),
+which declares `oracle = True` and gets `obs.truth`.
 """
 
 from __future__ import annotations
@@ -23,6 +24,16 @@ import numpy as np
 class Truth:
     host_next_fail: np.ndarray  # failure time (days) of each host's current life
     vm_t_depart: np.ndarray  # departure time of each eligible VM (same order as obs.vm)
+
+
+@dataclass(frozen=True)
+class Feedback:
+    """What happened during the previous day: outcomes an operator observes after the fact."""
+
+    failed: np.ndarray  # hosts that failed
+    interrupt_cost: np.ndarray  # per host: interruption cost charged on it (resident + transient)
+    migration_cost: np.ndarray  # per host: migration cost charged with it as the source
+    migrated_gb: np.ndarray  # per host: GB that started migrating off it
 
 
 @dataclass(frozen=True)
@@ -44,6 +55,9 @@ class Observation:
     vm_mig_s: np.ndarray  # duration estimate, seconds
     rng: np.random.Generator
     truth: Truth | None = None
+    feedback: Feedback | None = None
+    host_avoid: np.ndarray | None = None  # per host: currently marked avoid-allocation
+    host_life_start: np.ndarray | None = None  # day the host's current life began (-1: first)
 
 
 class Policy:
@@ -52,6 +66,12 @@ class Policy:
 
     def decide(self, obs: Observation, budget_gb: float) -> np.ndarray:
         raise NotImplementedError
+
+    def avoid(self, obs: Observation) -> np.ndarray | None:
+        """Hosts to mark avoid-allocation from today (bool per host), or None for no change.
+        Called after decide(). A marked host takes no new VMs and is never a destination; a
+        repair clears the mark. Only P5 uses it."""
+        return None
 
     def dest_key(self, obs: Observation) -> np.ndarray:
         """Per-host key for choosing between the two random destination candidates (lower is

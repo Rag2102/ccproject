@@ -45,7 +45,7 @@ from vmsim.accounting import (
 )
 from vmsim.config import SimConfig, from_dict
 from vmsim.entities import MIN_MIGRATE_AGE_DAYS, azure_table, split, survival
-from vmsim.policies.base import Observation, Policy, Truth
+from vmsim.policies.base import Feedback, Observation, Policy, Truth
 from vmsim.predictor import Miscalibrated, Noisy, RenewalOracle
 from vmsim.rng import Streams
 from vmsim.worlds import World, n_days
@@ -233,6 +233,11 @@ def run(
     sched = prep.sched
     sp = 0
     gb_day: dict[int, float] = {}
+    fb_failed: list[int] = []
+    fb_icost = np.zeros(n_hosts)
+    fb_mcost = np.zeros(n_hosts)
+    fb_gb = np.zeros(n_hosts)
+    feedback = None
 
     def close(mid: int, status: int, t: float):
         M_status[mid] = status
@@ -278,7 +283,7 @@ def run(
 
         # 3. repairs
         rep = np.flatnonzero((state == DOWN) & (repair_day <= d))
-        state[rep] = UP
+        state[rep] = UP  # also clears an avoid mark
         used[rep] = 0.0
         life_start[rep] = d
 
@@ -341,8 +346,17 @@ def run(
             vm_mig_s=V["mig_s_est"][el],
             rng=rng_pol,
             truth=Truth(host_next_fail, V["t_dep"][el]) if policy.oracle else None,
+            feedback=feedback,
+            host_avoid=state == AVOID,
+            host_life_start=life_start,
         )
         plan = np.asarray(policy.decide(obs, budget), dtype=np.int64) if budget > 0 else []
+        # avoid-allocation marks (zero budget means no mitigation action of any kind)
+        mark = policy.avoid(obs) if budget > 0 else None
+        if mark is not None:
+            mark = np.asarray(mark, dtype=bool)
+            state[(state == UP) & mark] = AVOID
+            state[(state == AVOID) & ~mark] = UP
         if check and len(plan):
             if len(np.unique(plan)) != len(plan) or not np.isin(plan, el).all():
                 raise InvariantError(f"day {d}: plan has duplicates or ineligible VMs")
@@ -386,6 +400,8 @@ def run(
                 src, V["mem"][sel], V["dirty"][sel], float(d), mc
             )
             cost = migration.migration_cost_min(V["w"][sel], dur, blk, cfg.cost)
+            np.add.at(fb_mcost, src, cost)
+            np.add.at(fb_gb, src, V["mem"][sel])
             base = len(M_status)
             for k, col in (
                 ("vm", sel),
@@ -416,6 +432,7 @@ def run(
                 if state[h] == DOWN:
                     raise InvariantError(f"host {h} failed while down")
             last_t = tf
+            n_it = len(ledger.interrupts)
             _fail(
                 h,
                 tf,
@@ -436,6 +453,8 @@ def run(
                 ledger,
             )
             ledger.transient(tf, h, prep.transient_n[sp], prep.transient_cost[sp])
+            fb_failed.append(h)
+            fb_icost[h] += prep.transient_cost[sp] + sum(r[4] for r in ledger.interrupts[n_it:])
             state[h] = DOWN
             used[h] = 0.0
             epoch[h] += 1
@@ -444,6 +463,9 @@ def run(
             host_next_fail[h] = next_fail(h)
             sp += 1
         alive = alive[vm_state[alive] == RUNNING]
+        feedback = Feedback(np.array(fb_failed, dtype=np.int64), fb_icost, fb_mcost, fb_gb)
+        fb_failed, fb_icost, fb_mcost = [], np.zeros(n_hosts), np.zeros(n_hosts)
+        fb_gb = np.zeros(n_hosts)
 
         rho = np.nan
         if d % RHO_EVERY_DAYS == 0 and len(alive) > 10:
