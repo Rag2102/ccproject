@@ -11,7 +11,7 @@ This file records exactly what v1 was when v2 started. The frozen copies are in 
 | Commits on main | 10 |
 | Tags | none on the remote before this file; `v1.0-course` is created in Week 1 |
 | Python used for the checks below | 3.12.14 (macOS, venv from `requirements.txt` + `requirements-dev.txt`) |
-| Python pins | `.python-version` says 3.11.15, `ci.yml` and the Lambda image use 3.12. v2 uses 3.12 (see docs/v2/decisions/ADR-004-python-3.12.md) |
+| Python pins | `.python-version` says 3.11.15, `ci.yml` and the Lambda image use 3.12. v2 uses 3.12 (see docs/v2/DECISIONS/ADR-004-python-3.12.md) |
 | Package pins | `v1_reference/pip_freeze_py312.txt` |
 
 ## Checks run on 4 Oct 2026
@@ -54,6 +54,7 @@ SHA-256 of the three LFS objects is in `v1_reference/LFS_OIDS_sha256.txt`: `azur
 4. Task 5's "failure cost is 600x migration cost" check is tautological (both sides share the criticality weight), as `docs/task5_summary.md` already says.
 5. Policies are compared at matched migration count, not matched GB of memory moved (v3 audit finding A1).
 6. Single seed (42) everywhere in the simulation scripts; no confidence intervals.
+7. The live demo (Render, commit 729fb75) headed its findings table "Threshold (matched budget)" but displayed the naive threshold row (7,980 migrations, cost 410,867), and its note said the policies land "within ~3%". Against the naive row the cost-sensitive policy costs 11.1% more; against the matched-budget threshold (5,522 migrations, cost 442,701) it costs 3.1% more. Found 4 Oct 2026; fixed on `main` in a77a5f6 (`scripts/11_headline_matched.py` adds the matched row). The tag `v1.0-course` and `v1_reference/` keep the original two-row table.
 
 ## What v1 contains beyond the research pipeline
 
