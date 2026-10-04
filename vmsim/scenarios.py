@@ -35,9 +35,27 @@ CALIBRATION = Path(__file__).resolve().parents[1] / "results" / "v2" / "regime_c
 B2_CLASSES = CALIBRATION.with_name("b2_classes.json")
 
 
+def second_source_latent() -> float | None:
+    """Week 21 second placement source (Google 2019 cell f): its latent rho_L point estimate
+    under the primary choices (M1, platform proxy, placement weights, tau-b), from
+    scripts/v2/13_trace_rho.py --analyse-second. None until that has run."""
+    f = CALIBRATION.with_name("trace_rho_second_table.csv")
+    if not f.exists():
+        return None
+    import pandas as pd
+
+    d = pd.read_csv(f)
+    d = d[
+        (d.mapping == "M1") & (d.proxy == "risk_platform") & (d.weight == "n") & (d.stat == "tau_b")
+    ]
+    return float(d["latent"].iloc[0]) if len(d) else None
+
+
 def latent_of(cell: str) -> float | None:
     if cell == "D0":  # calibration entry for regime D's first half
         return D_LATENT[0]
+    if cell == "B1-f":  # Week 21 second source, B-style placement at cell f's measured rho_L
+        return second_source_latent()
     return A_LATENT.get(cell, B1_LATENT.get(cell))
 
 

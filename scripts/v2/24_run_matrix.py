@@ -384,8 +384,13 @@ def main() -> None:
     ap.add_argument("--policies", nargs="+", help="only these policies")
     ap.add_argument("--budgets", nargs="+", type=float, help="only these budgets (%)")
     ap.add_argument("--subdir", help="collect: write cells under <group>/<subdir> (replication)")
+    ap.add_argument(
+        "--extra-regimes", nargs="+", help="add regimes as group S (Week 21 second source, B1-f)"
+    )
     a = ap.parse_args()
     m = load_matrix(MATRIX.with_name("matrix_small.yaml") if a.small else None)
+    if a.extra_regimes:
+        m["regimes"]["S"] = list(a.extra_regimes)
     m["_full"] = copy.deepcopy(m)
     if a.regimes:
         m["regimes"] = {g: [r for r in rs if r in a.regimes] for g, rs in m["regimes"].items()}
