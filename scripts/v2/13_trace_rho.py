@@ -180,19 +180,27 @@ def placements(cell: str, raw: Path, out: Path) -> dict:
             )
         # At equal times, end events sort before SCHEDULE, so a placement ends before the next
         # one starts. Time 0 means "before the trace"; MAXINT or no end means "after".
-        q = f"""WITH s AS (
+        # The full tie-break makes next_t deterministic (rows equal in every ordered column
+        # give the same result). Placements go to a temporary table, and each window is its
+        # own query: as one statement (a CTE shared by a UNION ALL of the three windows, or the
+        # UNION ALL over the table), DuckDB 1.5.6 stalled at 0% CPU (4 Oct); each part alone
+        # takes seconds.
+        con.execute(
+            f"""CREATE OR REPLACE TEMP TABLE p AS
+                WITH s AS (
                     SELECT time, type, machine_id, priority, scheduling_class,
                            lead(time) OVER (PARTITION BY collection_id, instance_index
-                                            ORDER BY time, (type = 3)) AS next_t
-                    FROM {src}),
-                p AS (
-                    SELECT machine_id, {TIER5} AS tier5, scheduling_class,
-                           greatest(time, {T0}) AS t_start,
-                           least(CASE WHEN next_t IS NULL OR next_t = {MAXINT} THEN {T1}
-                                      ELSE next_t END, {T1}) AS t_end
-                    FROM s WHERE type = 3 AND machine_id IS NOT NULL AND machine_id <> -1)
-                {" UNION ALL ".join(overlaps)}"""
-        parts.append(con.execute(q).df())
+                                            ORDER BY time, (type = 3), type, machine_id,
+                                                     priority, scheduling_class) AS next_t
+                    FROM {src})
+                SELECT machine_id, {TIER5} AS tier5, scheduling_class,
+                       greatest(time, {T0}) AS t_start,
+                       least(CASE WHEN next_t IS NULL OR next_t = {MAXINT} THEN {T1}
+                                  ELSE next_t END, {T1}) AS t_end
+                FROM s WHERE type = 3 AND machine_id IS NOT NULL AND machine_id <> -1"""
+        )
+        parts += [con.execute(q).df() for q in overlaps]
+        con.execute("DROP TABLE p")
         log(f"cell {cell}: bucket {b + 1}/16")
         ded = con.execute(
             f"SELECT count(*) FROM {src} WHERE type = 3 AND machine_id = -1"
