@@ -1,0 +1,46 @@
+{
+  "pH_latent": 0.3750524868428311,
+  "c0_latent": 0.2512164591914626,
+  "f": {
+    "gini_high_share": {
+      "2": 0.243697521255956,
+      "3": 0.08725541195305442,
+      "4": 0.0739628989029606
+    },
+    "stage1": {
+      "events": 1179245752,
+      "task_events_3_to_8": 489411296,
+      "alloc_events": 52456027,
+      "dedicated_schedules": 361,
+      "placement_rows": 577241,
+      "placements_by_window": {
+        "2": 46953936,
+        "3": 51468031,
+        "4": 50352698
+      },
+      "cell": "f",
+      "files": 1182,
+      "bytes": 14109095124,
+      "md5": {
+        "machine_attributes-000000000000.parquet.gz": "/p692QbF1G0XaAGEIw9W3A==",
+        "machine_events-000000000000.parquet.gz": "ug4X4TSTycql0jKGFxgQ7g=="
+      },
+      "seconds": 784,
+      "finished": "2026-10-05T02:40:56"
+    },
+    "platform_long_removal_rate_per_machine_day": {
+      "5dA1xC6vB4+Z2ucXfjwZMKPuxA/oUajDZReIcQV9WqE=": 0.00107,
+      "Dza/U2s43vvYOOFCmkikwthqRcXXkIyR/WG6M23f67s=": 0.00056,
+      "JQ1tVQBMHBAIISU1gUNXk2powhYumYA+4cB3KzU29l8=": 0.00823,
+      "No+NZu2jn50BnbQS9kENCZjWL1KEhNp67aYCqakF7Xk=": 0.0013,
+      "ab11I4qQr/9Dkmo3M2CCSSHPkOU1S1Cb1p3rphUUjS8=": 0.00027
+    }
+  },
+  "direct_spearman_class": {
+    "f": "C0"
+  },
+  "g1_class_per_cell": {
+    "f (would-be class)": "C0"
+  },
+  "note": "second placement source (Week 21); not part of G1, which is final"
+}
