@@ -1,0 +1,757 @@
+{
+  "schema": "v1_anomaly/1",
+  "provenance": "DERIVED",
+  "inputs": {
+    "hosts": 122618,
+    "failures": 6912,
+    "vms": 2013767,
+    "placement_seed": 42,
+    "dev_seeds": [
+      101,
+      102,
+      103,
+      104,
+      105,
+      106,
+      107,
+      108,
+      109,
+      110
+    ]
+  },
+  "delta_definition": "(C_ref - C_policy) / C_ref; positive means the policy is better",
+  "verdict_rules": {
+    "H1": "confirmed if overall observed/expected failures is outside [0.90, 1.10] or at least two p-deciles have |z| > 3; rejected if overall is within [0.95, 1.05] and no decile has |z| > 3; else inconclusive",
+    "H2": "rejected if urgency exceeds 1 in no row of the lookup table (urgency is identically 1); confirmed if setting urgency to 1 moves Delta by at least 1 point",
+    "H3": "confirmed if matching the budget in GB moves Delta to -1% or above (materiality); rejected if Delta stays at or below -2%; else inconclusive",
+    "H4": "confirmed if any reweighting of the Unknown class moves Delta by at least 1 point; rejected if every variant moves it by less than 0.5 point; else inconclusive",
+    "H5": "rejected if, with calibrated oracle p (synthetic fates, sigma = 0), the v1 rule still loses by 1% or more on average; confirmed if it does not lose at sigma = 0 and loses at a sigma of 1 or less; else inconclusive",
+    "H6": "confirmed if any accounting window moves Delta by at least 1 point or flips its sign; else rejected",
+    "H7": "confirmed if BAM with the denominator matching the budget reaches Delta >= -1% at both budgets in the v1 world and on average over the dev seeds; rejected if it stays at or below -2%; else inconclusive",
+    "H8": "rejected if the three within-host orders change total cost by less than 0.1%"
+  },
+  "reproduction": {
+    "cost_sensitive": {
+      "hosts": 5116,
+      "cost": 456532.73059018864,
+      "gb": 452291.25
+    },
+    "threshold_naive": {
+      "tau": 0.007307951948433355,
+      "hosts": 7980,
+      "cost": 410866.9487854554
+    },
+    "threshold_matched_v1": {
+      "tau": 0.014681427089420083,
+      "hosts": 5522,
+      "cost": 442700.7434314229,
+      "gb": 548173.0
+    },
+    "delta_v1": -0.031244553717150885
+  },
+  "budget_grid_v1_world": {
+    "count|0.5|v1_cost_sensitive|30": {
+      "delta": 0.0014701397529100135,
+      "hosts": 2558,
+      "gb": 206589.5,
+      "threshold_hosts": 2558
+    },
+    "count|0.5|v1_cost_sensitive|inf": {
+      "delta": 0.010020181695672436,
+      "hosts": 2558,
+      "gb": 206589.5,
+      "threshold_hosts": 2558
+    },
+    "count|0.5|bam_count|30": {
+      "delta": 0.0025372263219410112,
+      "hosts": 2558,
+      "gb": 254137.25,
+      "threshold_hosts": 2558
+    },
+    "count|0.5|bam_count|inf": {
+      "delta": 0.01136142019994865,
+      "hosts": 2558,
+      "gb": 254137.25,
+      "threshold_hosts": 2558
+    },
+    "count|1.0|v1_cost_sensitive|30": {
+      "delta": 0.0018723059640184437,
+      "hosts": 5116,
+      "gb": 452291.25,
+      "threshold_hosts": 5116
+    },
+    "count|1.0|v1_cost_sensitive|inf": {
+      "delta": -0.021130576837187304,
+      "hosts": 5116,
+      "gb": 452291.25,
+      "threshold_hosts": 5116
+    },
+    "count|1.0|bam_count|30": {
+      "delta": 0.0018723059640184437,
+      "hosts": 5116,
+      "gb": 452291.25,
+      "threshold_hosts": 5116
+    },
+    "count|1.0|bam_count|inf": {
+      "delta": -0.021130576837187304,
+      "hosts": 5116,
+      "gb": 452291.25,
+      "threshold_hosts": 5116
+    },
+    "count|2.0|v1_cost_sensitive|30": {
+      "delta": 0.0031690793954339065,
+      "hosts": 10232,
+      "gb": 865830.75,
+      "threshold_hosts": 10232
+    },
+    "count|2.0|v1_cost_sensitive|inf": {
+      "delta": -0.02737121808636666,
+      "hosts": 10232,
+      "gb": 865830.75,
+      "threshold_hosts": 10232
+    },
+    "count|2.0|bam_count|30": {
+      "delta": 0.015074318492147952,
+      "hosts": 5116,
+      "gb": 452291.25,
+      "threshold_hosts": 10232
+    },
+    "count|2.0|bam_count|inf": {
+      "delta": -0.1628434661620552,
+      "hosts": 5116,
+      "gb": 452291.25,
+      "threshold_hosts": 10232
+    },
+    "gb|0.5|v1_cost_sensitive|30": {
+      "delta": 0.005978924043157729,
+      "hosts": 2718,
+      "gb": 226084.25,
+      "threshold_hosts": 2279
+    },
+    "gb|0.5|v1_cost_sensitive|inf": {
+      "delta": 0.028424097413053896,
+      "hosts": 2718,
+      "gb": 226084.25,
+      "threshold_hosts": 2279
+    },
+    "gb|0.5|bam_count|30": {
+      "delta": 0.007545220633212256,
+      "hosts": 2269,
+      "gb": 226137.5,
+      "threshold_hosts": 2279
+    },
+    "gb|0.5|bam_count|inf": {
+      "delta": 0.010721095580287065,
+      "hosts": 2269,
+      "gb": 226137.5,
+      "threshold_hosts": 2279
+    },
+    "gb|0.5|bam_gb|30": {
+      "delta": 0.006323252145548101,
+      "hosts": 2730,
+      "gb": 225975.75,
+      "threshold_hosts": 2279
+    },
+    "gb|0.5|bam_gb|inf": {
+      "delta": 0.029805566664141026,
+      "hosts": 2730,
+      "gb": 225975.75,
+      "threshold_hosts": 2279
+    },
+    "gb|1.0|v1_cost_sensitive|30": {
+      "delta": 0.001893333816215547,
+      "hosts": 5116,
+      "gb": 452291.25,
+      "threshold_hosts": 4548
+    },
+    "gb|1.0|v1_cost_sensitive|inf": {
+      "delta": -0.010847946231916072,
+      "hosts": 5116,
+      "gb": 452291.25,
+      "threshold_hosts": 4548
+    },
+    "gb|1.0|bam_count|30": {
+      "delta": 0.001893333816215547,
+      "hosts": 5116,
+      "gb": 452291.25,
+      "threshold_hosts": 4548
+    },
+    "gb|1.0|bam_count|inf": {
+      "delta": -0.010847946231916072,
+      "hosts": 5116,
+      "gb": 452291.25,
+      "threshold_hosts": 4548
+    },
+    "gb|1.0|bam_gb|30": {
+      "delta": 0.001893333816215547,
+      "hosts": 5116,
+      "gb": 452291.25,
+      "threshold_hosts": 4548
+    },
+    "gb|1.0|bam_gb|inf": {
+      "delta": -0.010847946231916072,
+      "hosts": 5116,
+      "gb": 452291.25,
+      "threshold_hosts": 4548
+    },
+    "gb|2.0|v1_cost_sensitive|30": {
+      "delta": 0.001340824892763316,
+      "hosts": 10788,
+      "gb": 904556.25,
+      "threshold_hosts": 9101
+    },
+    "gb|2.0|v1_cost_sensitive|inf": {
+      "delta": 0.0027387030627931924,
+      "hosts": 10788,
+      "gb": 904556.25,
+      "threshold_hosts": 9101
+    },
+    "gb|2.0|bam_count|30": {
+      "delta": 0.01362469688611716,
+      "hosts": 5116,
+      "gb": 452291.25,
+      "threshold_hosts": 9101
+    },
+    "gb|2.0|bam_count|inf": {
+      "delta": -0.1375509885106352,
+      "hosts": 5116,
+      "gb": 452291.25,
+      "threshold_hosts": 9101
+    },
+    "gb|2.0|bam_gb|30": {
+      "delta": 0.01362469688611716,
+      "hosts": 5116,
+      "gb": 452291.25,
+      "threshold_hosts": 9101
+    },
+    "gb|2.0|bam_gb|inf": {
+      "delta": -0.1375509885106352,
+      "hosts": 5116,
+      "gb": 452291.25,
+      "threshold_hosts": 9101
+    }
+  },
+  "budget_grid_dev_seeds": {
+    "count|0.5|v1_cost_sensitive|30": {
+      "mean": 1.7812406299007613e-05,
+      "sd": 0.0020945007769332205,
+      "min": -0.004161763479688822,
+      "max": 0.0029239433608169
+    },
+    "count|0.5|v1_cost_sensitive|inf": {
+      "mean": 0.008811543607910895,
+      "sd": 0.0025101149380708874,
+      "min": 0.0055545112510528285,
+      "max": 0.012696073205382097
+    },
+    "count|0.5|bam_count|30": {
+      "mean": 0.002227786885452349,
+      "sd": 0.0016165475252860912,
+      "min": 0.00021425634498029565,
+      "max": 0.004683349199186995
+    },
+    "count|0.5|bam_count|inf": {
+      "mean": 0.008863711018611439,
+      "sd": 0.0024234714152577062,
+      "min": 0.005071818795048504,
+      "max": 0.01229457459615577
+    },
+    "count|1.0|v1_cost_sensitive|30": {
+      "mean": 0.004111913985040656,
+      "sd": 0.0006341380551947425,
+      "min": 0.003225253880941578,
+      "max": 0.005213887343434438
+    },
+    "count|1.0|v1_cost_sensitive|inf": {
+      "mean": -0.021049004610091075,
+      "sd": 0.0010189879033590027,
+      "min": -0.023001252406708434,
+      "max": -0.01981101981392095
+    },
+    "count|1.0|bam_count|30": {
+      "mean": 0.004096940736539577,
+      "sd": 0.0006388864296418905,
+      "min": 0.003225253880941578,
+      "max": 0.005213887343434438
+    },
+    "count|1.0|bam_count|inf": {
+      "mean": -0.021049004610091075,
+      "sd": 0.0010189879033590027,
+      "min": -0.023001252406708434,
+      "max": -0.01981101981392095
+    },
+    "count|2.0|v1_cost_sensitive|30": {
+      "mean": 0.0030229376721078666,
+      "sd": 0.0012069434653944433,
+      "min": 0.0012152520317213703,
+      "max": 0.004739615564686838
+    },
+    "count|2.0|v1_cost_sensitive|inf": {
+      "mean": -0.03144526448711876,
+      "sd": 0.0032749660197148576,
+      "min": -0.0361837050877857,
+      "max": -0.027425970973637824
+    },
+    "count|2.0|bam_count|30": {
+      "mean": 0.01757062812139961,
+      "sd": 0.0007525391877713633,
+      "min": 0.01625581562929973,
+      "max": 0.01890591078825917
+    },
+    "count|2.0|bam_count|inf": {
+      "mean": -0.1621567471376842,
+      "sd": 0.0018007037731381605,
+      "min": -0.16445150496325628,
+      "max": -0.15909050708802763
+    },
+    "gb|0.5|v1_cost_sensitive|30": {
+      "mean": 0.0038156173321019374,
+      "sd": 0.001895316870731019,
+      "min": 0.0009180408402331944,
+      "max": 0.007683108143035832
+    },
+    "gb|0.5|v1_cost_sensitive|inf": {
+      "mean": 0.026751092457798775,
+      "sd": 0.002524863912282684,
+      "min": 0.024199912168785,
+      "max": 0.031047673164913688
+    },
+    "gb|0.5|bam_count|30": {
+      "mean": 0.0057145969428423135,
+      "sd": 0.001534572875055959,
+      "min": 0.0035815610271862958,
+      "max": 0.008203832555124477
+    },
+    "gb|0.5|bam_count|inf": {
+      "mean": 0.008340428108124772,
+      "sd": 0.002042989166305687,
+      "min": 0.004299355911892387,
+      "max": 0.011345301137808591
+    },
+    "gb|0.5|bam_gb|30": {
+      "mean": 0.0034823964615782596,
+      "sd": 0.001970838172650144,
+      "min": 0.00020815914325059704,
+      "max": 0.006721774938305311
+    },
+    "gb|0.5|bam_gb|inf": {
+      "mean": 0.02788903732465194,
+      "sd": 0.002447682944687423,
+      "min": 0.025370945971473505,
+      "max": 0.031762523266743954
+    },
+    "gb|1.0|v1_cost_sensitive|30": {
+      "mean": 0.004131966028571805,
+      "sd": 0.000607050153337245,
+      "min": 0.003464620239882405,
+      "max": 0.0049579336405673295
+    },
+    "gb|1.0|v1_cost_sensitive|inf": {
+      "mean": -0.009810336144147943,
+      "sd": 0.0009253721121901073,
+      "min": -0.011423602460801015,
+      "max": -0.008858594307753384
+    },
+    "gb|1.0|bam_count|30": {
+      "mean": 0.004117007216712408,
+      "sd": 0.0005859103136247859,
+      "min": 0.003464620239882405,
+      "max": 0.004808345521973356
+    },
+    "gb|1.0|bam_count|inf": {
+      "mean": -0.009810336144147943,
+      "sd": 0.0009253721121901073,
+      "min": -0.011423602460801015,
+      "max": -0.008858594307753384
+    },
+    "gb|1.0|bam_gb|30": {
+      "mean": 0.004131966028571805,
+      "sd": 0.000607050153337245,
+      "min": 0.003464620239882405,
+      "max": 0.0049579336405673295
+    },
+    "gb|1.0|bam_gb|inf": {
+      "mean": -0.009810336144147943,
+      "sd": 0.0009253721121901073,
+      "min": -0.011423602460801015,
+      "max": -0.008858594307753384
+    },
+    "gb|2.0|v1_cost_sensitive|30": {
+      "mean": 0.0009049803901029371,
+      "sd": 0.0012444353613213692,
+      "min": -0.0005620645200019081,
+      "max": 0.0032937670381593944
+    },
+    "gb|2.0|v1_cost_sensitive|inf": {
+      "mean": -0.0004329349890185675,
+      "sd": 0.002759937875963673,
+      "min": -0.0032506180111905093,
+      "max": 0.004599458455440929
+    },
+    "gb|2.0|bam_count|30": {
+      "mean": 0.01626730983456954,
+      "sd": 0.0006965982952130711,
+      "min": 0.01533175882576524,
+      "max": 0.01745126123295782
+    },
+    "gb|2.0|bam_count|inf": {
+      "mean": -0.13696155290808684,
+      "sd": 0.0023285158112646715,
+      "min": -0.14216283410086014,
+      "max": -0.1337721183634432
+    },
+    "gb|2.0|bam_gb|30": {
+      "mean": 0.0162820961307577,
+      "sd": 0.0006985962076880251,
+      "min": 0.01533175882576524,
+      "max": 0.01745126123295782
+    },
+    "gb|2.0|bam_gb|inf": {
+      "mean": -0.13696155290808684,
+      "sd": 0.0023285158112646715,
+      "min": -0.14216283410086014,
+      "max": -0.1337721183634432
+    }
+  },
+  "H1": {
+    "observed_over_expected": 1.0331877916629775,
+    "deciles": [
+      {
+        "decile": 0,
+        "n": 340070,
+        "observed": 32,
+        "expected": 47.17438670582087,
+        "mean_p": 0.0001387196362684767,
+        "obs_rate": 9.409827388478843e-05,
+        "z": -2.2093169071732905
+      },
+      {
+        "decile": 1,
+        "n": 350076,
+        "observed": 84,
+        "expected": 109.59470302536685,
+        "mean_p": 0.0003130597442422984,
+        "obs_rate": 0.0002399478970280739,
+        "z": -2.44486741719814
+      },
+      {
+        "decile": 2,
+        "n": 346627,
+        "observed": 151,
+        "expected": 168.145935842837,
+        "mean_p": 0.0004850918590959071,
+        "obs_rate": 0.0004356267688322029,
+        "z": -1.3222634915661569
+      },
+      {
+        "decile": 3,
+        "n": 342481,
+        "observed": 254,
+        "expected": 247.85682006009304,
+        "mean_p": 0.0007237096950198494,
+        "obs_rate": 0.0007416469818763669,
+        "z": 0.39020497270962534
+      },
+      {
+        "decile": 4,
+        "n": 347352,
+        "observed": 351,
+        "expected": 332.2498316299245,
+        "mean_p": 0.0009565220054294332,
+        "obs_rate": 0.0010105023146548746,
+        "z": 1.0286622140130024
+      },
+      {
+        "decile": 5,
+        "n": 330793,
+        "observed": 555,
+        "expected": 508.22994401475665,
+        "mean_p": 0.0015363987267407613,
+        "obs_rate": 0.001677786410232381,
+        "z": 2.0746162012844858
+      },
+      {
+        "decile": 6,
+        "n": 345786,
+        "observed": 677,
+        "expected": 650.7178192876077,
+        "mean_p": 0.0018818512585460593,
+        "obs_rate": 0.0019578583285615957,
+        "z": 1.0303031966826064
+      },
+      {
+        "decile": 7,
+        "n": 349083,
+        "observed": 782,
+        "expected": 772.3965157298367,
+        "mean_p": 0.0022126443159072103,
+        "obs_rate": 0.0022401549201765767,
+        "z": 0.34554823289277764
+      },
+      {
+        "decile": 8,
+        "n": 351040,
+        "observed": 900,
+        "expected": 912.6270816977167,
+        "mean_p": 0.002599780884508081,
+        "obs_rate": 0.002563810391978122,
+        "z": -0.41798078217593393
+      },
+      {
+        "decile": 9,
+        "n": 359036,
+        "observed": 3126,
+        "expected": 2940.9814814249376,
+        "mean_p": 0.008191327558865789,
+        "obs_rate": 0.008706647801334686,
+        "z": 3.4116860078309763
+      }
+    ],
+    "deciles_abs_z_gt_3": 1,
+    "verdict": "inconclusive",
+    "note": "in-sample: the hazard model was trained on 80% of these drives",
+    "by_majority_tier": {
+      "low": {
+        "hosts": 30755,
+        "observed": 1745,
+        "expected": 1669.1475889429917,
+        "observed_over_expected": 1.0454438011111065
+      },
+      "medium": {
+        "hosts": 91862,
+        "observed": 5167,
+        "expected": 5020.814099369223,
+        "observed_over_expected": 1.0291159755644295
+      },
+      "high": {
+        "hosts": 1,
+        "observed": 0,
+        "expected": 0.012831106682025101,
+        "observed_over_expected": 0.0
+      }
+    }
+  },
+  "H2": {
+    "share_of_lookup_rows_with_urgency_above_1": 0.0,
+    "min_expected_ttf_days": 2238.788660160072,
+    "verdict": "rejected",
+    "note": "urgency is identically 1, so the v1 rule is p * F > M; cost with urgency removed equals the v1 cost (456,532.7)"
+  },
+  "H3": {
+    "v1_count_match": {
+      "cs_hosts": 5116,
+      "threshold_hosts": 5522,
+      "cs_gb": 452291.25,
+      "threshold_gb": 548173.0
+    },
+    "delta_v1_bisection": -0.031244553717150885,
+    "delta_exact_count": -0.021130576837187304,
+    "delta_gb_match": -0.010847946231916072,
+    "verdict": "inconclusive"
+  },
+  "H4": {
+    "variants": {
+      "v1 (Unknown weight 0.6)": {
+        "delta_cs_vs_threshold_exact_count": -0.021130576837187304,
+        "delta_at_fixed_5116_hosts": -0.021130576837187304,
+        "hosts": 5116,
+        "sd_log_F_over_M": 0.387665086093883
+      },
+      "Unknown as low (0.3)": {
+        "delta_cs_vs_threshold_exact_count": -0.015436989124829924,
+        "delta_at_fixed_5116_hosts": -0.01760194613772152,
+        "hosts": 4010,
+        "sd_log_F_over_M": 0.40862258128656287
+      },
+      "Unknown as high (1.0)": {
+        "delta_cs_vs_threshold_exact_count": 0.005537104675977303,
+        "delta_at_fixed_5116_hosts": -0.01991400680444148,
+        "hosts": 6216,
+        "sd_log_F_over_M": 0.37420415962626574
+      },
+      "Unknown VMs removed": {
+        "delta_cs_vs_threshold_exact_count": -0.022356900571177715,
+        "delta_at_fixed_5116_hosts": -0.020776500475248375,
+        "hosts": 4978,
+        "sd_log_F_over_M": 0.5609443595289209
+      }
+    },
+    "pre_written_rule_max_move_points": 2.6667681513164605,
+    "pre_written_rule_verdict": "confirmed",
+    "fixed_budget_max_move_points": 0.3528630699465785,
+    "verdict": "rejected",
+    "note": "the pre-written test let the operating point move with the weight (4,010 to 6,216 hosts); the verdict uses the fixed-budget control, a deviation decided after the first run"
+  },
+  "H5": {
+    "sigmas": [
+      0.0,
+      0.25,
+      0.5,
+      1.0,
+      1.5,
+      2.0
+    ],
+    "delta_by_window_then_sigma": {
+      "30": {
+        "0.0": {
+          "mean": 0.004769191541016023,
+          "sd": 0.0015933813861486222,
+          "min": 0.0020303466338372498,
+          "max": 0.00801376577195818
+        },
+        "0.25": {
+          "mean": 0.004203336301568292,
+          "sd": 0.0016963621610039282,
+          "min": 0.0012749236381256863,
+          "max": 0.006597042012859632
+        },
+        "0.5": {
+          "mean": 0.002642586856015314,
+          "sd": 0.0018091549379847694,
+          "min": -0.0007234933246874267,
+          "max": 0.005930425867526631
+        },
+        "1.0": {
+          "mean": 0.003944591277376714,
+          "sd": 0.0011824767554039046,
+          "min": 0.0008421332666011655,
+          "max": 0.005539979275414098
+        },
+        "1.5": {
+          "mean": 0.005406983784785292,
+          "sd": 0.001535468906509169,
+          "min": 0.002696996003863161,
+          "max": 0.007327277077111736
+        },
+        "2.0": {
+          "mean": 0.005580196361502353,
+          "sd": 0.0010139939069768952,
+          "min": 0.004194604056981497,
+          "max": 0.007509497365659339
+        }
+      },
+      "inf": {
+        "0.0": {
+          "mean": -0.017635126673717978,
+          "sd": 0.002770775608707767,
+          "min": -0.021677912139585958,
+          "max": -0.013527728531338818
+        },
+        "0.25": {
+          "mean": -0.0047543577934352765,
+          "sd": 0.0033466242254820812,
+          "min": -0.010298247278145971,
+          "max": 0.000786172291143673
+        },
+        "0.5": {
+          "mean": -0.0037443950561133177,
+          "sd": 0.0020382100634062303,
+          "min": -0.008225472564763742,
+          "max": -0.001477380118915216
+        },
+        "1.0": {
+          "mean": -0.0027283589246429726,
+          "sd": 0.0026218479397894885,
+          "min": -0.006574006471795514,
+          "max": 0.0016974290444936408
+        },
+        "1.5": {
+          "mean": 0.0018091386403737528,
+          "sd": 0.0023764181712021787,
+          "min": -0.0017648015246448103,
+          "max": 0.006394322909506194
+        },
+        "2.0": {
+          "mean": 0.004763306447360378,
+          "sd": 0.003918198376053308,
+          "min": -0.0034181073227955157,
+          "max": 0.01041887917728801
+        }
+      }
+    },
+    "seeds": [
+      101,
+      102,
+      103,
+      104,
+      105,
+      106,
+      107,
+      108,
+      109,
+      110
+    ],
+    "verdict": "rejected",
+    "note": "fates drawn from hazard_30d, so p is calibrated by construction; persistent per-host log-odds noise shared by both policies; observation ends from the real data; v1 rule at its own operating point vs threshold at the same count"
+  },
+  "H6": {
+    "lead_time": {
+      "v1_cost_sensitive": {
+        "necessary_migrations": 1419,
+        "median_lead_days": 169.5,
+        "share_lead_over_30_days": 0.9288231148696265,
+        "share_lead_over_365_days": 0.06765327695560254
+      },
+      "threshold_matched_v1": {
+        "necessary_migrations": 1601,
+        "median_lead_days": 182.41666666666697,
+        "share_lead_over_30_days": 0.9369144284821986,
+        "share_lead_over_365_days": 0.09431605246720799
+      }
+    },
+    "delta_by_accounting_window_days": {
+      "7": 0.0026640590517577494,
+      "30": 0.0022335871458472427,
+      "90": 0.009970815933261136,
+      "365": -0.020645110649024894,
+      "inf": -0.031244553717150885
+    },
+    "delta_by_window_exact_budgets": {
+      "exact_count": {
+        "7": 0.0019377866649634716,
+        "30": 0.0018723059640184437,
+        "90": 0.010838064128053613,
+        "365": -0.016434340858897032,
+        "inf": -0.021130576837187304
+      },
+      "same_gb": {
+        "7": 0.0009861313250550227,
+        "30": 0.001893333816215547,
+        "90": 0.01130438239915204,
+        "365": -0.011757105777176516,
+        "inf": -0.010847946231916072
+      }
+    },
+    "verdict": "confirmed",
+    "note": "window W: a migration averts the failure only if it happens within W days; W = 7 mirrors Narya's default unallocatable period"
+  },
+  "H7": {
+    "pre_written_rule_inputs": [
+      -0.021130576837187304,
+      -0.010847946231916072,
+      -0.021049004610091075,
+      -0.009810336144147943
+    ],
+    "pre_written_rule_verdict": "inconclusive",
+    "gb_denominator_minus_m_denominator_dev_mean": {
+      "0.5|inf": 0.001137944866853164,
+      "0.5|30": -0.00033322087052367784,
+      "1.0|inf": 0.0,
+      "1.0|30": 0.0
+    },
+    "verdict": "rejected",
+    "corr_M_GB_hosts": 0.9988173233336038,
+    "note": "redesigned after the first run; the pre-written rule is degenerate at 1x"
+  },
+  "H8": {
+    "costs": {
+      "smallest_first": 451556.34895809775,
+      "largest_first": 451619.228331779,
+      "random": 451592.2039139791
+    },
+    "relative_spread": 0.00013925033681034738,
+    "boundary_host_vms": 22,
+    "verdict": "rejected",
+    "note": "v1 moves whole hosts, so only the one host at the budget boundary can be split; the order of VMs matters nowhere else"
+  }
+}

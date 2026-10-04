@@ -2,6 +2,14 @@
 
 Sunday ritual (15 minutes): update this log, tick the week's "done when", log any cut as an ADR, re-read the next gate's criteria, update `CAPACITY.md` for the coming month, write Monday's first task. Newest week first. Hours are yours to fill; nothing here is estimated.
 
+## Week 3 (19-25 Oct 2026)
+- planned hours: 12   actual hours: __
+- done (4 Oct, ahead of the week): v1 re-run from the tag reproduces exactly; `scripts/v2/diag_v1_anomaly.py`; `v1_anomaly.md` with 8 verdicts; `PROTOCOL.md` v0 with gates and power plan; advisor email draft; tag `protocol-v0`
+- slipped (and why): sending the advisor email (yours)
+- decisions made (ADR ids): none; four deviations from the pre-written verdict rules are listed in `v1_anomaly.md` section 4
+- risks changed: R7 (novelty thin) eased: the v1 loss is an accounting artifact, and under consistent accounting the theory's prediction (no loss) held on 10 of 10 synthetic seeds
+- next week's first task: Week 4 task 1, record the Backblaze source (download needs your go-ahead: see the reply)
+
 ## Week 2 (12-18 Oct 2026)
 - planned hours: 12   actual hours: __
 - done: charter, falsification list, seven reading notes, `refs.bib` (17 papers + 8 sources, each checked), T5 draft, benchmark landscape: all drafted on 4 Oct, ahead of the week (see `TASKS_W1-W2.md`)

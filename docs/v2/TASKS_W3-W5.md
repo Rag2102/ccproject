@@ -23,7 +23,7 @@ Goal: a written diagnosis of the -3.1% at rho = 0, and a protocol that fixes eve
 - If blocked (v1 cannot be re-run): reproduce from the `v1_reference` CSVs (`scripts/11_headline_matched.py` already does this for the totals) and log the gap as ADR-005
 
 ### 2. Write H1-H8 (about 1.5 h)
-- [ ] `docs/v2/v1_anomaly.md`, one section per hypothesis, each with the result that would confirm or reject it:
+- [x] `docs/v2/v1_anomaly.md`, one section per hypothesis, each with the result that would confirm or reject it:
   - H1: host-level p is miscalibrated after placement
   - H2: urgency(TTF) misbehaves
   - H3: the budget is matched in count, not GB
@@ -34,15 +34,15 @@ Goal: a written diagnosis of the -3.1% at rho = 0, and a protocol that fixes eve
   - H8: the baseline's within-host VM order
 
 ### 3. One diagnostic each (about 4 h)
-- [ ] `scripts/v2/diag_v1_anomaly.py`:
+- [x] `scripts/v2/diag_v1_anomaly.py`:
   - H7: re-rank by b / w with w = GB, at the same GB budget
   - H8: re-run P1 with smallest-first, largest-first and random within-host order
   - H5: oracle p plus Gaussian noise of growing sigma until the order flips
   - H3 and H4 (to reach at least five verdicts): match the budget in GB; recompute with Unknown dropped or reweighted
-- [ ] Verdict per hypothesis (confirmed / rejected / inconclusive) with its figure; export `results/summary/v1_anomaly.json` (result R13)
+- [x] Verdict per hypothesis (confirmed / rejected / inconclusive) with its figure; export `results/summary/v1_anomaly.json` (result R13)
 
 ### 4. Protocol v0 (about 2 h)
-- [ ] `PROTOCOL.md`. Section 1 is `docs/v2/FALSIFICATION.md`. Then:
+- [x] `PROTOCOL.md`. Section 1 is `docs/v2/FALSIFICATION.md`. Then:
   - policies P0-P8, with P4 = BAM-GB primary and BAM-time / BAM-cost as ablations
   - P2 = best of three within-host orders, tuned on seeds 101-110
   - regimes A1-A7, B1, B2, C, D, E; budgets 0.5 / 1 / 2 / 5%
@@ -50,19 +50,21 @@ Goal: a written diagnosis of the -3.1% at rho = 0, and a protocol that fixes eve
   - the 30-comparison confirmatory family (Holm); everything else exploratory; negative results reported
 
 ### 5. Exhaustive gates (about 1.5 h)
-- [ ] G1: classes A / B / C0 / C1 / D against pH = 0.30, precision rule (CI width > 0.30 means class B), "class is final"
-- [ ] G2: five criteria (analytic checks, self-calibration, v1 regression within 1%, invariants and determinism, run time); G2-late runs to 10 Jan 2027
-- [ ] G3: Strong / Medium / Weak. Strong needs the win criterion in a real-trace regime, theory that matches, seed replication and a second placement source that agree
-- [ ] Paste the numeric criteria into the protocol. The meanings of classes A-D are defined in the attached v3 package (Part V), not in the pages read so far; look them up
+- [x] G1: classes A / B / C0 / C1 / D against pH = 0.30, precision rule (CI width > 0.30 means class B), "class is final"
+- [x] G2: five criteria (analytic checks, self-calibration, v1 regression within 1%, invariants and determinism, run time); G2-late runs to 10 Jan 2027
+- [x] G3: Strong / Medium / Weak. Strong needs the win criterion in a real-trace regime, theory that matches, seed replication and a second placement source that agree
+- [x] Paste the numeric criteria into the protocol. The meanings of classes A-D are defined in the attached v3 package (Part V), not in the pages read so far; look them up
 
 ### 6. Power plan (about 0.5 h)
-- [ ] Insert the max-SD table: SD of the paired difference must be below 2.7% uncorrected / 1.6% Bonferroni at 30 seeds (3.5 / 2.1% at 50, 5.0 / 3.1% at 100)
-- [ ] Rule: the Week 14 pilot chooses seeds, hosts and horizon; delta never moves
-- [ ] Pre-specify the regression adjustment of the difference on realised failure count
+- [x] Insert the max-SD table: SD of the paired difference must be below 2.7% uncorrected / 1.6% Bonferroni at 30 seeds (3.5 / 2.1% at 50, 5.0 / 3.1% at 100)
+- [x] Rule: the Week 14 pilot chooses seeds, hosts and horizon; delta never moves
+- [x] Pre-specify the regression adjustment of the difference on realised failure count
 
 ### 7. Advisor check (about 0.5 h)
-- [ ] Send the charter, anomaly note and protocol v0; ask "what would you attack first?"
-- [ ] Tag `protocol-v0`
+- [~] Send the charter, anomaly note and protocol v0; ask "what would you attack first?" (draft: `docs/v2/advisor_email_w3_draft.md`; yours to send)
+- [x] Tag `protocol-v0`
+
+Status (4 Oct): done except sending the email. Eight verdicts (H6 confirmed: v1's accounting credited migrations for failures months later; H2, H4, H5, H7, H8 rejected; H1, H3 inconclusive). `docs/v2/PROTOCOL.md` is `docs/v2/`, not the repository root, following the v5 layout.
 
 Deliverables: `v1_anomaly.md` with at least 5 verdicts; diagnostic script; `PROTOCOL.md` v0 tagged `protocol-v0`; gates with numbers.
 Done when: you can state in two sentences why the threshold won at rho = 0, or list exactly which hypotheses remain open and the week each closes.
