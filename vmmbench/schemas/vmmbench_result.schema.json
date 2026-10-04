@@ -1,0 +1,83 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "vmmbench/1",
+  "title": "vmmbench result record (one per policy run)",
+  "type": "object",
+  "required": ["schema", "scenario", "world", "policy", "budget", "metrics", "run"],
+  "additionalProperties": false,
+  "properties": {
+    "schema": {"const": "vmmbench/1"},
+    "scenario": {
+      "type": "object",
+      "required": ["id", "version", "card_sha256", "calibration"],
+      "additionalProperties": false,
+      "properties": {
+        "id": {"type": "string"},
+        "version": {"type": "integer"},
+        "card_sha256": {"type": "string"},
+        "calibration": {"type": ["string", "null"]}
+      }
+    },
+    "world": {
+      "type": "object",
+      "required": ["seed", "family", "world_sha256"],
+      "additionalProperties": false,
+      "properties": {
+        "seed": {"type": "integer"},
+        "family": {"enum": ["dev", "pilot", "eval", "replication", "hidden", "test"]},
+        "world_sha256": {"type": "string"}
+      }
+    },
+    "policy": {
+      "type": "object",
+      "required": ["id", "version", "predictor"],
+      "additionalProperties": false,
+      "properties": {
+        "id": {"type": "string"},
+        "version": {"type": "string"},
+        "predictor": {"type": "string"},
+        "params": {"type": "object"}
+      }
+    },
+    "budget": {
+      "type": "object",
+      "required": ["resource", "pct", "utilisation", "overspend"],
+      "additionalProperties": false,
+      "properties": {
+        "resource": {"enum": ["gb", "nic_seconds"]},
+        "pct": {"type": "number"},
+        "utilisation": {"type": "number"},
+        "overspend": {"type": "boolean"}
+      }
+    },
+    "metrics": {
+      "type": "object",
+      "required": ["total_cost", "interruption_cost", "migration_cost", "missed_failures",
+                   "unnecessary_migrations", "realised_failures"],
+      "properties": {
+        "total_cost": {"type": "number"},
+        "interruption_cost": {"type": "number"},
+        "migration_cost": {"type": "number"},
+        "missed_failures": {"type": "integer"},
+        "unnecessary_migrations": {"type": "integer"},
+        "realised_failures": {"type": "integer"},
+        "migrations": {"type": "integer"},
+        "rejected_arrivals": {"type": "integer"},
+        "rho_tier_risk_horizon": {"type": ["number", "null"]}
+      }
+    },
+    "run": {
+      "type": "object",
+      "required": ["git_sha", "config_hash", "lockfile_sha256", "seconds"],
+      "additionalProperties": false,
+      "properties": {
+        "git_sha": {"type": "string"},
+        "config_hash": {"type": "string"},
+        "lockfile_sha256": {"type": "string"},
+        "seconds": {"type": "number"},
+        "outcomes_sha256": {"type": "string"},
+        "protocol_tag": {"type": "string"}
+      }
+    }
+  }
+}

@@ -1,0 +1,52 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "vmconsole/1",
+  "title": "Console summary (generated from vmmbench/1 records by 30_stats.py)",
+  "type": "object",
+  "required": ["schema", "run", "cells"],
+  "properties": {
+    "schema": {"const": "vmconsole/1"},
+    "run": {
+      "type": "object",
+      "required": ["git_sha", "config_hash", "protocol_tag", "seeds"],
+      "properties": {
+        "git_sha": {"type": "string"},
+        "config_hash": {"type": "string"},
+        "protocol_tag": {"type": "string"},
+        "seeds": {"type": "array", "items": {"type": "integer"}}
+      }
+    },
+    "cells": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["regime", "budget_pct", "policy", "n_seeds", "delta_mean", "ci_bca",
+                     "holm_p", "family", "provenance"],
+        "properties": {
+          "regime": {"type": "string"},
+          "budget_pct": {"type": "number"},
+          "policy": {"type": "string"},
+          "n_seeds": {"type": "integer"},
+          "delta_mean": {"type": "number"},
+          "delta_adjusted": {"type": ["number", "null"]},
+          "ci_bca": {"type": "array", "items": {"type": ["number", "null"]}},
+          "holm_p": {"type": ["number", "null"]},
+          "wilcoxon_p": {"type": ["number", "null"]},
+          "win": {"type": ["boolean", "null"]},
+          "family": {"enum": ["confirmatory", "exploratory"]},
+          "provenance": {"enum": ["SIMULATED", "MEASURED", "DERIVED", "ASSUMED"]}
+        }
+      }
+    },
+    "rho": {
+      "type": "object",
+      "properties": {
+        "tau_b": {"type": "number"},
+        "spearman": {"type": "number"},
+        "ci": {"type": "array", "items": {"type": "number"}},
+        "proxy": {"type": "string"},
+        "provenance": {"const": "MEASURED"}
+      }
+    }
+  }
+}
