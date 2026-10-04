@@ -43,7 +43,7 @@ About 12 h.
   - Gini dispersion;
   - mapping to the latent axis;
   - G1 class per cell and majority.
-- [x] Axis made precise before any estimate: pH = 0.30 is v1's tie-corrected Spearman under v1's margins, which is **0.375** on the latent axis (`rho_definition.md` step 6, `PROTOCOL.md` v0.2). **Needs your confirmation.**
+- [x] Axis made precise before any estimate: pH = 0.30 is v1's tie-corrected Spearman under v1's margins, which is **0.375** on the latent axis (`rho_definition.md` step 6, `PROTOCOL.md` v0.2). Confirmed 4 Oct.
 - [ ] Run cells a, b and h, then `--analyse`; figure F3 draft (`v2_trace_rho.pdf`)
 - [ ] Mapping sensitivity (M2, M3) is in the table; if the sign changes, it goes in the first paragraph
 - [~] `docs/v2/G1_decision.md`: drafted from the result, **signed off by you**. The class is final under the protocol.

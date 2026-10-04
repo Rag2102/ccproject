@@ -16,7 +16,7 @@ Sunday ritual (15 minutes): update this log, tick the week's "done when", log an
 - slipped (and why): the Botezatu 2016 note (closed access; yours, through the library)
 - decisions made:
   - G1 combines cells by majority, with no majority meaning B (`PROTOCOL.md` v0.1, confirmed)
-  - the G1 axis is made precise, pH = 0.30 on v1's Spearman axis = 0.375 on the latent axis (v0.2, written before any estimate; to confirm)
+  - the G1 axis is made precise, pH = 0.30 on v1's Spearman axis = 0.375 on the latent axis (v0.2, written before any estimate; confirmed)
   - cells a, b and h, chosen before any data by workload mix
 - found:
   - v1's third-party table is Backblaze 2013-2017 restricted to drives of at least 1.5 TB; with that filter the rebuild gives 122,620 vs 122,619 drives and 6,907 vs 6,913 failures, and the per-model and per-age tables match within a few drives

@@ -108,7 +108,7 @@ The measured correlation (Kendall tau-b and tie-corrected Spearman, 95% cluster 
 | C0, below (negligible) | CI upper bound < 0.20 | Measurement + safe policy + benchmark |
 | D, no trace | No usable risk proxy after the Week 8 fallback (Alibaba 2018 or tier mix) | Synthetic and adversarial regimes only; venue ceiling drops |
 
-**Axis (v0.2, 4 Oct 2026, before any trace estimate; to confirm).** pH = 0.30 is v1's achieved tie-corrected Spearman under v1's margins. G1 compares on the latent Gaussian-copula axis: pH_L = 0.375 (and the 0.20 boundary converted the same way) against each cell's τ-b mapped to ρ_L under that cell's margins (`rho_definition.md`, step 6). The CI-width rule (> 0.30 means B) is applied on the latent axis.
+**Axis (v0.2, 4 Oct 2026, before any trace estimate; confirmed by the owner).** pH = 0.30 is v1's achieved tie-corrected Spearman under v1's margins. G1 compares on the latent Gaussian-copula axis: pH_L = 0.375 (and the 0.20 boundary converted the same way) against each cell's τ-b mapped to ρ_L under that cell's margins (`rho_definition.md`, step 6). The CI-width rule (> 0.30 means B) is applied on the latent axis.
 
 **Combining cells (confirmed 4 Oct 2026).** Each cell analysed gets its own class from the table above, using mapping M1 and the primary proxy (`rho_definition.md`). The G1 class is the class held by a strict majority of those cells. If no class has a majority, the G1 class is B (unresolved): a split across cells is treated the same way as a CI that straddles pH. A cell with no usable risk proxy counts as D. Every cell's class and interval is shown in `G1_decision.md`, not only the majority.
 
@@ -140,6 +140,6 @@ Record: `G3_decision.md`, tag `results-frozen`.
 
 - `protocol-v0`: sent to the advisor in Week 3.
 - v0.1 (4 Oct 2026): G1 cell-combination rule added (section 7), confirmed by the owner. Still before any trace data is read, so not a post-freeze change.
-- v0.2 (4 Oct 2026): G1 axis made precise (section 7): pH = 0.30 is on v1's Spearman axis and is converted to the latent axis (0.375). Written before any trace estimate; to be confirmed by the owner.
+- v0.2 (4 Oct 2026): G1 axis made precise (section 7): pH = 0.30 is on v1's Spearman axis and is converted to the latent axis (0.375). Written before any trace estimate; confirmed by the owner on 4 Oct 2026.
 - `protocol-v1.0`: frozen in Week 17 with the matrix, n from the pilot, budgets, ablations, robustness and sensitivity grids, confirmatory family, analysis scripts and Console schema.
 - After the freeze: `CHANGES_AFTER_FREEZE.md`; results produced under a change are exploratory.
