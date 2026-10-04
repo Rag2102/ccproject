@@ -40,6 +40,6 @@ From the v5 week cards for W11-W14. Built on 4 Oct 2026, ahead of the calendar (
   - SD of Delta, P3 vs P2c: 1.3% (A1), 3.8% (A3). Against the protocol's Bonferroni column (30 seeds: 1.6%; 100 seeds: 3.1%), A3 at this scale does not meet the bound: the design must grow (hosts or horizon), per the protocol's rule
   - achieved correlation of the VMs present at A3: 0.217 against the 0.256 target. Corrected diagnosis: under P0 alone, arrivals overshoot (0.475); the 0.217 is an average over policies that migrate, and migrations lower it. Fixed by calibrating the arrival blend under P0 (`scripts/v2/17_calibrate_regimes.py`)
   - P7 ≤ every policy and P8 ≥ P2 on every cell; per-run time 0.9-3.2 s
-- [ ] Scale ADR (`docs/v2/DECISIONS/ADR-007-scale.md`; ADR-005 and ADR-006 went to the P2 and model-choice decisions) from the SD of Delta **against budget-tuned P2** (ADR-005): hosts, horizon and number of eval seeds. Waits for pilot b (calibrated A3 and B1)
-- [ ] B1 pilot cell: after Week 8's rho
+- [~] Scale ADR drafted (`docs/v2/DECISIONS/ADR-007-scale.md`, proposed): 2,000 hosts × 365 days, n = 30 with a pre-specified extension to 50 if any confirmatory SD exceeds 1.6%. Decision for you at the freeze
+- [x] B1 pilot cell (pilot b, 4 Oct; `results/v2/pilot_w14b.json`; calibrated A3 and B1 at 2%): SD(Delta) P3 vs budget-tuned P2 0.67% (A3) and 1.22% (B1). Calibrated A3 achieves 0.250 under P0 (target 0.256). P7 ≤ every policy and P8 ≥ P2 in both cells
 - [ ] Smoke grid P0-P3, P7, P8 on 5 seeds in regime A: the pilot table doubles as the smoke grid
