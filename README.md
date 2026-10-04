@@ -1,6 +1,7 @@
 # A Workload-Aware, Cost-Sensitive Mitigation Policy for Cloud VM Failures
 
 [![CI](https://github.com/Rag2102/ccproject/actions/workflows/ci.yml/badge.svg)](https://github.com/Rag2102/ccproject/actions/workflows/ci.yml)
+[![CI v2-research](https://github.com/Rag2102/ccproject/actions/workflows/ci.yml/badge.svg?branch=v2-research)](https://github.com/Rag2102/ccproject/actions/workflows/ci.yml?query=branch%3Av2-research)
 ![Python](https://img.shields.io/badge/python-3.12-blue)
 ![Terraform](https://img.shields.io/badge/IaC-Terraform-844FBA)
 ![AWS](https://img.shields.io/badge/cloud-AWS-FF9900)

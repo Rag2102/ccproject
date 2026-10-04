@@ -29,3 +29,10 @@ cloud/infra/bootstrap/crash.log
 # Generated at `terraform apply` time from config.js.tpl -- never hand-edit
 # or commit a real one (see cloud/frontend/config.js.tpl).
 cloud/frontend/config.js
+
+# v2
+results/raw/*
+!results/raw/README.md
+worlds/*.parquet
+worlds/*/
+.dvc/cache

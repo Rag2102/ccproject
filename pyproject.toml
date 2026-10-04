@@ -1,0 +1,40 @@
+# v2 environment managed by uv (uv.lock). v1 deployments (Render, Lambda images,
+# CI) keep using requirements.txt; the pins here must match it.
+
+[project]
+name = "ccproject"
+version = "2.0.0.dev0"
+description = "Workload-aware, cost-sensitive VM failure mitigation: v1 course project and the v2 research programme (VMMBench)."
+readme = "README.md"
+requires-python = ">=3.12,<3.13"
+# Same exact pins as requirements.txt: the saved .joblib models in models/ must
+# unpickle (scikit-learn does not guarantee this across versions).
+dependencies = [
+    "pandas==3.0.2",
+    "numpy==2.4.4",
+    "scikit-learn==1.8.0",
+    "scipy==1.17.1",
+    "joblib==1.5.3",
+    "matplotlib==3.10.9",
+    "flask==3.1.3",
+    "pydantic==2.13.3",
+    "gunicorn>=21.2",
+]
+
+[dependency-groups]
+dev = ["pytest==8.3.4", "requests==2.33.1", "ruff==0.8.6"]
+
+[tool.uv]
+package = false
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]          # keeps a bare `pytest` from collecting scripts/test_gqat_numpy_gradcheck.py
+addopts = "-q"
+
+[tool.ruff]
+line-length = 100
+target-version = "py312"
+extend-exclude = ["v1_reference", "cloud", "webapp", "scripts/[0-9][0-9]_*.py", "scripts/numpy_nn.py", "scripts/gqat_net_numpy.py"]
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "B", "UP"]
