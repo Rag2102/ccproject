@@ -97,16 +97,10 @@ def within_host_key(obs: Observation, order: str) -> np.ndarray:
 
 
 def top_hosts_mask(obs: Observation, host_key: np.ndarray, ok: np.ndarray, budget_gb: float):
-    """VMs on the hosts that come first by host_key (ascending) among ok hosts, enough to cover
-    the budget several times over. A speed-up only: the engine takes VMs in order and stops at
-    the budget, so VMs on later hosts could never be reached (the margin covers VMs skipped for
-    lack of a destination)."""
-    n = len(obs.p_h)
-    gb = np.bincount(obs.vm_host, weights=obs.vm_mem_gb, minlength=n)
-    hosts = np.flatnonzero(ok & (gb > 0))
-    hosts = hosts[np.argsort(host_key[hosts], kind="stable")]
-    cum = np.cumsum(gb[hosts])
-    k = int(np.searchsorted(cum, 3 * budget_gb + 200.0)) + 1
-    keep = np.zeros(n, dtype=bool)
-    keep[hosts[:k]] = True
-    return keep[obs.vm_host]
+    """VMs on ok hosts. Until 4 Oct 2026 (after the Week 17 freeze, before any evaluation run;
+    CHANGES_AFTER_FREEZE.md) this kept only the first hosts by host_key, covering 3 x the budget
+    + 200 GB, as a speed-up. That was not exact: VMs the engine skips (no destination, first-fit)
+    left small budgets unfilled (P2 used 88% of a 0.5% budget whatever its tau). Passing every VM
+    costs no measurable time. host_key and budget_gb are kept for the callers' signatures."""
+    del host_key, budget_gb
+    return ok[obs.vm_host]

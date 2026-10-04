@@ -145,3 +145,12 @@ def test_b2_world_has_classes_by_risk_and_runs_clean():
     s0 = engine.run(prep, R.Never(), budget_frac=0.0, check=True)
     s1 = engine.run(prep, R.Never(), budget_frac=0.0)
     assert s0["outcomes_sha256"] == s1["outcomes_sha256"]
+
+
+def test_threshold_fills_a_small_budget_exactly():
+    """Regression (4 Oct 2026): the host pre-filter used to cut the candidate list at 3 x the
+    budget, so P2 used only about 88% of a 0.5% budget and tau had no effect there."""
+    cfg = scenarios.regime(SimConfig(n_hosts=600, horizon_days=60, name="t"), "A1")
+    prep = engine.prepare(worlds.generate(cfg, 101), cfg)
+    s = engine.run(prep, R.Threshold(1e-6, "random", "P2"), budget_frac=0.005)
+    assert s["budget_utilisation"] > 0.99
