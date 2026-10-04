@@ -212,17 +212,32 @@ def convert(name: str, files: list[Path], con: duckdb.DuckDBPyConnection) -> dic
         "count(*) FILTER (alt_date_format AND date IS NOT NULL), "
         "count(*) FILTER (date <> file_date) FROM v"
     ).fetchone()
+    # A row dated differently from its file is dropped when the correctly named file has the
+    # same (date, serial): 2022-12-10.csv holds an exact copy of 2022-12-11 (power-on hours
+    # equal), so that day would otherwise count twice. Archives without such rows are unchanged.
+    dup_dropped = 0
+    if vs_file:
+        con.execute(
+            """CREATE OR REPLACE TEMP VIEW k AS SELECT * FROM v
+               WHERE NOT (date <> file_date AND (date, serial_number) IN
+                          (SELECT date, serial_number FROM v WHERE date = file_date))"""
+        )
+        dup_dropped = (
+            vs_file - con.execute("SELECT count(*) FROM k WHERE date <> file_date").fetchone()[0]
+        )
+    else:
+        con.execute("CREATE OR REPLACE TEMP VIEW k AS SELECT * FROM v")
     out = []
     for year, qn in quarters_of(name):
         pq = PARQUET / f"{year}_Q{qn}.parquet"
         where = f"year(date) = {year} AND quarter(date) = {qn}"
-        n = con.execute(f"SELECT count(*) FROM v WHERE {where}").fetchone()[0]
+        n = con.execute(f"SELECT count(*) FROM k WHERE {where}").fetchone()[0]
         if n == 0:
             log(f"{name}: no rows for {year}_Q{qn}")
             continue
         tmp = pq.with_suffix(".parquet.part")
         con.execute(
-            f"COPY (SELECT * EXCLUDE (file_date, alt_date_format) FROM v WHERE {where} "
+            f"COPY (SELECT * EXCLUDE (file_date, alt_date_format) FROM k WHERE {where} "
             f"ORDER BY date, serial_number) TO '{tmp}' "
             "(FORMAT PARQUET, COMPRESSION ZSTD)"
         )
@@ -253,6 +268,7 @@ def convert(name: str, files: list[Path], con: duckdb.DuckDBPyConnection) -> dic
         "unparseable_dates": bad_dates,
         "rows_with_mdy_dates": alt_format,
         "date_vs_filename_mismatch": vs_file,
+        "duplicate_rows_dropped": dup_dropped,
         "quarters": out,
     }
 
@@ -278,7 +294,8 @@ def process(name: str, zpath: Path, delete_zips: bool) -> dict:
         "csv_files": len(files),
         "csv_rows": csv_rows,
         "parquet_rows": pq_rows,
-        "rows_match": csv_rows == pq_rows + res["unparseable_dates"],
+        "rows_match": csv_rows
+        == pq_rows + res["unparseable_dates"] + res["duplicate_rows_dropped"],
         **res,
         "processed_at": datetime.now(UTC).isoformat(timespec="seconds"),
         "seconds": round(time.time() - t0, 1),
@@ -338,12 +355,13 @@ def main() -> None:
     g.add_argument("--only", nargs="+", metavar="ARCHIVE", help="e.g. data_2013 data_Q1_2016")
     ap.add_argument("--delete-zips", action="store_true", help="delete each ZIP after conversion")
     ap.add_argument("--downloads", type=int, default=3, help="parallel downloads (default 3)")
+    ap.add_argument("--force", action="store_true", help="re-convert even if already done")
     args = ap.parse_args()
 
     for d in (RAW, TMP, PARQUET, META):
         d.mkdir(parents=True, exist_ok=True)
     names = list_archives() if args.all else sorted(args.only, key=archive_order)
-    todo = [n for n in names if not done(n)]
+    todo = names if args.force else [n for n in names if not done(n)]
     log(f"{len(names)} archives, {len(names) - len(todo)} already done, {len(todo)} to do")
 
     failed = []

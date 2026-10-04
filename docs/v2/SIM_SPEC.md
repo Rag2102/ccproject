@@ -98,7 +98,7 @@ At each arrival, choose among UP hosts with capacity:
 - **oracle:** the true conditional probability under the generator (computed from the drives' known hazards and the Weibull);
 - **noisy(σ):** logit(p) + N(0, σ²), with a per-host-per-day draw from the `predictor` stream;
 - **model:** the calibrated v2 model's daily score for each replayed drive, combined across the host's drives;
-- **miscal(γ):** logit(p) × γ.
+- **miscal(γ):** p′ = p^γ, rescaled so the mean over hosts is unchanged (the plan's Week 12 definition; γ < 1 flattens the risk ranking, γ > 1 sharpens it).
 
 ## 10. Policy interface
 
@@ -123,6 +123,7 @@ At each arrival, choose among UP hosts with capacity:
 | Hosts per cluster | 2,000-5,000 (set by the Week 14 pilot) | plan; power from seeds, not scale | — |
 | Drives per host d | 1, 4, 12 | plan; Week 4 group columns give real pod sizes | 1, 4, 12 |
 | VMs per host | about 16 on average | v1: 2.01M VMs on 122,618 hosts | ±50% |
+| Host memory | 144 GB | 16 VMs × 6.07 GB mean (Azure V1; largest VM 112 GB) ÷ 0.70 fill | with VMs per host |
 | VM size, CPU, tier, lifetime | resampled jointly from Azure V1 (`azure_vms_clean.csv.gz`) | v1 | tier weights: 3 alternative vectors |
 | NIC bandwidth, usable share | 10 Gbps, 50% | assumption (v1: 1,250 MB/s, 100%) | 25%, 50%, 100% |
 | Concurrent migrations per host | 2 | assumption | 1, 2, 4 |

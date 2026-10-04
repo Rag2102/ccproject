@@ -1,0 +1,103 @@
+"""Run configuration as frozen dataclasses, loaded from YAML (SIM_SPEC section 11).
+
+Unknown keys are an error, so a typo in a scenario card cannot silently fall back to a default.
+"""
+
+from __future__ import annotations
+
+from dataclasses import asdict, dataclass, field, fields, replace
+from pathlib import Path
+from typing import Any
+
+import yaml
+
+
+@dataclass(frozen=True)
+class MigrationConfig:
+    nic_gbps: float = 10.0
+    usable_share: float = 0.5
+    max_concurrent: int = 2
+    max_rounds: int = 30
+    stop_copy_mb: float = 50.0
+    dirty_mbps_at_100pct_cpu: float = 150.0  # v1
+    blackout_converged_s: float = 1.0  # v1
+    blackout_fallback_s: float = 60.0  # v1
+    v1_closed_form: bool = False  # True for the v1 regression (SIM_SPEC section 6)
+
+
+@dataclass(frozen=True)
+class CostConfig:
+    d_fail_min: float = 10.0  # v1 UNMITIGATED_FAILURE_DOWNTIME_MIN
+    tier_weights: tuple[float, float, float] = (0.3, 0.6, 1.0)  # low, medium, high (v1)
+    lambda_bw: float = 1.0  # weight of migration resource minutes (v1 adds both)
+
+
+@dataclass(frozen=True)
+class FailureConfig:
+    drives_per_host: int = 4
+    hazard_source: str = "v1_lookup"  # "v1_lookup" until the Week 7 model is plugged in
+    non_disk_multiplier: float = 1.0  # 0x, 1x, 3x of the disk failure probability per year
+    weibull_shape: float = 0.7
+    repair_median_days: float = 2.0
+    repair_sigma: float = 0.5
+
+
+@dataclass(frozen=True)
+class PlacementConfig:
+    regime: str = "random"  # random | rho | trace | adversarial
+    rho: float = 0.0  # target tie-corrected Spearman for regime "rho"
+    init_fill: float = 0.70
+    capacity: str = "gb"  # "gb" (memory) or "slots" (v1: equal VM count per host)
+
+
+@dataclass(frozen=True)
+class SimConfig:
+    name: str = "default"
+    n_hosts: int = 2_000
+    host_mem_gb: float = 144.0  # about 16 VMs per host (v1) x 6.07 GB mean (Azure) / 0.70 fill
+    horizon_days: int = 365
+    warmup_days: int = 30
+    risk_h_days: int = 30
+    budget_frac: float = 0.01  # GB per day as a share of cluster memory
+    migration: MigrationConfig = field(default_factory=MigrationConfig)
+    cost: CostConfig = field(default_factory=CostConfig)
+    failure: FailureConfig = field(default_factory=FailureConfig)
+    placement: PlacementConfig = field(default_factory=PlacementConfig)
+
+    def with_(self, **kw: Any) -> SimConfig:
+        return replace(self, **kw)
+
+    def to_dict(self) -> dict:
+        return asdict(self)
+
+
+_NESTED = {
+    "migration": MigrationConfig,
+    "cost": CostConfig,
+    "failure": FailureConfig,
+    "placement": PlacementConfig,
+}
+
+
+def _build(cls, data: dict, where: str):
+    known = {f.name: f for f in fields(cls)}
+    unknown = set(data) - set(known)
+    if unknown:
+        raise ValueError(f"{where}: unknown keys {sorted(unknown)}")
+    kw = {}
+    for k, v in data.items():
+        if cls is SimConfig and k in _NESTED:
+            kw[k] = _build(_NESTED[k], v or {}, f"{where}.{k}")
+        elif isinstance(v, list):
+            kw[k] = tuple(v)
+        else:
+            kw[k] = v
+    return cls(**kw)
+
+
+def from_dict(data: dict) -> SimConfig:
+    return _build(SimConfig, data, "config")
+
+
+def load(path: str | Path) -> SimConfig:
+    return from_dict(yaml.safe_load(Path(path).read_text()) or {})
