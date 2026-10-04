@@ -503,12 +503,14 @@
     <div class="grid-2">
       <div>
         <table id="headline-table">
-          <thead><tr><th>Metric</th><th>Cost-sensitive</th><th>Threshold (matched budget)</th></tr></thead>
+          <thead><tr><th>Metric</th><th>Cost-sensitive</th><th>Threshold (matched budget)</th><th>Threshold (naive, &tau; = 0.0073)</th></tr></thead>
           <tbody></tbody>
         </table>
-        <p class="note">Under random workload placement, the two policies land within ~3% of each other on total cost
-          (matched to the same migration budget) -- an honest, non-confirmatory baseline result. The follow-up
-          experiment on the right shows where the hypothesis <i>does</i> hold.</p>
+        <p class="note">Under random workload placement the fair comparison is the matched-budget column: with nearly the same number of
+          migrations (5,522 vs 5,116, the closest achievable match) the cost-sensitive policy costs about 3.1% more than the threshold
+          policy. The naive column (&tau; = 0.0073, the 95th percentile of host risk) migrates far more and the cost-sensitive policy costs
+          about 11.1% more than it, but that is not a like-for-like comparison. This is an honest, non-confirmatory baseline result; the follow-up experiment on the right
+          shows where the hypothesis <i>does</i> hold.</p>
       </div>
       <div class="chart-panel">
         <span class="chart-eyebrow">Correlation sensitivity</span>

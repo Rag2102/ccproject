@@ -26,6 +26,7 @@ function renderHeadlineTable(headline) {
     <tr>
       <td>${metric.replace(/_/g, " ")}</td>
       <td>${fmtMetric(row.cost_sensitive)}</td>
+      <td>${row.threshold_matched === undefined ? "n/a" : fmtMetric(row.threshold_matched)}</td>
       <td>${fmtMetric(row.threshold)}</td>
     </tr>`).join("");
 }

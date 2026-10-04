@@ -509,16 +509,19 @@
     <div class="grid-2">
       <div>
         <table>
-          <tr><th>Metric</th><th>Cost-sensitive</th><th>Threshold (matched budget)</th></tr>
+          <tr><th>Metric</th><th>Cost-sensitive</th><th>Threshold (matched budget)</th><th>Threshold (naive, &tau; = 0.0073)</th></tr>
           {% for metric, row in headline.items() %}
           <tr><td>{{ metric.replace('_',' ') }}</td>
               <td>{{ '%.4f'|format(row.cost_sensitive) if row.cost_sensitive is number and row.cost_sensitive < 5 else '%.0f'|format(row.cost_sensitive) }}</td>
+              <td>{% if row.threshold_matched is defined %}{{ '%.4f'|format(row.threshold_matched) if row.threshold_matched is number and row.threshold_matched < 5 else '%.0f'|format(row.threshold_matched) }}{% else %}n/a{% endif %}</td>
               <td>{{ '%.4f'|format(row.threshold) if row.threshold is number and row.threshold < 5 else '%.0f'|format(row.threshold) }}</td></tr>
           {% endfor %}
         </table>
-        <p class="note">Under random workload placement, the two policies land within ~3% of each other on total cost
-          (matched to the same migration budget) -- an honest, non-confirmatory baseline result. The follow-up
-          experiment on the right shows where the hypothesis <i>does</i> hold.</p>
+        <p class="note">Under random workload placement the fair comparison is the matched-budget column: with nearly the same number of
+          migrations (5,522 vs 5,116, the closest achievable match) the cost-sensitive policy costs about 3.1% more than the threshold
+          policy. The naive column (&tau; = 0.0073, the 95th percentile of host risk) migrates far more and the cost-sensitive policy costs
+          about 11.1% more than it, but that is not a like-for-like comparison. This is an honest, non-confirmatory baseline result; the follow-up experiment on the right
+          shows where the hypothesis <i>does</i> hold.</p>
       </div>
       <div class="chart-panel">
         <span class="chart-eyebrow">Correlation sensitivity</span>
