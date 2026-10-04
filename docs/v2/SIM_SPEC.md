@@ -1,6 +1,6 @@
 # Simulator v2: design specification (Week 10)
 
-Status: draft v0, 4 Oct 2026 (ahead of the calendar). Source: v5 plan Part I section 7 (architecture, parameters, validation), v3 section 3.1 (BAM), `PROTOCOL.md` v0.2 (policies, regimes, accounting), v1's code for the regression values. The test for this document (Week 10 card): someone can implement from it without asking a question. Items marked **[open]** need a decision before Week 11 starts; each has a default.
+Status: v0.1, 4 Oct 2026 (ahead of the calendar); the three open defaults were confirmed by the owner on 4 Oct. Source: v5 plan Part I section 7 (architecture, parameters, validation), v3 section 3.1 (BAM), `PROTOCOL.md` v0.2 (policies, regimes, accounting), v1's code for the regression values. The test for this document (Week 10 card): someone can implement from it without asking a question. Items left open are listed in section 15.
 
 ## 1. What the simulator must do
 
@@ -89,7 +89,7 @@ At each arrival, choose among UP hosts with capacity:
 | D | ρ_L moves from 0.1 to 0.6 at mid-run; calibration drifts (γ from 1.0 to 0.7) |
 | E1-E3 | ρ_L = 0; σ_log κ ∈ {0.25, 0.5, 1.0} |
 
-**[open] Initial fill:** the warm-up fills the cluster to 70% memory with the same placement rule. Default: 70%, from v1's VMs-per-host and Resource Central's typical utilisation; to confirm.
+**Initial fill (confirmed 4 Oct):** the warm-up fills the cluster to 70% memory with the same placement rule.
 
 ## 9. Predictor interface
 
@@ -108,7 +108,7 @@ At each arrival, choose among UP hosts with capacity:
 - b_i = p_j · c_i · e_i − m_i, with w_i = mem_gb;
 - e_i is the probability that the migration finishes before the host fails, given its position in the host's queue (from E_TTF and the duration of the migrations ahead of it); it is recomputed after each pick.
 
-**[open] VM lifetimes.** The median Azure VM lives 40 minutes (`v1_anomaly.md`, H6). Most VMs on a host will leave before it fails, which the plan's c_i does not account for.
+**VM lifetimes (confirmed 4 Oct).** The median Azure VM lives 40 minutes (`v1_anomaly.md`, H6). Most VMs on a host will leave before it fails, which the plan's c_i does not account for.
 - **Default:** BAM and P3 use c_i × s_i, where s_i is the probability that VM i is still running H days ahead given its current age, from the empirical Azure lifetime distribution. A policy may know a VM's age; it may not know `t_depart`.
 - Both versions are run as an ablation in Week 20.
 
@@ -165,9 +165,7 @@ At each arrival, choose among UP hosts with capacity:
 
 ## 15. Open items
 
-- **[open] VM lifetime in BAM and P3** (section 10). Default: survival-weighted c_i, plus an ablation.
-- **[open] Initial fill:** 70% (section 8).
-- **[open] Repair model:** a repaired host returns empty with new drives. The alternative, permanent removal plus a replacement host, gives the same cluster size; the default is chosen because it keeps host IDs stable.
+- Confirmed 4 Oct: survival-weighted c_i in BAM and P3, with the unweighted version as an ablation; initial fill 70%; a repaired host returns empty with new drives.
 - To verify against sources: Narya's scoring cadence; Clark et al.'s round and stop thresholds.
 - Week 11 calibrates the A-regime placement's ρ_L to the achieved τ-b, using the same contingency code as `scripts/v2/13_trace_rho.py`.
 

@@ -64,5 +64,5 @@ About 12 h.
   - placement per regime, predictor and policy interfaces;
   - parameter table with sources;
   - 9 invariants, architecture, performance target (≤ 10 s per policy-seed at 5,000 hosts × 365 days), G2 validation.
-- [~] Three open items with defaults (VM lifetime in BAM, initial fill, repair model): yours to confirm
+- [x] Three open items confirmed with their defaults (4 Oct): survival-weighted interruption cost, 70% initial fill, repaired host returns empty
 - [ ] Reader test: someone reads it for 30 minutes and lists their questions
