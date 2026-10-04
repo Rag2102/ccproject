@@ -11,6 +11,7 @@ Sunday ritual (15 minutes): update this log, tick the week's "done when", log an
 - decisions made:
   - ADR-005: P2 is tuned to use the budget, as the protocol says (owner, 4 Oct). P2c is not a comparator; tables show P0 and P3 next to P2
   - ADR-006: the simulator's model is chosen by validation PR-AUC on raw scores, rule committed (0b05ff3) before the scores were computed
+  - P6 falls back to P2, as pre-registered (owner, 4 Oct), although with budget-tuned P2 the fallback costs more than BAM and more than never migrating (P6 smoke rerun: regret 69-158%)
 - found:
   - BAM as specified over-migrates: b = p·c·e − m ignores the value of waiting (decisions recur daily, most VMs leave before their host fails) and the destination's risk. Input for THEORY.md (Week 17)
   - P6's plug-in advantage uses BAM's own formula, so it is almost always positive; the calibration audit is the guard's real protection
