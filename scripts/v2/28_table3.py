@@ -40,8 +40,14 @@ def cell(c: dict) -> tuple[str, str]:
 def main() -> None:
     ap = argparse.ArgumentParser(description=__doc__.splitlines()[0])
     ap.add_argument("--dry-run", action="store_true")
+    ap.add_argument("--small", action="store_true", help="make reproduce-small")
     a = ap.parse_args()
-    summ = ROOT / "results" / ("dryrun_summary" if a.dry_run else "summary")
+    summ = (
+        ROOT
+        / "results"
+        / ("small" if a.small else "")
+        / ("dryrun_summary" if a.dry_run else "summary")
+    )
     conf = json.loads((summ / "confirmatory.json").read_text())
     rows, csv = [], []
     by = {(c["regime"], c["budget_pct"], c["policy"]): c for c in conf["cells"]}
@@ -80,7 +86,11 @@ def main() -> None:
             r"\bottomrule\end{tabular}\end{table*}",
         ]
     )
-    out_tex = ROOT / "paper" / "tables" / ("table3_dryrun.tex" if a.dry_run else "table3.tex")
+    out_tex = (
+        (summ / "table3.tex")
+        if (a.small or a.dry_run)
+        else ROOT / "paper" / "tables" / "table3.tex"
+    )
     out_tex.parent.mkdir(parents=True, exist_ok=True)
     out_tex.write_text(tex + "\n")
     pd.DataFrame(csv).to_csv(summ / "table3.csv", index=False)

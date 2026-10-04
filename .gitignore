@@ -47,3 +47,5 @@ results/raw/*/*/
 results/dryrun/*/*/
 results/raw/tuning/*.tmp
 results/dryrun_summary/
+results/small/
+console/data/

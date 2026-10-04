@@ -20,3 +20,11 @@ Tags: `protocol-v1.0` and `v2.0-rc1` are on the freeze commit d126174. `v2.0-rc2
 | 5 Oct 2026 | Morris implemented in the repo (`vmsim/morris.py`), not SALib | Owner decision: no new dependency; Sobol only if compute allows | — | None |
 
 Also recorded: testing the Week 19 scripts ran them on the Week 17 dry run (eval seeds 1-2, code from before the pre-filter fix). Comparisons on those two seeds were displayed. They feed no decision and are superseded by the Week 18-19 runs.
+
+## Week 21-22 preparation (5 Oct 2026, before any evaluation run)
+
+| Date | Change | Reason | Commit | Results affected |
+| --- | --- | --- | --- | --- |
+| 5 Oct 2026 | `worlds.generate`, regime B2: if the initial class-constrained placement leaves a VM without room, retry largest-first (first-fit decreasing) | Bug found by `make reproduce-small`: at 300 hosts, seeds 1-5 and 30 crashed ("initial VMs do not fit") because the largest VMs (up to 112 GB) met already fragmented hosts | this commit | None for the frozen matrix: the retry runs only when the first pass fails, and every eval and replication seed (1-30, 1001-1030) at 2,000 hosts passes the first pass, so its world is unchanged |
+| 5 Oct 2026 | Runner: `--regimes/--policies/--budgets` filters, `--subdir` for collect, `--small` mode; statistics `--subdir`/`--small` | Week 21 seed replication (confirmatory cells only) and `make reproduce-small` | this commit | None: the frozen card hashes are computed from the unfiltered matrix |
+| 5 Oct 2026 | Second placement source: Alibaba 2018 chosen (owner), then found to have no machine-risk signal (all machines "USING" for the whole trace, no attribute changes). The 20 GB batch file was not downloaded | Decision needed (owner) | — | G3 "Strong" needs a second source |

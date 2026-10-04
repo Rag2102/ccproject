@@ -14,16 +14,17 @@ from __future__ import annotations
 
 import argparse
 import json
+import sys
 from pathlib import Path
 
 import numpy as np
 import pandas as pd
 
 ROOT = Path(__file__).resolve().parents[2]
-COLORS = {
-    "P0": "#888888", "P1": "#c9a227", "P2": "#e0571f", "P3": "#8c6bb1", "P4": "#12a150",
-    "P5": "#2563eb", "P6": "#0e9f9a", "P7": "#111111", "P8": "#bbbbbb",
-}  # fmt: skip
+sys.path.insert(0, str(Path(__file__).resolve().parent))
+import figstyle  # noqa: E402
+
+COLORS = figstyle.C
 
 
 def load(root: Path, groups: list[str]) -> pd.DataFrame:
@@ -57,6 +58,7 @@ def figure(res: dict, path: Path) -> None:
     matplotlib.use("Agg")
     import matplotlib.pyplot as plt
 
+    figstyle.apply()
     regs = list(res)
     fig, ax = plt.subplots(2, len(regs), figsize=(3.2 * len(regs), 6.2), squeeze=False)
     for j, r in enumerate(regs):
@@ -87,20 +89,18 @@ def main() -> None:
     ap = argparse.ArgumentParser(description=__doc__.splitlines()[0])
     ap.add_argument("--groups", nargs="+", default=["A", "E", "B", "C", "D"])
     ap.add_argument("--dry-run", action="store_true")
+    ap.add_argument("--small", action="store_true", help="make reproduce-small")
     a = ap.parse_args()
-    root = ROOT / "results" / ("dryrun" if a.dry_run else "raw")
-    out = ROOT / "results" / ("dryrun_summary" if a.dry_run else "summary")
+    res_root = ROOT / "results" / ("small" if a.small else "")
+    root = res_root / ("dryrun" if a.dry_run else "raw")
+    out = res_root / ("dryrun_summary" if a.dry_run else "summary")
     out.mkdir(parents=True, exist_ok=True)
     groups = [g for g in a.groups if (root / g).exists()]
     res = frontiers(load(root, groups))
     (out / "pareto.json").write_text(json.dumps(res, indent=1))
-    figure(
-        res,
-        ROOT
-        / "results"
-        / "figures"
-        / ("v2_F5_pareto_dryrun.pdf" if a.dry_run else "v2_F5_pareto.pdf"),
-    )
+    fig_dir = res_root / "figures" if a.small else ROOT / "results" / "figures"
+    fig_dir.mkdir(parents=True, exist_ok=True)
+    figure(res, fig_dir / ("v2_F5_pareto_dryrun.pdf" if a.dry_run else "v2_F5_pareto.pdf"))
     print({r: {p: round(v, 3) for p, v in x["normalised_area"].items()} for r, x in res.items()})
 
 

@@ -91,6 +91,11 @@ def fig_ablation(res: dict) -> None:
     matplotlib.use("Agg")
     import matplotlib.pyplot as plt
 
+    sys.path.insert(0, str(Path(__file__).resolve().parent))
+    import figstyle
+
+    figstyle.apply()
+
     if not res:
         return
     d = pd.DataFrame(
@@ -162,6 +167,11 @@ def fig_f7(res: dict, w: dict) -> None:
     matplotlib.use("Agg")
     import matplotlib.pyplot as plt
 
+    sys.path.insert(0, str(Path(__file__).resolve().parent))
+    import figstyle
+
+    figstyle.apply()
+
     if not res:
         return
     f7 = w["robustness"]["f7"]
@@ -226,6 +236,11 @@ def fig_morris(res: dict) -> None:
 
     matplotlib.use("Agg")
     import matplotlib.pyplot as plt
+
+    sys.path.insert(0, str(Path(__file__).resolve().parent))
+    import figstyle
+
+    figstyle.apply()
 
     if not res.get("ranking"):
         return

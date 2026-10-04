@@ -2,6 +2,20 @@
 
 Sunday ritual (15 minutes): update this log, tick the week's "done when", log any cut as an ADR, re-read the next gate's criteria, update `CAPACITY.md` for the coming month, write Monday's first task. Newest week first. Hours are yours to fill; nothing here is estimated.
 
+## Weeks 21-22 (22 Feb-7 Mar 2027)
+- planned hours: 12 + 14   actual hours: __
+- done (5 Oct, ahead of the weeks):
+  - Week 21: the regime-D adaptive analysis and F8; the seed-replication launcher; `make reproduce-small` (3.6 min); the G3 template; SoCC verified on the official page.
+  - Week 22: `paper/main.tex` (SoCC format); `numbers.tex` (143 macros) with a missing-macro test; the claims ledger; Okabe-Ito figure style; the static Console skeleton.
+  - Bug fixed: B2 world generation at small scale; the frozen matrix is unaffected (logged).
+- slipped (and why):
+  - every result-dependent item (G3 verdict, results freeze, results prose) waits for the overnight runs;
+  - the paper is not compiled yet (BasicTeX, yours to install);
+  - the second placement source waits for a decision.
+- decisions made: Alibaba 2018 as the second source (owner), then found unusable (no machine-risk signal); BasicTeX; a static Console with no npm.
+- risks changed: R-new, second source. Alibaba 2018 has no failure signal; without a second source G3 cannot be Strong.
+- next task: run `scripts/v2/run_overnight.sh`; decide the second source
+
 ## Weeks 17-20 (25 Jan-21 Feb 2027)
 - planned hours: 12 × 4   actual hours: __
 - done (4-5 Oct, ahead of the weeks):

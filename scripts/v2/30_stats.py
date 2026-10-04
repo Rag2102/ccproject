@@ -132,14 +132,19 @@ def main() -> None:
     ap = argparse.ArgumentParser(description=__doc__.splitlines()[0])
     ap.add_argument("--groups", nargs="+", default=["A", "E"])
     ap.add_argument("--dry-run", action="store_true")
+    ap.add_argument("--small", action="store_true", help="make reproduce-small")
+    ap.add_argument("--subdir", help="cells under <group>/<subdir> (seed replication)")
     a = ap.parse_args()
-    m = yaml.safe_load((ROOT / "configs/v2/matrix.yaml").read_text())
+    mfile = "matrix_small.yaml" if a.small else "matrix.yaml"
+    m = yaml.safe_load((ROOT / "configs/v2" / mfile).read_text())
     conf = m["confirmatory"]
-    root = ROOT / "results" / ("dryrun" if a.dry_run else "raw")
-    out = ROOT / "results" / ("dryrun_summary" if a.dry_run else "summary")
+    res = ROOT / "results" / ("small" if a.small else "")
+    root = res / ("dryrun" if a.dry_run else "raw")
+    out = res / ("dryrun_summary" if a.dry_run else "summary")
     out.mkdir(parents=True, exist_ok=True)
+    sfx = f"_{a.subdir}" if a.subdir else ""
 
-    d = load(root, a.groups)
+    d = load(root, [f"{g}/{a.subdir}" if a.subdir else g for g in a.groups])
     rows = cell_stats(d, conf)
     fam = {
         (r["regime"], r["budget_pct"], r["policy"]): r["wilcoxon_p"]
@@ -166,7 +171,7 @@ def main() -> None:
     for g in a.groups:
         regs = set(m["regimes"][g])
         part = [r for r in rows if r["regime"] in regs]
-        (out / f"{g}.json").write_text(json.dumps({"group": g, "cells": part}, indent=1))
+        (out / f"{g}{sfx}.json").write_text(json.dumps({"group": g, "cells": part}, indent=1))
     confirm = {
         "family_size": n_family,
         "present": len(fam),
@@ -175,7 +180,7 @@ def main() -> None:
         "sd_rule_triggered": sd_flags,
         "cells": [r for r in rows if r["family"] == "confirmatory"],
     }
-    (out / "confirmatory.json").write_text(json.dumps(confirm, indent=1))
+    (out / f"confirmatory{sfx}.json").write_text(json.dumps(confirm, indent=1))
     shas = sorted(set(d["git_sha"]))
     console = {
         "schema": "vmconsole/1",
@@ -207,7 +212,7 @@ def main() -> None:
         ],
     }
     check(console, "vmconsole")
-    (out / "vmconsole.json").write_text(json.dumps(console, indent=1))
+    (out / f"vmconsole{sfx}.json").write_text(json.dumps(console, indent=1))
     print(
         f"{len(rows)} cells; confirmatory present {len(fam)} of {n_family}; "
         f"SD rule flags: {len(sd_flags)}"

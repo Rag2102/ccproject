@@ -1,0 +1,35 @@
+% Paper A (plan Week 22). SoCC format, checked 5 Oct 2026 on acmsocc.org/2026/papers.html:
+% acmart sigconf, review, anonymous; 9 pt; 12 pages plus references; dual-anonymous.
+% Numbers come only from numbers.tex (scripts/v2/40_numbers.py); figures only from results/.
+\documentclass[sigconf, review, anonymous]{acmart}
+\usepackage{booktabs}
+\settopmatter{printacmref=false}
+\setcopyright{none}
+\renewcommand\footnotetextcopyrightpermission[1]{}
+
+\input{numbers}
+
+\begin{document}
+\title{Which VMs to Move Before the Hardware Fails:\\Budget-Aware Migration, Measured and Bounded}
+\author{Anonymous}
+\affiliation{\institution{Anonymous}\country{}}
+
+\begin{abstract}
+% written last (plan Week 22, task 3), from the claims ledger (docs/v2/CLAIMS_LEDGER.md)
+\end{abstract}
+
+\maketitle
+
+% writing order (plan Week 22): evaluation, approach and theory, problem, simulator; intro last
+\input{sections/intro}
+\input{sections/problem}
+\input{sections/datasets}
+\input{sections/approach}
+\input{sections/simulator}
+\input{sections/evaluation}
+\input{sections/related}
+\input{sections/discussion}
+
+\bibliographystyle{ACM-Reference-Format}
+\bibliography{refs}
+\end{document}

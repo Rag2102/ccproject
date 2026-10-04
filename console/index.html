@@ -1,0 +1,159 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Research Console · VM Mitigation v2</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;600&family=Nunito:wght@400;600;700;800&family=JetBrains+Mono:wght@500&display=swap" rel="stylesheet">
+<style>
+  /* design tokens shared with the project site (webapp/templates/index.html) */
+  :root {
+    --bg: #040806; --bg-2: #0a120e; --surface: #0b1410; --surface-2: #101b16;
+    --line: rgba(140,255,195,.08); --line-2: rgba(140,255,195,.16);
+    --ink: #e7f3ec; --ink-2: #a2b8ad; --ink-3: #6c8579;
+    --good: #4ee597; --th: #ff9a66; --amber: #f2c25a; --cs: #7cc4ff;
+    --p3: #E69F00; --p4: #009E73; --p5: #0072B2; --p6: #56B4E9;
+    --radius: 22px; --display: 'Fredoka', 'Nunito', sans-serif; --sans: 'Nunito', system-ui, sans-serif;
+    --mono: 'JetBrains Mono', ui-monospace, monospace;
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; font-family: var(--sans); color: var(--ink); line-height: 1.55;
+    background: radial-gradient(1000px 560px at 8% -10%, rgba(34,197,94,.18), transparent 60%), var(--bg); min-height: 100vh; }
+  .wrap { max-width: 1320px; margin: 0 auto; padding: 0 32px; }
+  @media (max-width: 600px) { .wrap { padding: 0 16px; } }
+  header { display: flex; align-items: center; gap: 14px; height: 64px; border-bottom: 1px solid var(--line); padding: 0 28px; }
+  header b { font: 600 18px var(--display); }
+  nav { display: flex; gap: 4px; margin-left: auto; flex-wrap: wrap; }
+  nav span { padding: 7px 13px; border-radius: 999px; font-size: 13.5px; font-weight: 700; color: var(--ink-3); }
+  nav span.on { color: var(--ink); background: var(--line); }
+  nav span small { font-size: 10px; margin-left: 4px; color: var(--ink-3); }
+  .banner { margin: 22px 0 0; padding: 12px 18px; border-radius: 16px; background: rgba(242,194,90,.13); border: 1px solid rgba(242,194,90,.35); color: var(--amber); font-weight: 700; font-size: 14px; }
+  h1 { font: 600 clamp(30px, 4vw, 46px)/1.05 var(--display); margin: 34px 0 8px; letter-spacing: -.02em; }
+  .lede { color: var(--ink-2); max-width: 760px; margin: 0 0 26px; }
+  .grid { display: grid; grid-template-columns: 1fr 340px; gap: 18px; align-items: start; }
+  @media (max-width: 960px) { .grid { grid-template-columns: 1fr; } }
+  .panel { background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); padding: 22px; }
+  .panel h2 { font: 600 18px var(--display); margin: 0 0 4px; }
+  .panel p.sub { margin: 0 0 16px; color: var(--ink-3); font-size: 13.5px; }
+  .controls { display: flex; gap: 14px; flex-wrap: wrap; align-items: center; margin-bottom: 14px; }
+  .seg { display: inline-flex; padding: 4px; gap: 4px; border-radius: 999px; background: var(--bg-2); border: 1px solid var(--line); }
+  .seg button { border: 0; background: transparent; color: var(--ink-2); font: 700 13px var(--sans); padding: 7px 13px; border-radius: 999px; cursor: pointer; }
+  .seg button.on { background: var(--surface-2); color: var(--ink); box-shadow: 0 0 0 1px var(--line-2); }
+  .pol { display: inline-flex; align-items: center; gap: 6px; font-size: 13px; font-weight: 700; color: var(--ink-2); cursor: pointer; }
+  .pol i { width: 10px; height: 10px; border-radius: 50%; display: inline-block; }
+  .chart { position: relative; height: 380px; }
+  .badge { display: inline-block; font: 800 10px var(--sans); letter-spacing: .08em; padding: 3px 9px; border-radius: 999px; }
+  .b-sim { color: var(--cs); background: rgba(124,196,255,.13); }
+  .b-meas { color: var(--good); background: rgba(78,229,151,.12); }
+  .b-ill { color: var(--amber); background: rgba(242,194,90,.13); }
+  table { width: 100%; border-collapse: collapse; font-size: 13px; }
+  th, td { padding: 8px 6px; border-bottom: 1px solid var(--line); text-align: right; }
+  th:first-child, td:first-child { text-align: left; }
+  th { font-size: 11px; color: var(--ink-3); text-transform: uppercase; letter-spacing: .06em; }
+  td { font-family: var(--mono); font-size: 12px; }
+  .rho-row { display: flex; justify-content: space-between; padding: 10px 0; border-bottom: 1px solid var(--line); font-size: 13.5px; }
+  .rho-row b { font: 600 18px var(--display); }
+  footer { margin: 34px 0 48px; color: var(--ink-3); font-size: 12.5px; display: flex; gap: 16px; flex-wrap: wrap; }
+  .empty { color: var(--ink-3); padding: 60px 0; text-align: center; }
+</style>
+</head>
+<body>
+<header>
+  <b>Research Console</b><span style="color:var(--ink-3);font-size:13px">VM Mitigation v2 · read-only</span>
+  <nav aria-label="Sections">
+    <span class="on">S1 Crossover</span><span>S2 Trace Lens<small>soon</small></span><span>S3 Policy Lab<small>soon</small></span><span>S4 Run Matrix<small>soon</small></span>
+  </nav>
+</header>
+<main class="wrap">
+  <div class="banner" id="banner" hidden></div>
+  <h1>How much does budget-aware migration save over a tuned threshold?</h1>
+  <p class="lede">Paired seeds, regression-adjusted Δ against the budget-tuned threshold P2, 95% BCa intervals. Synthetic placement (A1–A7) along the latent correlation ρ<sub>L</sub>; cost spread only (E1–E3) at ρ<sub>L</sub> = 0. Every number comes from <span class="mono">console/data/console.json</span>, generated from <span class="mono">results/summary</span> at the commit shown below.</p>
+  <div class="grid">
+    <section class="panel">
+      <h2>S1 · Crossover Explorer <span class="badge b-sim">SIMULATED</span></h2>
+      <p class="sub">Positive means the policy costs less than P2. Dots: means; bars: 95% intervals; hollow markers at ρ<sub>L</sub> = 0: regime E.</p>
+      <div class="controls">
+        <div class="seg" id="budgets" role="group" aria-label="Budget"></div>
+        <div id="pols" style="display:flex;gap:14px;flex-wrap:wrap"></div>
+      </div>
+      <div class="chart"><canvas id="cx" aria-label="Advantage against correlation"></canvas></div>
+      <div class="empty" id="empty" hidden>No A or E results yet: run the Week 18 matrix, then <span class="mono">make stats console</span>.</div>
+    </section>
+    <aside>
+      <section class="panel" style="margin-bottom:18px">
+        <h2>Where real placement sits <span class="badge b-meas">MEASURED</span></h2>
+        <p class="sub">Google 2019, mapping M1, platform removal proxy (G1 = C0, final).</p>
+        <div id="rho"></div>
+      </section>
+      <section class="panel">
+        <h2>Confirmatory family</h2>
+        <p class="sub" id="scope">Holm over the 30 pre-registered comparisons.</p>
+        <div style="overflow-x:auto"><table id="fam"><thead><tr><th>Cell</th><th>Δ adj</th><th>Holm p</th><th>Win</th></tr></thead><tbody></tbody></table></div>
+      </section>
+    </aside>
+  </div>
+  <footer id="foot"></footer>
+</main>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.4/dist/chart.umd.min.js"></script>
+<script>
+const COL = { P3: '#E69F00', P4: '#009E73', P5: '#0072B2', P6: '#56B4E9' };
+const NAMES = { P3: 'v1 rule (P3)', P4: 'BAM (P4)', P5: 'Narya-inspired (P5)', P6: 'Guard (P6)' };
+let data, budget = 2, shown = new Set(['P4', 'P5', 'P6']), chart;
+const pct = (x, s = true) => (s && x > 0 ? '+' : '') + (100 * x).toFixed(1) + '%';
+
+fetch('data/console.json').then(r => r.json()).then(d => { data = d; init(); }).catch(() => {
+  document.getElementById('empty').hidden = false;
+  document.getElementById('empty').textContent = 'console/data/console.json not found: run `make console` and serve this folder (python3 -m http.server -d console 8040).';
+});
+
+function init() {
+  const m = data.meta;
+  if (!m.results) { const b = document.getElementById('banner'); b.hidden = false; b.textContent = `Demo data (${m.source}): not results. The frozen matrix has not been summarised yet.`; }
+  document.getElementById('foot').innerHTML = `<span>commit <b class="mono">${m.git_sha}</b></span><span>generated ${m.generated}</span><span>source ${m.source}</span><span><span class="badge b-meas">MEASURED</span> real data · <span class="badge b-sim">SIMULATED</span> simulator · <span class="badge b-ill">ILLUSTRATIVE</span> theory sandbox</span>`;
+  const budgets = [...new Set(data.crossover.map(c => c.budget_pct))].sort((a, b) => a - b);
+  if (!budgets.length) { document.getElementById('empty').hidden = false; }
+  if (!budgets.includes(budget)) budget = budgets[0];
+  const bEl = document.getElementById('budgets');
+  budgets.forEach(b => { const x = document.createElement('button'); x.textContent = b + '%'; x.onclick = () => { budget = b; draw(); sync(); }; x.dataset.b = b; bEl.appendChild(x); });
+  const pEl = document.getElementById('pols');
+  Object.keys(NAMES).forEach(p => {
+    const l = document.createElement('label'); l.className = 'pol';
+    l.innerHTML = `<input type="checkbox" ${shown.has(p) ? 'checked' : ''}><i style="background:${COL[p]}"></i>${NAMES[p]}`;
+    l.querySelector('input').onchange = (e) => { e.target.checked ? shown.add(p) : shown.delete(p); draw(); };
+    pEl.appendChild(l);
+  });
+  document.getElementById('rho').innerHTML = data.rho.map(r => `<div class="rho-row"><span>cell ${r.cell}<br><span style="color:var(--ink-3);font-size:12px">τ-b [${r.ci.map(v => v.toFixed(3)).join(', ')}]</span></span><b>${r.tau_b >= 0 ? '+' : ''}${r.tau_b.toFixed(3)}</b></div>`).join('') || '<p class="sub">no measurement file</p>';
+  if (data.meta.holm_scope) document.getElementById('scope').textContent = `Holm over the 30 pre-registered comparisons (${data.meta.holm_scope}).`;
+  document.querySelector('#fam tbody').innerHTML = data.family.map(c => `<tr><td>${c.policy} · ${c.regime} · ${c.budget_pct}%</td><td>${pct(c.delta_adjusted)}</td><td>${c.holm_p == null ? '–' : c.holm_p.toFixed(3)}</td><td>${c.win ? '✓' : '–'}</td></tr>`).join('');
+  sync(); draw();
+}
+function sync() { document.querySelectorAll('#budgets button').forEach(b => b.classList.toggle('on', +b.dataset.b === budget)); }
+function draw() {
+  const cells = data.crossover.filter(c => c.budget_pct === budget && shown.has(c.policy));
+  const sets = [];
+  [...shown].forEach(p => {
+    const a = cells.filter(c => c.policy === p && !c.kappa_sigma && c.regime.startsWith('A')).sort((x, y) => x.rho_latent - y.rho_latent);
+    const e = cells.filter(c => c.policy === p && c.regime.startsWith('E'));
+    sets.push({ label: NAMES[p], data: a.map(c => ({ x: c.rho_latent, y: 100 * c.delta, lo: 100 * c.ci[0], hi: 100 * c.ci[1], n: c.n })), borderColor: COL[p], backgroundColor: COL[p], pointRadius: 5, borderWidth: 2.5, tension: .3 });
+    if (e.length) sets.push({ label: NAMES[p] + ' · E', data: e.map(c => ({ x: -0.03, y: 100 * c.delta, lo: 100 * c.ci[0], hi: 100 * c.ci[1], n: c.n, reg: c.regime })), borderColor: COL[p], backgroundColor: 'transparent', pointRadius: 6, pointBorderWidth: 2, showLine: false });
+  });
+  const bars = { id: 'bars', afterDatasetsDraw(c) {
+    const { ctx, scales: { x, y } } = c; ctx.save();
+    c.data.datasets.forEach((ds, i) => { if (c.getDatasetMeta(i).hidden) return; ctx.strokeStyle = ds.borderColor; ctx.lineWidth = 1.5;
+      ds.data.forEach(p => { if (p.lo == null) return; const px = x.getPixelForValue(p.x); ctx.beginPath(); ctx.moveTo(px, y.getPixelForValue(p.lo)); ctx.lineTo(px, y.getPixelForValue(p.hi)); ctx.stroke(); }); });
+    const z = y.getPixelForValue(0); ctx.setLineDash([5, 5]); ctx.strokeStyle = 'rgba(162,184,173,.5)'; ctx.beginPath(); ctx.moveTo(c.chartArea.left, z); ctx.lineTo(c.chartArea.right, z); ctx.stroke();
+    const one = y.getPixelForValue(1); ctx.strokeStyle = 'rgba(242,194,90,.6)'; ctx.beginPath(); ctx.moveTo(c.chartArea.left, one); ctx.lineTo(c.chartArea.right, one); ctx.stroke();
+    ctx.setLineDash([]); ctx.fillStyle = '#f2c25a'; ctx.font = "700 11px Nunito"; ctx.fillText('δ = 1%', c.chartArea.right - 46, one - 6); ctx.restore(); } };
+  if (chart) chart.destroy();
+  chart = new Chart(document.getElementById('cx'), { type: 'line', data: { datasets: sets }, plugins: [bars], options: {
+    responsive: true, maintainAspectRatio: false, devicePixelRatio: Math.max(2, devicePixelRatio || 1),
+    plugins: { legend: { labels: { color: '#a2b8ad', font: { family: 'Nunito', weight: '700' }, usePointStyle: true } },
+      tooltip: { callbacks: { label: (it) => `${it.dataset.label}: ${it.raw.y >= 0 ? '+' : ''}${it.raw.y.toFixed(2)}% [${it.raw.lo.toFixed(2)}, ${it.raw.hi.toFixed(2)}], n=${it.raw.n}${it.raw.reg ? ' (' + it.raw.reg + ')' : ''}` } } },
+    scales: { x: { type: 'linear', min: -0.06, max: 0.95, title: { display: true, text: 'latent correlation ρL between criticality and host risk', color: '#6c8579', font: { family: 'Nunito', weight: '700' } }, ticks: { color: '#6c8579' }, grid: { color: 'rgba(140,255,195,.06)' } },
+      y: { title: { display: true, text: 'Δ vs P2 (%, adjusted)', color: '#6c8579', font: { family: 'Nunito', weight: '700' } }, ticks: { color: '#6c8579', callback: v => (v > 0 ? '+' : '') + v + '%' }, grid: { color: 'rgba(140,255,195,.06)' } } } } });
+}
+</script>
+</body>
+</html>

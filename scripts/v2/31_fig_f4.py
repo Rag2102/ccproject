@@ -33,7 +33,10 @@ sys.path.insert(0, str(ROOT))
 from vmsim import engine, scenarios, theory, worlds  # noqa: E402
 from vmsim.config import SimConfig  # noqa: E402
 
-POLICIES = {"P4": "C0", "P5": "C1", "P6": "C2", "P3": "C7"}
+sys.path.insert(0, str(Path(__file__).resolve().parent))
+import figstyle  # noqa: E402
+
+POLICIES = {p: figstyle.C[p] for p in ("P4", "P5", "P6", "P3")}
 PARAMS = ROOT / "results" / "v2" / "f4_theory_params.json"
 
 
@@ -96,6 +99,7 @@ def draw(cells: dict, par: dict, budgets: list[float], m: dict, path: Path) -> N
     matplotlib.use("Agg")
     import matplotlib.pyplot as plt
 
+    figstyle.apply()
     lat = scenarios.A_LATENT
     k = len(POLICIES) * len(lat)
     fig, axes = plt.subplots(1, len(budgets), figsize=(5.2 * len(budgets), 4.2), squeeze=False)
@@ -115,7 +119,7 @@ def draw(cells: dict, par: dict, budgets: list[float], m: dict, path: Path) -> N
             if xs:
                 ys_, lo_, hi_ = np.array(ys), np.array(lo), np.array(hi)
                 ax.errorbar(xs, ys_, [ys_ - lo_, hi_ - ys_], fmt="-o", ms=3, color=col, label=pol)
-        for e, mk in zip(m["regimes"]["E"], ("v", "s", "^"), strict=True):
+        for e, mk in zip(m["regimes"]["E"], ("v", "s", "^", "D"), strict=False):
             c = cells.get((e, b, "P4"))
             if c is not None:
                 ax.plot(-0.04, 100 * np.mean(c["per_seed_adj"]), mk, color="C0", ms=5,
@@ -133,8 +137,15 @@ def draw(cells: dict, par: dict, budgets: list[float], m: dict, path: Path) -> N
 
 
 def main() -> None:
-    m = yaml.safe_load((ROOT / "configs/v2/matrix.yaml").read_text())
-    summ = ROOT / "results" / ("dryrun_summary" if "--dry-run" in sys.argv else "summary")
+    small = "--small" in sys.argv
+    m = yaml.safe_load(
+        (ROOT / "configs/v2" / ("matrix_small.yaml" if small else "matrix.yaml")).read_text()
+    )
+    res_root = ROOT / "results" / ("small" if small else "")
+    summ = res_root / ("dryrun_summary" if "--dry-run" in sys.argv else "summary")
+    global PARAMS
+    if small:
+        PARAMS = res_root / "f4_theory_params.json"
     cells = {}
     for g in ("A", "E"):
         f = summ / f"{g}.json"
@@ -144,7 +155,8 @@ def main() -> None:
             c["per_seed_adj"] = c["per_seed_adjusted"]  # Delta - beta (F - mean F), per seed
             cells[(c["regime"], c["budget_pct"], c["policy"])] = c
     par = params(m)
-    fig = ROOT / "results" / "figures"
+    fig = res_root / "figures" if small else ROOT / "results" / "figures"
+    fig.mkdir(parents=True, exist_ok=True)
     draw(cells, par, [1.0, 2.0], m, fig / "v2_F4_advantage.pdf")
     draw(cells, par, [0.5, 5.0], m, fig / "v2_F4_advantage_other_budgets.pdf")
     print(json.dumps({r: {b: round(t3(par[r], b), 4) for b in m["budgets_pct"]} for r in par}))
