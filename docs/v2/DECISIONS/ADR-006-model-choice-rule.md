@@ -1,5 +1,5 @@
 # ADR-006: the simulator's failure model is chosen on validation PR-AUC
-Status: accepted (owner, 4 Oct 2026). Rule written and committed before the validation scores were computed. The result is appended below.
+Status: accepted (owner, 4 Oct 2026). Rule committed (0b05ff3) before the validation scores were computed; result appended below. **Winner: the ensemble.**
 Date: 2026-10-04
 
 Context: `TrainedModel` (the simulator's model-based predictor) needs one Week 7-style model at H = 30. There are three candidates, all on Week 7's split (train 2023-07-01..2025-08-05, validation 2025-08-06..2026-01-16, test 2026-01-17..2026-06-30, v2 features):
@@ -20,4 +20,14 @@ Script: `scripts/v2/22_model_choice.py` → `results/v2/model_choice.json`.
 Consequences: `TrainedModel` and the failure worlds for evaluation seeds 1-30 wait only for this result. The risk-averse BAM variant (Week 16) uses the ensemble's interval if the ensemble wins, and otherwise a bootstrap of the winner.
 
 ## Result
-(appended after the run)
+Run 4 Oct 2026, 21:59 (`scripts/v2/22_model_choice.py`, `results/v2/model_choice.json`, `logs/model_choice.log`). Validation period 2025-08-06..2026-01-16, 930,869 rows, H = 30, raw scores:
+
+| Candidate | Validation PR-AUC [95% CI] |
+| --- | --- |
+| ensemble (20 bootstrap boosted models, mean) | 0.0939 [0.0827, 0.1100] |
+| logit | 0.0720 [0.0621, 0.0845] |
+| boosted (Week 7 single model) | 0.0704 [0.0614, 0.0819] |
+
+The top two (ensemble vs logit) differ by 0.013 to 0.032 (paired bootstrap over drives). The interval excludes 0, so the tie rule does not apply. **The simulator uses the ensemble**, calibrated isotonically on the validation period. Its test numbers, reported and not used for the choice: PR-AUC 0.131, ROC-AUC 0.898 (`results/v2/uncertainty_w16.json`). The ensemble's 5-95% interval serves the risk-averse BAM variant.
+
+On validation, unlike test, logit and boosted are indistinguishable (0.072 vs 0.070). Week 7's test-period lead of logit (0.091 vs 0.074) therefore did not carry over to validation.
