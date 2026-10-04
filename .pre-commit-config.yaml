@@ -11,4 +11,5 @@ repos:
         exclude: ^(v1_reference/|docs/plan/)
       - id: check-added-large-files
         args: [--maxkb=5120]
-        exclude: ^(v1_reference/|docs/plan/)
+        # azure_vms_vmsim.parquet (18 MB): exact extract so CI runs without Git LFS
+        exclude: ^(v1_reference/|docs/plan/|data/processed/azure_vms_vmsim\.parquet$)

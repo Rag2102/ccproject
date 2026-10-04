@@ -15,7 +15,8 @@ import numpy as np
 import pandas as pd
 
 ROOT = Path(__file__).resolve().parents[1]
-AZURE = ROOT / "data" / "processed" / "azure_vms_clean.csv.gz"
+AZURE = ROOT / "data" / "processed" / "azure_vms_clean.csv.gz"  # Git LFS
+AZURE_EXTRACT = ROOT / "data" / "processed" / "azure_vms_vmsim.parquet"  # committed
 V1_DRIVES = ROOT / "data" / "processed" / "backblaze_drives_clean.csv"
 TIER_OF_WEIGHT = {0.3: 0, 0.6: 1, 1.0: 2}  # v1: low, medium, high
 
@@ -43,12 +44,21 @@ class Hosts:
         return len(self.cap_gb)
 
 
-@lru_cache(maxsize=1)
-def azure_table() -> pd.DataFrame:
+def azure_table_from_csv() -> pd.DataFrame:
     cols = ["memory_gb", "vcores", "avg_cpu", "criticality_weight", "lifetime_s"]
     t = pd.read_csv(AZURE, usecols=cols)
     t["tier"] = t["criticality_weight"].round(1).map(TIER_OF_WEIGHT).astype(np.int8)
     return t.drop(columns="criticality_weight")
+
+
+@lru_cache(maxsize=1)
+def azure_table() -> pd.DataFrame:
+    """The Azure VM columns vmsim uses. Read from the committed extract (exact copy of these
+    columns, scripts/v2/09_azure_extract.py), so a checkout without Git LFS works; the LFS CSV is
+    the fallback."""
+    if AZURE_EXTRACT.exists():
+        return pd.read_parquet(AZURE_EXTRACT)
+    return azure_table_from_csv()
 
 
 @lru_cache(maxsize=1)
