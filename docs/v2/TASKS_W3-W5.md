@@ -16,9 +16,9 @@ About 12 h. Deep-work week. Milestone M1.
 Goal: a written diagnosis of the -3.1% at rho = 0, and a protocol that fixes every decision rule before any new data is seen.
 
 ### 1. Reproduce the number from the tag (about 1.5 h)
-- [ ] `git worktree add ../ccproject-v1 v1.0-course`. Use a separate worktree because `06_simulation_evaluation.py` overwrites `simulation_headline_summary.csv` and the per-host file
-- [ ] Run `scripts/06_simulation_evaluation.py` there; confirm 442,701 (threshold at matched budget, 5,522 migrations) vs 456,533 (cost-sensitive, 5,116 migrations)
-- [ ] Diff the new per-host file against `v1_reference/data/simulation_results_per_host.csv`
+- [x] `git worktree add ../ccproject-v1 v1.0-course`. Use a separate worktree because `06_simulation_evaluation.py` overwrites `simulation_headline_summary.csv` and the per-host file
+- [x] Run `scripts/06_simulation_evaluation.py` there; confirm 442,701 (threshold at matched budget, 5,522 migrations) vs 456,533 (cost-sensitive, 5,116 migrations)
+- [x] Diff the new per-host file against `v1_reference/data/simulation_results_per_host.csv`
 - If it does not reproduce exactly, stop and debug: that is the first finding
 - If blocked (v1 cannot be re-run): reproduce from the `v1_reference` CSVs (`scripts/11_headline_matched.py` already does this for the totals) and log the gap as ADR-005
 
