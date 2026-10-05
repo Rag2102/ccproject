@@ -1,4 +1,50 @@
-% Related work (Week 23): Narya (OSDI '20), NENYA, Deoxys, Elkan's cost-sensitive learning, live
-% migration (Clark et al.), Backblaze-based failure prediction; see reading/ and refs.bib.
+% Related work (Week 23), grouped as the plan asks. Each paragraph ends with what the group does
+% not do that this paper does. Rows read only as abstracts are marked in docs/v2/T5_positioning.md;
+% claims about them here are limited to what the abstracts state.
 \section{Related work}
 \label{sec:related}
+
+\paragraph{Failure prediction.}
+Field studies established that drive replacement rates far exceed datasheet values and that
+SMART attributes carry real but incomplete signal~\cite{schroeder2007disk,pinheiro2007failure}.
+Later work predicts disk replacement from SMART data~\cite{botezatu2016predicting} and, in
+production, ranks disks by error-proneness from SMART and system signals with a cost-sensitive
+loss, acting on the top~$r$ under capacity constraints~\cite{xu2018cdef}. We use a predictor of
+this kind as a fixed input and do not claim a better one. These papers stop at the prediction or
+name VM migration as a downstream use; none asks which VMs to move under a migration budget, or
+how the answer depends on where critical work sits.
+
+\paragraph{Failure mitigation systems.}
+Narya~\cite{levy2020narya} chooses mitigation actions per flagged node with A/B tests and a
+Thompson-sampling bandit, NENYA~\cite{wang2022nenya} uses cascade reinforcement learning to trade
+mitigation cost against failures for databases, and Deoxys~\cite{zhang2024deoxys} recommends
+actions for unhealthy nodes with causal inference. All three are deployed at one operator and
+report large relative gains; none publishes data, code or absolute numbers, and none compares
+against a probability threshold tuned to the same budget. Protean~\cite{hadary2020protean} avoids
+risky hosts at allocation time; we take placement as given and measure it instead. Our P5 is a
+Narya-inspired baseline whose every departure from the paper is listed in the artifact. What this
+group does not do is isolate the ranking question, bound the gain from workload awareness, or let
+anyone reproduce the comparison.
+
+\paragraph{Cost-sensitive learning and decision theory.}
+Acting when expected cost exceeds a threshold is the classical cost-sensitive
+rule~\cite{elkan2001foundations}, and filling a budget by benefit density is the greedy solution
+of the knapsack relaxation~\cite{dantzig1957discrete}. We claim neither. What we add is the
+analysis of \emph{when} density ranking beats ranking by probability alone: a closed form for the
+advantage as a function of the correlation between cost and risk, the spread of cost per unit of
+budget and calibration error, and the observation that the accounting window must match the
+decision horizon for the classical guarantee to hold.
+
+\paragraph{Simulators, traces and benchmarks.}
+General cloud simulators such as CloudSim Plus~\cite{cloudsimplus} and OpenDC~\cite{opendc} inject
+host faults and model migration, and learning-augmented systems platforms such as
+Park~\cite{mao2019park} and Gymnasium~\cite{towers2024gymnasium} standardise environments for
+learned policies; VM rescheduling has recently been studied with deep reinforcement learning on
+production traces~\cite{ding2025vm2rl}, and Virt-LM benchmarks migration mechanisms
+themselves~\cite{huang2011virtlm}. Public traces from Google~\cite{tirmazi2020borg,googleclusterdata2019},
+Azure~\cite{cortez2017resource,azurepublicdataset} and Backblaze~\cite{backblaze2026drivestats}
+make realistic inputs available. We found no benchmark that combines calibrated failure worlds
+built from public failure data, a migration budget shared by all moves, paired comparisons on
+common random numbers and a frozen protocol, which is what VMMBench provides. Following
+holistic-evaluation practice~\cite{liang2023helm}, each scenario is documented by a card and every
+reported number traces to a file.

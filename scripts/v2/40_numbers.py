@@ -70,6 +70,35 @@ def build() -> tuple[dict[str, str], list[str]]:
         v["VGOneMaxAbsTauB"] = f"{tb.estimate.abs().max():.3f}"
         v["VGOneMaxLatentUpper"] = f"{tb.latent_high.max():.3f}"
 
+    t2 = RES / "trace_rho_second_table.csv"  # Week 21 second source (cell f), never part of G1
+    if t2.exists():
+        d = pd.read_csv(t2)
+        r = d[
+            (d.mapping == "M1")
+            & (d.proxy == "risk_platform")
+            & (d.weight == "n")
+            & (d.stat == "tau_b")
+        ].iloc[0]
+        v["VSecondTauB"] = f"{r.estimate:+.3f}"
+        v["VSecondLatent"] = f"{r.latent:+.3f}"
+        v["VSecondLatentHi"] = f"{r.latent_high:+.3f}"
+
+    an = load_json(SUMM / "v1_anomaly.json")
+    if an:
+        h6 = an["H6"]
+        v["VVOneAdvRandom"] = pct(h6["delta_by_accounting_window_days"]["inf"])
+        v["VVOneAdvAligned"] = pct(h6["delta_by_window_exact_budgets"]["same_gb"]["30"], 2)
+        v["VVOneMedianLeadDays"] = f"{h6['lead_time']['v1_cost_sensitive']['median_lead_days']:.0f}"
+
+    ex = load_json(RES / "bam_exact_check.json")
+    if ex:
+        v["VBamExactGap"] = pct(ex["sim-A3"]["gap_mean"], 2, sign=False)
+
+    fp = load_json(RES / "f4_theory_params.json")
+    if fp:
+        v["VSigmaKappaNatural"] = f"{fp['A1']['s_y']:.2f}"
+        v["VSigmaPNatural"] = f"{fp['A1']['s_x']:.2f}"
+
     mm = RES / "model_v2_metrics.csv"
     if mm.exists():
         d = pd.read_csv(mm)

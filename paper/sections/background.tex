@@ -1,0 +1,52 @@
+% Background and motivation (Week 23). Sources: reading/levy2020narya.md, reading/tirmazi2020borg.md,
+% reading/resource_central2017.md, docs/v2/v1_final_state.md, docs/v2/v1_anomaly.md.
+\section{Background and motivation}
+\label{sec:background}
+
+\paragraph{Predictive mitigation in production.}
+Narya~\cite{levy2020narya} is the most detailed public account of predictive failure mitigation
+for VMs. A rule set and a gradient-boosted model flag nodes likely to fail within days; for each
+flagged node an online bandit chooses among composite actions such as marking the node
+unallocatable, live-migrating its VMs, or sending it to investigation, and learns from the
+interruptions observed over the following weeks. Its decision is made per node and prediction
+rule. The VMs on a node are not ranked against VMs on other nodes, and what a migration costs in
+network or memory enters only through rate limits, not through the choice. Narya reports its gains
+relative to a fixed action plan, not to a tuned threshold, and only as percentages of
+proprietary totals. Disk-error predictors at the same operator rank disks and act on the top few
+under ``constraints of cost and capacity''~\cite{xu2018cdef}, again without saying which VMs to
+move.
+
+\paragraph{What public traces say about the inputs.}
+Three properties of public data shape the question. First, failure signals are weak at the top of
+the ranking: on the Backblaze fleet our calibrated 30-day model flags drives with a precision of
+about 5\% in its top 1\% (Section~\ref{sec:model}), so most migrations protect VMs whose host
+would not have failed. Second, VMs are short-lived and unequal: most Azure VMs live minutes, while
+the long-lived minority holds almost all memory-time~\cite{cortez2017resource}, so the cost of an
+interruption and the memory a migration moves vary by orders of magnitude across VMs. Third,
+cluster schedulers place work for packing, priority and spread~\cite{tirmazi2020borg,hadary2020protean},
+not for hardware risk, so there is no reason to expect critical work to sit on safer or riskier
+machines, but also no published measurement.
+
+\paragraph{Why the correlation was thought to matter.}
+\label{sec:v1}
+Our course prototype simulated 122{,}618 Backblaze drives as hosts carrying Azure VMs, and
+compared a cost-aware rule (migrate when $p\,c$ exceeds the migration cost) with a probability
+threshold matched to the same number of migrations. With VMs placed at random it found the
+cost-aware rule \VVOneAdvRandom\% behind; as placement was skewed so that critical VMs sat on
+riskier hosts, the sign flipped, reaching +3.4\% at a rank correlation of 0.86. Read at face value
+this says that workload awareness pays only above a break-even correlation, which makes the
+correlation in real placement the quantity that decides the method's value.
+
+A pre-registered diagnosis of the prototype~(eight hypotheses, each with a rule written before it
+was tested) found otherwise. The threshold had received a larger budget: matched on migration
+count, it moved 8\% more hosts and 21\% more memory. And every migration was credited with any
+failure of its host over the whole run, a median of \VVOneMedianLeadDays{} days after a decision
+made on a 30-day probability, so the comparison rewarded predicting the distant future, which
+neither rule was built to do. With the budget matched in memory and the accounting window equal
+to the decision horizon, the cost-aware rule is \VVOneAdvAligned\% ahead at zero correlation.
+The small size of that gain is itself predicted by the theory of Section~\ref{sec:approach} once
+it is diluted by the share of total cost a 30-day decision can affect.
+
+The prototype therefore left two questions open, which this paper answers in order: where real
+placement sits on the correlation axis, and how large the advantage of budget-aware ranking is
+there, with the accounting done right and the comparator tuned to use the same budget.

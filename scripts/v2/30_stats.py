@@ -169,7 +169,8 @@ def main() -> None:
         if r["family"] == "confirmatory" and bound and r["delta_sd"] and r["delta_sd"] > bound
     ]
     for g in a.groups:
-        regs = set(m["regimes"][g])
+        # group S (Week 21 second source) is not in the frozen matrix: its regimes are the ones run
+        regs = set(m["regimes"].get(g) or d.regime.unique())
         part = [r for r in rows if r["regime"] in regs]
         (out / f"{g}{sfx}.json").write_text(json.dumps({"group": g, "cells": part}, indent=1))
     confirm = {
