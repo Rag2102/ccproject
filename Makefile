@@ -53,6 +53,10 @@ console:
 	$(PY) scripts/v2/41_console_data.py
 	@echo "open console/index.html (or: python3 -m http.server -d console 8040)"
 
+# Week 25: the same for double-blind review (no SHA, no repository or demo links)
+console-anon:
+	$(PY) scripts/v2/41_console_data.py --anonymous
+
 # Week 21: reduced versions of every main figure in well under an hour on a laptop
 reproduce-small:
 	PY=$(PY) sh scripts/v2/reproduce_small.sh

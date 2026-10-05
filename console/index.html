@@ -26,9 +26,30 @@
   header { display: flex; align-items: center; gap: 14px; height: 64px; border-bottom: 1px solid var(--line); padding: 0 28px; }
   header b { font: 600 18px var(--display); }
   nav { display: flex; gap: 4px; margin-left: auto; flex-wrap: wrap; }
-  nav span { padding: 7px 13px; border-radius: 999px; font-size: 13.5px; font-weight: 700; color: var(--ink-3); }
-  nav span.on { color: var(--ink); background: var(--line); }
-  nav span small { font-size: 10px; margin-left: 4px; color: var(--ink-3); }
+  nav a { padding: 7px 13px; border-radius: 999px; font-size: 13.5px; font-weight: 700; color: var(--ink-3); text-decoration: none; }
+  nav a.on { color: var(--ink); background: var(--line); }
+  nav a:focus-visible, button:focus-visible, input:focus-visible { outline: 2px solid var(--good); outline-offset: 2px; }
+  .tab[hidden] { display: none; }
+  .lane { position: relative; height: 34px; margin: 4px 0; }
+  .lane .axis { position: absolute; left: 0; right: 0; top: 16px; height: 1px; background: var(--line-2); }
+  .lane .ci { position: absolute; top: 12px; height: 9px; border-radius: 6px; background: rgba(78,229,151,.35); }
+  .lane .pt { position: absolute; top: 9px; width: 15px; height: 15px; margin-left: -7px; border-radius: 50%; background: var(--good); border: 2px solid var(--bg); }
+  .lane.second .ci { background: rgba(124,196,255,.35); } .lane.second .pt { background: var(--cs); }
+  .ref { position: absolute; top: 0; bottom: 0; width: 0; border-left: 2px dashed; }
+  .ref span { position: absolute; top: -18px; left: 4px; font-size: 11px; font-weight: 800; white-space: nowrap; }
+  .lens { position: relative; padding-top: 40px; }
+  .lens .refs { position: absolute; top: 34px; bottom: 0; left: 180px; right: 84px; pointer-events: none; }
+  @media (max-width: 600px) { .lens-row { grid-template-columns: 110px 1fr 56px; } .lens .refs { left: 120px; right: 66px; } }
+  .lens-row { display: grid; grid-template-columns: 170px 1fr 74px; gap: 10px; align-items: center; font-size: 12.5px; }
+  .lens-row .lbl { color: var(--ink-2); font-family: var(--mono); font-size: 11.5px; }
+  .lens-row .v { text-align: right; font-family: var(--mono); font-size: 12px; }
+  .slider { display: grid; grid-template-columns: 150px 1fr 70px; gap: 12px; align-items: center; margin: 10px 0; font-size: 13.5px; }
+  .slider input { width: 100%; accent-color: var(--good); }
+  .verdict { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-top: 16px; }
+  .verdict div { padding: 16px; border-radius: 16px; background: var(--bg-2); border: 1px solid var(--line); }
+  .verdict b { font: 600 20px var(--display); display: block; margin-top: 4px; }
+  .cellgrid td.ok { color: var(--good); } .cellgrid td.part { color: var(--amber); } .cellgrid td.miss { color: var(--ink-3); }
+  .mono { font-family: var(--mono); }
   .banner { margin: 22px 0 0; padding: 12px 18px; border-radius: 16px; background: rgba(242,194,90,.13); border: 1px solid rgba(242,194,90,.35); color: var(--amber); font-weight: 700; font-size: 14px; }
   h1 { font: 600 clamp(30px, 4vw, 46px)/1.05 var(--display); margin: 34px 0 8px; letter-spacing: -.02em; }
   .lede { color: var(--ink-2); max-width: 760px; margin: 0 0 26px; }
@@ -63,11 +84,12 @@
 <header>
   <b>Research Console</b><span style="color:var(--ink-3);font-size:13px">VM Mitigation v2 · read-only</span>
   <nav aria-label="Sections">
-    <span class="on">S1 Crossover</span><span>S2 Trace Lens<small>soon</small></span><span>S3 Policy Lab<small>soon</small></span><span>S4 Run Matrix<small>soon</small></span>
+    <a href="#s1" data-tab="s1" class="on">S1 Crossover</a><a href="#s2" data-tab="s2">S2 Trace Lens</a><a href="#s3" data-tab="s3">S3 Policy Lab</a><a href="#s4" data-tab="s4">S4 Run Matrix</a>
   </nav>
 </header>
 <main class="wrap">
   <div class="banner" id="banner" hidden></div>
+  <div class="tab" id="tab-s1">
   <h1>How much does budget-aware migration save over a tuned threshold?</h1>
   <p class="lede">Paired seeds, regression-adjusted Δ against the budget-tuned threshold P2, 95% BCa intervals. Synthetic placement (A1–A7) along the latent correlation ρ<sub>L</sub>; cost spread only (E1–E3) at ρ<sub>L</sub> = 0. Every number comes from <span class="mono">console/data/console.json</span>, generated from <span class="mono">results/summary</span> at the commit shown below.</p>
   <div class="grid">
@@ -94,6 +116,41 @@
       </section>
     </aside>
   </div>
+  </div>
+
+  <div class="tab" id="tab-s2" hidden>
+    <h1>Where does real placement sit?</h1>
+    <p class="lede">Kendall's τ-b between task criticality and machine risk in Google's 2019 trace, mapped to the latent axis ρ<sub>L</sub> the simulator uses. Every combination of tier mapping (M1–M3), risk proxy and weighting is shown. Cell f was chosen by a fixed rule and analysed separately; it never entered the G1 class, which is final.</p>
+    <section class="panel">
+      <h2>S2 · Trace Lens <span class="badge b-meas">MEASURED</span></h2>
+      <p class="sub" id="lens-sub">Dots: latent ρ<sub>L</sub>; bars: 95% BCa intervals. Dashed lines: the C0 boundary and the prototype's break-even ρ<sub>H</sub>, converted to the same axis.</p>
+      <div class="controls"><div class="seg" id="lens-filter" role="group" aria-label="Rows">
+        <button data-f="primary" class="on">Primary analysis</button><button data-f="all">All combinations</button></div></div>
+      <div class="lens" id="lens"></div>
+    </section>
+  </div>
+
+  <div class="tab" id="tab-s3" hidden>
+    <h1>Why does a policy move this VM, or not?</h1>
+    <p class="lede">One VM on one host, through each rule. BAM moves a VM when its expected benefit b = p·c·e − m is positive and its density b / w clears the day's cut-off. The threshold moves it when the host's p clears τ, whatever the VM is.</p>
+    <section class="panel">
+      <h2>S3 · Policy Lab <span class="badge b-ill">ILLUSTRATIVE</span></h2>
+      <p class="sub">Sliders are free inputs, not results. The cut-off and τ are example values (<span class="badge b-ill">ASSUMED</span>); in the study both are set per regime and budget.</p>
+      <div id="lab"></div>
+      <div class="verdict"><div>BAM (P4)<b id="v-bam"></b><span class="sub" id="w-bam"></span></div><div>Threshold (P2)<b id="v-thr"></b><span class="sub" id="w-thr"></span></div></div>
+      <p class="sub" id="demo-link" style="margin-top:16px"></p>
+    </section>
+  </div>
+
+  <div class="tab" id="tab-s4" hidden>
+    <h1>Is every cell present?</h1>
+    <p class="lede">The frozen matrix: each regime × budget × policy cell and how many evaluation seeds its summary holds. P0 and P2 are the references every cell is compared with, so they have no row of their own.</p>
+    <section class="panel">
+      <h2>S4 · Run Matrix <span class="badge b-sim">SIMULATED</span></h2>
+      <p class="sub" id="mx-sub"></p>
+      <div style="overflow-x:auto"><table class="cellgrid" id="mx"></table></div>
+    </section>
+  </div>
   <footer id="foot"></footer>
 </main>
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.4/dist/chart.umd.min.js"></script>
@@ -111,7 +168,7 @@ fetch('data/console.json').then(r => r.json()).then(d => { data = d; init(); }).
 function init() {
   const m = data.meta;
   if (!m.results) { const b = document.getElementById('banner'); b.hidden = false; b.textContent = `Demo data (${m.source}): not results. The frozen matrix has not been summarised yet.`; }
-  document.getElementById('foot').innerHTML = `<span>commit <b class="mono">${m.git_sha}</b></span><span>generated ${m.generated}</span><span>source ${m.source}</span><span><span class="badge b-meas">MEASURED</span> real data · <span class="badge b-sim">SIMULATED</span> simulator · <span class="badge b-ill">ILLUSTRATIVE</span> theory sandbox</span>`;
+  document.getElementById('foot').innerHTML = `<span>commit <b class="mono">${m.git_sha}</b>${m.anonymous ? ' (double-blind build)' : ''}</span><span>generated ${m.generated}</span><span>source ${m.source}</span><span><span class="badge b-meas">MEASURED</span> real data · <span class="badge b-sim">SIMULATED</span> simulator · <span class="badge b-ill">ILLUSTRATIVE</span> theory sandbox</span>`;
   const budgets = [...new Set(data.crossover.map(c => c.budget_pct))].sort((a, b) => a - b);
   if (!budgets.length) { document.getElementById('empty').hidden = false; }
   if (!budgets.includes(budget)) budget = budgets[0];
@@ -127,7 +184,55 @@ function init() {
   document.getElementById('rho').innerHTML = data.rho.map(r => `<div class="rho-row"><span>cell ${r.cell}<br><span style="color:var(--ink-3);font-size:12px">τ-b [${r.ci.map(v => v.toFixed(3)).join(', ')}]</span></span><b>${r.tau_b >= 0 ? '+' : ''}${r.tau_b.toFixed(3)}</b></div>`).join('') || '<p class="sub">no measurement file</p>';
   if (data.meta.holm_scope) document.getElementById('scope').textContent = `Holm over the 30 pre-registered comparisons (${data.meta.holm_scope}).`;
   document.querySelector('#fam tbody').innerHTML = data.family.map(c => `<tr><td>${c.policy} · ${c.regime} · ${c.budget_pct}%</td><td>${pct(c.delta_adjusted)}</td><td>${c.holm_p == null ? '–' : c.holm_p.toFixed(3)}</td><td>${c.win ? '✓' : '–'}</td></tr>`).join('');
-  sync(); draw();
+  sync(); draw(); lens('primary'); lab(); matrix(); tabs();
+}
+function tabs() {
+  const go = () => { const t = (location.hash || '#s1').slice(1);
+    document.querySelectorAll('.tab').forEach(el => el.hidden = el.id !== 'tab-' + t);
+    document.querySelectorAll('nav a').forEach(a => a.classList.toggle('on', a.dataset.tab === t)); };
+  addEventListener('hashchange', go); go();
+}
+function lens(f) {
+  document.querySelectorAll('#lens-filter button').forEach(b => { b.classList.toggle('on', b.dataset.f === f); b.onclick = () => lens(b.dataset.f); });
+  const rows = (data.rho_all || []).filter(r => f === 'all' || (r.mapping === 'M1' && r.proxy === 'risk_platform' && r.weight === 'n'));
+  if (!rows.length) { document.getElementById('lens').innerHTML = '<p class="sub">no measurement file</p>'; return; }
+  const lo = -0.15, hi = 0.45, X = v => (100 * (Math.min(hi, Math.max(lo, v)) - lo) / (hi - lo)) + '%';
+  const refs = [[data.meta.c0_latent, 'C0 boundary', 'var(--amber)'], [data.meta.pH_latent, 'ρH (prototype break-even)', 'var(--th)'], [0, '0', 'var(--ink-3)']]
+    .filter(r => r[0] != null).map(([v, t, c], i) => `<div class="ref" style="left:${X(v)};border-color:${c}"><span style="color:${c};top:${i === 1 ? -32 : -18}px;${i === 1 ? "left:auto;right:4px" : ""}">${t}</span></div>`).join('');
+  document.getElementById('lens').innerHTML = `<div class="refs">${refs}</div>` + rows.map(r =>
+    `<div class="lens-row"><span class="lbl">cell ${r.cell}${r.second_source ? ' (2nd)' : ''} · ${r.mapping} · ${r.proxy.replace('risk_', '')}${r.weight === 'n' ? '' : ' · ' + r.weight}</span>
+     <div class="lane${r.second_source ? ' second' : ''}"><div class="axis"></div><div class="ci" style="left:${X(r.latent_ci[0])};width:calc(${X(r.latent_ci[1])} - ${X(r.latent_ci[0])})"></div><div class="pt" style="left:${X(r.latent)}" title="τ-b ${r.tau_b.toFixed(3)} [${r.ci.map(v => v.toFixed(3)).join(', ')}]"></div></div>
+     <span class="v">${r.latent >= 0 ? '+' : ''}${r.latent.toFixed(3)}</span></div>`).join('');
+  const all = data.rho_all.filter(r => !r.second_source);
+  const mx = Math.max(...all.map(r => Math.abs(r.tau_b)));
+  document.getElementById('lens-sub').innerHTML = `Across all ${all.length} G1 combinations, |τ-b| ≤ ${mx.toFixed(3)}. Dots: latent ρ<sub>L</sub>; bars: 95% BCa intervals; blue: the second source. Dashed lines: the C0 boundary and the prototype's break-even ρ<sub>H</sub> on the same axis.`;
+}
+function lab() {
+  const S = { p: [0.02, 0.0005, 0.1, 0.0005, 'host failure probability p (30 d)', v => (100 * v).toFixed(2) + '%'],
+    c: [120, 1, 600, 1, 'interruption cost c (min)', v => v.toFixed(0)], e: [0.9, 0, 1, 0.01, 'migration finishes first e', v => v.toFixed(2)],
+    m: [0.5, 0, 5, 0.05, 'migration cost m (min)', v => v.toFixed(2)], w: [8, 1, 112, 1, 'VM memory w (GB)', v => v.toFixed(0) + ' GB'] };
+  const cut = 0.05, tau = 0.01, st = {};
+  document.getElementById('lab').innerHTML = Object.entries(S).map(([k, [v, a, b, step, t]]) => `<label class="slider"><span>${t}</span><input type="range" id="sl-${k}" min="${a}" max="${b}" step="${step}" value="${v}"><span class="mono" id="sv-${k}"></span></label>`).join('');
+  const upd = () => { for (const k in S) { st[k] = +document.getElementById('sl-' + k).value; document.getElementById('sv-' + k).textContent = S[k][5](st[k]); }
+    const b = st.p * st.c * st.e - st.m, dens = b / st.w, bam = b > 0 && dens >= cut, thr = st.p >= tau;
+    document.getElementById('v-bam').textContent = bam ? 'moves it' : 'leaves it';
+    document.getElementById('w-bam').textContent = `b = ${b.toFixed(2)} min; b/w = ${dens.toFixed(3)} per GB ${b <= 0 ? '(not worth moving at any budget)' : dens >= cut ? '≥' : '<'} cut-off ${cut}`;
+    document.getElementById('v-thr').textContent = thr ? 'moves it' : 'leaves it';
+    document.getElementById('w-thr').textContent = `p ${thr ? '≥' : '<'} τ = ${(100 * tau).toFixed(1)}%; c, e, m and w are not used`; };
+  document.querySelectorAll('#lab input').forEach(i => i.oninput = upd); upd();
+  const u = data.meta.policy_lab_url;
+  document.getElementById('demo-link').innerHTML = u ? `The full Policy Lab, with the trained failure models and the migration-cost model, is the <a href="${u}" style="color:var(--good)">live demo</a>.` : 'The full Policy Lab is part of the artifact (link withheld for anonymous review).';
+}
+function matrix() {
+  const M = data.matrix; if (!M) return;
+  const have = {}; M.present.forEach(c => have[`${c.regime}|${c.budget_pct}|${c.policy}`] = c.n_seeds);
+  let full = 0, tot = 0;
+  const head = `<thead><tr><th>Regime</th><th>card hash</th>${M.budgets.map(b => M.policies.map(p => `<th>${p}<br>${b}%</th>`).join('')).join('')}</tr></thead>`;
+  const body = Object.values(M.groups).flat().map(r => `<tr><td>${r}</td><td>${(M.cards[r] || {}).config_hash || '–'}</td>` + M.budgets.map(b => M.policies.map(p => {
+    const n = have[`${r}|${+b}|${p}`]; tot++; if (n >= M.expected_seeds) full++;
+    return `<td class="${n == null ? 'miss' : n >= M.expected_seeds ? 'ok' : 'part'}">${n == null ? '·' : n}</td>`; }).join('')).join('') + '</tr>').join('');
+  document.getElementById('mx').innerHTML = head + '<tbody>' + body + '</tbody>';
+  document.getElementById('mx-sub').textContent = `${full} of ${tot} cells complete (${M.expected_seeds} seeds each); a dot means not run yet. Hashes identify each scenario card; the commit is in the footer.`;
 }
 function sync() { document.querySelectorAll('#budgets button').forEach(b => b.classList.toggle('on', +b.dataset.b === budget)); }
 function draw() {
