@@ -164,7 +164,70 @@ def build() -> tuple[dict[str, str], list[str]]:
         for k in ("VHolmScope", "VWins"):
             v[k] = PLACEHOLDER
             missing.append(k)
+
+    def need(k: str, val: str | None) -> None:
+        """A results macro: its value, or a placeholder listed as missing."""
+        if val is None:
+            missing.append(k)
+            v[k] = PLACEHOLDER
+        else:
+            v[k] = val
+
+    # every other cell of the main matrix (A, E, B, C, D) and the replication, when present
+    for f in sorted(SUMM.glob("[A-E].json")):
+        for c in json.loads(f.read_text())["cells"]:
+            base = (c["policy"], c["regime"].replace("-", ""), f"{float(c['budget_pct']):g}")
+            v.setdefault(name("Delta", *base), pct(c["delta_adjusted"]))
+            v.setdefault(name("CILo", *base), pct(c["ci_bca"][0]))
+            v.setdefault(name("CIHi", *base), pct(c["ci_bca"][1]))
+    rep = load_json(SUMM / "confirmatory_replication.json")
+    need("VWinsReplication", rep and str(sum(bool(c.get("win")) for c in rep["cells"])))
+    rc = {(c["regime"], c["budget_pct"], c["policy"]): c for c in (rep or {}).get("cells", [])}
+    c = rc.get(("B1", 2.0, "P4"))
+    need("VDeltaRepPFourBOneTwo", c and pct(c["delta_adjusted"]))
+
+    # Week 21 second source (group S, regime B1-f)
+    s2 = load_json(SUMM / "S_second.json")
+    sc2 = {(c["budget_pct"], c["policy"]): c for c in (s2 or {}).get("cells", [])}
+    for b in (1, 2):
+        for pol in ("P4", "P6"):
+            c = sc2.get((float(b), pol))
+            need(name("DeltaSecond", pol, b), c and pct(c["delta_adjusted"]))
+
+    # Week 21 adaptive guard on regime D (H4 targets)
+    ad = load_json(SUMM / "adaptive_D.json")
+    for b in (1, 2):
+        r = (ad or {}).get("budgets", {}).get(str(b))
+        need(name("GuardNotWorse", b), r and pct(r["share_not_worse_than_P2_by_1pct"], 0, False))
+        need(
+            name("GuardCapturedNinety", b),
+            r and r.get("share_captured_ge_90pct") is not None
+            and pct(r["share_captured_ge_90pct"], 0, False)
+            or (r and "n/a"),
+        )
+        need(name("GuardVsPTwo", b), r and pct(r["vs_P2_mean"]))
+        need(name("GuardDelay", b), r and f"{r['detection_delay_median_days'] or 0:.0f}")
+
+    # Week 20 global sensitivity: the two factors with the largest mu*
+    mo = load_json(SUMM / "w20_morris.json")
+    rk = sorted((mo or {}).get("ranking", []), key=lambda r: r["rank"])
+    need("VMorrisTopFactor", rk and FACTOR_NAMES.get(rk[0]["factor"], rk[0]["factor"]))
+    need("VMorrisSecondFactor", rk and FACTOR_NAMES.get(rk[1]["factor"], rk[1]["factor"]))
     return v, missing
+
+
+FACTOR_NAMES = {
+    "true_bw_factor": "bandwidth estimation error",
+    "true_dirty_factor": "dirty-rate estimation error",
+    "d_fail_min": "unmitigated downtime",
+    "repair_median_days": "repair time",
+    "non_disk_multiplier": "non-disk hazard",
+    "max_concurrent": "concurrent migrations per host",
+    "init_fill": "initial fill",
+    "budget_pct": "budget",
+    "gamma": "miscalibration",
+    "sigma": "predictor noise",
+}
 
 
 def render(v: dict[str, str]) -> str:
