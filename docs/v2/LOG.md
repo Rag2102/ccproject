@@ -2,6 +2,16 @@
 
 Sunday ritual (15 minutes): update this log, tick the week's "done when", log any cut as an ADR, re-read the next gate's criteria, update `CAPACITY.md` for the coming month, write Monday's first task. Newest week first. Hours are yours to fill; nothing here is estimated.
 
+## Week 18 results (read 5 Oct 2026)
+- run: 330 of 330 cells (A1-A7, E1-E3; 30 seeds), done 10:33. Analysis: `RESULTS_W18.md`, F4, F4b (new), A/E paragraph in `evaluation.tex`. B and C not run or opened.
+- pre-registered: all 12 A3/A5 confirmatory comparisons meet the bar. The SD extension rule is triggered (P5, P6 above 1.6%): A3 and A5 go to n = 50, queued last in `run_rest.sh`.
+- against never migrating:
+  - P2 is worse in every seed.
+  - BAM saves 5-11% (A) and goes from −2.4% to +5.3% with cost spread (E).
+  - **P5 beats BAM everywhere with about 34× fewer migrations.**
+  - P6 is below P0.
+- decisions needed (owner + advisor, at G3): paper framing given that P5 beats BAM; whether to add exploratory variants (BAM with an option to wait; guard falling back to P0).
+
 ## Weeks 23-28 (8 Mar-18 Apr 2027), prepared 5 Oct 2026
 - planned hours: 14 + 12 + 12 + 10 + 7 + 7   actual hours: __
 - done:

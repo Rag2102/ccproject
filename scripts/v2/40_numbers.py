@@ -206,6 +206,11 @@ def build() -> tuple[dict[str, str], list[str]]:
             v.setdefault(name("Delta", *base), pct(c["delta_adjusted"]))
             v.setdefault(name("CILo", *base), pct(c["ci_bca"][0]))
             v.setdefault(name("CIHi", *base), pct(c["ci_bca"][1]))
+            if c.get("migrations_mean") is not None:
+                n_mig = f"{c['migrations_mean']:,.0f}".replace(",", "{,}")
+                v.setdefault(name("Migrations", *base), n_mig)
+            if c.get("utilisation_mean") is not None:
+                v.setdefault(name("Util", *base), pct(c["utilisation_mean"], 1, False))
     rep = load_json(SUMM / "confirmatory_replication.json")
     need("VWinsReplication", rep and str(sum(bool(c.get("win")) for c in rep["cells"])))
     rc = {(c["regime"], c["budget_pct"], c["policy"]): c for c in (rep or {}).get("cells", [])}
@@ -221,6 +226,13 @@ def build() -> tuple[dict[str, str], list[str]]:
                 c = vc.get((reg, float(b), pol))
                 k = name("SaveVsPZero", pol, reg.replace("-", ""), f"{float(b):g}")
                 need(k, c and pct(c["saving_vs_p0_mean"]))
+
+    for (reg, b, pol), c in vc.items():  # every other cell present, descriptive
+        base = (pol, reg.replace("-", ""), f"{float(b):g}")
+        v.setdefault(name("SaveVsPZero", *base), pct(c["saving_vs_p0_mean"]))
+        v.setdefault(name("SaveVsPZeroLo", *base), pct(c["ci_bca"][0]))
+        v.setdefault(name("SaveVsPZeroHi", *base), pct(c["ci_bca"][1]))
+        v.setdefault(name("BeatsPZero", *base), pct(c["share_seeds_beating_p0"], 0, False))
 
     # Week 21 second source (group S, regime B1-f)
     s2 = load_json(SUMM / "S_second.json")
