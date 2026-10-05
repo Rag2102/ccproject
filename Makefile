@@ -2,7 +2,7 @@
 # v1 is run as documented in README.md; nothing here changes it.
 PY ?= .venv/bin/python
 
-.PHONY: test diag data train sim worlds bench stats numbers figures paper console reproduce-small reproduce release
+.PHONY: test diag data train sim worlds bench stats numbers figures paper console reproduce-small reproduce docker-repro release
 
 test:
 	$(PY) -m pytest tests -q
@@ -55,17 +55,26 @@ console:
 
 # Week 21: reduced versions of every main figure in well under an hour on a laptop
 reproduce-small:
-	$(PY) scripts/v2/24_run_matrix.py --small --phase tune --groups A E B C D
-	$(PY) scripts/v2/24_run_matrix.py --small --phase run --groups A E B C D --seeds 1-3
-	$(PY) scripts/v2/24_run_matrix.py --small --phase collect --groups A E B C D --seeds 1-3
-	$(PY) scripts/v2/30_stats.py --small --groups A E B C D
-	$(PY) scripts/v2/31_fig_f4.py --small
-	$(PY) scripts/v2/27_pareto.py --small
-	$(PY) scripts/v2/28_table3.py --small
-	$(PY) scripts/v2/33_adaptive.py --small
-	@echo "figures in results/small/figures, summaries in results/small/summary"
+	PY=$(PY) sh scripts/v2/reproduce_small.sh
 
-worlds reproduce release:
+# Week 25: the full study from the committed extracts (about 14 h on 8 cores), then every summary,
+# figure and number. Raw-data rebuilds (Backblaze, Google 2019) are separate: scripts/v2/fetch_data.sh
+reproduce: bench stats figures numbers
+	scripts/v2/run_w21.sh
+	scripts/v2/run_w21_second.sh
+
+# Week 24: Table 3 (small) from scratch in a clean container, compared with this machine's copy
+docker-repro:
+	scripts/v2/docker_repro.sh
+
+# Week 25: what a release needs; tagging and the Zenodo upload are the owner's (docs/v2/RELEASE.md)
+release:
+	$(PY) scripts/v2/verify_checksums.py
+	$(PY) scripts/v2/40_numbers.py --strict
+	$(PY) -m pytest tests -q
+	@echo "checks passed; tag and Zenodo steps: docs/v2/RELEASE.md"
+
+worlds:
 	@echo "make $@: not yet (see docs/plan, Part I section 6 for the week it first works)"
 
 sim: worlds bench

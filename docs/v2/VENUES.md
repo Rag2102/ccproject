@@ -13,3 +13,19 @@ Last checked on an official page: 5 Oct 2026 (SoCC only; Week 21 task 7, done ea
 | Benchmark / reproducibility venues | not checked | verify | Only if VMMBench attracts ML-policy entries | |
 
 Rule: never submit overlapping work to two venues at the same time. A rejection is progress: revise within two weeks and move one rung.
+
+## Venue-rule checklist: SoCC (Week 25, checked 5 Oct 2026 on acmsocc.org/2026/papers.html)
+
+The 2027 call is not out; these are SoCC 2026's rules. Re-check every row the day the 2027 call appears.
+
+| Rule | SoCC 2026 says | What we do |
+| --- | --- | --- |
+| Format | `\documentclass[sigconf, review, anonymous]{acmart}`, 9 pt | `paper/main.tex` uses it |
+| Length | Full research papers: 12 pages + unlimited references (short and vision: 6) | Target 11 pages + references; appendices count against the 12 unless the 2027 call says otherwise |
+| Anonymity | Dual-anonymous | Author block "Anonymous"; no repository URL in the submission. Link the artifact through an anonymised mirror (for example anonymous.4open.science) built from the release tag; owner creates it |
+| Preprints | Allowed (arXiv, technical reports, talks, social media), **but the submission must use an anonymised system or project name different from any used in such contexts** | If a preprint names the benchmark "VMMBench", the submission renames it (for example "the benchmark") and drops the repository name. Decide before posting |
+| Round 1 / round 2 | A paper rejected in round 1 may not be resubmitted in round 2 | Submit in one round only; the plan targets round 2 |
+| Artifact evaluation | Not stated on the page | Artifact ready regardless (`ARTIFACT.md`, `make reproduce-small`, Docker) |
+| Ethics / data statements | Not stated | Data statement drafted in `docs/v2/SUBMISSION.md`: public data only, no personal data, terms per source |
+| Supplementary material | Not stated | None planned; the anonymised artifact link replaces it |
+| Conflicts of interest | Not stated on the page (entered in the submission system) | Owner lists them at submission |

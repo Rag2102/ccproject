@@ -15,20 +15,37 @@
 \affiliation{\institution{Anonymous}\country{}}
 
 \begin{abstract}
-% written last (plan Week 22, task 3), from the claims ledger (docs/v2/CLAIMS_LEDGER.md)
+% 150-200 words (plan Week 23); every number is a macro; every sentence maps to the claims ledger
+Cloud operators move VMs off hosts predicted to fail, under a daily migration budget. Which VMs
+should go first? Ranking by expected benefit per GB moved is a classical cost-sensitive rule, but
+when it beats the operational default, a tuned threshold on failure probability, has not been
+measured, and our own prototype suggested it pays only when critical VMs sit on risky hosts. We
+show that this was an accounting artifact. In four Google 2019 cells, criticality and machine risk
+are essentially uncorrelated ($|\tau_b| \le \VGOneMaxAbsTauB$). Under calibrated probabilities,
+equal budgets and horizon-matched accounting, budget-aware ranking never loses in expectation; a
+closed form, confirmed by Monte Carlo at \VTheoryPoints{} points, shows its advantage is driven by
+the spread of cost per GB, not by correlation, while flattening miscalibration can reverse it. In
+a validated simulator built from public drive, VM and placement data, at the measured
+correlation and a 2\% budget, budget-aware migration's adjusted advantage over the tuned threshold
+is \VDeltaPFourBOneTwo\% (95\% CI [\VCILoPFourBOneTwo, \VCIHiPFourBOneTwo]\%), and \VWins{} of
+\VFamilySize{} pre-registered comparisons clear a 1\% bar. We release the simulator, the frozen
+protocol and VMMBench.
 \end{abstract}
 
 \maketitle
 
-% writing order (plan Week 22): evaluation, approach and theory, problem, simulator; intro last
+% order: plan section 14 (intro, background, problem, approach, data, simulator, evaluation,
+% discussion, related work, conclusion)
 \input{sections/intro}
+\input{sections/background}
 \input{sections/problem}
-\input{sections/datasets}
 \input{sections/approach}
+\input{sections/datasets}
 \input{sections/simulator}
 \input{sections/evaluation}
-\input{sections/related}
 \input{sections/discussion}
+\input{sections/related}
+\input{sections/conclusion}
 
 \bibliographystyle{ACM-Reference-Format}
 \bibliography{refs}

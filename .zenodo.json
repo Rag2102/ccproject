@@ -1,0 +1,8 @@
+{
+  "title": "VMMBench: budget-aware VM failure mitigation, simulator and benchmark",
+  "upload_type": "software",
+  "license": "Apache-2.0",
+  "creators": [{"name": "Gupta, Raghav"}],
+  "keywords": ["cloud computing", "failure mitigation", "live migration", "benchmark", "simulation"],
+  "description": "Code, frozen protocol, scenario cards and processed results for the v2 study of budget-aware VM migration. Raw third-party data is not included; scripts/v2/fetch_data.sh downloads it and checks every file against data/CHECKSUMS.sha256."
+}

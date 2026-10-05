@@ -1,7 +1,7 @@
 % Datasets (draft, Week 12; written 4 Oct 2026 from docs/v2/data_sources.md).
-% Counts marked %N are to be replaced by macros from numbers.tex when it exists.
+% Counts come from numbers.tex (Week 23 notation pass).
 
-\section{Datasets}
+\section{Data and failure model}
 \label{sec:data}
 
 We use three public datasets and no proprietary data. Each is used under its published terms;
@@ -14,8 +14,8 @@ Table~\ref{tab:data} summarises them.
     \toprule
     Dataset & Period & Size & Used for \\
     \midrule
-    Backblaze Drive Stats~\cite{backblaze2026drivestats} & Apr 2013--Jun 2026 & 744.3M drive-days, 512{,}600 drives & failure model \\
-    Google cluster trace~\cite{googleclusterdata2019,tirmazi2020borg} & May 2019 & 3 of 8 cells, about 12k machines each & empirical $\rho$ \\
+    Backblaze Drive Stats~\cite{backblaze2026drivestats} & Apr 2013--Jun 2026 & \VDriveDaysM{}M drive-days, \VDrives{} drives & failure model \\
+    Google cluster trace~\cite{googleclusterdata2019,tirmazi2020borg} & May 2019 & 3 of 8 cells (+1), 10--12k machines each & empirical $\rho$ \\
     Azure Public Dataset V1~\cite{azurepublicdataset,cortez2017resource} & 2017 & 2{,}013{,}767 VMs & VM size, tier, lifetime \\
     \bottomrule
   \end{tabular}
@@ -58,3 +58,34 @@ utilisation~\cite{cortez2017resource}. We use the category as the criticality ti
 VM size, CPU, tier and lifetime jointly from it. VMs in this trace are short-lived (median
 lifetime 40 minutes), which matters for what a migration can protect
 (Section~\ref{sec:problem}).
+
+\paragraph{Failure model.}
+\label{sec:model}
+We predict whether a drive fails within $H$ days from its SMART attributes, their recent trends,
+its model and its age, and train only on the past: training ends in August 2025, the validation
+period (used to choose the model and fit its calibration) ends in January 2026, and the test
+period runs to June 2026. At $H=30$ days a gradient-boosted model reaches a test PR-AUC of
+\VPrAucSMART{} and ROC-AUC of \VRocAucSMART; the prototype's features (model, capacity and age),
+refitted on the same split, reach a PR-AUC of only \VPrAucVOneFeatures, barely above the base
+rate. The signal is in the SMART telemetry, not the model class: a logistic regression on the
+same features does as well (\VPrAucLogit). We chose the predictor for the simulator by a rule
+fixed in advance, the highest validation PR-AUC, which selected an ensemble of boosted models
+(\VPrAucEnsembleVal{} against \VPrAucLogitVal{} for the next best). Isotonic calibration fitted on
+the validation period makes its probabilities usable as $p$ in Eq.~\eqref{eq:benefit}. Even so,
+most drives the model flags do not fail within the horizon, which is why what a migration costs
+matters.
+
+\paragraph{Where real placement sits.}
+\label{sec:rho}
+For each cell we compute Kendall's $\tau_b$ between the criticality tier of every placement and
+the risk proxy of its machine, over three weekly windows after a one-week warm-up, with
+bias-corrected bootstrap intervals over machines. To compare with the simulator, each value is
+also mapped to the latent axis of a Gaussian copula under that cell's own margins ($\rho_L$). The
+method, the three cells and the decision rule were fixed before any data was read. In all three
+cells, under every combination of three tier mappings, three proxies and two weightings,
+$|\tau_b| \le \VGOneMaxAbsTauB$ and the upper end of every latent interval is at most
+\VGOneMaxLatentUpper. The sign of the estimate changes with the analysis choices; its magnitude
+does not. A fourth cell, chosen by a rule fixed before downloading it and analysed separately,
+gives $\tau_b = \VSecondTauB$ ($\rho_L = \VSecondLatent$). Critical work is essentially uncorrelated
+with machine risk, so the realistic regimes of our evaluation (B1 and its interval ends) place VMs
+at these measured values.
