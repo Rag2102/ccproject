@@ -2,6 +2,25 @@
 
 Sunday ritual (15 minutes): update this log, tick the week's "done when", log any cut as an ADR, re-read the next gate's criteria, update `CAPACITY.md` for the coming month, write Monday's first task. Newest week first. Hours are yours to fill; nothing here is estimated.
 
+## Weeks 23-28 (8 Mar-18 Apr 2027), prepared 5 Oct 2026
+- planned hours: 14 + 12 + 12 + 10 + 7 + 7   actual hours: __
+- done:
+  - W23: complete draft (intro, background, related work, discussion with every assumed element, abstract, conclusion; notation and numbers passes).
+  - W24: three mock reviews with a rebuttal table; Dockerfile and clean-container check, which found a real bug (git dependency, fixed); citations checked.
+  - W25: artifact (Apache-2.0, CITATION.cff, fetch_data.sh with checksums, ARTIFACT.md, make reproduce/release); SoCC rules; Console S1-S4 with a double-blind build.
+  - W26: submission pack draft and next-cycle plan.
+  - W27-28 ready-now parts: feedback.csv, weakest-claim note, ADR-009, number-diff script, venue check.
+- evaluation runs:
+  - Week 18 running (started 02:56; about 95 min lost to sleep).
+  - Weeks 19-21 and the second source taken off the queue at the owner's request; `scripts/v2/run_rest.sh` runs them.
+- second source: cell f τ-b −0.004 (latent −0.006), would-be class C0, agrees with G1.
+- found and fixed before any result was read (all in CHANGES_AFTER_FREEZE.md):
+  - group S stats crash;
+  - Table 3 missing the P0/P3 columns ADR-005 required;
+  - git needed in a clean build.
+- slipped (and why): everything that reads results (Evaluation prose, G3, claims ledger, RETRO) waits for the runs; PDF and page check wait for LaTeX.
+- next: Week 18 analysis (A/E only, protocol order) as soon as it collects.
+
 ## Weeks 21-22 (22 Feb-7 Mar 2027)
 - planned hours: 12 + 14   actual hours: __
 - done (5 Oct, ahead of the weeks):

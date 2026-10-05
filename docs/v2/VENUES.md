@@ -14,6 +14,10 @@ Last checked on an official page: 5 Oct 2026 (SoCC only; Week 21 task 7, done ea
 
 Rule: never submit overlapping work to two venues at the same time. A rejection is progress: revise within two weeks and move one rung.
 
+## SoCC 2027 call: checked 5 Oct 2026 (Week 27, task 5)
+
+`acmsocc.org/2027/` returns 404, and no 2027 call appears in search; SoCC 2026 was in Singapore with the two-round model. The inferred dates (round 2 about early July 2027) stand. Check again monthly: when the call appears, re-check every row below and shift Weeks 37-40 if the dates differ.
+
 ## Venue-rule checklist: SoCC (Week 25, checked 5 Oct 2026 on acmsocc.org/2026/papers.html)
 
 The 2027 call is not out; these are SoCC 2026's rules. Re-check every row the day the 2027 call appears.
