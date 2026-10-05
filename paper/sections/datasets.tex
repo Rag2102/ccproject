@@ -71,7 +71,8 @@ rate. The signal is in the SMART telemetry, not the model class: a logistic regr
 same features does as well (\VPrAucLogit). We chose the predictor for the simulator by a rule
 fixed in advance, the highest validation PR-AUC, which selected an ensemble of boosted models
 (\VPrAucEnsembleVal{} against \VPrAucLogitVal{} for the next best). Isotonic calibration fitted on
-the validation period makes its probabilities usable as $p$ in Eq.~\eqref{eq:benefit}. Even so,
+the validation period makes its probabilities usable as $p$ in Eq.~\eqref{eq:benefit}. Its accuracy varies
+over time: on rolling three-month test folds PR-AUC ranges from \VPrAucFoldMin{} to \VPrAucFoldMax. Even so,
 most drives the model flags do not fail within the horizon, which is why what a migration costs
 matters.
 
@@ -85,7 +86,8 @@ method, the three cells and the decision rule were fixed before any data was rea
 cells, under every combination of three tier mappings, three proxies and two weightings,
 $|\tau_b| \le \VGOneMaxAbsTauB$ and the upper end of every latent interval is at most
 \VGOneMaxLatentUpper. The sign of the estimate changes with the analysis choices; its magnitude
-does not. A fourth cell, chosen by a rule fixed before downloading it and analysed separately,
+does not, and every cell is in the lowest class on the direct Spearman reading too, without the
+latent conversion. A fourth cell, chosen by a rule fixed before downloading it and analysed separately,
 gives $\tau_b = \VSecondTauB$ ($\rho_L = \VSecondLatent$). Critical work is essentially uncorrelated
 with machine risk, so the realistic regimes of our evaluation (B1 and its interval ends) place VMs
 at these measured values.

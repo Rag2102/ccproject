@@ -10,7 +10,12 @@
 seeds, four daily budgets (0.5, 1, 2 and 5\% of cluster memory), all policies on the same failure
 world per seed. The comparator is the threshold tuned to use the budget (P2); the decision rule is
 the one registered in advance (mean regression-adjusted $\Delta \geq 1\%$ and Holm-adjusted
-$p<0.05$ over \VFamilySize{} confirmatory comparisons).
+$p<0.05$ over \VFamilySize{} confirmatory comparisons). Policies see the true host probabilities (an
+oracle predictor), so that differences come from the policy rather than the model; the results
+are therefore what the policies achieve under calibrated probabilities, an upper bound for any
+real predictor, whose noise, miscalibration and drift are varied separately. The adjustment uses
+each seed's realised failures, which are drawn before any policy runs and are identical across
+policies on a seed: it removes seed luck, not policy effect.
 
 \paragraph{Where the measured world sits.}
 Across the three Google 2019 cells and every mapping and proxy, $|\tau_b| \leq \VGOneMaxAbsTauB$

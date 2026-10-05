@@ -107,6 +107,11 @@ def build() -> tuple[dict[str, str], list[str]]:
         v["VPrAucSMART"] = f"{d.loc['v2', 'pr_auc']:.3f}"
         v["VPrAucLogit"] = f"{d.loc['logit', 'pr_auc']:.3f}"
         v["VRocAucSMART"] = f"{d.loc['v2', 'roc_auc']:.3f}"
+    mj = load_json(RES / "model_v2.json")
+    if mj:
+        folds = [f["pr_auc"] for f in mj["rolling_origin"]]
+        v["VPrAucFoldMin"] = f"{min(folds):.3f}"
+        v["VPrAucFoldMax"] = f"{max(folds):.3f}"
     mc = load_json(RES / "model_choice.json")
     if mc:
         v["VPrAucEnsembleVal"] = f"{mc['pr_auc_raw']['ensemble']:.3f}"
