@@ -11,7 +11,7 @@ From the v5 week cards for W27 and W28 (plan page 23). Prepared on 5 Oct 2026, a
 - [x] **Strengthening experiment** (`DECISIONS/ADR-009-strengthening-experiment.md`, proposed; yours to accept). The second trace is already done (cell f, C0), so the choice is a published migration-cost range:
   - six sources, each checked to exist with title, venue and year, including a SoCC 2015 paper on live-migration performance models;
   - rerun B1, B2 and C at the range's ends, exploratory, about 2 h.
-- [x] **Post-freeze labelling:** every change since the freeze is in `CHANGES_AFTER_FREEZE.md` (15 rows). ADR-009's work will be added when it runs.
+- [x] **Post-freeze labelling:** every change since the freeze is in `CHANGES_AFTER_FREEZE.md` (14 rows). ADR-009's work will be added when it runs.
 - [x] **Venue check:** no SoCC 2027 call yet (acmsocc.org/2027 is 404). Inferred dates stand; recorded in `VENUES.md` with the date.
 
 ## Week 28 (12-18 Apr): fix the must-fix items
