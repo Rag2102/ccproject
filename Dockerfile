@@ -5,6 +5,9 @@
 FROM python:3.12-slim@sha256:f77ac9e44ae96ef2c90b8053ea08c31f8be030f824196b0ae4db6d462c84e51f
 ENV PYTHONDONTWRITEBYTECODE=1 PIP_NO_CACHE_DIR=1 PIP_DISABLE_PIP_VERSION_CHECK=1 MPLBACKEND=Agg
 WORKDIR /repo
+# no .git in a `git archive` build: results record the commit from here (docker_repro.sh sets it)
+ARG GIT_SHA=unknown
+ENV VMMBENCH_GIT_SHA=$GIT_SHA
 COPY requirements.txt requirements-dev.txt ./
 RUN pip install -r requirements.txt -r requirements-dev.txt
 COPY . .

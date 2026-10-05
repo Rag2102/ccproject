@@ -87,14 +87,23 @@ def sha256_file(p: Path) -> str:
 
 
 def git_sha() -> str:
-    sha = subprocess.run(
-        ["git", "-C", str(ROOT), "rev-parse", "HEAD"], capture_output=True, text=True
-    ).stdout.strip()
-    dirty = subprocess.run(
-        ["git", "-C", str(ROOT), "status", "--porcelain", "--", "vmsim", "scripts/v2", "configs"],
-        capture_output=True,
-        text=True,
-    ).stdout.strip()
+    """The commit this run comes from. A checkout asks git; a build from `git archive` (the clean
+    container, Dockerfile) has no .git and gets the commit from VMMBENCH_GIT_SHA instead."""
+    env = os.environ.get("VMMBENCH_GIT_SHA")
+    try:
+        sha = subprocess.run(
+            ["git", "-C", str(ROOT), "rev-parse", "HEAD"], capture_output=True, text=True
+        ).stdout.strip()
+        dirty = subprocess.run(
+            ["git", "-C", str(ROOT), "status", "--porcelain", "--"]
+            + ["vmsim", "scripts/v2", "configs"],
+            capture_output=True,
+            text=True,
+        ).stdout.strip()
+    except OSError:
+        sha, dirty = "", ""
+    if not sha:
+        return f"{env}+archive" if env else "unknown"
     return sha + ("+dirty" if dirty else "")
 
 
