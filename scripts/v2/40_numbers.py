@@ -90,6 +90,27 @@ def build() -> tuple[dict[str, str], list[str]]:
         v["VVOneAdvAligned"] = pct(h6["delta_by_window_exact_budgets"]["same_gb"]["30"], 2)
         v["VVOneMedianLeadDays"] = f"{h6['lead_time']['v1_cost_sensitive']['median_lead_days']:.0f}"
 
+        h3 = an["H3"]["v1_count_match"]
+        v["VVOneExtraHosts"] = pct(h3["threshold_hosts"] / h3["cs_hosts"] - 1, 0, False)
+        v["VVOneExtraGB"] = pct(h3["threshold_gb"] / h3["cs_gb"] - 1, 0, False)
+    sw = ROOT / "data" / "processed" / "correlated_assignment_sweep.csv"
+    if sw.exists():
+        top = pd.read_csv(sw).sort_values("rho_achieved").iloc[-1]
+        v["VVOneAdvTop"] = pct(top.cost_sensitive_advantage_pct)
+        v["VVOneRhoTop"] = f"{top.rho_achieved:.2f}"
+
+    g2 = load_json(RES / "g2_validation.json")
+    if g2:
+        v["VGTwoHosts"] = f"{g2['analytic']['hosts']:,}".replace(",", "{,}")
+        v["VGTwoZNever"] = f"{g2['analytic']['never']['max_abs_z']:.1f}"
+        v["VGTwoZMoveAll"] = f"{g2['analytic']['move_all_day0']['max_abs_z']:.1f}"
+        v["VGTwoZSelf"] = f"{g2['self_calibration']['z']:.2f}"
+        v["VGTwoZDecile"] = f"{g2['self_calibration']['max_abs_decile_z']:.2f}"
+        cs = g2["v1_regression"]
+        v["VVOneHosts"] = f"{cs['hosts']:,}".replace(",", "{,}")
+        v["VVOneCostCS"] = f"{cs['cost_sensitive']['v1_cost']:,}".replace(",", "{,}")
+        v["VVOneCostMatched"] = f"{round(cs['threshold_matched']['cost']):,}".replace(",", "{,}")
+
     ex = load_json(RES / "bam_exact_check.json")
     if ex:
         v["VBamExactGap"] = pct(ex["sim-A3"]["gap_mean"], 2, sign=False)

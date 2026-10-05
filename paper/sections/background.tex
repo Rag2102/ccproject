@@ -29,17 +29,17 @@ machines, but also no published measurement.
 
 \paragraph{Why the correlation was thought to matter.}
 \label{sec:v1}
-Our course prototype simulated 122{,}618 Backblaze drives as hosts carrying Azure VMs, and
+Our course prototype simulated \VVOneHosts{} Backblaze drives as hosts carrying Azure VMs, and
 compared a cost-aware rule (migrate when $p\,c$ exceeds the migration cost) with a probability
 threshold matched to the same number of migrations. With VMs placed at random it found the
 cost-aware rule \VVOneAdvRandom\% behind; as placement was skewed so that critical VMs sat on
-riskier hosts, the sign flipped, reaching +3.4\% at a rank correlation of 0.86. Read at face value
+riskier hosts, the sign flipped, reaching \VVOneAdvTop\% at a rank correlation of \VVOneRhoTop. Read at face value
 this says that workload awareness pays only above a break-even correlation, which makes the
 correlation in real placement the quantity that decides the method's value.
 
 A pre-registered diagnosis of the prototype~(eight hypotheses, each with a rule written before it
 was tested) found otherwise. The threshold had received a larger budget: matched on migration
-count, it moved 8\% more hosts and 21\% more memory. And every migration was credited with any
+count, it moved \VVOneExtraHosts\% more hosts and \VVOneExtraGB\% more memory. And every migration was credited with any
 failure of its host over the whole run, a median of \VVOneMedianLeadDays{} days after a decision
 made on a 30-day probability, so the comparison rewarded predicting the distant future, which
 neither rule was built to do. With the budget matched in memory and the accounting window equal
