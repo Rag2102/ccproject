@@ -31,6 +31,7 @@ bench:
 stats:
 	$(PY) scripts/v2/30_stats.py --groups A E B C D
 	$(PY) scripts/v2/33_adaptive.py
+	$(PY) scripts/v2/34_vs_p0.py
 	$(PY) scripts/v2/32_protocol_check.py --no-rerun
 
 # Every figure and table from results/ files, never by re-running the simulator

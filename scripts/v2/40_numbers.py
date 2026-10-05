@@ -186,6 +186,16 @@ def build() -> tuple[dict[str, str], list[str]]:
     c = rc.get(("B1", 2.0, "P4"))
     need("VDeltaRepPFourBOneTwo", c and pct(c["delta_adjusted"]))
 
+    # ADR-005: every policy against never migrating (34_vs_p0.py), confirmatory regimes
+    vp = load_json(SUMM / "vs_p0.json")
+    vc = {(c["regime"], c["budget_pct"], c["policy"]): c for c in (vp or {}).get("cells", [])}
+    for reg in conf["regimes"]:
+        for b in conf["budgets_pct"]:
+            for pol in ("P2", "P3", "P4", "P6"):
+                c = vc.get((reg, float(b), pol))
+                k = name("SaveVsPZero", pol, reg.replace("-", ""), f"{float(b):g}")
+                need(k, c and pct(c["saving_vs_p0_mean"]))
+
     # Week 21 second source (group S, regime B1-f)
     s2 = load_json(SUMM / "S_second.json")
     sc2 = {(c["budget_pct"], c["policy"]): c for c in (s2 or {}).get("cells", [])}

@@ -10,6 +10,7 @@ $PY scripts/v2/24_run_matrix.py --small --phase tune --groups $G
 $PY scripts/v2/24_run_matrix.py --small --phase run --groups $G --seeds 1-3
 $PY scripts/v2/24_run_matrix.py --small --phase collect --groups $G --seeds 1-3
 $PY scripts/v2/30_stats.py --small --groups $G
+$PY scripts/v2/34_vs_p0.py --small
 $PY scripts/v2/31_fig_f4.py --small
 $PY scripts/v2/27_pareto.py --small
 $PY scripts/v2/28_table3.py --small
