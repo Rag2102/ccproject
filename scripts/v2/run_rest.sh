@@ -1,7 +1,8 @@
 #!/bin/zsh
 # Everything after Week 18, in order: Week 19 (B, C, D), Week 20, the Week 21 seed replication and
 # the second placement source (B1-f), then the ADR-007 SD extension (A3 and A5 to n = 50; triggered by
-# the Week 18 run: SD of Delta above 1.6% for P5 and P6). About 9.5 hours on 8 cores. Resumable: rerun it after a stop
+# the Week 18 run: SD of Delta above 1.6% for P5 and P6), then the ADR-010 exploratory avoidance
+# baselines on the eval seeds (about 5 min). About 9.5 hours on 8 cores. Resumable: rerun it after a stop
 # and finished work is skipped. Then the clean-container check (Week 24, about 25 min on 1 core).
 cd ~/Desktop/ccproject
 mkdir -p logs/w19 logs/w20 logs/w21
@@ -18,6 +19,9 @@ for i in 1 2 3 4 5 6 7 8; do
 done
 wait
 .venv/bin/python scripts/v2/24_run_matrix.py --phase collect $EXT --seeds 1-50 > logs/w18x/collect.log 2>&1
+# ADR-010 (exploratory): P0+avoid and P4+avoid on every regime's eval seeds; then the summary
+# against never migrating (results/summary/explore_avoid.json)
+.venv/bin/python scripts/v2/37_explore_avoid.py > logs/explore_avoid.log 2>&1
 echo "runs done $(date)" > logs/rest_done.txt
 if docker info >/dev/null 2>&1; then
   scripts/v2/docker_repro.sh > logs/docker_repro.log 2>&1
