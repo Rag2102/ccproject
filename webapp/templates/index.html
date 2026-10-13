@@ -302,8 +302,8 @@
   .err { color: var(--bad); font-size: 13px; padding: 10px 22px; display: none; }
 
   /* ---------- findings (v1) ---------- */
-  .two { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; align-items: start; }
-  @media (max-width: 960px) { .two { grid-template-columns: 1fr; } }
+  .two { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 20px; align-items: start; }
+  @media (max-width: 960px) { .two { grid-template-columns: minmax(0, 1fr); } }
   table { width: 100%; border-collapse: collapse; font-size: 13px; }
   th, td { padding: 11px 12px; text-align: right; border-bottom: 1px solid var(--line); }
   th:first-child, td:first-child { text-align: left; }
@@ -352,8 +352,8 @@
   .fcard .src { font: 500 11px var(--mono); color: var(--ink-3); border-top: 1px solid var(--line); padding-top: 10px; margin-top: 4px; }
   .fcard .src .more { font-family: var(--sans); font-size: 13px; }
 
-  .sandbox { display: grid; grid-template-columns: 300px 1fr; gap: 0; margin-top: 20px; }
-  @media (max-width: 880px) { .sandbox { grid-template-columns: 1fr; } }
+  .sandbox { display: grid; grid-template-columns: 300px minmax(0, 1fr); gap: 0; margin-top: 20px; }
+  @media (max-width: 880px) { .sandbox { grid-template-columns: minmax(0, 1fr); } }
   .sandbox-ctrl { padding: 24px; border-right: 1px solid var(--line); }
   @media (max-width: 880px) { .sandbox-ctrl { border-right: none; border-bottom: 1px solid var(--line); } }
   .sandbox-ctrl h3 { margin: 10px 0 6px; font-size: 16px; font-weight: 600; }
@@ -363,10 +363,32 @@
   .sb-read div { font-size: 12px; color: var(--ink-3); }
   .sb-read b { display: block; font-family: var(--serif); font-size: 26px; font-weight: 600; color: var(--ink); line-height: 1.2; }
 
+  #w18 { margin-top: 20px; }
+  #w18 .panel-head { display: flex; justify-content: space-between; gap: 16px; flex-wrap: wrap; align-items: flex-start; }
+  .w18-seg { flex-shrink: 0; }
+  @media (max-width: 600px) { .w18-seg { width: 100%; } .w18-seg label { flex: 1; padding-left: 4px; padding-right: 4px; } .w18-seg label small { display: none; } }
+  .w18-bars { display: grid; gap: 12px; margin-top: 18px; }
+  .w18-row { display: grid; grid-template-columns: 190px 1fr 88px; gap: 12px; align-items: center; font-size: 12.5px; color: var(--ink-2); }
+  @media (max-width: 600px) { .w18-row { grid-template-columns: 1fr 72px; } .w18-row .trk { grid-column: 1 / -1; grid-row: 2; } }
+  .w18-row .nm b { display: block; color: var(--ink); font-weight: 600; font-size: 13px; }
+  .w18-row .nm span { font-size: 11.5px; color: var(--ink-3); }
+  .w18-row .trk { position: relative; height: 18px; border-radius: 6px; background: var(--bg-2); }
+  .w18-row .zero { position: absolute; top: -4px; bottom: -4px; width: 2px; background: var(--ink-3); opacity: .6; }
+  .w18-row .fill { position: absolute; top: 3px; bottom: 3px; border-radius: 4px; transition: left .45s cubic-bezier(.2,.7,.2,1), width .45s cubic-bezier(.2,.7,.2,1); }
+  .w18-row .fill.clip { border-top-left-radius: 0; border-bottom-left-radius: 0; background-image: repeating-linear-gradient(90deg, transparent 0 6px, rgba(0,0,0,.18) 6px 8px); }
+  .w18-row .ci { position: absolute; top: 7px; height: 4px; border-radius: 2px; background: var(--ink); opacity: .55; transition: left .45s, width .45s; }
+  .w18-row .val { font: 600 12.5px var(--mono); color: var(--ink); text-align: right; }
+  .w18-row .val small { display: block; font: 500 10.5px var(--sans); color: var(--ink-3); }
+  .w18-scale { display: grid; grid-template-columns: 190px 1fr 88px; gap: 12px; font: 500 10.5px var(--mono); color: var(--ink-3); }
+  .w18-scale .ax { position: relative; height: 14px; }
+  .w18-scale .ax span { position: absolute; transform: translateX(-50%); }
+  @media (max-width: 600px) { .w18-scale { grid-template-columns: 1fr; } .w18-scale > div:not(.ax) { display: none; } }
+
   .timeline { margin-top: 20px; }
   .tl-track { display: grid; grid-template-columns: repeat(60, 1fr); gap: 2px; margin: 0 0 8px; }
   .tl-track i { height: 26px; border-radius: 7px; background: var(--bg-2); border: 1px solid var(--line); }
   .tl-track i.done { background: var(--cs); border-color: transparent; }
+  .tl-track i.prep { background: var(--amber-soft); border-color: color-mix(in srgb, var(--amber) 45%, transparent); }
   .tl-track i.now { background: var(--amber); border-color: transparent; animation: blink 1.8s ease-in-out infinite; }
   @keyframes blink { 50% { opacity: .45; } }
   .tl-scale { display: flex; justify-content: space-between; font: 500 11px var(--mono); color: var(--ink-3); }
@@ -443,7 +465,7 @@
         <div class="fig"><div class="n">2.0M+</div><div class="l">real VMs, Azure public trace</div></div>
         <div class="fig"><div class="n">744M</div><div class="l">drive-days of Backblaze telemetry, 2013–2026</div></div>
         <div class="fig"><div class="n">3</div><div class="l">Google 2019 cluster cells measured</div></div>
-        <div class="fig"><div class="n">17<span style="font-size:18px;color:var(--ink-3)">/60</span></div><div class="l">weeks of the v2 plan built</div></div>
+        <div class="fig"><div class="n">18<span style="font-size:18px;color:var(--ink-3)">/60</span></div><div class="l">weeks of the v2 plan done; code ready to Week 28</div></div>
       </div>
     </div>
     <div class="fleet-card" aria-label="Illustration: hosts coloured by failure risk; VMs move off risky hosts before they fail">
@@ -728,12 +750,12 @@
     <div class="panel pad reveal">
       <div class="status">
         <div>
-          <h3>Weeks 1–17 built · Week 18 benchmark runs next</h3>
-          <p>Data, failure model, real-trace measurement, simulator (validated), policies, theory and a frozen protocol are done. The pre-registered benchmark runs start next, then the paper, an open benchmark and a results console.</p>
-          <div class="progress" aria-label="17 of 60 weeks built"><span style="width:28.3%;background:var(--cs)"></span><span style="width:1.7%;background:var(--amber)"></span></div>
+          <h3>Week 18 benchmark done · Weeks 19–21 runs queued</h3>
+          <p>Data, failure model, real-trace measurement, a validated simulator, policies, theory and a frozen protocol are done, and the first pre-registered benchmark runs (regimes A and E) are in. The code for Weeks 19–28 (the remaining runs, paper draft, artifact and console) is written and tested; the remaining runs take about ten hours of compute.</p>
+          <div class="progress" aria-label="18 of 60 weeks done, code ready to week 28"><span style="width:30%;background:var(--cs)"></span><span style="width:16.7%;background:var(--amber);opacity:.55"></span></div>
           <div class="progress-scale" style="position:relative;height:16px"><span style="position:absolute;left:0">Week 1</span><span style="position:absolute;left:66.7%;transform:translateX(-50%)">Paper A · W40</span><span style="position:absolute;right:0">Week 60</span></div>
         </div>
-        <div class="status-num"><div class="n">17<small>/60</small></div><div class="l">weeks of work built</div></div>
+        <div class="status-num"><div class="n">18<small>/60</small></div><div class="l">weeks done · code to W28</div></div>
       </div>
     </div>
 
@@ -774,12 +796,43 @@
         <div class="src"><a class="more" href="https://github.com/Rag2102/ccproject/blob/main/docs/v2/G2_simulator_validation.md" target="_blank" rel="noopener">G2_simulator_validation.md</a></div>
       </article>
       <article class="panel fcard reveal">
-        <span class="tag simulated">Simulated</span>
-        <div class="big">0 / 5</div>
-        <h3>A safety guard that ignores noise</h3>
-        <p>The guard switches to budget-aware migration only when its evidence and a calibration audit agree. On a control where risk scores carry no information it never switched.</p>
-        <div class="src">P6 smoke test · dev seeds</div>
+        <span class="tag simulated">Simulated · pre-registered</span>
+        <div class="big">+5% <small>to</small> +11%</div>
+        <h3>Budget-aware migration beats doing nothing</h3>
+        <p>Week 18, 30 seeds per cell: BAM saves 5–11% against never migrating in every A regime. The industry-style threshold (P2) costs 2–4× more than doing nothing, so "beating P2", the registered test, says little on its own.</p>
+        <div class="src"><a class="more" href="https://github.com/Rag2102/ccproject/blob/v2-research/docs/v2/RESULTS_W18.md" target="_blank" rel="noopener">RESULTS_W18.md</a> · ADR-005</div>
       </article>
+      <article class="panel fcard reveal">
+        <span class="tag simulated">Simulated</span>
+        <div class="big">σ<sub style="font-size:18px">κ</sub> drives it</div>
+        <h3>The theory's direction holds in simulation</h3>
+        <p>At zero correlation, BAM goes from −2.4% to +1.6% to +5.3% against never migrating as the spread of VM costs rises (σ = 0.25, 0.5, 1.0): the first simulation evidence for the theory's claim.</p>
+        <div class="src"><a class="more" href="https://github.com/Rag2102/ccproject/blob/v2-research/docs/v2/RESULTS_W18.md" target="_blank" rel="noopener">RESULTS_W18.md</a> · regime E</div>
+      </article>
+      <article class="panel fcard reveal">
+        <span class="tag illustrative">Exploratory · dev seeds</span>
+        <div class="big">+11% <small>to</small> +22%</div>
+        <h3>Where new VMs go matters more than which to move</h3>
+        <p>Keeping new VMs off the riskiest 2% of hosts, with no migrations at all, beats every migration policy tested. It is why the Narya-inspired policy (P5) beats BAM. A full run on the evaluation seeds is queued.</p>
+        <div class="src"><a class="more" href="https://github.com/Rag2102/ccproject/blob/v2-research/docs/v2/DIAG_P5_VS_BAM.md" target="_blank" rel="noopener">DIAG_P5_VS_BAM.md</a> · ADR-010</div>
+      </article>
+      <article class="panel fcard reveal">
+        <span class="tag simulated">Simulated · pre-registered</span>
+        <div class="big">−30% <small>to</small> −51%</div>
+        <h3>The safety guard, as registered, does harm</h3>
+        <p>It ignored pure noise in the smoke test (0 of 5 switches), but its fallback is the threshold P2, so in Week 18 it costs more than never migrating. With a do-nothing fallback it saves 3–9% in regime A (exploratory).</p>
+        <div class="src"><a class="more" href="https://github.com/Rag2102/ccproject/blob/v2-research/docs/v2/RESULTS_W18.md" target="_blank" rel="noopener">RESULTS_W18.md</a> · P6</div>
+      </article>
+    </div>
+
+    <div class="panel pad reveal" id="w18">
+      <div class="panel-head">
+        <div><h3>First benchmark results: saving against never migrating</h3>
+        <p>2% budget, oracle failure probabilities, mean with 95% interval. Bars right of zero cost less than doing nothing.</p></div>
+        <div class="seg w18-seg" role="radiogroup" aria-label="Regime" id="w18Seg"></div>
+      </div>
+      <div class="w18-bars" id="w18Bars"></div>
+      <p class="fine" id="w18Note"></p>
     </div>
 
     <div class="panel sandbox reveal">
@@ -811,7 +864,7 @@
     </div>
 
     <div class="panel pad timeline reveal">
-      <div class="panel-head"><div><h3>The 60-week plan</h3><p>Each square is a week; built weeks in blue, the next one in amber.</p></div></div>
+      <div class="panel-head"><div><h3>The 60-week plan</h3><p>Each square is a week: done in blue; code written and tested, runs or reviews pending, in amber.</p></div></div>
       <div class="tl-track" id="tlTrack" aria-hidden="true"></div>
       <div class="tl-scale"><span>Oct 2026</span><span>Apr 2027</span><span>Nov 2027</span></div>
       <div class="phases">
@@ -819,8 +872,8 @@
         <div class="phase done"><span class="dot"></span><div><b>Real data</b><span class="w">W4–8</span> <span>· Backblaze, Google trace</span></div></div>
         <div class="phase done"><span class="dot"></span><div><b>Simulator</b><span class="w">W9–13</span> <span>· validated at G2</span></div></div>
         <div class="phase done"><span class="dot"></span><div><b>Policies and theory</b><span class="w">W14–17</span> <span>· protocol frozen</span></div></div>
-        <div class="phase now"><span class="dot"></span><div><b>Benchmark runs</b><span class="w">W18–21</span> <span>· next</span></div></div>
-        <div class="phase"><span class="dot"></span><div><b>Paper, artifact, console</b><span class="w">W22–26</span></div></div>
+        <div class="phase now"><span class="dot"></span><div><b>Benchmark runs</b><span class="w">W18–21</span> <span>· W18 done, rest queued</span></div></div>
+        <div class="phase now"><span class="dot"></span><div><b>Paper, artifact, console</b><span class="w">W22–26</span> <span>· drafted</span></div></div>
         <div class="phase"><span class="dot"></span><div><b>Polish and submit paper A</b><span class="w">W27–40</span></div></div>
         <div class="phase"><span class="dot"></span><div><b>Ground the cost model</b><span class="w">W41–46</span></div></div>
         <div class="phase"><span class="dot"></span><div><b>Failure physics</b><span class="w">W47–50</span></div></div>
@@ -1281,9 +1334,57 @@ initCharts();
 // canvas text uses whatever font is loaded at draw time: redraw once the web fonts arrive
 if (document.fonts && document.fonts.ready) document.fonts.ready.then(() => redrawCharts());
 
+/* ---------------- Week 18 results ----------------
+   Saving against never migrating (P0), % at a 2% budget: [mean, CI low, CI high, % of seeds beating P0].
+   P2-P6: results/summary/vs_p0.json (Week 18, eval seeds 1-30, 95% BCa).
+   AV (P0 + avoid): results/v2/diag_p5_vs_bam.json (exploratory, dev seeds 101-105; [mean, min, max]). */
+const W18 = {"A1":{"P2":[-281.4,-286.8,-274.8,0],"P3":[1.7,1.2,2.1,87],"P4":[5.0,4.4,5.6,100],"P5":[8.6,7.8,9.3,100],"P6":[-49.7,-65.4,-37.5,0],"AV":[10.6,8.2,12.0]},"A3":{"P2":[-219.4,-224.1,-215.1,0],"P3":[6.7,5.6,7.8,100],"P4":[10.8,9.4,12.0,100],"P5":[15.5,14.2,16.6,100],"P6":[-33.1,-46.8,-22.7,13],"AV":[19.6,15.6,24.7]},"A7":{"P2":[-188.6,-193.4,-182.7,0],"P3":[3.1,2.0,4.3,83],"P4":[7.5,6.0,8.9,97],"P5":[16.9,15.4,18.3,100],"P6":[-29.9,-42.1,-20.9,3],"AV":[21.9,17.1,24.3]},"E1":{"P2":[-237.0,-241.4,-231.9,0],"P3":[-2.3,-2.8,-1.8,7],"P4":[-2.4,-3.1,-1.7,13],"P5":[8.4,7.5,9.3,100],"P6":[-46.8,-59.6,-36.9,0],"AV":[10.7,9.1,11.7]},"E3":{"P2":[-285.1,-290.5,-278.5,0],"P3":[1.7,1.3,2.1,83],"P4":[5.3,4.8,5.9,100],"P5":[8.6,7.8,9.4,100],"P6":[-50.6,-66.6,-38.2,0],"AV":[10.6,8.3,12.0]}};
+const W18_REG = { A1: 'A1 · ρ = 0', A3: 'A3 · ρ = 0.3', A7: 'A7 · ρ = 0.9', E1: 'E1 · low cost spread', E3: 'E3 · high cost spread' };
+const W18_NOTE = {
+  A1: 'No correlation between VM importance and host risk, as measured in the Google trace.',
+  A3: 'Moderate correlation: BAM gains most here; the curve is hump-shaped in ρ.',
+  A7: 'Strong correlation: important VMs sit on risky hosts.',
+  E1: 'ρ = 0 and VM costs nearly equal: BAM is slightly worse than doing nothing, as the theory predicts.',
+  E3: 'ρ = 0 and VM costs widely spread: BAM gains again.' };
+const W18_POL = [
+  ['AV', 'Avoid risky hosts', 'no migration · exploratory', '--good'],
+  ['P5', 'Narya-inspired (P5)', 'learns per host; uses avoidance', '--violet'],
+  ['P4', 'Budget-aware, BAM (P4)', 'the paper’s method', '--cs'],
+  ['P3', 'v1 rule (P3)', 'the course project’s policy', '--ink-3'],
+  ['P6', 'Safety guard (P6)', 'falls back to P2, as registered', '--th'],
+  ['P2', 'Threshold (P2)', 'industry habit, budget-tuned', '--bad'] ];
+const W18_LO = -40, W18_HI = 25;
+let w18Reg = 'A3';
+function w18x(v) { return (Math.max(W18_LO, Math.min(W18_HI, v)) - W18_LO) / (W18_HI - W18_LO) * 100; }
+function drawW18() {
+  const d = W18[w18Reg], z = w18x(0);
+  let h = '<div class="w18-scale"><div></div><div class="ax">' +
+    [-40, -20, 0, 10, 20].map(v => `<span style="left:${w18x(v)}%">${v > 0 ? '+' : ''}${v}%</span>`).join('') + '</div><div></div></div>';
+  W18_POL.forEach(([k, name, sub, col]) => {
+    const [m, lo, hi, share] = d[k];
+    const a = w18x(Math.min(0, m)), b = w18x(Math.max(0, m)), clip = m < W18_LO;
+    const ci = `<i class="ci" style="left:${w18x(lo)}%;width:${Math.max(0.6, w18x(hi) - w18x(lo))}%"></i>`;
+    const tip = k === 'AV' ? `5 dev seeds, range ${lo} to ${hi}%` : `95% CI ${lo} to ${hi}%; ${share}% of 30 seeds beat never migrating`;
+    h += `<div class="w18-row" title="${tip}"><div class="nm"><b>${name}</b><span>${sub}</span></div>
+      <div class="trk"><i class="zero" style="left:calc(${z}% - 1px)"></i>
+      <i class="fill${clip ? ' clip' : ''}" style="left:${a}%;width:${b - a}%;background-color:${css(col)}"></i>${clip ? '' : ci}</div>
+      <div class="val">${m > 0 ? '+' : ''}${m.toFixed(1)}%<small>${k === 'AV' ? 'dev seeds' : share + '% of seeds win'}</small></div></div>`;
+  });
+  $('w18Bars').innerHTML = h;
+  $('w18Note').textContent = W18_NOTE[w18Reg] + ' Bars past −40% are cut off (hatched). Avoidance is from 5 development seeds, not the 30 evaluation seeds; its full run is queued.';
+}
+(function () {
+  $('w18Seg').innerHTML = Object.keys(W18).map(r =>
+    `<input type="radio" name="w18r" id="w18_${r}" value="${r}"${r === w18Reg ? ' checked' : ''}><label for="w18_${r}">${r}<small>${W18_REG[r].split(' · ')[1]}</small></label>`).join('');
+  document.querySelectorAll('input[name=w18r]').forEach(el => el.addEventListener('change', () => { w18Reg = el.value; drawW18(); }));
+  drawW18();
+  $('themeBtn').addEventListener('click', drawW18);
+  matchMedia('(prefers-color-scheme: dark)').addEventListener('change', drawW18);
+})();
+
 /* ---------------- timeline ---------------- */
 (function () {
-  let h = ''; for (let w = 1; w <= 60; w++) h += `<i class="${w <= 17 ? 'done' : w === 18 ? 'now' : ''}" title="Week ${w}"></i>`;
+  let h = ''; for (let w = 1; w <= 60; w++) h += `<i class="${w <= 18 ? 'done' : w <= 28 ? 'prep' : ''}" title="Week ${w}"></i>`;
   $('tlTrack').innerHTML = h;
 })();
 </script>
