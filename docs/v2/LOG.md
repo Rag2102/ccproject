@@ -2,6 +2,14 @@
 
 Sunday ritual (15 minutes): update this log, tick the week's "done when", log any cut as an ADR, re-read the next gate's criteria, update `CAPACITY.md` for the coming month, write Monday's first task. Newest week first. Hours are yours to fill; nothing here is estimated.
 
+## Diagnosis: why P5 beats BAM (13 Oct 2026, exploratory, dev seeds 101-105)
+- P5's whole advantage is avoid-allocation: with its marks off it is at or below BAM.
+- Avoidance alone (no migration, no budget) saves 10.6-21.9% against P0, more than any migration policy; BAM adds about ±1 point on top.
+- Option to wait: refuted (BAM-wait7 saves less than BAM).
+- Guard with a P0 fallback: no longer harmful in A.
+- Mechanism: avoidance protects long-lived VMs as much as BAM's migrations, but for free.
+- `DIAG_P5_VS_BAM.md`; ADR-010 (proposed) adds avoidance as an exploratory baseline on the eval seeds.
+
 ## Week 18 results (read 5 Oct 2026)
 - run: 330 of 330 cells (A1-A7, E1-E3; 30 seeds), done 10:33. Analysis: `RESULTS_W18.md`, F4, F4b (new), A/E paragraph in `evaluation.tex`. B and C not run or opened.
 - pre-registered: all 12 A3/A5 confirmatory comparisons meet the bar. The SD extension rule is triggered (P5, P6 above 1.6%): A3 and A5 go to n = 50, queued last in `run_rest.sh`.
