@@ -8,6 +8,10 @@ Writes console/data/console.json:
              n, per-seed values; provenance SIMULATED
   rho        the G1 measurement per cell (M1, platform proxy): tau-b, CI, latent rho; MEASURED
   family     the confirmatory cells with Holm p and the win flag
+  vs_p0      (S1's other baseline) per (regime, budget, policy) in A and E: the saving against
+             never migrating, (C_P0 - C) / C_P0, with its BCa CI and the share of seeds beating
+             P0 (34_vs_p0.py); plus the ADR-010 avoidance baselines (37_explore_avoid.py) when
+             explore_avoid.json exists, marked exploratory
   rho_all    (S2 Trace Lens, Week 25) every tau-b row of the G1 table and of the second source,
              with the latent value and its interval, plus the pH and C0 reference lines
   matrix     (S4 Run Matrix, Week 25) expected vs present cells of the frozen matrix, n seeds per
@@ -81,6 +85,31 @@ def main() -> None:
                     "provenance": "SIMULATED",
                 }
             )
+    # S1 against never migrating (ADR-005 companion) and the exploratory avoidance baselines
+    out["vs_p0"] = []
+    for fname in ("vs_p0.json", "explore_avoid.json"):
+        f = summ / fname
+        if not f.exists():
+            continue
+        for c in json.loads(f.read_text())["cells"]:
+            reg = c["regime"]
+            if reg[0] not in "AE" or (fname != "vs_p0.json" and "avoid" not in c["policy"]):
+                continue
+            out["vs_p0"].append(
+                {
+                    "regime": reg,
+                    "rho_latent": scenarios.A_LATENT.get(reg, 0.0),
+                    "kappa_sigma": scenarios.E_SIGMA.get(reg),
+                    "budget_pct": c["budget_pct"],
+                    "policy": c["policy"],
+                    "saving": c["saving_vs_p0_mean"],
+                    "ci": c["ci_bca"],
+                    "n": c["n_seeds"],
+                    "share_beating_p0": c["share_seeds_beating_p0"],
+                    "family": c.get("family", "descriptive"),
+                    "provenance": "SIMULATED",
+                }
+            )
     cf = summ / "confirmatory.json"
     if cf.exists():
         d = json.loads(cf.read_text())
@@ -109,7 +138,8 @@ def main() -> None:
         ]
     # S2 Trace Lens: every tau-b row, G1 cells and the separately analysed second source
     res = ROOT / "results" / "v2"
-    g1 = json.loads((res / "trace_rho.json").read_text()) if (res / "trace_rho.json").exists() else {}
+    g1f = res / "trace_rho.json"
+    g1 = json.loads(g1f.read_text()) if g1f.exists() else {}
     out["meta"]["pH_latent"] = g1.get("pH_latent")
     out["meta"]["c0_latent"] = g1.get("c0_latent")
     out["rho_all"] = []

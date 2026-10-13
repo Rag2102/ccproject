@@ -2,6 +2,10 @@
 
 Sunday ritual (15 minutes): update this log, tick the week's "done when", log any cut as an ADR, re-read the next gate's criteria, update `CAPACITY.md` for the coming month, write Monday's first task. Newest week first. Hours are yours to fill; nothing here is estimated.
 
+## Console and site (13 Oct 2026)
+- Console S1 opens on the saving against never migrating (P0; `vs_p0.json`, descriptive), with a toggle to the pre-registered Δ against P2. The ADR-010 avoidance baselines appear there once `37_explore_avoid.py` has run (`41_console_data.py` reads `explore_avoid.json`).
+- Site (`ui-redesign`): the v2 section shows the Week 18 results against P0 per regime, the avoidance finding (dev seeds, labelled exploratory), the guard result, and 18/60 weeks done with code to Week 28.
+
 ## Diagnosis: why P5 beats BAM (13 Oct 2026, exploratory, dev seeds 101-105)
 - P5's whole advantage is avoid-allocation: with its marks off it is at or below BAM.
 - Avoidance alone (no migration, no budget) saves 10.6-21.9% against P0, more than any migration policy; BAM adds about ±1 point on top.

@@ -90,13 +90,14 @@
 <main class="wrap">
   <div class="banner" id="banner" hidden></div>
   <div class="tab" id="tab-s1">
-  <h1>How much does budget-aware migration save over a tuned threshold?</h1>
-  <p class="lede">Paired seeds, regression-adjusted Δ against the budget-tuned threshold P2, 95% BCa intervals. Synthetic placement (A1–A7) along the latent correlation ρ<sub>L</sub>; cost spread only (E1–E3) at ρ<sub>L</sub> = 0. Every number comes from <span class="mono">console/data/console.json</span>, generated from <span class="mono">results/summary</span> at the commit shown below.</p>
+  <h1 id="s1-h1">How much does each policy save over never migrating?</h1>
+  <p class="lede" id="s1-lede">Paired seeds, regression-adjusted Δ against the budget-tuned threshold P2, 95% BCa intervals. Synthetic placement (A1–A7) along the latent correlation ρ<sub>L</sub>; cost spread only (E1–E3) at ρ<sub>L</sub> = 0. Every number comes from <span class="mono">console/data/console.json</span>, generated from <span class="mono">results/summary</span> at the commit shown below.</p>
   <div class="grid">
     <section class="panel">
       <h2>S1 · Crossover Explorer <span class="badge b-sim">SIMULATED</span></h2>
-      <p class="sub">Positive means the policy costs less than P2. Dots: means; bars: 95% intervals; hollow markers at ρ<sub>L</sub> = 0: regime E.</p>
+      <p class="sub" id="s1-sub"></p>
       <div class="controls">
+        <div class="seg" id="bases" role="group" aria-label="Compared with"><button data-base="P0">vs never migrating (P0)</button><button data-base="P2">vs tuned threshold (P2)</button></div>
         <div class="seg" id="budgets" role="group" aria-label="Budget"></div>
         <div id="pols" style="display:flex;gap:14px;flex-wrap:wrap"></div>
       </div>
@@ -155,9 +156,18 @@
 </main>
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.4/dist/chart.umd.min.js"></script>
 <script>
-const COL = { P3: '#E69F00', P4: '#009E73', P5: '#0072B2', P6: '#56B4E9' };
-const NAMES = { P3: 'v1 rule (P3)', P4: 'BAM (P4)', P5: 'Narya-inspired (P5)', P6: 'Guard (P6)' };
-let data, budget = 2, shown = new Set(['P4', 'P5', 'P6']), chart;
+const COL = { P2: '#D55E00', P3: '#E69F00', P4: '#009E73', P5: '#0072B2', P6: '#56B4E9', 'P0+avoid': '#CC79A7', 'P4+avoid': '#F0E442' };
+const NAMES = { P2: 'Threshold (P2)', P3: 'v1 rule (P3)', P4: 'BAM (P4)', P5: 'Narya-inspired (P5)', P6: 'Guard (P6)', 'P0+avoid': 'Avoid risky hosts (P0+avoid)', 'P4+avoid': 'BAM + avoid (P4+avoid)' };
+// S1 baselines: P0 (never migrating; ADR-005 companion, descriptive) or P2 (the pre-registered comparison)
+const BASE = {
+  P0: { h1: 'How much does each policy save over never migrating?', y: 'saving vs P0, never migrating (%)', pols: ['P2', 'P3', 'P4', 'P5', 'P6', 'P0+avoid', 'P4+avoid'],
+    lede: 'Paired seeds, saving (C<sub>P0</sub> − C) / C<sub>P0</sub> against never migrating, 95% BCa intervals. This is the comparison to read first: the tuned threshold P2 costs more than doing nothing in every seed, so beating P2 says little (ADR-005). Descriptive, outside the 30-comparison family.',
+    sub: 'Positive means the policy costs less than never migrating (the dashed zero line). Dots: means; bars: 95% intervals; hollow markers at ρ<sub>L</sub> = 0: regime E.' },
+  P2: { h1: 'How much does budget-aware migration save over a tuned threshold?', y: 'Δ vs P2 (%, adjusted)', pols: ['P3', 'P4', 'P5', 'P6'],
+    lede: 'Paired seeds, regression-adjusted Δ against the budget-tuned threshold P2, 95% BCa intervals: the pre-registered comparison. Read it beside the P0 view: P2 is worse than never migrating, so these margins overstate what any policy gains.',
+    sub: 'Positive means the policy costs less than P2. Amber line: the pre-registered δ = 1%. Dots: means; bars: 95% intervals; hollow markers at ρ<sub>L</sub> = 0: regime E.' } };
+const LEDE_TAIL = ' Synthetic placement (A1–A7) along the latent correlation ρ<sub>L</sub>; cost spread only (E1–E3) at ρ<sub>L</sub> = 0. Every number comes from <span class="mono">console/data/console.json</span>, generated from <span class="mono">results/summary</span> at the commit shown below.';
+let data, budget = 2, base = 'P0', shown = new Set(['P4', 'P5', 'P6', 'P0+avoid']), chart;
 const pct = (x, s = true) => (s && x > 0 ? '+' : '') + (100 * x).toFixed(1) + '%';
 
 fetch('data/console.json').then(r => r.json()).then(d => { data = d; init(); }).catch(() => {
@@ -169,18 +179,9 @@ function init() {
   const m = data.meta;
   if (!m.results) { const b = document.getElementById('banner'); b.hidden = false; b.textContent = `Demo data (${m.source}): not results. The frozen matrix has not been summarised yet.`; }
   document.getElementById('foot').innerHTML = `<span>commit <b class="mono">${m.git_sha}</b>${m.anonymous ? ' (double-blind build)' : ''}</span><span>generated ${m.generated}</span><span>source ${m.source}</span><span><span class="badge b-meas">MEASURED</span> real data · <span class="badge b-sim">SIMULATED</span> simulator · <span class="badge b-ill">ILLUSTRATIVE</span> theory sandbox</span>`;
-  const budgets = [...new Set(data.crossover.map(c => c.budget_pct))].sort((a, b) => a - b);
-  if (!budgets.length) { document.getElementById('empty').hidden = false; }
-  if (!budgets.includes(budget)) budget = budgets[0];
-  const bEl = document.getElementById('budgets');
-  budgets.forEach(b => { const x = document.createElement('button'); x.textContent = b + '%'; x.onclick = () => { budget = b; draw(); sync(); }; x.dataset.b = b; bEl.appendChild(x); });
-  const pEl = document.getElementById('pols');
-  Object.keys(NAMES).forEach(p => {
-    const l = document.createElement('label'); l.className = 'pol';
-    l.innerHTML = `<input type="checkbox" ${shown.has(p) ? 'checked' : ''}><i style="background:${COL[p]}"></i>${NAMES[p]}`;
-    l.querySelector('input').onchange = (e) => { e.target.checked ? shown.add(p) : shown.delete(p); draw(); };
-    pEl.appendChild(l);
-  });
+  if (!(data.vs_p0 || []).length) base = 'P2';
+  document.querySelectorAll('#bases button').forEach(b => b.onclick = () => { base = b.dataset.base; controls(); draw(); });
+  controls();
   document.getElementById('rho').innerHTML = data.rho.map(r => `<div class="rho-row"><span>cell ${r.cell}<br><span style="color:var(--ink-3);font-size:12px">τ-b [${r.ci.map(v => v.toFixed(3)).join(', ')}]</span></span><b>${r.tau_b >= 0 ? '+' : ''}${r.tau_b.toFixed(3)}</b></div>`).join('') || '<p class="sub">no measurement file</p>';
   if (data.meta.holm_scope) document.getElementById('scope').textContent = `Holm over the 30 pre-registered comparisons (${data.meta.holm_scope}).`;
   document.querySelector('#fam tbody').innerHTML = data.family.map(c => `<tr><td>${c.policy} · ${c.regime} · ${c.budget_pct}%</td><td>${pct(c.delta_adjusted)}</td><td>${c.holm_p == null ? '–' : c.holm_p.toFixed(3)}</td><td>${c.win ? '✓' : '–'}</td></tr>`).join('');
@@ -234,30 +235,61 @@ function matrix() {
   document.getElementById('mx').innerHTML = head + '<tbody>' + body + '</tbody>';
   document.getElementById('mx-sub').textContent = `${full} of ${tot} cells complete (${M.expected_seeds} seeds each); a dot means not run yet. Hashes identify each scenario card; the commit is in the footer.`;
 }
+function s1cells() {
+  return base === 'P2' ? data.crossover : (data.vs_p0 || []).map(c => ({ ...c, delta: c.saving }));
+}
+function controls() {
+  const B = BASE[base], cells = s1cells();
+  document.getElementById('s1-h1').textContent = B.h1;
+  document.getElementById('s1-lede').innerHTML = B.lede + LEDE_TAIL;
+  const hasAvoid = cells.some(c => c.policy.includes('avoid'));
+  document.getElementById('s1-sub').innerHTML = B.sub + (base === 'P0' && !hasAvoid ? ' The avoidance baselines (ADR-010, exploratory) appear here once <span class="mono">37_explore_avoid.py</span> has run.' : '')
+    + (base === 'P0' ? ' P2 sits far below zero (about −30% to −770%); tick it to see the whole scale.' : '');
+  document.querySelectorAll('#bases button').forEach(b => { b.classList.toggle('on', b.dataset.base === base); b.disabled = b.dataset.base === 'P0' && !(data.vs_p0 || []).length; });
+  const budgets = [...new Set(cells.map(c => c.budget_pct))].sort((a, b) => a - b);
+  document.getElementById('empty').hidden = budgets.length > 0;
+  if (budgets.length && !budgets.includes(budget)) budget = budgets.includes(2) ? 2 : budgets[0];
+  const bEl = document.getElementById('budgets'); bEl.innerHTML = '';
+  budgets.forEach(b => { const x = document.createElement('button'); x.textContent = b + '%'; x.onclick = () => { budget = b; draw(); sync(); }; x.dataset.b = b; bEl.appendChild(x); });
+  const have = new Set(cells.map(c => c.policy));
+  const pEl = document.getElementById('pols'); pEl.innerHTML = '';
+  B.pols.filter(p => have.has(p)).forEach(p => {
+    const l = document.createElement('label'); l.className = 'pol';
+    l.innerHTML = `<input type="checkbox" ${shown.has(p) ? 'checked' : ''}><i style="background:${COL[p]}"></i>${NAMES[p]}`;
+    l.querySelector('input').onchange = (e) => { e.target.checked ? shown.add(p) : shown.delete(p); draw(); };
+    pEl.appendChild(l);
+  });
+  sync();
+}
 function sync() { document.querySelectorAll('#budgets button').forEach(b => b.classList.toggle('on', +b.dataset.b === budget)); }
 function draw() {
-  const cells = data.crossover.filter(c => c.budget_pct === budget && shown.has(c.policy));
+  const pols = BASE[base].pols.filter(p => shown.has(p));
+  const cells = s1cells().filter(c => c.budget_pct === budget && shown.has(c.policy));
   const sets = [];
-  [...shown].forEach(p => {
+  pols.forEach(p => {
+    if (!cells.some(c => c.policy === p)) return;
     const a = cells.filter(c => c.policy === p && !c.kappa_sigma && c.regime.startsWith('A')).sort((x, y) => x.rho_latent - y.rho_latent);
     const e = cells.filter(c => c.policy === p && c.regime.startsWith('E'));
-    sets.push({ label: NAMES[p], data: a.map(c => ({ x: c.rho_latent, y: 100 * c.delta, lo: 100 * c.ci[0], hi: 100 * c.ci[1], n: c.n })), borderColor: COL[p], backgroundColor: COL[p], pointRadius: 5, borderWidth: 2.5, tension: .3 });
-    if (e.length) sets.push({ label: NAMES[p] + ' · E', data: e.map(c => ({ x: -0.03, y: 100 * c.delta, lo: 100 * c.ci[0], hi: 100 * c.ci[1], n: c.n, reg: c.regime })), borderColor: COL[p], backgroundColor: 'transparent', pointRadius: 6, pointBorderWidth: 2, showLine: false });
+    sets.push({ label: NAMES[p], data: a.map(c => ({ x: c.rho_latent, y: 100 * c.delta, lo: 100 * c.ci[0], hi: 100 * c.ci[1], n: c.n, share: c.share_beating_p0, expl: c.family === 'exploratory' })), borderColor: COL[p], backgroundColor: COL[p], pointRadius: 5, borderWidth: 2.5, tension: .3 });
+    if (e.length) sets.push({ label: NAMES[p] + ' · E', data: e.map(c => ({ x: -0.03, y: 100 * c.delta, lo: 100 * c.ci[0], hi: 100 * c.ci[1], n: c.n, reg: c.regime, share: c.share_beating_p0, expl: c.family === 'exploratory' })), borderColor: COL[p], backgroundColor: 'transparent', pointRadius: 6, pointBorderWidth: 2, showLine: false });
   });
   const bars = { id: 'bars', afterDatasetsDraw(c) {
     const { ctx, scales: { x, y } } = c; ctx.save();
     c.data.datasets.forEach((ds, i) => { if (c.getDatasetMeta(i).hidden) return; ctx.strokeStyle = ds.borderColor; ctx.lineWidth = 1.5;
       ds.data.forEach(p => { if (p.lo == null) return; const px = x.getPixelForValue(p.x); ctx.beginPath(); ctx.moveTo(px, y.getPixelForValue(p.lo)); ctx.lineTo(px, y.getPixelForValue(p.hi)); ctx.stroke(); }); });
     const z = y.getPixelForValue(0); ctx.setLineDash([5, 5]); ctx.strokeStyle = 'rgba(162,184,173,.5)'; ctx.beginPath(); ctx.moveTo(c.chartArea.left, z); ctx.lineTo(c.chartArea.right, z); ctx.stroke();
-    const one = y.getPixelForValue(1); ctx.strokeStyle = 'rgba(242,194,90,.6)'; ctx.beginPath(); ctx.moveTo(c.chartArea.left, one); ctx.lineTo(c.chartArea.right, one); ctx.stroke();
-    ctx.setLineDash([]); ctx.fillStyle = '#f2c25a'; ctx.font = "700 11px Nunito"; ctx.fillText('δ = 1%', c.chartArea.right - 46, one - 6); ctx.restore(); } };
+    ctx.setLineDash([]); ctx.fillStyle = 'rgba(162,184,173,.8)'; ctx.font = "700 11px Nunito";
+    if (base === 'P0') ctx.fillText('never migrating', c.chartArea.right - 92, z - 6);
+    else { const one = y.getPixelForValue(1); ctx.setLineDash([5, 5]); ctx.strokeStyle = 'rgba(242,194,90,.6)'; ctx.beginPath(); ctx.moveTo(c.chartArea.left, one); ctx.lineTo(c.chartArea.right, one); ctx.stroke();
+      ctx.setLineDash([]); ctx.fillStyle = '#f2c25a'; ctx.fillText('δ = 1%', c.chartArea.right - 46, one - 6); }
+    ctx.restore(); } };
   if (chart) chart.destroy();
   chart = new Chart(document.getElementById('cx'), { type: 'line', data: { datasets: sets }, plugins: [bars], options: {
     responsive: true, maintainAspectRatio: false, devicePixelRatio: Math.max(2, devicePixelRatio || 1),
     plugins: { legend: { labels: { color: '#a2b8ad', font: { family: 'Nunito', weight: '700' }, usePointStyle: true } },
-      tooltip: { callbacks: { label: (it) => `${it.dataset.label}: ${it.raw.y >= 0 ? '+' : ''}${it.raw.y.toFixed(2)}% [${it.raw.lo.toFixed(2)}, ${it.raw.hi.toFixed(2)}], n=${it.raw.n}${it.raw.reg ? ' (' + it.raw.reg + ')' : ''}` } } },
+      tooltip: { callbacks: { label: (it) => `${it.dataset.label}: ${it.raw.y >= 0 ? '+' : ''}${it.raw.y.toFixed(2)}% [${it.raw.lo.toFixed(2)}, ${it.raw.hi.toFixed(2)}], n=${it.raw.n}${it.raw.reg ? ' (' + it.raw.reg + ')' : ''}${it.raw.share != null ? `; ${Math.round(100 * it.raw.share)}% of seeds beat P0` : ''}${it.raw.expl ? '; exploratory' : ''}` } } },
     scales: { x: { type: 'linear', min: -0.06, max: 0.95, title: { display: true, text: 'latent correlation ρL between criticality and host risk', color: '#6c8579', font: { family: 'Nunito', weight: '700' } }, ticks: { color: '#6c8579' }, grid: { color: 'rgba(140,255,195,.06)' } },
-      y: { title: { display: true, text: 'Δ vs P2 (%, adjusted)', color: '#6c8579', font: { family: 'Nunito', weight: '700' } }, ticks: { color: '#6c8579', callback: v => (v > 0 ? '+' : '') + v + '%' }, grid: { color: 'rgba(140,255,195,.06)' } } } } });
+      y: { title: { display: true, text: BASE[base].y, color: '#6c8579', font: { family: 'Nunito', weight: '700' } }, ticks: { color: '#6c8579', callback: v => (v > 0 ? '+' : '') + v + '%' }, grid: { color: 'rgba(140,255,195,.06)' } } } } });
 }
 </script>
 </body>
