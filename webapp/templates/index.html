@@ -5,6 +5,11 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>VM Mitigation: move the right VMs before hardware fails</title>
 <meta name="description" content="A workload-aware, cost-sensitive VM mitigation policy: live model demo, course-project results, and the v2 research programme in progress.">
+<meta property="og:type" content="website">
+<meta property="og:title" content="VM Mitigation: move the right VMs before hardware fails">
+<meta property="og:description" content="Which VMs are worth moving off failing hardware? A live model demo, course-project results and the v2 research programme.">
+<meta name="theme-color" content="#040806" media="(prefers-color-scheme: dark)">
+<meta name="theme-color" content="#f1f6f3" media="(prefers-color-scheme: light)">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&family=Nunito:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
@@ -414,9 +419,12 @@
 
   .js .reveal { opacity: 0; transform: translateY(12px); transition: opacity .6s ease, transform .6s ease; }
   .js .reveal.in { opacity: 1; transform: none; }
+  .skip { position: absolute; left: 12px; top: -48px; z-index: 60; padding: 8px 14px; border-radius: 10px; background: var(--cs); color: var(--bg); font-weight: 700; text-decoration: none; }
+  .skip:focus { top: 12px; }
 </style>
 </head>
 <body>
+<a class="skip" href="#how">Skip to content</a>
 
 <header class="nav">
   <div class="wrap">
@@ -944,8 +952,11 @@ function spy() {
   document.querySelectorAll('#navLinks a').forEach(a => a.classList.toggle('active', cur !== null && a.getAttribute('href') === '#' + cur));
 }
 addEventListener('scroll', spy, { passive: true }); spy();
-const rev = new IntersectionObserver((es) => es.forEach(e => { if (e.isIntersecting) { e.target.classList.add('in'); rev.unobserve(e.target); } }), { rootMargin: '0px 0px -8% 0px' });
-document.querySelectorAll('.reveal').forEach(el => rev.observe(el));
+// reveal on scroll; without IntersectionObserver everything is shown at once
+if ('IntersectionObserver' in window) {
+  const rev = new IntersectionObserver((es) => es.forEach(e => { if (e.isIntersecting) { e.target.classList.add('in'); rev.unobserve(e.target); } }), { rootMargin: '0px 0px -8% 0px' });
+  document.querySelectorAll('.reveal').forEach(el => rev.observe(el));
+} else document.querySelectorAll('.reveal').forEach(el => el.classList.add('in'));
 
 /* ---------------- hero fleet ---------------- */
 const COLS = 12, ROWS = 8, W = 360, H = 240, GAP = 4;
