@@ -234,6 +234,22 @@ def build() -> tuple[dict[str, str], list[str]]:
         v.setdefault(name("SaveVsPZeroHi", *base), pct(c["ci_bca"][1]))
         v.setdefault(name("BeatsPZero", *base), pct(c["share_seeds_beating_p0"], 0, False))
 
+    # ADR-010 (exploratory): avoidance baselines against never migrating, eval seeds
+    xa = load_json(SUMM / "explore_avoid.json")
+    for c in (xa or {}).get("cells", []):
+        if "avoid" not in c["policy"]:
+            continue
+        base = (
+            c["policy"].split("+")[0],
+            c["regime"].replace("-", ""),
+            f"{float(c['budget_pct']):g}",
+        )
+        v.setdefault(name("SaveAvoid", *base), pct(c["saving_vs_p0_mean"]))
+        v.setdefault(name("SaveAvoidLo", *base), pct(c["ci_bca"][0]))
+        v.setdefault(name("SaveAvoidHi", *base), pct(c["ci_bca"][1]))
+    for k in ("VSaveAvoidPZeroAOneTwo", "VSaveAvoidPZeroASevenTwo"):
+        need(k, v.get(k))
+
     # Week 21 second source (group S, regime B1-f)
     s2 = load_json(SUMM / "S_second.json")
     sc2 = {(c["budget_pct"], c["policy"]): c for c in (s2 or {}).get("cells", [])}
@@ -249,7 +265,8 @@ def build() -> tuple[dict[str, str], list[str]]:
         need(name("GuardNotWorse", b), r and pct(r["share_not_worse_than_P2_by_1pct"], 0, False))
         need(
             name("GuardCapturedNinety", b),
-            r and r.get("share_captured_ge_90pct") is not None
+            r
+            and r.get("share_captured_ge_90pct") is not None
             and pct(r["share_captured_ge_90pct"], 0, False)
             or (r and "n/a"),
         )

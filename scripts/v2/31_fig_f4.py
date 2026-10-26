@@ -118,7 +118,8 @@ def draw(cells: dict, par: dict, budgets: list[float], m: dict, path: Path) -> N
                     ax.plot(np.full(len(adj), x), 100 * adj, ".", color=col, ms=2, alpha=0.35)
             if xs:
                 ys_, lo_, hi_ = np.array(ys), np.array(lo), np.array(hi)
-                ax.errorbar(xs, ys_, [ys_ - lo_, hi_ - ys_], fmt="-o", ms=3, color=col, label=pol)
+                ax.errorbar(xs, ys_, [ys_ - lo_, hi_ - ys_], marker=figstyle.MK[pol],
+                            ls=figstyle.LS[pol], ms=3, color=col, label=pol)  # fmt: skip
         for e, mk in zip(m["regimes"]["E"], ("v", "s", "^", "D"), strict=False):
             c = cells.get((e, b, "P4"))
             if c is not None:

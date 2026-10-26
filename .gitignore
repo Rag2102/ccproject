@@ -49,3 +49,4 @@ results/raw/tuning/*.tmp
 results/dryrun_summary/
 results/small/
 console/data/
+results/figures/gray/

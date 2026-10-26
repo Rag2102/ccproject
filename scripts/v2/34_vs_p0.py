@@ -72,6 +72,9 @@ def main() -> None:
                 "ci_bca": bca(s),
                 "share_seeds_beating_p0": float((s > 0).mean()),
                 "cost_ratio_to_p0_mean": float((g.total_cost[ok] / base[ok]).mean()),
+                "family": "descriptive",  # ADR-005 companion, outside the confirmatory family
+                "seeds": [int(x) for x in g.index[ok]],
+                "per_seed": [round(float(x), 6) for x in s],  # Console S5
             }
         )
     out.mkdir(parents=True, exist_ok=True)

@@ -31,30 +31,45 @@ the guard's is \VDeltaPSixBOneTwo\%.
 % section 9). A3 and A5 triggered the SD extension rule (ADR-007): their numbers are provisional
 % until seeds 31-50 are run, and are decided against 2.1%.
 Against the threshold tuned to spend the budget, every policy that ranks by expected cost wins
-by a wide margin (Figure~F4): BAM's adjusted $\Delta$ is \VDeltaPFourAOneTwo\% at $\rho_L=0$ and a
-2\% budget, and all twelve confirmatory comparisons in A3 and A5 meet the pre-registered bar.
+by a wide margin (Figure~F4): BAM's adjusted $\Delta$ is \VDeltaPFourAOneTwo\%
+[\VCILoPFourAOneTwo, \VCIHiPFourAOneTwo] at $\rho_L=0$ and a 2\% budget, and all twelve confirmatory comparisons in A3 and A5 meet the pre-registered bar.
 These wins say little on their own. The tuned threshold costs more than never migrating in every
-seed: at $\rho_L=0$ its saving against never migrating is \VSaveVsPZeroPTwoAOneTwo\% at a 2\% budget
-and \VSaveVsPZeroPTwoAOneZeroFive\% at 0.5\%, because spending the budget forces it to move VMs whose
+seed: at $\rho_L=0$ its saving against never migrating is \VSaveVsPZeroPTwoAOneTwo\%
+[\VSaveVsPZeroLoPTwoAOneTwo, \VSaveVsPZeroHiPTwoAOneTwo] at a 2\% budget and
+\VSaveVsPZeroPTwoAOneZeroFive\% [\VSaveVsPZeroLoPTwoAOneZeroFive, \VSaveVsPZeroHiPTwoAOneZeroFive]
+at 0.5\%, because spending the budget forces it to move VMs whose
 expected benefit is negative.
 
 Against never migrating (Figure~F4b), BAM saves \VSaveVsPZeroPFourAOneTwo\% [\VSaveVsPZeroLoPFourAOneTwo,
-\VSaveVsPZeroHiPFourAOneTwo] at $\rho_L = 0$, rising to \VSaveVsPZeroPFourAThreeTwo\% at $\rho_L = 0.3$ and
-falling to \VSaveVsPZeroPFourASevenTwo\% at $\rho_L = 0.9$, ahead of never migrating in at least
+\VSaveVsPZeroHiPFourAOneTwo] at $\rho_L = 0$, rising to \VSaveVsPZeroPFourAThreeTwo\%
+[\VSaveVsPZeroLoPFourAThreeTwo, \VSaveVsPZeroHiPFourAThreeTwo] at $\rho_L = 0.3$ and falling to
+\VSaveVsPZeroPFourASevenTwo\% [\VSaveVsPZeroLoPFourASevenTwo, \VSaveVsPZeroHiPFourASevenTwo] at
+$\rho_L = 0.9$, ahead of never migrating in at least
 \VBeatsPZeroPFourASixTwo\% of seeds in every A regime. At zero correlation the saving follows the spread
-of cost per GB, as the theory predicts: \VSaveVsPZeroPFourEOneTwo\%, \VSaveVsPZeroPFourETwoTwo\% and
-\VSaveVsPZeroPFourEThreeTwo\% for $\sigma_\kappa = 0.25$, $0.5$ and $1$, so with little spread BAM is
+of cost per GB, as the theory predicts: \VSaveVsPZeroPFourEOneTwo\%
+[\VSaveVsPZeroLoPFourEOneTwo, \VSaveVsPZeroHiPFourEOneTwo], \VSaveVsPZeroPFourETwoTwo\%
+[\VSaveVsPZeroLoPFourETwoTwo, \VSaveVsPZeroHiPFourETwoTwo] and \VSaveVsPZeroPFourEThreeTwo\%
+[\VSaveVsPZeroLoPFourEThreeTwo, \VSaveVsPZeroHiPFourEThreeTwo] for $\sigma_\kappa = 0.25$, $0.5$
+and $1$, so with little spread BAM is
 slightly worse than doing nothing. The budget never binds: BAM uses \VUtilPFourAOneZeroFive\% of the
 smallest budget and its saving is the same at every budget, so its advantage comes from its
 stopping rule ($b_i > 0$), not from ranking under scarcity.
 
 Two results cut against the method. The Narya-inspired bandit (P5) saves more than BAM in every A
-and E cell (\VSaveVsPZeroPFiveAOneTwo\% at $\rho_L = 0$, \VSaveVsPZeroPFiveAThreeTwo\% at $0.3$) with far
-fewer moves (\VMigrationsPFiveAOneTwo{} migrations against BAM's \VMigrationsPFourAOneTwo{} at
-$\rho_L=0$): BAM's one-shot benefit $b_i$ ignores that moving today forgoes the option to wait, and
-the bandit learns from realised outcomes to move less. And the guard (P6), whose fallback is the
-tuned threshold, inherits that threshold's cost: its saving against never migrating is
-\VSaveVsPZeroPSixAOneTwo\% at $\rho_L=0$ and a 2\% budget. The closed form (dashed in Figure~F4)
+and E cell (\VSaveVsPZeroPFiveAOneTwo\% [\VSaveVsPZeroLoPFiveAOneTwo, \VSaveVsPZeroHiPFiveAOneTwo] at
+$\rho_L = 0$, \VSaveVsPZeroPFiveAThreeTwo\% [\VSaveVsPZeroLoPFiveAThreeTwo,
+\VSaveVsPZeroHiPFiveAThreeTwo] at $0.3$) with far fewer moves (\VMigrationsPFiveAOneTwo{}
+migrations against BAM's \VMigrationsPFourAOneTwo{} at $\rho_L=0$). An exploratory diagnosis after
+the freeze traces the whole difference to one action only P5 has: marking a risky host so that it
+takes no new VMs. With that action switched off P5 is no better than BAM, and BAM judged over a
+shorter window, which waits more, saves less; the option to wait does not explain it. Avoidance on
+its own, with no migration at all, saves \VSaveAvoidPZeroAOneTwo\% [\VSaveAvoidLoPZeroAOneTwo,
+\VSaveAvoidHiPZeroAOneTwo] at $\rho_L = 0$ and \VSaveAvoidPZeroASevenTwo\%
+[\VSaveAvoidLoPZeroASevenTwo, \VSaveAvoidHiPZeroASevenTwo] at $\rho_L = 0.9$ (evaluation seeds;
+exploratory, outside the confirmatory family), more than any migration policy. And the guard (P6),
+whose fallback is the tuned threshold, inherits that threshold's cost: its saving against never
+migrating is \VSaveVsPZeroPSixAOneTwo\% [\VSaveVsPZeroLoPSixAOneTwo, \VSaveVsPZeroHiPSixAOneTwo] at
+$\rho_L=0$ and a 2\% budget. The closed form (dashed in Figure~F4)
 reproduces the direction of the advantage over the threshold in $\rho_L$ and in the budget but
 under-predicts its level, which is expected once the budget does not bind and the stopping term
 dominates (Section~\ref{sec:approach}).

@@ -68,10 +68,11 @@ def figure(res: dict, path: Path) -> None:
             miss = [pts[b]["missed_failures"] for b in bs]
             cost = [pts[b]["total_cost"] for b in bs]
             col = COLORS.get(pol, "#555555")
-            ax[0, j].plot(mig, miss, "-o", ms=3, lw=1.3, color=col, label=pol)
+            sty = {"marker": figstyle.MK.get(pol, "o"), "ls": figstyle.LS.get(pol, "-")}
+            ax[0, j].plot(mig, miss, ms=3, lw=1.3, color=col, label=pol, **sty)
             if pol != "P0":
                 ax[1, j].plot(
-                    [float(b) for b in bs], cost, "-o", ms=3, lw=1.3, color=col, label=pol
+                    [float(b) for b in bs], cost, ms=3, lw=1.3, color=col, label=pol, **sty
                 )
         if np.isfinite(res[r]["p0_cost"]):
             ax[1, j].axhline(res[r]["p0_cost"], color=COLORS["P0"], ls=":", lw=1)

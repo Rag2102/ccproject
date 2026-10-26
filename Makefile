@@ -2,7 +2,7 @@
 # v1 is run as documented in README.md; nothing here changes it.
 PY ?= .venv/bin/python
 
-.PHONY: test diag data train sim worlds bench stats numbers figures paper console reproduce-small reproduce docker-repro release
+.PHONY: test diag data train sim worlds bench stats numbers audit figures paper console reproduce-small reproduce docker-repro release
 
 test:
 	$(PY) -m pytest tests -q
@@ -41,6 +41,12 @@ figures: stats
 	$(PY) scripts/v2/28_table3.py
 	$(PY) scripts/v2/29_w20_analysis.py
 	$(PY) scripts/v2/theory_check.py --quick
+
+# Week 33: reporting audit (every result in the text has an interval, n and family) and the
+# grayscale check of the figures
+audit: numbers
+	$(PY) scripts/v2/43_report_audit.py
+	$(PY) scripts/v2/44_grayscale_check.py
 
 # Week 22: number macros for the paper (paper/numbers.tex); a test fails if a macro is missing
 numbers:
