@@ -234,6 +234,26 @@ def build() -> tuple[dict[str, str], list[str]]:
         v.setdefault(name("SaveVsPZeroHi", *base), pct(c["ci_bca"][1]))
         v.setdefault(name("BeatsPZero", *base), pct(c["share_seeds_beating_p0"], 0, False))
 
+    # Appendix (Week 33): the scale pilot (ADR-007) and P2's within-host order (ADR-005)
+    pb = load_json(RES / "pilot_w14b.json")
+    if pb:
+        for cell in ("A3", "B1"):
+            sd = pb["cells"].get(f"{cell}@0.02", {}).get("delta_vs_p2_sd", {}).get("P3")
+            if sd is not None:
+                v[name("PilotSD", cell)] = pct(sd, 2, False)
+    spread, utils = [], []
+    for f in ("pilot_w14.json", "pilot_w14b.json"):
+        for cell in (load_json(RES / f) or {}).get("p2", {}).values():
+            tab = cell["budget"]["table"]
+            costs = [r["cost"] for r in tab]
+            spread.append((max(costs) - min(costs)) / min(costs))
+            utils += [r["util"] for r in tab]
+    if spread:
+        v["VPTwoOrderSpread"] = pct(max(spread), 1, False)
+        v["VPTwoOrderCells"] = str(len(spread))
+        v["VPTwoUtilLo"] = pct(min(utils), 1, False)
+        v["VPTwoUtilHi"] = pct(max(utils), 1, False)
+
     # ADR-010 (exploratory): avoidance baselines against never migrating, eval seeds
     xa = load_json(SUMM / "explore_avoid.json")
     for c in (xa or {}).get("cells", []):
