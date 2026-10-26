@@ -19,9 +19,10 @@ for i in 1 2 3 4 5 6 7 8; do
 done
 wait
 .venv/bin/python scripts/v2/24_run_matrix.py --phase collect $EXT --seeds 1-50 > logs/w18x/collect.log 2>&1
-# ADR-010 (exploratory): P0+avoid and P4+avoid on every regime's eval seeds; then the summary
-# against never migrating (results/summary/explore_avoid.json)
-.venv/bin/python scripts/v2/37_explore_avoid.py > logs/explore_avoid.log 2>&1
+# ADR-010 (exploratory): the avoidance runs were done on 26 Oct 2026 (every regime, eval seeds), so this
+# skips them and only re-summarises, now that B, C and D have their P0 runs
+# (results/summary/explore_avoid.json)
+.venv/bin/python scripts/v2/37_explore_avoid.py > logs/explore_avoid_resummary.log 2>&1
 echo "runs done $(date)" > logs/rest_done.txt
 if docker info >/dev/null 2>&1; then
   scripts/v2/docker_repro.sh > logs/docker_repro.log 2>&1

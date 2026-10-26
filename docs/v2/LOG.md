@@ -2,6 +2,11 @@
 
 Sunday ritual (15 minutes): update this log, tick the week's "done when", log any cut as an ADR, re-read the next gate's criteria, update `CAPACITY.md` for the coming month, write Monday's first task. Newest week first. Hours are yours to fill; nothing here is estimated.
 
+## Avoidance on the eval seeds (26 Oct 2026, ADR-010, exploratory)
+- 1,440 runs in 14 minutes, every regime, eval seeds 1-30. The dev-seed finding holds: avoidance alone saves 11-20% against never migrating in every A and E cell, 6-13 points ahead of BAM and 2-3 ahead of P5, with no migrations. Adding BAM on top gains at most about 2 points.
+- Rejected arrivals rise by up to about a quarter in tight A regimes: the main caveat. B, C and D are run and join the summary once their P0 runs exist.
+- `RESULTS_AVOID.md`; Console S1 shows it in the "vs never migrating" view.
+
 ## Console and site (13 Oct 2026)
 - Console S1 opens on the saving against never migrating (P0; `vs_p0.json`, descriptive), with a toggle to the pre-registered Δ against P2. The ADR-010 avoidance baselines appear there once `37_explore_avoid.py` has run (`41_console_data.py` reads `explore_avoid.json`).
 - Site (`ui-redesign`): the v2 section shows the Week 18 results against P0 per regime, the avoidance finding (dev seeds, labelled exploratory), the guard result, and 18/60 weeks done with code to Week 28.

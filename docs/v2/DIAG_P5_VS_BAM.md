@@ -1,5 +1,7 @@
 # Why does P5 beat BAM? (exploratory diagnosis, post-freeze)
 
+**Update, 26 Oct 2026:** confirmed on the 30 evaluation seeds in every A and E regime (`RESULTS_AVOID.md`).
+
 Asked by the Week 18 result (`RESULTS_W18.md`): against never migrating, the Narya-inspired P5 saves more than BAM in every A and E cell, with about 34× fewer migrations.
 
 **Setup:**
