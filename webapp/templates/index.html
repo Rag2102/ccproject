@@ -402,13 +402,6 @@
   @media (max-width: 600px) { .w18-scale { grid-template-columns: 1fr; } .w18-scale > div:not(.ax) { display: none; } }
 
   .timeline { margin-top: 20px; }
-  .tl-track { display: grid; grid-template-columns: repeat(60, 1fr); gap: 2px; margin: 0 0 8px; }
-  .tl-track i { height: 26px; border-radius: 7px; background: var(--bg-2); border: 1px solid var(--line); }
-  .tl-track i.done { background: var(--cs); border-color: transparent; }
-  .tl-track i.prep { background: var(--amber-soft); border-color: color-mix(in srgb, var(--amber) 45%, transparent); }
-  .tl-track i.now { background: var(--amber); border-color: transparent; animation: blink 1.8s ease-in-out infinite; }
-  @keyframes blink { 50% { opacity: .45; } }
-  .tl-scale { display: flex; justify-content: space-between; font: 500 11px var(--mono); color: var(--ink-3); }
   .phases { display: grid; grid-template-columns: repeat(auto-fill, minmax(210px, 1fr)); gap: 0; margin-top: 24px; border-top: 1px solid var(--line); }
   .phase { padding: 16px 18px 16px 0; border-bottom: 1px solid var(--line); display: grid; grid-template-columns: 18px 1fr; gap: 10px; }
   .phase .dot { width: 12px; height: 12px; border-radius: 50%; margin-top: 4px; border: 2px solid var(--line-2); }
@@ -551,7 +544,7 @@
       <a href="/research">Research<span class="new">v2</span></a>
     </nav>
     <div class="nav-right">
-      <a class="status-pill" href="/research#plan" title="Week 18 of the 60-week plan is done"><i></i><span>v2 · Week 18 of 60</span></a>
+      <a class="status-pill" href="/research#plan" title="Week 18 of the 60-week plan is done" aria-label="v2 research: Week 18 of 60 done; see the plan"><i></i><span>v2 · Week 18 of 60</span></a>
       <a class="icon-btn" href="https://github.com/Rag2102/ccproject" target="_blank" rel="noopener" aria-label="Repository on GitHub"><svg width="15" height="15" viewBox="0 0 16 16" fill="currentColor" aria-hidden="true"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.01 8.01 0 0 0 16 8c0-4.42-3.58-8-8-8z"/></svg><span class="gh-label">GitHub</span></a>
       <button class="icon-btn menu-btn" id="menuBtn" aria-label="Open menu" aria-expanded="false" aria-controls="navLinks">
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><line x1="4" y1="7" x2="20" y2="7"/><line x1="4" y1="12" x2="20" y2="12"/><line x1="4" y1="17" x2="20" y2="17"/></svg>
@@ -1118,7 +1111,9 @@ $('menuBtn').addEventListener('click', () => {
   const open = $('navLinks').classList.toggle('open');
   $('menuBtn').setAttribute('aria-expanded', open);
 });
-document.querySelectorAll('#navLinks a').forEach(a => a.addEventListener('click', () => $('navLinks').classList.remove('open')));
+function closeMenu() { $('navLinks').classList.remove('open'); $('menuBtn').setAttribute('aria-expanded', 'false'); }
+document.querySelectorAll('#navLinks a').forEach(a => a.addEventListener('click', closeMenu));
+addEventListener('keydown', (e) => { if (e.key === 'Escape' && $('navLinks').classList.contains('open')) { closeMenu(); $('menuBtn').focus(); } });
 
 // pages: every section is its own page (/how, /model, ...). The server renders the one asked for; after that,
 // links switch pages in place: the old page fades out, the new one rises in, the address and title follow,
@@ -1166,12 +1161,14 @@ document.addEventListener('click', (e) => {
   const k = PAGE_OF[url.pathname];
   if (!k) return;
   e.preventDefault();
-  $('navLinks').classList.remove('open');
+  closeMenu();
   if (url.pathname + url.hash !== location.pathname + location.hash) history.pushState({ k }, '', url.pathname + url.hash);
   showPage(k, url.hash);
 });
 addEventListener('popstate', () => showPage(PAGE_OF[location.pathname] || 'home', location.hash));
 markNav(document.documentElement.dataset.page);
+// a link straight to a part of a page (/research#plan) lands on it at once, and again once the fonts have set the layout
+if (location.hash.length > 1) { land(location.hash, false); if (document.fonts) document.fonts.ready.then(() => land(location.hash, false)); }
 // reveal on scroll; without IntersectionObserver everything is shown at once
 if ('IntersectionObserver' in window) {
   const rev = new IntersectionObserver((es) => es.forEach(e => { if (e.isIntersecting) { e.target.classList.add('in'); rev.unobserve(e.target); } }), { rootMargin: '0px 0px -8% 0px' });
@@ -1279,7 +1276,8 @@ function seedFleet() {
   hosts = [];
   for (let i = 0; i < COLS * ROWS; i++) {
     const r = Math.random();
-    hosts.push({ risk: r < 0.1 ? 0.6 + Math.random() * 0.4 : Math.random() * 0.35, state: 'up', vms: 2 + Math.floor(Math.random() * 3), saved: 0, t: 0 });
+    const base = 0.05 + Math.random() * 0.3;
+    hosts.push({ base, risk: r < 0.08 ? 0.6 + Math.random() * 0.3 : base, degrading: r < 0.08, state: 'up', vms: 2 + Math.floor(Math.random() * 3), saved: 0, t: 0 });
   }
 }
 function hostColor(h) {
@@ -1306,26 +1304,42 @@ function drawFleet(force) {
   svg.innerHTML = out;
   $('fleetClock').textContent = 'day ' + fleetDay;
 }
+// a steady state (tuned by simulating 600 days: about 12 of 96 hosts high risk, 3 failed, 2 being drained at a
+// time): hosts hover around their own baseline risk and a couple start to degrade each day; the budget lets the
+// policy drain the riskiest flagged host every other day, so some still fail; drained and failed hosts are
+// repaired and take new VMs again. VMs are moved, never lost; arrivals and departures keep about 290 running.
+function repair(h) { h.state = 'up'; h.degrading = false; h.risk = h.base; }
 function stepFleet() {
   fleetDay += 1;
   hosts.forEach(h => {
-    if (h.state === 'failed') { h.t -= 1; if (h.t <= 0) { h.state = 'up'; h.risk = Math.random() * 0.3; h.vms = 1; } return; }
-    if (h.saved) { h.saved -= 1; }
-    h.risk = Math.min(1, h.risk + Math.random() * 0.02);
+    if (h.state === 'failed') { h.t -= 1; if (h.t <= 0) { repair(h); h.vms = 1; } return; }
+    if (h.saved) { h.saved -= 1; if (!h.saved && !h.vms) repair(h); }
+    h.risk = h.degrading ? Math.min(1, h.risk + 0.02 + Math.random() * 0.03)
+      : Math.max(0, Math.min(0.5, h.risk + (h.base - h.risk) * 0.2 + (Math.random() - 0.5) * 0.06));
   });
-  // the policy moves VMs off the riskiest host (budget: one host per tick), then some risky host fails
-  const live = hosts.filter(h => h.state === 'up' && h.vms > 0);
-  live.sort((a, b) => b.risk - a.risk);
-  if (live[0] && live[0].risk > 0.6) {
-    const src = live[0], dst = hosts.filter(h => h.state === 'up').sort((a, b) => a.risk - b.risk)[Math.floor(Math.random() * 6)];
-    if (dst && dst !== src) { dst.vms = Math.min(5, dst.vms + src.vms); src.vms = 0; src.saved = 3; }
+  const up = hosts.filter(h => h.state === 'up');
+  for (let k = 0; k < 2; k++) if (Math.random() < 0.7) { const h = up[Math.floor(Math.random() * up.length)]; if (h && !h.degrading && h.vms) h.degrading = true; }
+  // the policy, every other day: move every VM off the riskiest flagged host, onto the safest hosts with room
+  const flagged = up.filter(h => h.vms > 0 && h.risk > 0.6).sort((a, b) => b.risk - a.risk)[0];
+  if (flagged && fleetDay % 2 === 0) {
+    const dst = up.filter(h => h !== flagged && !h.degrading && h.vms < 5).sort((a, b) => a.risk - b.risk).slice(0, 6);
+    for (let k = 0; flagged.vms > 0 && dst.length; k++) { const d = dst[k % dst.length]; if (d.vms >= 5) { dst.splice(k % dst.length, 1); continue; } d.vms += 1; flagged.vms -= 1; }
+    if (!flagged.vms) flagged.saved = 5;
   }
-  const cand = hosts.filter(h => h.state === 'up' && h.risk > 0.75);
-  if (cand.length && Math.random() < 0.55) { const f = cand[Math.floor(Math.random() * cand.length)]; f.state = 'failed'; f.t = 4; f.saved = 0; }
+  // a host that kept climbing fails, taking its VMs with it
+  const cand = up.filter(h => h.risk > 0.85);
+  if (cand.length && Math.random() < 0.5) { const f = cand[Math.floor(Math.random() * cand.length)]; f.state = 'failed'; f.t = 6; f.saved = 0; f.vms = 0; }
+  const total = hosts.reduce((a, h) => a + h.vms, 0);
+  if (Math.random() < 0.6 && total < 290) { const h = up.filter(x => !x.degrading && x.vms < 4)[Math.floor(Math.random() * 20)]; if (h) h.vms += 1; }
+  if (Math.random() < 0.6 && total > 290) { const h = up.filter(x => x.vms > 1)[Math.floor(Math.random() * 30)]; if (h) h.vms -= 1; }
   drawFleet();
 }
 drawFleet('reseed');
-if (!matchMedia('(prefers-reduced-motion: reduce)').matches) fleetTimer = setInterval(stepFleet, 900);
+// it only runs while it can be seen: not on a hidden page, below the fold or in a background tab
+let fleetSeen = false;
+if ('IntersectionObserver' in window) new IntersectionObserver(([e]) => { fleetSeen = e.isIntersecting; }).observe($('fleet'));
+else fleetSeen = true;
+if (!matchMedia('(prefers-reduced-motion: reduce)').matches) fleetTimer = setInterval(() => { if (fleetSeen && !document.hidden) stepFleet(); }, 900);
 
 /* ---------------- live demo ---------------- */
 const age = $('age_days');
