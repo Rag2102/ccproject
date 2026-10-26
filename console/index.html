@@ -18,9 +18,21 @@
     --radius: 22px; --display: 'Fredoka', 'Nunito', sans-serif; --sans: 'Nunito', system-ui, sans-serif;
     --mono: 'JetBrains Mono', ui-monospace, monospace;
   }
+  /* Week 34: light theme (system setting, or the header toggle) */
+  @media (prefers-color-scheme: light) { :root:not([data-theme="dark"]) {
+    --bg: #f6faf7; --bg-2: #eaf2ed; --surface: #ffffff; --surface-2: #f1f6f3;
+    --line: rgba(10,40,25,.09); --line-2: rgba(10,40,25,.17);
+    --ink: #0c1912; --ink-2: #3f5248; --ink-3: #5f7368;
+    --good: #0f8a52; --th: #c2410c; --amber: #8a5d00; --cs: #1d5fd1; } }
+  :root[data-theme="light"] {
+    --bg: #f6faf7; --bg-2: #eaf2ed; --surface: #ffffff; --surface-2: #f1f6f3;
+    --line: rgba(10,40,25,.09); --line-2: rgba(10,40,25,.17);
+    --ink: #0c1912; --ink-2: #3f5248; --ink-3: #5f7368;
+    --good: #0f8a52; --th: #c2410c; --amber: #8a5d00; --cs: #1d5fd1; }
+  @media (prefers-reduced-motion: reduce) { *, *::before, *::after { transition: none !important; animation: none !important; scroll-behavior: auto !important; } }
   * { box-sizing: border-box; }
-  body { margin: 0; font-family: var(--sans); color: var(--ink); line-height: 1.55;
-    background: radial-gradient(1000px 560px at 8% -10%, rgba(34,197,94,.18), transparent 60%), var(--bg); min-height: 100vh; }
+  body { margin: 0; font-family: var(--sans); color: var(--ink); line-height: 1.55; min-height: 100vh;
+    background: radial-gradient(1000px 560px at 8% -10%, rgba(34,197,94,.14), transparent 60%), var(--bg); }
   .wrap { max-width: 1320px; margin: 0 auto; padding: 0 32px; }
   @media (max-width: 600px) { .wrap { padding: 0 16px; } }
   header { display: flex; align-items: center; gap: 14px; height: 64px; border-bottom: 1px solid var(--line); padding: 0 28px; }
@@ -78,14 +90,51 @@
   .rho-row b { font: 600 18px var(--display); }
   footer { margin: 34px 0 48px; color: var(--ink-3); font-size: 12.5px; display: flex; gap: 16px; flex-wrap: wrap; }
   .empty { color: var(--ink-3); padding: 60px 0; text-align: center; }
+  .icon-btn { border: 1px solid var(--line-2); background: transparent; color: var(--ink-2); border-radius: 999px; width: 34px; height: 34px; cursor: pointer; flex-shrink: 0; }
+  /* S5 Paired Seeds */
+  .ps-head, .ps-row { display: grid; grid-template-columns: 150px minmax(0, 1fr) 96px 168px; gap: 12px; align-items: center; }
+  .ps-row { padding: 8px 0; border-bottom: 1px solid var(--line); font-size: 12.5px; }
+  .ps-head { font: 800 10.5px var(--sans); color: var(--ink-3); letter-spacing: .06em; text-transform: uppercase; }
+  .ps-lbl { font-family: var(--mono); font-size: 11.5px; color: var(--ink-2); }
+  .ps-lbl b { display: block; font-family: var(--sans); font-size: 13px; color: var(--ink); }
+  .strip { position: relative; height: 30px; border-radius: 8px; background: var(--bg-2); overflow: hidden; }
+  .strip .z { position: absolute; top: 0; bottom: 0; width: 1.5px; background: var(--ink-3); }
+  .strip .bar { position: absolute; top: 0; bottom: 0; width: 1px; border-left: 1.5px dashed var(--amber); }
+  .strip .ci { position: absolute; top: 11px; height: 8px; border-radius: 4px; opacity: .35; }
+  .strip .s { position: absolute; width: 5px; height: 5px; margin-left: -2.5px; border-radius: 50%; opacity: .75; }
+  .strip .m { position: absolute; top: 4px; bottom: 4px; width: 3px; margin-left: -1.5px; border-radius: 2px; background: var(--ink); }
+  .ps-v { font-family: var(--mono); text-align: right; font-size: 12px; }
+  .ps-v small { display: block; color: var(--ink-3); font-size: 10.5px; }
+  .chips { display: flex; gap: 4px; flex-wrap: wrap; }
+  .chip { font: 700 10.5px var(--sans); padding: 2px 7px; border-radius: 999px; border: 1px solid var(--line-2); color: var(--ink-3); white-space: nowrap; }
+  .chip.y { color: var(--good); border-color: color-mix(in srgb, var(--good) 45%, transparent); }
+  .chip.n { color: var(--th); border-color: color-mix(in srgb, var(--th) 45%, transparent); }
+  .ps-pending { color: var(--ink-3); font-size: 12px; }
+  .ps-axis { position: relative; height: 16px; font: 500 10.5px var(--mono); color: var(--ink-3); }
+  .ps-axis span { position: absolute; transform: translateX(-50%); }
+  @media (max-width: 760px) { .ps-head { display: none; } .ps-row { grid-template-columns: minmax(0, 1fr) 84px; } .ps-row .strip { grid-column: 1 / -1; grid-row: 2; } .ps-row .chips { grid-column: 1 / -1; } }
+  /* S6 Figures */
+  .figs { display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 18px; }
+  @media (max-width: 400px) { .figs { grid-template-columns: minmax(0, 1fr); } }
+  .fig { display: flex; flex-direction: column; gap: 10px; }
+  .fig .img { background: #fff; border-radius: 12px; padding: 8px; min-height: 120px; display: grid; place-items: center; }
+  .fig .img img { width: 100%; height: auto; display: block; }
+  .fig .img.none { background: var(--bg-2); color: var(--ink-3); font-size: 13px; }
+  .fig h3 { margin: 0; font: 600 16px var(--display); }
+  .fig p { margin: 0; font-size: 13px; color: var(--ink-2); }
+  .fig .kv { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 2px 10px; font-family: var(--mono); font-size: 11.5px; color: var(--ink-3); }
+  .fig .kv b { color: var(--ink); font-weight: 500; text-align: right; }
+  .fig code { display: block; font: 500 11.5px var(--mono); background: var(--bg-2); border: 1px solid var(--line); border-radius: 10px; padding: 8px 10px; color: var(--ink-2); overflow-x: auto; white-space: nowrap; }
+  @media (max-width: 600px) { header { padding: 0 16px; height: auto; min-height: 64px; flex-wrap: wrap; padding-top: 10px; padding-bottom: 10px; } .grid { gap: 14px; } .panel { padding: 16px; } .slider { grid-template-columns: 1fr 60px; } .slider span:first-child { grid-column: 1 / -1; } .verdict { grid-template-columns: 1fr; } }
 </style>
 </head>
 <body>
 <header>
   <b>Research Console</b><span style="color:var(--ink-3);font-size:13px">VM Mitigation v2 · read-only</span>
   <nav aria-label="Sections">
-    <a href="#s1" data-tab="s1" class="on">S1 Crossover</a><a href="#s2" data-tab="s2">S2 Trace Lens</a><a href="#s3" data-tab="s3">S3 Policy Lab</a><a href="#s4" data-tab="s4">S4 Run Matrix</a>
+    <a href="#s1" data-tab="s1" class="on">S1 Crossover</a><a href="#s2" data-tab="s2">S2 Trace Lens</a><a href="#s3" data-tab="s3">S3 Policy Lab</a><a href="#s4" data-tab="s4">S4 Run Matrix</a><a href="#s5" data-tab="s5">S5 Paired Seeds</a><a href="#s6" data-tab="s6">S6 Figures</a>
   </nav>
+  <button class="icon-btn" id="themeBtn" type="button" aria-label="Switch light or dark theme" title="Theme">◐</button>
 </header>
 <main class="wrap">
   <div class="banner" id="banner" hidden></div>
@@ -152,6 +201,24 @@
       <div style="overflow-x:auto"><table class="cellgrid" id="mx"></table></div>
     </section>
   </div>
+  <div class="tab" id="tab-s5" hidden>
+    <h1>Does every seed agree?</h1>
+    <p class="lede">The 30 pre-registered comparisons, one row each, with every evaluation seed as a dot. A comparison wins when its mean Δ against the tuned threshold P2 is at least 1% and its Holm-adjusted p is below 0.05. The SD rule (ADR-007) extends a regime to 50 seeds when the seed-to-seed spread is above its bound. The other view shows the same cells against never migrating.</p>
+    <section class="panel">
+      <h2>S5 · Paired Seeds <span class="badge b-sim">SIMULATED</span></h2>
+      <p class="sub" id="ps-sub"></p>
+      <div class="controls"><div class="seg" id="ps-base" role="group" aria-label="Compared with">
+        <button data-b="P2" class="on">Δ vs P2 (confirmatory)</button><button data-b="P0">saving vs P0 (descriptive)</button></div></div>
+      <div class="ps-head"><span>Comparison</span><div class="ps-axis" id="ps-axis"></div><span style="text-align:right">Mean</span><span>Checklist</span></div>
+      <div id="ps"></div>
+    </section>
+  </div>
+
+  <div class="tab" id="tab-s6" hidden>
+    <h1>Where does each figure come from?</h1>
+    <p class="lede">Every figure in the paper with the numbers its caption quotes, the result file it is drawn from and the command that rebuilds it. A figure is pending until its result file exists, even if an older or dry-run copy is on disk.</p>
+    <div class="figs" id="figs"></div>
+  </div>
   <footer id="foot"></footer>
 </main>
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.4/dist/chart.umd.min.js"></script>
@@ -185,7 +252,7 @@ function init() {
   document.getElementById('rho').innerHTML = data.rho.map(r => `<div class="rho-row"><span>cell ${r.cell}<br><span style="color:var(--ink-3);font-size:12px">τ-b [${r.ci.map(v => v.toFixed(3)).join(', ')}]</span></span><b>${r.tau_b >= 0 ? '+' : ''}${r.tau_b.toFixed(3)}</b></div>`).join('') || '<p class="sub">no measurement file</p>';
   if (data.meta.holm_scope) document.getElementById('scope').textContent = `Holm over the 30 pre-registered comparisons (${data.meta.holm_scope}).`;
   document.querySelector('#fam tbody').innerHTML = data.family.map(c => `<tr><td>${c.policy} · ${c.regime} · ${c.budget_pct}%</td><td>${pct(c.delta_adjusted)}</td><td>${c.holm_p == null ? '–' : c.holm_p.toFixed(3)}</td><td>${c.win ? '✓' : '–'}</td></tr>`).join('');
-  sync(); draw(); lens('primary'); lab(); matrix(); tabs();
+  sync(); draw(); lens('primary'); lab(); matrix(); paired(); figures(); tabs();
 }
 function tabs() {
   const go = () => { const t = (location.hash || '#s1').slice(1);
@@ -261,6 +328,87 @@ function controls() {
   });
   sync();
 }
+const cssv = (v) => getComputedStyle(document.documentElement).getPropertyValue(v).trim();
+const REDUCED = matchMedia('(prefers-reduced-motion: reduce)').matches;
+(function theme() {
+  try { const s = localStorage.getItem('console-theme'); if (s) document.documentElement.setAttribute('data-theme', s); } catch (e) {}
+  const cur = () => document.documentElement.getAttribute('data-theme') || (matchMedia('(prefers-color-scheme: light)').matches ? 'light' : 'dark');
+  document.getElementById('themeBtn').onclick = () => {
+    const next = cur() === 'light' ? 'dark' : 'light';
+    document.documentElement.setAttribute('data-theme', next);
+    try { localStorage.setItem('console-theme', next); } catch (e) {}
+    if (data) { draw(); paired(); }
+  };
+  matchMedia('(prefers-color-scheme: light)').addEventListener('change', () => { if (data) { draw(); paired(); } });
+})();
+
+/* S5 Paired Seeds: one row per confirmatory comparison, every seed a dot */
+let psBase = 'P2';
+function paired() {
+  const C = data.confirm; if (!C) return;
+  document.querySelectorAll('#ps-base button').forEach(b => { b.classList.toggle('on', b.dataset.b === psBase); b.onclick = () => { psBase = b.dataset.b; paired(); }; });
+  const fam = {}; (data.family || []).forEach(c => fam[`${c.regime}|${c.budget_pct}|${c.policy}`] = c);
+  const src = psBase === 'P2' ? data.crossover : (data.vs_p0 || []);
+  const by = {}; src.forEach(c => by[`${c.regime}|${c.budget_pct}|${c.policy}`] = c);
+  const rows = [];
+  C.policies.forEach(p => C.regimes.forEach(r => C.budgets.forEach(b => {
+    const k = `${r}|${b}|${p}`, c = by[k];
+    const seeds = c ? (psBase === 'P2' ? c.per_seed : c.per_seed) : [];
+    rows.push({ p, r, b, c, f: fam[k], seeds: (seeds || []).map(v => 100 * v) });
+  })));
+  const all = rows.flatMap(x => x.seeds);
+  let lo = Math.min(0, ...all), hi = Math.max(psBase === 'P2' ? 2 : 1, ...all);
+  if (!all.length) { lo = -10; hi = 10; }
+  const pad = (hi - lo) * 0.04; lo -= pad; hi += pad;
+  const X = v => (100 * (v - lo) / (hi - lo)).toFixed(2) + '%';
+  const step = (hi - lo) > 60 ? 20 : (hi - lo) > 25 ? 10 : 5;
+  let ticks = ''; for (let v = Math.ceil(lo / step) * step; v <= hi; v += step) ticks += `<span style="left:${X(v)}">${v > 0 ? '+' : ''}${v}%</span>`;
+  document.getElementById('ps-axis').innerHTML = ticks;
+  const col = { P4: COL.P4, P5: COL.P5, P6: COL.P6 };
+  let present = 0, wins = 0, ext = 0;
+  document.getElementById('ps').innerHTML = rows.map(x => {
+    const label = `<div class="ps-lbl"><b>${NAMES[x.p]}</b>${x.r} · ${x.b}% budget</div>`;
+    if (!x.c || !x.seeds.length) return `<div class="ps-row">${label}<div class="strip"><i class="z" style="left:${X(0)}"></i></div><div class="ps-v">–</div><div class="ps-pending">not run yet</div></div>`;
+    present++;
+    const n = x.seeds.length, mean = x.seeds.reduce((a, v) => a + v, 0) / n;
+    // the SD rule uses the unadjusted per-seed Δ (30_stats.py); the dots show the adjusted values
+    const sd = psBase === 'P2' && x.c.sd != null ? 100 * x.c.sd : Math.sqrt(x.seeds.reduce((a, v) => a + (v - mean) ** 2, 0) / (n - 1));
+    const ci = (x.c.ci || x.c.ci_bca || []).map(v => 100 * v);
+    const dots = x.seeds.map((v, i) => `<i class="s" style="left:${X(v)};top:${4 + (i * 7) % 20}px;background:${col[x.p]}"></i>`).join('');
+    let chips;
+    if (psBase === 'P2') {
+      const bound = 100 * (C.sd_bound[String(n)] ?? C.sd_bound['30']);
+      const holm = x.f ? x.f.holm_p : null, win = x.f ? x.f.win : null;
+      wins += win ? 1 : 0; ext += sd > bound ? 1 : 0;
+      chips = [[mean >= 100 * C.delta_bar, `Δ ≥ ${100 * C.delta_bar}%`], [holm == null ? null : holm < 0.05, holm == null ? 'Holm p –' : `Holm p ${holm < 0.001 ? '< 0.001' : holm.toFixed(3)}`],
+        [null, `n = ${n}`], [sd <= bound, `SD ${sd.toFixed(1)}% ${sd <= bound ? '≤' : '>'} ${bound.toFixed(1)}%`]];
+    } else {
+      const share = x.c.share_beating_p0;
+      chips = [[mean > 0, mean > 0 ? 'cheaper than P0' : 'costs more than P0'], [null, `${Math.round(100 * share)}% of seeds win`], [null, `n = ${n}`]];
+    }
+    const chipHtml = chips.map(([ok, s]) => `<span class="chip ${ok === true ? 'y' : ok === false ? 'n' : ''}">${s}</span>`).join('');
+    const ciBar = ci.length ? `<i class="ci" style="left:${X(ci[0])};width:calc(${X(ci[1])} - ${X(ci[0])});background:${col[x.p]}"></i>` : '';
+    const bar = psBase === 'P2' ? `<i class="bar" style="left:${X(100 * C.delta_bar)}"></i>` : '';
+    return `<div class="ps-row" title="mean ${mean.toFixed(2)}%, SD ${sd.toFixed(2)}%">${label}<div class="strip"><i class="z" style="left:${X(0)}"></i>${bar}${ciBar}${dots}<i class="m" style="left:${X(mean)}"></i></div>
+      <div class="ps-v">${mean >= 0 ? '+' : ''}${mean.toFixed(1)}%<small>${ci.length ? `[${ci[0].toFixed(1)}, ${ci[1].toFixed(1)}]` : ''}</small></div><div class="chips">${chipHtml}</div></div>`;
+  }).join('');
+  document.getElementById('ps-sub').textContent = psBase === 'P2'
+    ? `${present} of ${rows.length} comparisons run; ${wins} win (Holm scope: ${data.meta.holm_scope || 'partial'}); ${ext} above the SD bound, so their regime extends to 50 seeds. Dots: seeds; black tick: mean; band: 95% interval; dashed: the 1% bar.`
+    : `${present} of ${rows.length} cells run. Saving against never migrating per seed; descriptive, outside the family (ADR-005). Black tick: mean; band: 95% interval.`;
+}
+
+/* S6 Figures: the catalogue with macro values and the command that rebuilds each figure */
+function figures() {
+  const F = data.figures || [];
+  const badge = { MEASURED: 'b-meas', SIMULATED: 'b-sim', DERIVED: 'b-ill' };
+  document.getElementById('figs').innerHTML = F.length ? F.map(f => `<section class="panel fig">
+    <div class="img${f.png ? '' : ' none'}">${f.png ? `<img src="${f.png}" alt="${f.id}: ${f.title}" loading="lazy">` : (f.status === 'pending' ? 'pending: result file not there yet' : 'no preview (pdftoppm not installed)')}</div>
+    <h3>${f.id} · ${f.title} <span class="badge ${badge[f.provenance] || 'b-sim'}">${f.provenance}</span></h3>
+    <p>${f.takeaway}</p>
+    <div class="kv">${Object.entries(f.macros).map(([k, v]) => `<span>\\${k}</span><b>${v}</b>`).join('') || '<span>no quoted numbers</span><b></b>'}</div>
+    <div class="kv"><span>source</span><b>${f.source}${f.status === 'pending' ? ' (missing)' : ''}</b><span>file</span><b>results/figures/${f.file}</b></div>
+    <code>${f.make}</code></section>`).join('') : '<p class="empty">results/figures/catalogue.yaml not found</p>';
+}
 function sync() { document.querySelectorAll('#budgets button').forEach(b => b.classList.toggle('on', +b.dataset.b === budget)); }
 function draw() {
   const pols = BASE[base].pols.filter(p => shown.has(p));
@@ -277,19 +425,19 @@ function draw() {
     const { ctx, scales: { x, y } } = c; ctx.save();
     c.data.datasets.forEach((ds, i) => { if (c.getDatasetMeta(i).hidden) return; ctx.strokeStyle = ds.borderColor; ctx.lineWidth = 1.5;
       ds.data.forEach(p => { if (p.lo == null) return; const px = x.getPixelForValue(p.x); ctx.beginPath(); ctx.moveTo(px, y.getPixelForValue(p.lo)); ctx.lineTo(px, y.getPixelForValue(p.hi)); ctx.stroke(); }); });
-    const z = y.getPixelForValue(0); ctx.setLineDash([5, 5]); ctx.strokeStyle = 'rgba(162,184,173,.5)'; ctx.beginPath(); ctx.moveTo(c.chartArea.left, z); ctx.lineTo(c.chartArea.right, z); ctx.stroke();
-    ctx.setLineDash([]); ctx.fillStyle = 'rgba(162,184,173,.8)'; ctx.font = "700 11px Nunito";
+    const z = y.getPixelForValue(0); ctx.setLineDash([5, 5]); ctx.strokeStyle = cssv('--ink-3'); ctx.beginPath(); ctx.moveTo(c.chartArea.left, z); ctx.lineTo(c.chartArea.right, z); ctx.stroke();
+    ctx.setLineDash([]); ctx.fillStyle = cssv('--ink-2'); ctx.font = "700 11px Nunito";
     if (base === 'P0') ctx.fillText('never migrating', c.chartArea.right - 92, z - 6);
     else { const one = y.getPixelForValue(1); ctx.setLineDash([5, 5]); ctx.strokeStyle = 'rgba(242,194,90,.6)'; ctx.beginPath(); ctx.moveTo(c.chartArea.left, one); ctx.lineTo(c.chartArea.right, one); ctx.stroke();
-      ctx.setLineDash([]); ctx.fillStyle = '#f2c25a'; ctx.fillText('δ = 1%', c.chartArea.right - 46, one - 6); }
+      ctx.setLineDash([]); ctx.fillStyle = cssv('--amber'); ctx.fillText('δ = 1%', c.chartArea.right - 46, one - 6); }
     ctx.restore(); } };
   if (chart) chart.destroy();
   chart = new Chart(document.getElementById('cx'), { type: 'line', data: { datasets: sets }, plugins: [bars], options: {
-    responsive: true, maintainAspectRatio: false, devicePixelRatio: Math.max(2, devicePixelRatio || 1),
-    plugins: { legend: { labels: { color: '#a2b8ad', font: { family: 'Nunito', weight: '700' }, usePointStyle: true } },
+    responsive: true, maintainAspectRatio: false, devicePixelRatio: Math.max(2, devicePixelRatio || 1), animation: REDUCED ? false : {},
+    plugins: { legend: { labels: { color: cssv('--ink-2'), font: { family: 'Nunito', weight: '700' }, usePointStyle: true } },
       tooltip: { callbacks: { label: (it) => `${it.dataset.label}: ${it.raw.y >= 0 ? '+' : ''}${it.raw.y.toFixed(2)}% [${it.raw.lo.toFixed(2)}, ${it.raw.hi.toFixed(2)}], n=${it.raw.n}${it.raw.reg ? ' (' + it.raw.reg + ')' : ''}${it.raw.share != null ? `; ${Math.round(100 * it.raw.share)}% of seeds beat P0` : ''}${it.raw.expl ? '; exploratory' : ''}` } } },
-    scales: { x: { type: 'linear', min: -0.06, max: 0.95, title: { display: true, text: 'latent correlation ρL between criticality and host risk', color: '#6c8579', font: { family: 'Nunito', weight: '700' } }, ticks: { color: '#6c8579' }, grid: { color: 'rgba(140,255,195,.06)' } },
-      y: { title: { display: true, text: BASE[base].y, color: '#6c8579', font: { family: 'Nunito', weight: '700' } }, ticks: { color: '#6c8579', callback: v => (v > 0 ? '+' : '') + v + '%' }, grid: { color: 'rgba(140,255,195,.06)' } } } } });
+    scales: { x: { type: 'linear', min: -0.06, max: 0.95, title: { display: true, text: 'latent correlation ρL between criticality and host risk', color: cssv('--ink-3'), font: { family: 'Nunito', weight: '700' } }, ticks: { color: cssv('--ink-3') }, grid: { color: cssv('--line') } },
+      y: { title: { display: true, text: BASE[base].y, color: cssv('--ink-3'), font: { family: 'Nunito', weight: '700' } }, ticks: { color: cssv('--ink-3'), callback: v => (v > 0 ? '+' : '') + v + '%' }, grid: { color: cssv('--line') } } } } });
 }
 </script>
 </body>

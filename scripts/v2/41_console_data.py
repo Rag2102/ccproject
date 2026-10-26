@@ -16,6 +16,11 @@ Writes console/data/console.json:
              with the latent value and its interval, plus the pH and C0 reference lines
   matrix     (S4 Run Matrix, Week 25) expected vs present cells of the frozen matrix, n seeds per
              cell, and each scenario card's config hash
+  confirm    (S5 Paired Seeds, Week 31) the 30 pre-registered comparisons, the win bar and the SD
+             rule's bounds (ADR-007); per-seed values come from crossover and vs_p0
+  figures    (S6 Figures, Week 34) results/figures/catalogue.yaml with each figure's status, the
+             values of the macros it quotes (paper/numbers.tex) and a PNG preview
+             (console/data/figs/, rendered with pdftoppm when it is installed)
 --anonymous (double-blind review) drops the git SHA and every link that names the repository or
 the author; the page then shows "anonymised".
 The Console reads only this file (ADR-002: read-only, never blocks the paper).
@@ -25,6 +30,8 @@ from __future__ import annotations
 
 import argparse
 import json
+import re
+import shutil
 import subprocess
 import sys
 import time
@@ -81,6 +88,7 @@ def main() -> None:
                     "ci": c["ci_bca"],
                     "n": c["n_seeds"],
                     "per_seed": c.get("per_seed_adjusted", []),
+                    "sd": c.get("delta_sd"),  # the SD rule's statistic (unadjusted, 30_stats)
                     "family": c["family"],
                     "provenance": "SIMULATED",
                 }
@@ -106,6 +114,7 @@ def main() -> None:
                     "ci": c["ci_bca"],
                     "n": c["n_seeds"],
                     "share_beating_p0": c["share_seeds_beating_p0"],
+                    "per_seed": c.get("per_seed", []),
                     "family": c.get("family", "descriptive"),
                     "provenance": "SIMULATED",
                 }
@@ -186,6 +195,51 @@ def main() -> None:
         ],
         "cards": cards,
     }
+    # S5 Paired Seeds: the confirmatory family's definition, the win bar and the SD rule
+    conf = m["confirmatory"]
+    out["confirm"] = {
+        "policies": conf["policies"],
+        "regimes": conf["regimes"],
+        "budgets": [float(b) for b in conf["budgets_pct"]],
+        "delta_bar": 0.01,
+        "sd_bound": {"30": 0.016, "50": 0.021},  # 30_stats.SD_BOUND, PROTOCOL section 6
+    }
+
+    # S6 Figures: the catalogue, each figure's status and the macro values its caption quotes
+    nums = {}
+    nt = ROOT / "paper" / "numbers.tex"
+    if nt.exists():
+        for k, val in re.findall(
+            r"\\newcommand\{\\(V[A-Za-z]+)\}\{(.*?)\\xspace\}", nt.read_text()
+        ):
+            nums[k] = val
+    cat = ROOT / "results" / "figures" / "catalogue.yaml"
+    figs_dir = ROOT / "console" / "data" / "figs"
+    figs_dir.mkdir(parents=True, exist_ok=True)
+    out["figures"] = []
+    for f in yaml.safe_load(cat.read_text()) if cat.exists() else []:
+        pdf = ROOT / "results" / "figures" / f["file"]
+        have_src = (ROOT / f["source"]).exists()
+        png = None
+        if pdf.exists() and have_src and shutil.which("pdftoppm"):
+            stem = figs_dir / f["id"]
+            subprocess.run(
+                ["pdftoppm", "-png", "-r", "90", "-singlefile", str(pdf), str(stem)], check=True
+            )
+            png = f"data/figs/{f['id']}.png"
+        out["figures"].append(
+            {
+                **{k: f[k] for k in ("id", "title", "takeaway", "file", "source", "make")},
+                "provenance": f.get("provenance", "SIMULATED"),
+                "status": "results" if have_src and pdf.exists() else "pending",
+                "png": png,
+                "macros": {
+                    k: ("??" if "??" in nums.get(k, "??") else re.sub(r"\{,\}", ",", nums[k]))
+                    for k in f.get("macros", [])
+                },
+            }
+        )
+
     if a.anonymous:
         out["meta"]["git_sha"] = "anonymised"
 

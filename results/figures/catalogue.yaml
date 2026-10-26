@@ -1,0 +1,60 @@
+# Week 34: one entry per paper figure, read by scripts/v2/41_console_data.py for Console S6.
+# file: the PDF in results/figures; source: the result file it is drawn from (the tile says
+# "pending" while that file is missing, even if an older or dry-run PDF exists); macros: the
+# paper/numbers.tex values its caption and text quote; make: the command that regenerates it.
+- id: F2
+  title: Calibration of the failure model
+  takeaway: SMART telemetry carries the signal; the ensemble is calibrated isotonically on the validation period.
+  file: v2_reliability.pdf
+  source: results/v2/model_v2.json
+  make: make train   # 12_train.py; hours, needs data/v2/features
+  macros: [VPrAucSMART, VPrAucVOneFeatures, VRocAucSMART, VPrAucEnsembleVal]
+  provenance: MEASURED
+- id: F3
+  title: Measured correlation in real placement
+  takeaway: In Google 2019 cells, criticality and machine risk are essentially uncorrelated under every mapping and proxy.
+  file: v2_trace_rho.pdf
+  source: results/v2/trace_rho.json
+  make: .venv/bin/python scripts/v2/13_trace_rho.py --analyse
+  macros: [VGOneMaxAbsTauB, VGOneMaxLatentUpper]
+  provenance: MEASURED
+- id: F4
+  title: Advantage over the tuned threshold along rho_L
+  takeaway: Every cost-ranking policy beats the budget-tuned threshold by a wide margin; the closed form gets the direction, not the level.
+  file: v2_F4_advantage.pdf
+  source: results/summary/A.json
+  make: make figures   # 31_fig_f4.py
+  macros: [VDeltaPFourAOneTwo, VCILoPFourAOneTwo, VCIHiPFourAOneTwo]
+  provenance: SIMULATED
+- id: F4b
+  title: Saving against never migrating
+  takeaway: BAM beats doing nothing in every A regime; avoiding risky hosts, with no migration, beats every migration policy (exploratory).
+  file: v2_F4b_vs_p0.pdf
+  source: results/summary/vs_p0.json
+  make: .venv/bin/python scripts/v2/35_fig_vs_p0.py
+  macros: [VSaveVsPZeroPFourAOneTwo, VSaveVsPZeroPFiveAOneTwo, VSaveAvoidPZeroAOneTwo, VSaveVsPZeroPTwoAOneTwo]
+  provenance: SIMULATED
+- id: F5
+  title: Pareto frontiers
+  takeaway: Missed failures against migrations, per regime.
+  file: v2_F5_pareto.pdf
+  source: results/summary/pareto.json
+  make: make figures   # 27_pareto.py
+  macros: []
+  provenance: SIMULATED
+- id: F8
+  title: The guard on the adaptive regime D
+  takeaway: P6 against the best fixed policy when placement shifts mid-run.
+  file: v2_F8_adaptive.pdf
+  source: results/summary/adaptive_D.json
+  make: make stats   # 33_adaptive.py
+  macros: [VGuardNotWorseOne, VGuardNotWorseTwo, VGuardDelayTwo]
+  provenance: SIMULATED
+- id: T
+  title: Theory check
+  takeaway: The closed form agrees with Monte Carlo at every grid point.
+  file: v2_theory_check.pdf
+  source: results/v2/theory_check.json
+  make: .venv/bin/python scripts/v2/theory_check.py
+  macros: [VTheoryPoints, VTheoryMinDeltaNoNoise]
+  provenance: DERIVED
