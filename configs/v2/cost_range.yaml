@@ -1,0 +1,87 @@
+# ADR-009 (accepted 26 Oct 2026), Weeks 29-30: a migration-cost range from published live-migration
+# measurements. Read by vmsim/scenarios.py: a regime "B1@G0-low" is B1 with the overrides of setting
+# G0-low. Everything run with it is exploratory and outside the 30-comparison family.
+#
+# The rule below was written on 26 Oct 2026, before any measurement beyond Clark et al. was read and
+# before any rerun (ADR-009 step 2). It does not change after the B/C results are seen.
+rule:
+  parameters:
+    usable_share: >-
+      effective migration throughput / link capacity, from each source's stated link and the
+      migration throughput it reports (or the rate limit it applied while migrating).
+    dirty_mbps_at_100pct_cpu: >-
+      page-dirtying rate of a non-synthetic server workload while it migrates, in MB/s, as reported
+      or derived from reported pages or MB re-sent per pre-copy round and the round's duration.
+      Synthetic worst cases (a program written to dirty every page) are recorded but excluded.
+    blackout_converged_s: >-
+      measured downtime (stop-and-copy plus resume) of a converged live migration, non-synthetic
+      workloads only.
+  ends: >-
+    G0-low is the cheap end: the highest usable share, the lowest dirty rate and the shortest
+    downtime among the extracted values. G0-high is the expensive end: the lowest usable share,
+    the highest dirty rate and the longest downtime. Each end combines the extremes, so the pair
+    brackets every published setup jointly, not only one parameter at a time. The central
+    setting is the frozen default (10 Gb/s, 50%, 150 MB/s, 1 s) and is not rerun.
+  minimum: >-
+    the settings are derived only when at least four of the six ADR-009 sources have been
+    extracted (status: extracted); until then scenarios.cost_setting() refuses to run.
+  link: >-
+    the simulator keeps its 10 Gb/s NIC; only the share, the dirty rate and the downtime move.
+    Older measurements on 1 Gb/s links enter through the share, not the absolute rate.
+
+sources:
+  - key: clark2005
+    cite: Clark et al., "Live Migration of Virtual Machines", NSDI 2005, pp. 273-286
+    status: extracted
+    setup: Xen 2.0, dual Xeon 2.4 GHz hosts, switched Gigabit Ethernet (section 6.1)
+    measurements:
+      - what: SPECweb99 VM, 800 MB, 90% of maximum load
+        where: section 6.3, Figure 9
+        total_time_s: 71
+        downtime_ms: 210  # 201 ms last round (18.2 MB) + 9 ms resume
+        first_round: {mb: 676.8, s: 54.1}  # about 100 Mbit/s, rate-limited
+        later_rounds_mb: [126.7, 39.0]
+        derived:
+          usable_share_first_round: 0.10  # 676.8 MB x 8 / 54.1 s = 100 Mbit/s of 1,000
+          dirty_mbps: 2.3  # 126.7 MB dirtied during the 54.1 s first round (unique pages)
+      - what: Apache static web server VM, 800 MB, 100 clients, 512 KB file
+        where: section 6.2, Figure 8
+        downtime_ms: 165
+        first_round: {mb: 776, s: 62}
+        notes: migration starts rate-limited at 100 Mbit/s (12% CPU); server falls from 870 to 765 Mbit/s
+        derived:
+          usable_share_first_round: 0.10  # 776 MB x 8 / 62 s = 100 Mbit/s of 1,000
+      - what: Quake 3 server VM, 64 MB, 6 clients
+        where: section 6.4, Figures 10-11
+        downtime_ms: 60  # 20 ms last round (148 KB) + 40 ms start-up; Figure 10 shows 50 and 48 ms
+        total_data_mb: 88  # x1.37 of the VM's memory
+      - what: MMuncher, synthetic page-dirtying program (excluded by the rule)
+        where: section 6.5, Figure 12; section 5.5
+        notes: >-
+          rate scaled up to 500 Mbit/s (usable share 0.5) and still outpaced; a one-word-per-page
+          writer dirtied memory at 320 Gbit/s
+        derived:
+          usable_share_max: 0.5  # the adaptive limit's ceiling in this experiment
+    summary:
+      usable_share: [0.10, 0.50]
+      dirty_mbps: [2.3, 2.3]
+      blackout_s: [0.060, 0.210]
+  - key: voorsluys2009
+    cite: Voorsluys, Broberg, Venugopal, Buyya, "Cost of Virtual Machine Live Migration in Clouds", CloudCom 2009
+    status: pending  # paper text not read yet
+  - key: akoush2010
+    cite: Akoush, Sohan, Rice, Moore, Hopper, "Predicting the Performance of Virtual Machine Migration", MASCOTS 2010
+    status: pending
+  - key: liu2011
+    cite: Liu, Xu, Jin, Gong, Liao, "Performance and energy modeling for live migration of virtual machines", HPDC 2011
+    status: pending
+  - key: hu2013
+    cite: Hu et al., "A quantitative study of virtual machine live migration", CAC 2013
+    status: pending
+  - key: socc2015
+    cite: '"Towards a comprehensive performance model of virtual machine live migration", SoCC 2015'
+    status: pending
+
+# Filled by scripts/v2/38_cost_range.py from `sources` by the rule above; null until four sources
+# are extracted.
+settings: null

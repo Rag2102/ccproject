@@ -60,7 +60,10 @@ def main() -> None:
             other[(c["regime"], c["budget_pct"], c["policy"])] = c
     vp0 = summ / "vs_p0.json"
     p0 = (
-        {(c["regime"], c["budget_pct"], c["policy"]): c for c in json.loads(vp0.read_text())["cells"]}
+        {
+            (c["regime"], c["budget_pct"], c["policy"]): c
+            for c in json.loads(vp0.read_text())["cells"]
+        }
         if vp0.exists()
         else {}
     )
@@ -105,6 +108,33 @@ def main() -> None:
             + r" \\"
         )
         csv.append(rec)
+    # Week 30: exploratory rows (post-freeze, outside the family): the second placement source
+    # (S_second.json, B1-f) and the published cost range (S_costrange.json, ADR-009), if run
+    for tag in ("second", "costrange"):
+        f = summ / f"S_{tag}.json"
+        if not f.exists():
+            continue
+        ex = {
+            (c["regime"], c["budget_pct"], c["policy"]): c
+            for c in json.loads(f.read_text())["cells"]
+        }
+        for reg, b in sorted({(r, bb) for r, bb, _ in ex}):
+            texs = [
+                "--" if (c := ex.get((reg, b, p))) is None else pct(c["delta_adjusted"])
+                for p in POLS
+            ]
+            p3 = ex.get((reg, b, "P3"))
+            texs += ["--" if p3 is None else pct(p3["delta_adjusted"]), "--"]
+            name = reg.replace("@", r"\,@\,")
+            rows.append(f"{name}$^\\dagger$ & {b:g}\\% & " + " & ".join(texs) + r" \\")
+            csv.append(
+                {"regime": reg, "budget_pct": b, "family": f"exploratory ({tag})"}
+                | {
+                    p: f"{pct(ex[(reg, b, p)]['delta_adjusted'])}%"
+                    for p in POLS
+                    if (reg, b, p) in ex
+                }
+            )
     n = max((c["n_seeds"] for c in conf["cells"]), default=0)
     tex = "\n".join(
         [
@@ -118,12 +148,11 @@ def main() -> None:
             rf"({conf['holm_scope']}). $\checkmark$: mean $\geq 1\%$ and Holm $p<0.05$. "
             r"Descriptive, outside the family (ADR-005): the v1 rule P3 against P2, and P2's own "
             r"saving against never migrating (P0; negative means P2 costs more than doing "
-            r"nothing).}",
+            r"nothing). $^\dagger$ Exploratory rows added after the freeze (second placement "
+            r"source; published migration-cost range, ADR-009): means only, outside the family.}",
             r"\label{tab:main}",
             r"\begin{tabular}{llccccc}\toprule",
-            "Regime & Budget & "
-            + " & ".join(POLS.values())
-            + r" & P3 & P2 vs P0 \\ \midrule",
+            "Regime & Budget & " + " & ".join(POLS.values()) + r" & P3 & P2 vs P0 \\ \midrule",
             *rows,
             r"\bottomrule\end{tabular}\end{table*}",
         ]

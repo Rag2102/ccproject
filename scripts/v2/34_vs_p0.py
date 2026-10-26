@@ -28,7 +28,11 @@ def bca(x: np.ndarray) -> list[float]:
     if len(x) < 3 or np.allclose(x, x[0]):
         return [float(x.mean()), float(x.mean())]
     r = stats.bootstrap(
-        (x,), np.mean, n_resamples=10_000, method="BCa", random_state=np.random.default_rng(SEED_BOOT)
+        (x,),
+        np.mean,
+        n_resamples=10_000,
+        method="BCa",
+        random_state=np.random.default_rng(SEED_BOOT),
     )
     return [float(r.confidence_interval.low), float(r.confidence_interval.high)]
 
@@ -37,10 +41,14 @@ def main() -> None:
     ap = argparse.ArgumentParser(description=__doc__.splitlines()[0])
     ap.add_argument("--small", action="store_true")
     ap.add_argument("--groups", nargs="+", default=["A", "E", "B", "C", "D"])
+    ap.add_argument(
+        "--subdir", help="cells under <group>/<subdir> -> vs_p0_<subdir>.json (group S)"
+    )
     a = ap.parse_args()
     res = ROOT / "results" / ("small" if a.small else "")
     raw, out = res / "raw", res / "summary"
-    parts = [pd.read_parquet(f) for g in a.groups for f in sorted((raw / g).glob("*.parquet"))]
+    dirs = [raw / g / a.subdir if a.subdir else raw / g for g in a.groups]
+    parts = [pd.read_parquet(f) for d_ in dirs for f in sorted(d_.glob("*.parquet"))]
     if not parts:
         raise SystemExit(f"no collected cells under {raw}")
     d = pd.concat(parts, ignore_index=True)
@@ -68,8 +76,9 @@ def main() -> None:
         )
     out.mkdir(parents=True, exist_ok=True)
     note = "S = (C_P0 - C) / C_P0 per seed; positive: cheaper than never migrating. Descriptive."
-    (out / "vs_p0.json").write_text(json.dumps({"note": note, "cells": cells}, indent=1))
-    print(f"{len(cells)} cells -> {(out / 'vs_p0.json').relative_to(ROOT)}")
+    dest = out / (f"vs_p0_{a.subdir}.json" if a.subdir else "vs_p0.json")
+    dest.write_text(json.dumps({"note": note, "cells": cells}, indent=1))
+    print(f"{len(cells)} cells -> {dest.relative_to(ROOT)}")
 
 
 if __name__ == "__main__":

@@ -1,5 +1,5 @@
 # ADR-009: the strengthening experiment is a published migration-cost range (Week 27, task 3)
-Status: proposed (owner to accept; drafted 5 Oct 2026, before the B/C results exist)
+Status: accepted (owner, 26 Oct 2026; drafted 5 Oct 2026, before the B/C results exist)
 Date: 2026-10-05
 
 Context: plan Week 27 asks for one experiment that strengthens the weakest claim (`WEAKEST_CLAIM.md`). It offers two paths:
@@ -34,3 +34,8 @@ Consequences:
 - Everything this adds is exploratory and outside the 30-comparison family.
 - If the published range moves the B-regime result across the 1% bar, the paper says so in the Evaluation section, not only in the Discussion.
 - The bibliography gains up to five entries. Each is checked against its publisher page before it enters `refs.bib`, as the Week 24 rule requires.
+
+## Implementation (26 Oct 2026)
+- The rule for turning measurements into the low and high settings is written in `configs/v2/cost_range.yaml` (before any rerun): G0-low takes the highest usable share, lowest dirty rate and shortest downtime among the extracted values; G0-high the opposite; at least four sources must be extracted first.
+- Clark et al. (2005) is extracted (sections 6.2-6.5, Figures 8-12). The other five sources are pending.
+- `scripts/v2/38_cost_range.py` derives the settings; a regime `B1@G0-low` is B1 with them (`vmsim/scenarios.py`); `39_dev_precheck.py` checks them on dev seeds; `run_w30.sh` runs B1, B2 and C at both ends (P0, P2, P4, P6; 1% and 2%; seeds 1-30) as group S, then stats, the saving against P0 and Table 3's exploratory rows. Tested end to end at small scale with placeholder settings.

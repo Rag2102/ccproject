@@ -120,6 +120,7 @@ def card(m: dict, regime: str) -> dict:
     }[pc.regime]
     if regime.startswith("B1"):
         kind = "rank_copula"
+    base_reg, cost = scenarios.split_cost(regime)
     return {
         "id": regime,
         "version": m["version"],
@@ -129,7 +130,7 @@ def card(m: dict, regime: str) -> dict:
             "target_spearman": pc.rho,
             "arrival_blend": pc.arrival_blend,
             "kappa_sigma": cfg.cost.kappa_sigma,
-            "calibrations": [regime.split("-")[1] if "-" in regime else "point"],
+            "calibrations": [base_reg.split("-")[1] if "-" in base_reg else "point"],
         },
         "hosts": {
             "n": cfg.n_hosts,
@@ -138,7 +139,7 @@ def card(m: dict, regime: str) -> dict:
         },
         "horizon_days": cfg.horizon_days,
         "warmup_days": cfg.warmup_days,
-        "predictor": {"kind": m["predictor_by_regime"].get(regime, m["predictor"])},
+        "predictor": {"kind": m["predictor_by_regime"].get(base_reg, m["predictor"])},
         "migration": {
             "model": "precopy",
             "nic_gbps": mc.nic_gbps,
@@ -150,7 +151,7 @@ def card(m: dict, regime: str) -> dict:
         "provenance": {
             "rho": "MEASURED" if regime.startswith("B") else "ASSUMED",
             "hazard": "DERIVED",
-            "migration": "ASSUMED",
+            "migration": "DERIVED" if cost else "ASSUMED",  # ADR-009: published range
             "costs": "DERIVED",
         },
         "config_hash": accounting.config_hash(cfg.to_dict()),
