@@ -48,7 +48,7 @@ From the v5 week cards for W29-W40 (plan pages 23-26). Prepared on 26 Oct 2026, 
 - [ ] CFP rules: no SoCC 2027 call yet (5 Oct). Re-check in the week.
 - [~] Template: acmart sigconf, review, anonymous (in place). Font embedding is checked by `final_check.sh` once LaTeX is installed (*yours*: BasicTeX).
 - [ ] Cut: after the rewrite.
-- [x] References: `46_refs_check.py` (0 fail; 17 to do: arXiv entries now published, DOIs, two venues spelled two ways, dataset years).
+- [x] References: `46_refs_check.py` (0 fail, 0 to do since 26 Oct: four DOIs and page ranges added from Crossref, two arXiv entries replaced by their NeurIPS 2025 versions, venue names made consistent, access years on datasets and software; papers with no DOI say how that was checked). Still yours: Gymnasium author order on the proceedings page; 4 uncited entries to cite or drop at the cut.
 
 ## W38: second mock review
 - Left out (owner, 26 Oct).

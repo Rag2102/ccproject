@@ -7,11 +7,13 @@ Checks every entry of paper/refs.bib (offline; it never looks anything up):
   required     missing author/title/year, or venue (booktitle/journal) for papers  FAIL
   uncited      in refs.bib but not cited in the paper                              warn
   missing      cited in the paper but not in refs.bib                              FAIL
-  arxiv        an arXiv entry whose note names a venue: replace it with the
+  arxiv        an arXiv-only (@misc) entry whose note names a venue: replace it with the
                published version when that exists (Week 37, task 4)                todo
   doi          a conference or journal paper without a DOI (USENIX gives none:
-               not flagged when the url is usenix.org)                             todo
-  venue        the same venue acronym written in different ways                    todo
+               not flagged when the url is usenix.org, or when the note says
+               "No DOI" and how that was checked)                                  todo
+  venue        the same venue acronym written in different ways, ignoring the
+               edition, year, volume, track and "International"                    todo
 
   .venv/bin/python scripts/v2/46_refs_check.py         # exit 1 on any FAIL
 """
@@ -29,6 +31,14 @@ VENUE_HINT = re.compile(
     r"\b(NeurIPS|ICML|ICLR|EuroSys|OSDI|NSDI|SOSP|SoCC|ATC|TMLR|KDD|SIGMETRICS|DSN|ICPE|CLOUD)\b"
 )
 ACRONYM = re.compile(r"\(([A-Za-z]+)\s*'?\d{2,4}\)|\b(OSDI|NSDI|SOSP|SoCC|EuroSys|ATC|KDD|DSN)\b")
+# what differs between editions of one venue: "28th", "Twentieth", "'22", "2019", a volume
+# number ("Systems 32"), "International", a named track
+ORDINAL = r"(first|second|third|fourth|fifth|sixth|seventh|eighth|ninth|tenth|eleventh|twelfth)"
+EDITION = re.compile(
+    rf"\b(\d+(st|nd|rd|th)|(\w+-)?({ORDINAL}|\w*teenth|\w*tieth))\s+|\s*'\d{{2}}|\s\d{{4}}(?=\))"
+    r"|(?<=[a-z])\s\d+(?=\s\()|International\s+|,\s[^,]*Track$",
+    re.I,
+)
 
 
 def entries(text: str) -> dict[str, dict]:
@@ -69,7 +79,9 @@ def main() -> None:
             fail.append(f"required    {key}: missing {', '.join(miss)}")
         if key not in used:
             warn.append(f"uncited     {key}")
-        if f.get("archiveprefix") == "arXiv" or "arxiv.org" in f.get("url", ""):
+        if f["kind"] == "misc" and (
+            f.get("archiveprefix") == "arXiv" or "arxiv.org" in f.get("url", "")
+        ):
             if VENUE_HINT.search(f.get("note", "")):
                 todo.append(
                     f"arxiv       {key}: the note names a venue; cite the published version"
@@ -79,6 +91,7 @@ def main() -> None:
             and not f.get("doi")
             and "usenix.org" not in f.get("url", "")
             and f.get("archiveprefix") != "arXiv"
+            and "No DOI" not in f.get("note", "")
         ):
             todo.append(f"doi         {key}: no DOI")
     for key in sorted(used - set(e)):
@@ -88,7 +101,7 @@ def main() -> None:
         venue = f.get("booktitle") or f.get("journal") or ""
         m = ACRONYM.search(venue)
         if m:
-            forms[(m.group(1) or m.group(2)).upper()].add(re.sub(r"\d+(st|nd|rd|th)\s+", "", venue))
+            forms[(m.group(1) or m.group(2)).upper()].add(re.sub(EDITION, "", venue))
     for acr, vs in sorted(forms.items()):
         if len(vs) > 1:
             todo.append(f"venue       {acr} written {len(vs)} ways: " + " | ".join(sorted(vs)))

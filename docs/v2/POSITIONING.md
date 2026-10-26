@@ -21,7 +21,7 @@ What every version must keep true:
 ## First-page checklist for the rewrite (Week 32)
 
 - [ ] Shape chosen at G3; working title rewritten to match (current title assumes Shape 1).
-- [ ] Abstract 150-200 words, numbers as macros, one-sentence takeaway (`main.tex`; the current abstract has no avoidance sentence and says "four Google cells" while the bound macro covers the three G1 cells: fix the wording).
+- [ ] Abstract 150-200 words, numbers as macros, one-sentence takeaway (`main.tex`; the current abstract has no avoidance sentence. The "four Google cells" wording was corrected to three on 26 Oct, matching the bound macro; add the fourth cell only once its result is final).
 - [ ] Contribution bullets reordered by strength; `scripts/v2/48_contribution_map.py` passes (every bullet has a ledger claim and a reference).
 - [ ] If avoidance enters the first page, add a bullet with claim C9 and say "exploratory" in it.
 - [ ] First figure chosen: F4b if Shape 2 or 3 (the comparison against never migrating), F3 or F4 if Shape 1.
