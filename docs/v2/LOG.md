@@ -2,6 +2,14 @@
 
 Sunday ritual (15 minutes): update this log, tick the week's "done when", log any cut as an ADR, re-read the next gate's criteria, update `CAPACITY.md` for the coming month, write Monday's first task. Newest week first. Hours are yours to fill; nothing here is estimated.
 
+## Weeks 29-40 prepared (26 Oct 2026; W35 and W38 left out by the owner)
+- ADR-009 accepted. Cost-range rule fixed before any rerun; Clark 2005 extracted; five sources wait for their text. Runner, dev-seed pre-check and `run_w30.sh` built and tested at small scale.
+- Console S5 (paired seeds) and S6 (figures); light theme, reduced motion, 360 px.
+- Checks: reporting audit (found and fixed: savings without intervals; the refuted "option to wait" explanation still in the evaluation text), grayscale, contribution map, references, anonymity, clean-clone final check (byte-identical rebuild), supplementary zip.
+- Paper: appendix, statements, F4b with avoidance. Docs: `REBUTTAL_FAQ.md`, `POSITIONING.md`, `LICENCE_REVIEW.md`, `TASKS_W29-W40.md`.
+- Fixed: `.gitignore` had kept the cell Parquets out of git, against PROTOCOL section 10; they are committed now (6.8 MB).
+- Owner decisions raised: v1's third-party Backblaze summary (licence); approval to fetch five papers.
+
 ## Avoidance on the eval seeds (26 Oct 2026, ADR-010, exploratory)
 - 1,440 runs in 14 minutes, every regime, eval seeds 1-30. The dev-seed finding holds: avoidance alone saves 11-20% against never migrating in every A and E cell, 6-13 points ahead of BAM and 2-3 ahead of P5, with no migrations. Adding BAM on top gains at most about 2 points.
 - Rejected arrivals rise by up to about a quarter in tight A regimes: the main caveat. B, C and D are run and join the summary once their P0 runs exist.

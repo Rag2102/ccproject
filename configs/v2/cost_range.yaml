@@ -67,13 +67,14 @@ sources:
       dirty_mbps: [2.3, 2.3]
       blackout_s: [0.060, 0.210]
   - key: voorsluys2009
-    cite: Voorsluys, Broberg, Venugopal, Buyya, "Cost of Virtual Machine Live Migration in Clouds", CloudCom 2009
-    status: pending  # paper text not read yet
+    cite: Voorsluys, Broberg, Venugopal, Buyya, "Cost of Virtual Machine Live Migration in Clouds", CloudCom 2009, LNCS 5931, pp. 254-265, doi 10.1007/978-3-642-10665-1_23
+    status: pending  # arXiv 1109.4974: v2 is withdrawn (its PDF is 404); v1 is still served
+    text: https://arxiv.org/pdf/1109.4974v1
   - key: akoush2010
     cite: Akoush, Sohan, Rice, Moore, Hopper, "Predicting the Performance of Virtual Machine Migration", MASCOTS 2010
     status: pending
   - key: liu2011
-    cite: Liu, Xu, Jin, Gong, Liao, "Performance and energy modeling for live migration of virtual machines", HPDC 2011
+    cite: Liu, Xu, Jin, Gong, Liao, "Performance and energy modeling for live migration of virtual machines", HPDC 2011 (doi 10.1145/1996130.1996154 seen in a search result, not yet checked against the paper)
     status: pending
   - key: hu2013
     cite: Hu et al., "A quantitative study of virtual machine live migration", CAC 2013
