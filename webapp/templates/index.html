@@ -1,9 +1,9 @@
 <!doctype html>
-<html lang="en">
+<html lang="en" data-page="{{ page }}">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>VM Mitigation: move the right VMs before hardware fails</title>
+<title>{% if page_title %}{{ page_title }} · VM Mitigation{% else %}VM Mitigation: move the right VMs before hardware fails{% endif %}</title>
 <meta name="description" content="A workload-aware, cost-sensitive VM mitigation policy: live model demo, course-project results, and the v2 research programme in progress.">
 <meta property="og:type" content="website">
 <meta property="og:title" content="VM Mitigation: move the right VMs before hardware fails">
@@ -447,6 +447,45 @@
 
   .links-row { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 28px; }
 
+  /* ---------- pages: one per section, switched in place with Faultline's route transition (a short rise) ---------- */
+  .page[hidden] { display: none; }
+  .page [id] { scroll-margin-top: 80px; }
+  .page { animation: pageIn .42s var(--ease) both; }
+  .page.leaving { animation: pageOut .18s var(--ease-quick) both; }
+  @keyframes pageIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: none; } }
+  @keyframes pageOut { to { opacity: 0; transform: translateY(-6px); } }
+  .page > section.block:first-child { padding-top: 88px; }
+  html:not([data-page="home"]):not([data-page="research"]) .close { display: none; }
+  /* home: the contents as Faultline's figure grid (hairline gaps, a light under the pointer) */
+  .explore { padding-top: 96px; }
+  .xgrid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 1px; overflow: hidden; border-radius: 16px; border: 1px solid var(--line); background: var(--line); }
+  @media (max-width: 900px) { .xgrid { grid-template-columns: 1fr 1fr; } }
+  @media (max-width: 600px) { .xgrid { grid-template-columns: 1fr; } }
+  .xcard { display: flex; flex-direction: column; gap: 14px; min-height: 220px; padding: 28px; text-decoration: none; color: inherit; background-color: var(--bg);
+    background-image: radial-gradient(420px circle at var(--mx, -999px) var(--my, -999px), rgba(255,255,255,.06), transparent 45%); transition: background-color .2s; }
+  .xcard:hover { background-color: #0d0e10; }
+  .xcard .t { font: 11px var(--mono); letter-spacing: .12em; text-transform: uppercase; color: var(--ink-3); }
+  .xcard b { font-size: 21px; font-weight: 590; letter-spacing: -0.015em; line-height: 1.25; color: #f4f4f5; }
+  .xcard .go { margin-top: auto; display: inline-flex; align-items: center; gap: 6px; font-size: 14px; color: #a1a1aa; transition: color .2s; }
+  .xcard .go svg { transition: transform .2s var(--ease); }
+  .xcard:hover .go { color: #fafafa; } .xcard:hover .go svg { transform: translateX(3px); }
+  .xcard:last-child { grid-column: span 1; }
+  .xgrid .xcard:nth-child(4), .xgrid .xcard:nth-child(5) { min-height: 180px; }
+  @media (min-width: 901px) { .xgrid .xcard:nth-child(4) { grid-column: span 2; } }
+  /* the end of each page: previous, and the next page as a large link */
+  .pager { display: grid; grid-template-columns: auto 1fr; align-items: stretch; gap: 12px; padding-bottom: 96px; }
+  .pg { display: flex; flex-direction: column; justify-content: center; gap: 6px; padding: 22px 26px; border: 1px solid var(--line); border-radius: 16px; text-decoration: none; color: inherit;
+    background: var(--surface); transition: border-color .16s var(--ease-quick), background-color .16s; }
+  .pg:hover { border-color: rgba(255,255,255,.18); background: #121315; }
+  .pg.prev span { font-size: 14px; color: #a1a1aa; white-space: nowrap; }
+  .pg.next { position: relative; padding-right: 64px; text-align: right; align-items: flex-end; }
+  .pg.next .k { font: 11px var(--mono); letter-spacing: .12em; text-transform: uppercase; color: var(--ink-3); }
+  .pg.next b { font-size: clamp(18px, 2.2vw, 26px); font-weight: 590; letter-spacing: -0.02em; color: #fafafa; }
+  .pg.next svg { position: absolute; right: 24px; top: 50%; transform: translateY(-50%); color: #a1a1aa; transition: transform .2s var(--ease); }
+  .pg.next:hover svg { transform: translate(4px, -50%); color: #fafafa; }
+  @media (max-width: 600px) { .pager { grid-template-columns: 1fr; } .pg.prev { order: 2; } }
+  @media (prefers-reduced-motion: reduce) { .page, .page.leaving { animation: none; } }
+
   /* ---------- footer: Faultline's close (run it yourself), site map, and the white panel with the wordmark ---------- */
   footer { position: relative; isolation: isolate; overflow: hidden; }
   .close { position: relative; max-width: 920px; margin: 0 auto; padding: 144px 32px 120px; text-align: center; }
@@ -499,20 +538,20 @@
 </style>
 </head>
 <body>
-<a class="skip" href="#how">Skip to content</a>
+<a class="skip" href="#main">Skip to content</a>
 
 <header class="nav">
   <div class="wrap">
-    <a class="brand" href="#top" aria-label="VM Mitigation, back to top"><svg viewBox="0 0 32 32" fill="currentColor" aria-hidden="true"><rect x="4" y="4" width="11" height="11" rx="3"/><rect x="17" y="4" width="11" height="11" rx="3" opacity=".5"/><rect x="4" y="17" width="11" height="11" rx="3" opacity=".5"/><rect x="19" y="19" width="11" height="11" rx="3" fill="var(--ember)"/></svg><span>VM Mitigation</span></a>
+    <a class="brand" href="/" aria-label="VM Mitigation, home"><svg viewBox="0 0 32 32" fill="currentColor" aria-hidden="true"><rect x="4" y="4" width="11" height="11" rx="3"/><rect x="17" y="4" width="11" height="11" rx="3" opacity=".5"/><rect x="4" y="17" width="11" height="11" rx="3" opacity=".5"/><rect x="19" y="19" width="11" height="11" rx="3" fill="var(--ember)"/></svg><span>VM Mitigation</span></a>
     <nav class="nav-links" id="navLinks" aria-label="Sections">
-      <a href="#how">How it works</a>
-      <a href="#demo">Live model</a>
-      <a href="#findings">v1 results</a>
-      <a href="#comparison">Models</a>
-      <a href="#research">Research<span class="new">v2</span></a>
+      <a href="/how">How it works</a>
+      <a href="/model">Live model</a>
+      <a href="/v1">v1 results</a>
+      <a href="/models">Models</a>
+      <a href="/research">Research<span class="new">v2</span></a>
     </nav>
     <div class="nav-right">
-      <a class="status-pill" href="#plan" title="Week 18 of the 60-week plan is done"><i></i><span>v2 · Week 18 of 60</span></a>
+      <a class="status-pill" href="/research#plan" title="Week 18 of the 60-week plan is done"><i></i><span>v2 · Week 18 of 60</span></a>
       <a class="icon-btn" href="https://github.com/Rag2102/ccproject" target="_blank" rel="noopener" aria-label="Repository on GitHub"><svg width="15" height="15" viewBox="0 0 16 16" fill="currentColor" aria-hidden="true"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.01 8.01 0 0 0 16 8c0-4.42-3.58-8-8-8z"/></svg><span class="gh-label">GitHub</span></a>
       <button class="icon-btn menu-btn" id="menuBtn" aria-label="Open menu" aria-expanded="false" aria-controls="navLinks">
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><line x1="4" y1="7" x2="20" y2="7"/><line x1="4" y1="12" x2="20" y2="12"/><line x1="4" y1="17" x2="20" y2="17"/></svg>
@@ -521,8 +560,9 @@
   </div>
 </header>
 
-<main id="top">
+<main id="main">
 
+<div class="page" data-page="home"{% if page != 'home' %} hidden{% endif %}>
 <!-- ======================================================= hero -->
 <section class="hero" aria-labelledby="hero-title">
   <div class="aurora" aria-hidden="true"></div>
@@ -531,14 +571,14 @@
   <div class="frame" aria-hidden="true"><span class="plus l"></span><span class="plus r"></span><div class="scroll-cue"><span>Scroll to explore</span><b></b></div></div>
   <div class="wrap">
     <div>
-      <a class="ring" href="#research"><span>New: avoiding risky hosts beat every migration rule · exploratory <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><polyline points="9 6 15 12 9 18"/></svg></span></a>
+      <a class="ring" href="/research"><span>New: avoiding risky hosts beat every migration rule · exploratory <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><polyline points="9 6 15 12 9 18"/></svg></span></a>
       <h1 id="hero-title"><span><span>Move the right VMs</span></span><span><span class="gradient-text">before they fail.</span></span></h1>
       <p class="lede">A cloud can live-migrate VMs off a server that is about to fail, but every move costs bandwidth and a pause, and the budget is finite.
         This project asks <b>which VMs are worth moving</b>: a policy that weighs failure probability, time to failure, criticality and migration cost,
         against the habit of moving anything above a probability threshold.</p>
       <div class="cta-row">
-        <a class="btn btn-primary" href="#demo">Try the live model <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg></a>
-        <a class="btn btn-ghost" href="#research">What v2 has found</a>
+        <a class="btn btn-primary" href="/model">Try the live model <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg></a>
+        <a class="btn btn-ghost" href="/research">What v2 has found</a>
       </div>
     </div>
     <div class="hero-art">
@@ -569,7 +609,24 @@
   </div>
 </div>
 
-<!-- ======================================================= how -->
+<section class="block explore" aria-labelledby="explore-title">
+  <div class="wrap">
+    <div class="sec-head">
+      <p class="sec-num">Contents</p>
+      <h2 id="explore-title">Five pages, one question. <span class="mute">Which VMs are worth moving off failing hardware, and when does it matter? Start with how the decision works, or go straight to what the research has found.</span></h2>
+    </div>
+    <div class="xgrid">
+      <a class="xcard" href="/how"><span class="t">01 · How it works</span><b>Four signals, one decision.</b><span class="go">Open <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg></span></a>
+      <a class="xcard" href="/model"><span class="t">02 · Live model</span><b>Ask the model about one VM.</b><span class="go">Open <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg></span></a>
+      <a class="xcard" href="/v1"><span class="t">03 · v1 results</span><b>What the course project found.</b><span class="go">Open <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg></span></a>
+      <a class="xcard" href="/models"><span class="t">04 · Models</span><b>A deep attention model against a calibrated tree.</b><span class="go">Open <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg></span></a>
+      <a class="xcard" href="/research"><span class="t">05 · Research v2</span><b>Turning a course project into research.</b><span class="go">Open <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg></span></a>
+    </div>
+  </div>
+</section>
+</div>
+
+<div class="page" data-page="how"{% if page != 'how' %} hidden{% endif %}>
 <section class="block" id="how">
   <div class="wrap">
     <div class="sec-head reveal">
@@ -608,10 +665,13 @@
     </div>
   </div>
 </section>
+  <nav class="pager wrap" aria-label="More pages">
+    <a class="pg prev" href="/"><span>← Home</span></a>
+    <a class="pg next" href="/model"><span class="k">Next · Live model</span><b>Ask the model about one VM.</b><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg></a>
+  </nav>
+</div>
 
-<div class="rule" aria-hidden="true"><span class="plus l"></span><span class="plus r"></span></div>
-
-<!-- ======================================================= demo -->
+<div class="page" data-page="model"{% if page != 'model' %} hidden{% endif %}>
 <section class="block" id="demo">
   <div class="wrap">
     <div class="sec-head reveal">
@@ -753,10 +813,13 @@
     </div>
   </div>
 </section>
+  <nav class="pager wrap" aria-label="More pages">
+    <a class="pg prev" href="/how"><span>← How it works</span></a>
+    <a class="pg next" href="/v1"><span class="k">Next · v1 results</span><b>What the course project found.</b><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg></a>
+  </nav>
+</div>
 
-<div class="rule" aria-hidden="true"><span class="plus l"></span><span class="plus r"></span></div>
-
-<!-- ======================================================= v1 findings -->
+<div class="page" data-page="v1"{% if page != 'v1' %} hidden{% endif %}>
 <section class="block" id="findings">
   <div class="wrap">
     <div class="sec-head reveal">
@@ -793,10 +856,13 @@
     </div>
   </div>
 </section>
+  <nav class="pager wrap" aria-label="More pages">
+    <a class="pg prev" href="/model"><span>← Live model</span></a>
+    <a class="pg next" href="/models"><span class="k">Next · Models</span><b>A deep attention model against a calibrated tree.</b><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg></a>
+  </nav>
+</div>
 
-<div class="rule" aria-hidden="true"><span class="plus l"></span><span class="plus r"></span></div>
-
-<!-- ======================================================= model comparison -->
+<div class="page" data-page="models"{% if page != 'models' %} hidden{% endif %}>
 <section class="block" id="comparison">
   <div class="wrap">
     <div class="sec-head reveal">
@@ -817,10 +883,13 @@
     </div>
   </div>
 </section>
+  <nav class="pager wrap" aria-label="More pages">
+    <a class="pg prev" href="/v1"><span>← v1 results</span></a>
+    <a class="pg next" href="/research"><span class="k">Next · Research v2</span><b>Turning a course project into research.</b><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg></a>
+  </nav>
+</div>
 
-<div class="rule" aria-hidden="true"><span class="plus l"></span><span class="plus r"></span></div>
-
-<!-- ======================================================= v2 research -->
+<div class="page" data-page="research"{% if page != 'research' %} hidden{% endif %}>
 <section class="block" id="research">
   <div class="wrap">
     <div class="sec-head reveal">
@@ -982,6 +1051,11 @@
     </div>
   </div>
 </section>
+  <nav class="pager wrap" aria-label="More pages">
+    <a class="pg prev" href="/models"><span>← Models</span></a>
+    <a class="pg next" href="/"><span class="k">Next · Back to the start</span><b>Move the right VMs before they fail.</b><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg></a>
+  </nav>
+</div>
 
 </main>
 
@@ -1007,12 +1081,12 @@
 
   <div class="sitemap">
     <div class="wrap">
-      <a class="brand" href="#top"><svg viewBox="0 0 32 32" fill="currentColor" aria-hidden="true"><rect x="4" y="4" width="11" height="11" rx="3"/><rect x="17" y="4" width="11" height="11" rx="3" opacity=".5"/><rect x="4" y="17" width="11" height="11" rx="3" opacity=".5"/><rect x="19" y="19" width="11" height="11" rx="3" fill="var(--ember)"/></svg><span>VM Mitigation</span></a>
+      <a class="brand" href="/"><svg viewBox="0 0 32 32" fill="currentColor" aria-hidden="true"><rect x="4" y="4" width="11" height="11" rx="3"/><rect x="17" y="4" width="11" height="11" rx="3" opacity=".5"/><rect x="4" y="17" width="11" height="11" rx="3" opacity=".5"/><rect x="19" y="19" width="11" height="11" rx="3" fill="var(--ember)"/></svg><span>VM Mitigation</span></a>
       <nav aria-label="Site">
-        <div><h3>On this page</h3><ul><li><a href="#how">How it works</a></li><li><a href="#demo">Live model</a></li><li><a href="#findings">v1 results</a></li><li><a href="#comparison">Models</a></li><li><a href="#research">Research v2</a></li></ul></div>
+        <div><h3>Pages</h3><ul><li><a href="/how">How it works</a></li><li><a href="/model">Live model</a></li><li><a href="/v1">v1 results</a></li><li><a href="/models">Models</a></li><li><a href="/research">Research v2</a></li></ul></div>
         <div><h3>Evidence</h3><ul><li><a href="https://github.com/Rag2102/ccproject/blob/main/docs/v2/THEORY.md" target="_blank" rel="noopener">Theory</a></li><li><a href="https://github.com/Rag2102/ccproject/blob/main/docs/v2/PROTOCOL.md" target="_blank" rel="noopener">Protocol</a></li><li><a href="https://github.com/Rag2102/ccproject/blob/main/docs/v2/LOG.md" target="_blank" rel="noopener">Weekly log</a></li><li><a href="https://github.com/Rag2102/ccproject/tree/main/docs/v2/DECISIONS" target="_blank" rel="noopener">Decision records</a></li></ul></div>
         <div><h3>Data</h3><ul><li><a href="https://www.backblaze.com/cloud-storage/resources/hard-drive-test-data" target="_blank" rel="noopener">Backblaze drive stats</a></li><li><a href="https://github.com/Azure/AzurePublicDataset" target="_blank" rel="noopener">Azure public dataset</a></li><li><a href="https://github.com/google/cluster-data" target="_blank" rel="noopener">Google cluster data 2019</a></li></ul></div>
-        <div><h3>Repo</h3><ul><li><a href="https://github.com/Rag2102/ccproject" target="_blank" rel="noopener">Repository</a></li><li><a href="https://github.com/Rag2102/ccproject/blob/main/docs/cloud_architecture.md" target="_blank" rel="noopener">AWS architecture</a></li><li><a href="https://github.com/Rag2102/ccproject/blob/main/docs/VM_Mitigation_Policy_Report.docx" target="_blank" rel="noopener">v1 report</a></li><li><a href="#top">Back to top ↑</a></li></ul></div>
+        <div><h3>Repo</h3><ul><li><a href="https://github.com/Rag2102/ccproject" target="_blank" rel="noopener">Repository</a></li><li><a href="https://github.com/Rag2102/ccproject/blob/main/docs/cloud_architecture.md" target="_blank" rel="noopener">AWS architecture</a></li><li><a href="https://github.com/Rag2102/ccproject/blob/main/docs/VM_Mitigation_Policy_Report.docx" target="_blank" rel="noopener">v1 report</a></li><li><a href="#main">Back to top ↑</a></li></ul></div>
       </nav>
     </div>
   </div>
@@ -1020,7 +1094,7 @@
   <div class="light-close">
     <div class="top">
       <p>Move the right VMs,<br><span>before they fail.</span></p>
-      <ul><li><a href="#demo">Live model</a></li><li><a href="#research">Research</a></li><li><a href="#plan">The plan</a></li><li><a href="https://github.com/Rag2102/ccproject" target="_blank" rel="noopener">GitHub</a></li></ul>
+      <ul><li><a href="/model">Live model</a></li><li><a href="/research">Research</a></li><li><a href="/research#plan">The plan</a></li><li><a href="https://github.com/Rag2102/ccproject" target="_blank" rel="noopener">GitHub</a></li></ul>
     </div>
     <svg class="wordmark" viewBox="0 0 1000 186" aria-hidden="true" focusable="false">
       <defs><linearGradient id="wmFill" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#09090b"/><stop offset="1" stop-color="#71717a"/></linearGradient></defs>
@@ -1046,15 +1120,58 @@ $('menuBtn').addEventListener('click', () => {
 });
 document.querySelectorAll('#navLinks a').forEach(a => a.addEventListener('click', () => $('navLinks').classList.remove('open')));
 
-// scroll spy: the last section whose top has passed 35% of the viewport
-const secs = [...document.querySelectorAll('section.block')];
-function spy() {
-  const y = window.innerHeight * 0.35;
-  let cur = null;
-  secs.forEach(s => { if (s.getBoundingClientRect().top <= y) cur = s.id; });
-  document.querySelectorAll('#navLinks a').forEach(a => a.classList.toggle('active', cur !== null && a.getAttribute('href') === '#' + cur));
+// pages: every section is its own page (/how, /model, ...). The server renders the one asked for; after that,
+// links switch pages in place: the old page fades out, the new one rises in, the address and title follow,
+// and back/forward work. A link with a #fragment scrolls to it on its page.
+const PAGE_OF = { '/': 'home', '/how': 'how', '/model': 'model', '/v1': 'v1', '/models': 'models', '/research': 'research' };
+const PAGE_TITLE = { home: 'VM Mitigation: move the right VMs before hardware fails', how: 'How it works', model: 'Live model', v1: 'v1 results', models: 'Models', research: 'Research v2' };
+const stillPages = matchMedia('(prefers-reduced-motion: reduce)').matches;
+function markNav(k) {
+  document.querySelectorAll('#navLinks a').forEach(a => {
+    const on = PAGE_OF[new URL(a.href).pathname] === k;
+    a.classList.toggle('active', on);
+    if (on) a.setAttribute('aria-current', 'page'); else a.removeAttribute('aria-current');
+  });
 }
-addEventListener('scroll', spy, { passive: true }); spy();
+function land(hash, smooth) {
+  const el = hash && hash.length > 1 ? document.getElementById(decodeURIComponent(hash.slice(1))) : null;
+  if (el) el.scrollIntoView({ behavior: smooth && !stillPages ? 'smooth' : 'instant', block: 'start' });
+  else scrollTo({ top: 0, behavior: 'instant' });
+}
+let switching = null;
+function showPage(k, hash) {
+  const cur = document.querySelector('.page:not([hidden])'), next = document.querySelector(`.page[data-page="${k}"]`);
+  if (!next) return;
+  if (cur === next) { land(hash, true); return; }
+  clearTimeout(switching);
+  const swap = () => {
+    document.querySelectorAll('.page').forEach(p => { p.hidden = p !== next; p.classList.remove('leaving'); });
+    document.documentElement.dataset.page = k;
+    document.title = k === 'home' ? PAGE_TITLE.home : PAGE_TITLE[k] + ' · VM Mitigation';
+    markNav(k);
+    land(hash, false);
+    // move focus to the new page's heading, for keyboard and screen-reader users
+    const h = next.querySelector('h1, h2');
+    if (h) { h.setAttribute('tabindex', '-1'); h.focus({ preventScroll: true }); }
+    fitCharts();
+  };
+  if (stillPages || !cur) swap();
+  else { cur.classList.add('leaving'); switching = setTimeout(swap, 170); }
+}
+document.addEventListener('click', (e) => {
+  const a = e.target.closest('a[href]');
+  if (!a || a.target === '_blank' || a.hasAttribute('download') || e.defaultPrevented || e.button !== 0 || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return;
+  const url = new URL(a.href, location.href);
+  if (url.origin !== location.origin) return;
+  const k = PAGE_OF[url.pathname];
+  if (!k) return;
+  e.preventDefault();
+  $('navLinks').classList.remove('open');
+  if (url.pathname + url.hash !== location.pathname + location.hash) history.pushState({ k }, '', url.pathname + url.hash);
+  showPage(k, url.hash);
+});
+addEventListener('popstate', () => showPage(PAGE_OF[location.pathname] || 'home', location.hash));
+markNav(document.documentElement.dataset.page);
 // reveal on scroll; without IntersectionObserver everything is shown at once
 if ('IntersectionObserver' in window) {
   const rev = new IntersectionObserver((es) => es.forEach(e => { if (e.isIntersecting) { e.target.classList.add('in'); rev.unobserve(e.target); } }), { rootMargin: '0px 0px -8% 0px' });
@@ -1144,7 +1261,7 @@ function mountContours(canvas) {
   requestAnimationFrame(draw);
 }
 mountContours($('contours'));
-document.querySelectorAll('.panel, .fcard').forEach((el) => el.addEventListener('pointermove', (e) => {
+document.querySelectorAll('.panel, .fcard, .xcard').forEach((el) => el.addEventListener('pointermove', (e) => {
   const r = el.getBoundingClientRect();
   el.style.setProperty('--mx', (e.clientX - r.left) + 'px'); el.style.setProperty('--my', (e.clientY - r.top) + 'px');
 }));
@@ -1436,7 +1553,7 @@ function makeChart(canvas, sets, o) {
   const ink3 = css('--ink-3'), grid = css('--line'), good = css('--good'), th = css('--th'), surface = css('--surface');
   // the line runs coral below zero and green above it; the area fades to nothing at the zero line
   const lineGrad = (sc) => {
-    const c = sc.chart, { ctx, chartArea: a } = c, y = c.scales && c.scales.y; if (!a || !y) return good;
+    const c = sc.chart, { ctx, chartArea: a } = c, y = c.scales && c.scales.y; if (!a || !y || !(a.bottom > a.top)) return good;
     if (!o.zero) { const g = ctx.createLinearGradient(a.left, 0, a.right, 0); g.addColorStop(0, css('--cs')); g.addColorStop(1, good); return g; }
     const z = Math.min(Math.max((y.getPixelForValue(0) - a.top) / (a.bottom - a.top), 0), 1);
     const g = ctx.createLinearGradient(0, a.top, 0, a.bottom);
@@ -1444,7 +1561,7 @@ function makeChart(canvas, sets, o) {
     return g;
   };
   const fillGrad = (sc) => {
-    const c = sc.chart, { ctx, chartArea: a } = c, y = c.scales && c.scales.y; if (!a || !y) return 'transparent';
+    const c = sc.chart, { ctx, chartArea: a } = c, y = c.scales && c.scales.y; if (!a || !y || !(a.bottom > a.top)) return 'transparent';   // hidden page: no size yet
     const g = ctx.createLinearGradient(0, a.top, 0, a.bottom);
     if (!o.zero) { g.addColorStop(0, rgba(good, 0.28)); g.addColorStop(1, rgba(good, 0)); return g; }
     const z = Math.min(Math.max((y.getPixelForValue(0) - a.top) / (a.bottom - a.top), 0), 1);
@@ -1520,10 +1637,23 @@ function drawCorr() {
   const pts = CORR.map(r => ({ x: Math.max(0, r.rho_achieved), y: 100 * r.cost_sensitive_advantage_pct })).sort((a, b) => a.x - b.x);
   corrChart = makeChart($('corrChart'), [{ data: pts, points: true }], { xLabel: 'Achieved correlation ρ between workload criticality and host risk', yLabel: 'Cost-sensitive advantage', xMin: 0, xMax: 1, yMin: -5, yMax: 5, yStep: 1, zero: true, labels: true, unit: 'vs threshold' });
 }
-function redrawCharts() {
+function rebuildCharts() {
   if (corrChart) { corrChart.destroy(); corrChart = null; }
   if (sbChart) { sbChart.destroy(); sbChart = null; }
   drawCorr(); updateSandbox();
+}
+function redrawCharts() { rebuildCharts(); fitCharts(); }
+// a chart built while its page was hidden has no size; when its page shows, size it, or rebuild it if it
+// never got one (a rebuild measures its container at once, and replays the chart's draw-in)
+function fitCharts() {
+  const fit = () => {
+    const page = document.querySelector('.page:not([hidden])');
+    if (!window.Chart || !page) return;
+    const mine = Object.values(Chart.instances).filter(c => page.contains(c.canvas));
+    if (mine.some(c => !c.width && c.canvas.parentElement.clientWidth)) rebuildCharts();
+    else mine.forEach(c => c.resize());
+  };
+  fit(); setTimeout(fit, 450);
 }
 function initCharts() {
   if (typeof Chart === 'undefined') return;

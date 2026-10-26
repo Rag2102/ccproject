@@ -31,9 +31,19 @@ import core
 app = Flask(__name__)
 
 
+# One template, one page per section: every path renders the same document with that page shown, and
+# the page script switches between them in place (with a transition) after the first load.
+PAGES = {"how": "How it works", "model": "Live model", "v1": "v1 results", "models": "Models", "research": "Research v2"}
+
+
 @app.route("/")
 def index():
-    return render_template("index.html", **core.get_meta())
+    return render_template("index.html", page="home", page_title=None, **core.get_meta())
+
+
+@app.route("/<any(how, model, v1, models, research):name>")
+def section(name):
+    return render_template("index.html", page=name, page_title=PAGES[name], **core.get_meta())
 
 
 @app.route("/figures/<path:fname>")
