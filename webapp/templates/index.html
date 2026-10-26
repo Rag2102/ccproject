@@ -810,11 +810,11 @@
         <div class="src"><a class="more" href="https://github.com/Rag2102/ccproject/blob/v2-research/docs/v2/RESULTS_W18.md" target="_blank" rel="noopener">RESULTS_W18.md</a> · regime E</div>
       </article>
       <article class="panel fcard reveal">
-        <span class="tag illustrative">Exploratory · dev seeds</span>
-        <div class="big">+11% <small>to</small> +22%</div>
+        <span class="tag illustrative">Exploratory · 30 seeds</span>
+        <div class="big">+11% <small>to</small> +20%</div>
         <h3>Where new VMs go matters more than which to move</h3>
-        <p>Keeping new VMs off the riskiest 2% of hosts, with no migrations at all, beats every migration policy tested. It is why the Narya-inspired policy (P5) beats BAM. A full run on the evaluation seeds is queued.</p>
-        <div class="src"><a class="more" href="https://github.com/Rag2102/ccproject/blob/v2-research/docs/v2/DIAG_P5_VS_BAM.md" target="_blank" rel="noopener">DIAG_P5_VS_BAM.md</a> · ADR-010</div>
+        <p>Keeping new VMs off the riskiest 2% of hosts, with no migrations at all, beats every migration policy tested, in every regime and every seed. It is why the Narya-inspired policy (P5) beats BAM; adding migration on top gains at most about 2 points.</p>
+        <div class="src"><a class="more" href="https://github.com/Rag2102/ccproject/blob/v2-research/docs/v2/RESULTS_AVOID.md" target="_blank" rel="noopener">RESULTS_AVOID.md</a> · ADR-010</div>
       </article>
       <article class="panel fcard reveal">
         <span class="tag simulated">Simulated · pre-registered</span>
@@ -1337,8 +1337,8 @@ if (document.fonts && document.fonts.ready) document.fonts.ready.then(() => redr
 /* ---------------- Week 18 results ----------------
    Saving against never migrating (P0), % at a 2% budget: [mean, CI low, CI high, % of seeds beating P0].
    P2-P6: results/summary/vs_p0.json (Week 18, eval seeds 1-30, 95% BCa).
-   AV (P0 + avoid): results/v2/diag_p5_vs_bam.json (exploratory, dev seeds 101-105; [mean, min, max]). */
-const W18 = {"A1":{"P2":[-281.4,-286.8,-274.8,0],"P3":[1.7,1.2,2.1,87],"P4":[5.0,4.4,5.6,100],"P5":[8.6,7.8,9.3,100],"P6":[-49.7,-65.4,-37.5,0],"AV":[10.6,8.2,12.0]},"A3":{"P2":[-219.4,-224.1,-215.1,0],"P3":[6.7,5.6,7.8,100],"P4":[10.8,9.4,12.0,100],"P5":[15.5,14.2,16.6,100],"P6":[-33.1,-46.8,-22.7,13],"AV":[19.6,15.6,24.7]},"A7":{"P2":[-188.6,-193.4,-182.7,0],"P3":[3.1,2.0,4.3,83],"P4":[7.5,6.0,8.9,97],"P5":[16.9,15.4,18.3,100],"P6":[-29.9,-42.1,-20.9,3],"AV":[21.9,17.1,24.3]},"E1":{"P2":[-237.0,-241.4,-231.9,0],"P3":[-2.3,-2.8,-1.8,7],"P4":[-2.4,-3.1,-1.7,13],"P5":[8.4,7.5,9.3,100],"P6":[-46.8,-59.6,-36.9,0],"AV":[10.7,9.1,11.7]},"E3":{"P2":[-285.1,-290.5,-278.5,0],"P3":[1.7,1.3,2.1,83],"P4":[5.3,4.8,5.9,100],"P5":[8.6,7.8,9.4,100],"P6":[-50.6,-66.6,-38.2,0],"AV":[10.6,8.3,12.0]}};
+   AV (P0 + avoid): results/summary/explore_avoid.json (ADR-010, exploratory, eval seeds 1-30, 95% BCa). */
+const W18 = {"A1":{"P2":[-281.4,-286.8,-274.8,0],"P3":[1.7,1.2,2.1,87],"P4":[5.0,4.4,5.6,100],"P5":[8.6,7.8,9.3,100],"P6":[-49.7,-65.4,-37.5,0],"AV":[11.0,10.4,11.7,100]},"A3":{"P2":[-219.4,-224.1,-215.1,0],"P3":[6.7,5.6,7.8,100],"P4":[10.8,9.4,12.0,100],"P5":[15.5,14.2,16.6,100],"P6":[-33.1,-46.8,-22.7,13],"AV":[17.8,16.8,18.9,100]},"A7":{"P2":[-188.6,-193.4,-182.7,0],"P3":[3.1,2.0,4.3,83],"P4":[7.5,6.0,8.9,97],"P5":[16.9,15.4,18.3,100],"P6":[-29.9,-42.1,-20.9,3],"AV":[19.7,18.6,21.0,100]},"E1":{"P2":[-237.0,-241.4,-231.9,0],"P3":[-2.3,-2.8,-1.8,7],"P4":[-2.4,-3.1,-1.7,13],"P5":[8.4,7.5,9.3,100],"P6":[-46.8,-59.6,-36.9,0],"AV":[10.6,9.9,11.4,100]},"E3":{"P2":[-285.1,-290.5,-278.5,0],"P3":[1.7,1.3,2.1,83],"P4":[5.3,4.8,5.9,100],"P5":[8.6,7.8,9.4,100],"P6":[-50.6,-66.6,-38.2,0],"AV":[11.0,10.4,11.7,100]}};
 const W18_REG = { A1: 'A1 · ρ = 0', A3: 'A3 · ρ = 0.3', A7: 'A7 · ρ = 0.9', E1: 'E1 · low cost spread', E3: 'E3 · high cost spread' };
 const W18_NOTE = {
   A1: 'No correlation between VM importance and host risk, as measured in the Google trace.',
@@ -1364,14 +1364,14 @@ function drawW18() {
     const [m, lo, hi, share] = d[k];
     const a = w18x(Math.min(0, m)), b = w18x(Math.max(0, m)), clip = m < W18_LO;
     const ci = `<i class="ci" style="left:${w18x(lo)}%;width:${Math.max(0.6, w18x(hi) - w18x(lo))}%"></i>`;
-    const tip = k === 'AV' ? `5 dev seeds, range ${lo} to ${hi}%` : `95% CI ${lo} to ${hi}%; ${share}% of 30 seeds beat never migrating`;
+    const tip = `95% CI ${lo} to ${hi}%; ${share}% of 30 seeds beat never migrating${k === 'AV' ? ' (exploratory)' : ''}`;
     h += `<div class="w18-row" title="${tip}"><div class="nm"><b>${name}</b><span>${sub}</span></div>
       <div class="trk"><i class="zero" style="left:calc(${z}% - 1px)"></i>
       <i class="fill${clip ? ' clip' : ''}" style="left:${a}%;width:${b - a}%;background-color:${css(col)}"></i>${clip ? '' : ci}</div>
-      <div class="val">${m > 0 ? '+' : ''}${m.toFixed(1)}%<small>${k === 'AV' ? 'dev seeds' : share + '% of seeds win'}</small></div></div>`;
+      <div class="val">${m > 0 ? '+' : ''}${m.toFixed(1)}%<small>${share}% of seeds win</small></div></div>`;
   });
   $('w18Bars').innerHTML = h;
-  $('w18Note').textContent = W18_NOTE[w18Reg] + ' Bars past −40% are cut off (hatched). Avoidance is from 5 development seeds, not the 30 evaluation seeds; its full run is queued.';
+  $('w18Note').textContent = W18_NOTE[w18Reg] + ' Bars past −40% are cut off (hatched). Avoidance was added after the protocol was frozen, so it is exploratory: same 30 evaluation seeds, outside the pre-registered tests.';
 }
 (function () {
   $('w18Seg').innerHTML = Object.keys(W18).map(r =>
