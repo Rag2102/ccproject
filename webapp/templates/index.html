@@ -8,70 +8,39 @@
 <meta property="og:type" content="website">
 <meta property="og:title" content="VM Mitigation: move the right VMs before hardware fails">
 <meta property="og:description" content="Which VMs are worth moving off failing hardware? A live model demo, course-project results and the v2 research programme.">
-<meta name="theme-color" content="#040806" media="(prefers-color-scheme: dark)">
-<meta name="theme-color" content="#f1f6f3" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#08090a">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&family=Nunito:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Mona+Sans:wdth,wght@75..125,400..900&family=Geist+Mono:wght@400;500;600&display=swap" rel="stylesheet">
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%23111318'/%3E%3Crect x='7' y='7' width='8' height='8' rx='2' fill='%236f9bff'/%3E%3Crect x='17' y='7' width='8' height='8' rx='2' fill='%23ff8a5c'/%3E%3Crect x='7' y='17' width='8' height='8' rx='2' fill='%23ffffff' opacity='.35'/%3E%3Crect x='17' y='17' width='8' height='8' rx='2' fill='%236f9bff' opacity='.6'/%3E%3C/svg%3E">
 <script type="importmap">{"imports": {"three": "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js", "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/"}}</script>
 <script>
-  // theme before first paint: saved choice, else the system's
+  // dark only, like Faultline: the charts read their colours from these tokens
   (function () {
-    var t = null;
-    try { t = localStorage.getItem('vm-theme'); } catch (e) {}
-    if (t === 'light' || t === 'dark') document.documentElement.setAttribute('data-theme', t);
+    document.documentElement.setAttribute('data-theme', 'dark');
     document.documentElement.classList.add('js');
   })();
 </script>
 <style>
-  :root {
-    --bg: #f1f6f3; --bg-2: #e5eee9; --surface: #ffffff; --surface-2: #f6faf8;
-    --line: rgba(10, 40, 25, 0.09); --line-2: rgba(10, 40, 25, 0.17);
-    --ink: #0c1912; --ink-2: #3f5248; --ink-3: #6d7f75;
-    --cs: #2563eb; --cs-soft: rgba(37, 99, 235, 0.10);
-    --th: #e0571f; --th-soft: rgba(224, 87, 31, 0.10);
-    --good: #0f8a52; --good-soft: rgba(15, 138, 82, 0.11);
-    --bad: #cc3636; --bad-soft: rgba(204, 54, 54, 0.10);
-    --amber: #a8730b; --amber-soft: rgba(168, 115, 11, 0.12);
-    --violet: #0e9f6e; --violet-soft: rgba(14, 159, 110, 0.12);
-    --glow-1: rgba(34, 197, 94, 0.16); --glow-2: rgba(16, 185, 129, 0.10);
-    --shadow: 0 1px 2px rgba(20, 22, 28, 0.04), 0 8px 24px -12px rgba(20, 22, 28, 0.12);
-    --radius: 26px; --radius-sm: 16px;
-    --action: #12a150; --action-hover: #0f8a44; --link: #0f8a44; --on-action: #ffffff;
-    --serif: 'Fredoka', 'Nunito', system-ui, sans-serif;
-    --sans: 'Nunito', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
-    --mono: 'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, monospace;
-    color-scheme: light;
-  }
-  @media (prefers-color-scheme: dark) {
-    :root:not([data-theme="light"]) {
-      --bg: #040806; --bg-2: #0a120e; --surface: #0b1410; --surface-2: #101b16;
-      --line: rgba(140, 255, 195, 0.08); --line-2: rgba(140, 255, 195, 0.16);
-      --ink: #e7f3ec; --ink-2: #a2b8ad; --ink-3: #6c8579;
-      --cs: #7cc4ff; --cs-soft: rgba(124, 196, 255, 0.13);
-      --th: #ff9a66; --th-soft: rgba(255, 154, 102, 0.13);
-      --good: #4ee597; --good-soft: rgba(78, 229, 151, 0.12);
-      --bad: #ff7272; --bad-soft: rgba(255, 114, 114, 0.12);
-      --amber: #f2c25a; --amber-soft: rgba(242, 194, 90, 0.13);
-      --violet: #4ee597; --violet-soft: rgba(78, 229, 151, 0.14);
-      --glow-1: rgba(34, 197, 94, 0.20); --glow-2: rgba(16, 185, 129, 0.12);
-      --shadow: 0 1px 2px rgba(0, 0, 0, 0.3), 0 12px 32px -16px rgba(0, 0, 0, 0.6);
-      color-scheme: dark;
-    }
-  }
-  :root[data-theme="dark"] {
-    --bg: #040806; --bg-2: #0a120e; --surface: #0b1410; --surface-2: #101b16;
-    --line: rgba(140, 255, 195, 0.08); --line-2: rgba(140, 255, 195, 0.16);
-    --ink: #e7f3ec; --ink-2: #a2b8ad; --ink-3: #6c8579;
-    --cs: #7cc4ff; --cs-soft: rgba(124, 196, 255, 0.13);
-    --th: #ff9a66; --th-soft: rgba(255, 154, 102, 0.13);
-    --good: #4ee597; --good-soft: rgba(78, 229, 151, 0.12);
-    --bad: #ff7272; --bad-soft: rgba(255, 114, 114, 0.12);
-    --amber: #f2c25a; --amber-soft: rgba(242, 194, 90, 0.13);
-    --violet: #4ee597; --violet-soft: rgba(78, 229, 151, 0.14);
-    --glow-1: rgba(34, 197, 94, 0.20); --glow-2: rgba(16, 185, 129, 0.12);
-    --shadow: 0 1px 2px rgba(0, 0, 0, 0.3), 0 12px 32px -16px rgba(0, 0, 0, 0.6);
+  :root, :root[data-theme="dark"] {
+    --bg: #08090a; --bg-2: #111214; --surface: #0f1011; --surface-2: #141516;
+    --line: rgba(255, 255, 255, 0.08); --line-2: rgba(255, 255, 255, 0.14);
+    --ink: #f7f8f8; --ink-2: #9ba0a8; --ink-3: #7a7f87;
+    --cs: #7cc4ff; --cs-soft: rgba(124, 196, 255, 0.12);
+    --th: #ff7b39; --th-soft: rgba(255, 123, 57, 0.13);
+    --good: #5ef0b4; --good-soft: rgba(94, 240, 180, 0.11);
+    --bad: #ff6b6b; --bad-soft: rgba(255, 107, 107, 0.12);
+    --amber: #f2c25a; --amber-soft: rgba(242, 194, 90, 0.12);
+    --violet: #8b7bff; --violet-soft: rgba(139, 123, 255, 0.14);
+    --ember: oklch(0.72 0.19 45); --iris: oklch(0.66 0.19 290); --proof: oklch(0.82 0.15 165);
+    --shadow: inset 0 1px 0 rgba(255, 255, 255, 0.03);
+    --radius: 16px; --radius-sm: 12px;
+    --action: #fafafa; --action-hover: #ffffff; --link: #e4e4e7; --on-action: #09090b;
+    --ease: cubic-bezier(0.22, 1, 0.36, 1); --ease-quick: cubic-bezier(0.25, 0.46, 0.45, 0.94); --ease-slide: cubic-bezier(0.65, 0.05, 0, 1);
+    --hero: 'Mona Sans', 'Inter', ui-sans-serif, system-ui, sans-serif;
+    --serif: 'Inter', ui-sans-serif, system-ui, sans-serif;
+    --sans: 'Inter', ui-sans-serif, system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+    --mono: 'Geist Mono', ui-monospace, SFMono-Regular, Menlo, monospace;
     color-scheme: dark;
   }
 
@@ -79,101 +48,129 @@
   html { scroll-behavior: smooth; -webkit-text-size-adjust: 100%; }
   @media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } *, *::before, *::after { animation: none !important; transition: none !important; } }
   body {
-    margin: 0; color: var(--ink); font-family: var(--sans);
-    background: radial-gradient(1100px 620px at 8% -8%, var(--glow-1), transparent 62%),
-                radial-gradient(900px 560px at 100% 4%, var(--glow-2), transparent 58%),
-                radial-gradient(1200px 700px at 50% 112%, var(--glow-2), transparent 60%), var(--bg);
-    background-attachment: fixed;
-    font-size: 16px; line-height: 1.6; -webkit-font-smoothing: antialiased; overflow-x: hidden;
+    margin: 0; color: var(--ink); font-family: var(--sans); background: var(--bg);
+    font-size: 16px; line-height: 1.6; letter-spacing: -0.011em; font-feature-settings: "cv01", "ss03";
+    -webkit-font-smoothing: antialiased; overflow-x: hidden;
   }
+  ::selection { background: color-mix(in oklch, var(--iris) 62%, transparent); color: #fff; }
+  * { scrollbar-width: thin; scrollbar-color: rgba(255, 255, 255, 0.16) transparent; }
   a { color: inherit; }
-  :focus-visible { outline: 2px solid var(--cs); outline-offset: 2px; border-radius: 4px; }
-  .wrap { max-width: 1400px; margin: 0 auto; padding: 0 40px; }
-  @media (max-width: 1100px) { .wrap { padding: 0 28px; } }
-  @media (max-width: 600px) { .wrap { padding: 0 16px; } }
+  :focus-visible { outline: 2px solid #38bdf8; outline-offset: 2px; border-radius: 6px; }
+  .wrap { max-width: 1240px; margin: 0 auto; padding: 0 32px; }
+  @media (max-width: 640px) { .wrap { padding: 0 20px; } }
   .mono { font-family: var(--mono); }
   .serif { font-family: var(--serif); font-weight: 400; }
 
-  /* ---------- nav ---------- */
-  .nav {
-    position: sticky; top: 0; z-index: 40; border-bottom: 1px solid var(--line);
-    background: color-mix(in srgb, var(--bg) 70%, transparent);
-    backdrop-filter: saturate(1.4) blur(14px); -webkit-backdrop-filter: saturate(1.4) blur(14px);
-  }
-  .nav .wrap { display: flex; align-items: center; gap: 14px; height: 66px; max-width: none; padding: 0 32px; }
-  @media (max-width: 600px) { .nav .wrap { padding: 0 16px; } }
-  .brand { display: flex; align-items: center; gap: 11px; text-decoration: none; font: 600 18px var(--serif); letter-spacing: -0.01em; white-space: nowrap; margin-right: auto; }
-  .brand-mark { display: grid; grid-template-columns: 1fr 1fr; gap: 3px; width: 26px; height: 26px; }
-  .brand-mark i { border-radius: 50%; background: var(--ink-3); opacity: .45; }
-  .brand-mark i:nth-child(1) { background: var(--action); opacity: 1; }
-  .brand-mark i:nth-child(2) { background: var(--th); opacity: 1; }
-  .nav-links { display: flex; gap: 4px; }
-  .nav-links a {
-    text-decoration: none; color: var(--ink-2); font-size: 14px; font-weight: 600;
-    padding: 8px 14px; border-radius: 999px; transition: color .15s, background .15s;
-  }
-  .nav-links a:hover { color: var(--ink); background: var(--line); }
-  .nav-links a.active { color: var(--ink); background: var(--line); }
-  .nav-links a .new { font-size: 10px; font-weight: 700; color: var(--amber); margin-left: 5px; letter-spacing: .04em; }
-  .icon-btn {
-    display: inline-flex; align-items: center; justify-content: center; gap: 7px; height: 34px; min-width: 34px; padding: 0 10px;
-    border: 1px solid var(--line-2); border-radius: 980px; background: var(--surface); color: var(--ink);
-    font: 600 12.5px var(--sans); text-decoration: none; cursor: pointer; transition: border-color .15s, background .15s;
-  }
-  .icon-btn:hover { border-color: var(--ink-3); }
+  /* ---------- nav: Faultline's top bar ---------- */
+  .nav { position: sticky; top: 0; z-index: 40; border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+    background: color-mix(in srgb, var(--bg) 72%, transparent); backdrop-filter: blur(24px); -webkit-backdrop-filter: blur(24px); }
+  .nav .wrap { display: flex; align-items: center; gap: 12px; height: 56px; max-width: 1440px; padding: 0 24px; }
+  @media (max-width: 640px) { .nav .wrap { padding: 0 16px; } }
+  .brand { display: flex; align-items: center; gap: 8px; text-decoration: none; color: #fafafa; font: 590 15px var(--sans); letter-spacing: -0.01em; white-space: nowrap; border-radius: 8px; }
+  .brand svg { width: 28px; height: 28px; transition: transform .5s var(--ease); }
+  .brand:hover svg { transform: rotate(8deg); }
+  .nav-links { display: flex; gap: 4px; margin-left: 24px; }
+  .nav-links a { position: relative; text-decoration: none; color: #a1a1aa; font-size: 14px; font-weight: 500; padding: 6px 12px; border-radius: 8px; transition: color .15s; }
+  .nav-links a:hover { color: #fafafa; }
+  .nav-links a.active { color: #fafafa; }
+  .nav-links a.active::after { content: ""; position: absolute; left: 12px; right: 12px; bottom: -11px; height: 2px; border-radius: 2px;
+    background: linear-gradient(90deg, var(--ember), var(--iris)); }
+  .nav-links a .new { font: 500 10.5px var(--mono); color: var(--amber); margin-left: 5px; }
+  .nav-right { margin-left: auto; display: flex; align-items: center; gap: 8px; }
+  .status-pill { display: inline-flex; align-items: center; gap: 7px; height: 28px; padding: 0 11px; border-radius: 999px; font-size: 12.5px; font-weight: 500;
+    color: #a7f3d0; background: rgba(16, 185, 129, 0.10); border: 1px solid rgba(52, 211, 153, 0.30); white-space: nowrap; text-decoration: none; }
+  .status-pill i { width: 7px; height: 7px; border-radius: 50%; background: #34d399; box-shadow: 0 0 12px rgba(52, 211, 153, 0.7); }
+  .icon-btn { display: inline-flex; align-items: center; justify-content: center; gap: 7px; height: 36px; min-width: 36px; padding: 0 12px;
+    border: 1px solid rgba(255, 255, 255, 0.10); border-radius: 999px; background: transparent; color: #e4e4e7;
+    font: 500 13px var(--sans); text-decoration: none; cursor: pointer; transition: background .16s var(--ease-quick); }
+  .icon-btn:hover { background: rgba(255, 255, 255, 0.05); }
   .menu-btn { display: none; }
-  @media (max-width: 880px) {
-    .nav-links { display: none; position: absolute; top: 60px; left: 0; right: 0; flex-direction: column; gap: 0;
+  @media (max-width: 960px) {
+    .nav-links { display: none; position: absolute; top: 56px; left: 0; right: 0; flex-direction: column; gap: 0; margin: 0;
       background: var(--bg); border-bottom: 1px solid var(--line); padding: 8px 16px 14px; }
     .nav-links.open { display: flex; }
-    .nav-links a { padding: 11px 10px; }
-    .menu-btn { display: inline-flex; margin-left: auto; }
-    .nav .gh-label { display: none; }
+    .nav-links a { padding: 12px 10px; } .nav-links a.active::after { display: none; }
+    .menu-btn { display: inline-flex; }
   }
+  @media (max-width: 640px) { .nav .gh-label, .status-pill span { display: none; } .status-pill { padding: 0 9px; } }
 
-  /* ---------- hero ---------- */
-  .hero { padding: 84px 0 64px; border-bottom: 1px solid var(--line); position: relative; overflow: hidden; }
-  .hero .wrap { display: grid; grid-template-columns: 1.1fr 0.9fr; gap: 64px; align-items: center; }
-  @media (max-width: 960px) { .hero .wrap { grid-template-columns: 1fr; gap: 36px; } .hero { padding: 48px 0 40px; } }
-  .eyebrow {
-    display: inline-flex; align-items: center; gap: 8px; font-size: 12px; font-weight: 600; letter-spacing: .02em;
-    color: var(--ink-2); border: 1px solid var(--line-2); border-radius: 999px; padding: 5px 12px 5px 8px; background: var(--surface);
-  }
-  .eyebrow .pulse { width: 7px; height: 7px; border-radius: 50%; background: var(--good); box-shadow: 0 0 0 0 var(--good); animation: pulse 2.4s infinite; }
-  @keyframes pulse { 0% { box-shadow: 0 0 0 0 color-mix(in srgb, var(--good) 55%, transparent); } 70% { box-shadow: 0 0 0 7px transparent; } 100% { box-shadow: 0 0 0 0 transparent; } }
-  .hero h1 {
-    font-family: var(--serif); font-weight: 600; font-size: clamp(40px, 5.6vw, 76px); line-height: 1.02;
-    letter-spacing: -0.025em; margin: 22px 0 20px;
-  }
-  .hero h1 em { font-style: normal; background: linear-gradient(100deg, var(--action), var(--cs)); -webkit-background-clip: text; background-clip: text; color: transparent; }
-  .hero .lede { font-size: 17px; color: var(--ink-2); max-width: 600px; margin: 0 0 28px; line-height: 1.65; }
-  .cta-row { display: flex; gap: 10px; flex-wrap: wrap; }
-  /* buttons: pill shapes and an action blue, in the style of Apple's product pages */
-  .btn {
-    display: inline-flex; align-items: center; justify-content: center; gap: 7px; padding: 11px 22px; border-radius: 980px;
-    font: 500 15px/1.2 var(--sans); letter-spacing: -0.01em; text-decoration: none; cursor: pointer; border: 1px solid transparent;
-    transition: background .2s ease, color .2s ease, border-color .2s ease, transform .1s ease; white-space: nowrap;
-  }
-  .btn:active { transform: scale(.98); }
+  /* ---------- hero: Faultline's (aurora, beam, contours, frame marks, ring chip, heavy wide headline) ---------- */
+  .hero { position: relative; isolation: isolate; overflow: hidden; padding: 56px 0 0; }
+  .hero > .wrap { display: grid; grid-template-columns: minmax(0, 1.3fr) minmax(0, 0.9fr); gap: 16px; align-items: center; }
+  @media (max-width: 1024px) { .hero > .wrap { grid-template-columns: 1fr; } .hero { padding-top: 40px; } }
+  .aurora { position: absolute; inset: -30% -10% auto -10%; height: 120%; pointer-events: none; z-index: -1; opacity: .6;
+    background: radial-gradient(55% 48% at 50% 0%, rgba(255,255,255,.085), rgba(255,255,255,.03) 45%, transparent 78%),
+                radial-gradient(38% 42% at 22% 5%, color-mix(in oklch, var(--iris) 24%, transparent), transparent 78%),
+                radial-gradient(34% 36% at 80% 8%, color-mix(in oklch, var(--ember) 17%, transparent), transparent 78%); }
+  .beam { position: absolute; left: -20%; right: -20%; top: 38%; height: 220px; pointer-events: none; z-index: -1; transform: rotate(-9deg); opacity: .8;
+    background: radial-gradient(60% 50% at 50% 50%, rgba(255,255,255,.075), rgba(255,255,255,.025) 55%, transparent 80%); }
+  .contours { position: absolute; inset: 0; width: 100%; height: 100%; z-index: -1; pointer-events: none; opacity: .9;
+    -webkit-mask-image: radial-gradient(ellipse 75% 70% at 50% 45%, #000 35%, transparent 100%); mask-image: radial-gradient(ellipse 75% 70% at 50% 45%, #000 35%, transparent 100%); }
+  .frame { position: absolute; inset: 20px; pointer-events: none; }
+  .plus { position: absolute; width: 12px; height: 12px; color: #52525b; }
+  .plus::before, .plus::after { content: ""; position: absolute; background: currentColor; }
+  .plus::before { left: 50%; top: 0; width: 1px; height: 100%; transform: translateX(-50%); }
+  .plus::after { top: 50%; left: 0; height: 1px; width: 100%; transform: translateY(-50%); }
+  .frame .plus.l { left: 0; top: 0; } .frame .plus.r { right: 0; top: 0; }
+  .scroll-cue { position: absolute; right: 12px; top: 52vh; display: flex; flex-direction: column; align-items: center; gap: 12px; }
+  .scroll-cue span { font: 10px var(--mono); text-transform: uppercase; letter-spacing: .3em; color: #71717a; writing-mode: vertical-rl; }
+  .scroll-cue b { position: relative; width: 1px; height: 40px; overflow: hidden; background: rgba(255,255,255,.1); }
+  .scroll-cue b::after { content: ""; position: absolute; inset: 0; background: #d4d4d8; animation: cue 2.2s var(--ease) infinite; }
+  @keyframes cue { 0% { transform: scaleY(0); transform-origin: top; } 50% { transform: scaleY(1); transform-origin: top; } 50.1% { transform-origin: bottom; } 100% { transform: scaleY(0); transform-origin: bottom; } }
+  @media (max-width: 1024px) { .scroll-cue { display: none; } }
+  @property --turn { syntax: "<angle>"; inherits: false; initial-value: 0deg; }
+  .ring { display: inline-flex; border-radius: 999px; padding: 1px; text-decoration: none;
+    background: conic-gradient(from var(--turn), var(--ember), var(--iris), var(--proof), var(--ember)); animation: turn 6s linear infinite; }
+  @keyframes turn { to { --turn: 360deg; } }
+  .ring > span { display: inline-flex; align-items: center; gap: 6px; border-radius: 999px; background: #0b0b0c; padding: 4px 14px; font-size: 13px; color: #e4e4e7; }
+  .ring > span svg { color: #a1a1aa; }
+  .hero h1 { font-family: var(--hero); font-weight: 800; font-stretch: 112%; font-variation-settings: "wdth" 112; letter-spacing: -0.045em;
+    font-size: clamp(2.6rem, 4.9vw, 4.6rem); line-height: .92; margin: 28px 0 0; }
+  @media (min-width: 1025px) { .hero h1 > span > span { white-space: nowrap; } }
+  .hero h1 > span { display: block; overflow: hidden; padding-bottom: .06em; }
+  .hero h1 > span > span { display: block; color: #fafafa; }
+  .js .hero h1 > span > span { transform: translateY(105%); animation: lineUp 1s var(--ease-slide) forwards; }
+  .js .hero h1 > span:nth-child(2) > span { animation-delay: .12s; }
+  @keyframes lineUp { to { transform: none; } }
+  .gradient-text { background-image: linear-gradient(to right bottom, #fff 30%, rgba(255,255,255,.5)); background-repeat: no-repeat;
+    -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent; color: transparent !important; padding-right: .08em; }
+  .accent-text { background-image: linear-gradient(100deg, var(--ember), oklch(0.78 0.16 20) 45%, var(--iris)); -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent; color: transparent; }
+  .hero .lede { margin: 28px 0 0; max-width: 34rem; font-size: 18px; line-height: 1.55; color: #8a8f98; }
+  .hero .lede b { color: #f4f4f5; font-weight: 500; }
+  .cta-row { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; margin-top: 36px; }
+  .hero-art { position: relative; height: 560px; margin-right: -48px; }
+  .hero-art::before { content: ""; position: absolute; left: 12%; right: 12%; bottom: 8%; height: 96px; border-radius: 50%; pointer-events: none;
+    background: radial-gradient(closest-side, rgba(255,255,255,.07), transparent); }
+  @media (max-width: 1024px) { .hero-art { height: 440px; margin: 0; } }
+  @media (max-width: 640px) { .hero-art { height: 360px; margin: 0 -20px; } }
+  .hero-art .cube-box { position: absolute; inset: 0; min-height: 0; }
+  /* buttons: Faultline's pills (white, or quiet) */
+  .btn { display: inline-flex; align-items: center; justify-content: center; gap: 8px; height: 44px; padding: 0 20px; border-radius: 999px;
+    font: 500 15px/1 var(--sans); letter-spacing: -0.01em; text-decoration: none; cursor: pointer; border: 1px solid transparent; white-space: nowrap;
+    transition: transform .16s var(--ease-quick), background-color .16s var(--ease-quick), color .16s; }
+  .btn:active { transform: scale(.96); }
   .btn:disabled { opacity: .4; cursor: default; transform: none; }
-  .btn-primary { background: var(--action); color: var(--on-action); box-shadow: 0 8px 28px -10px var(--action); }
-  .btn-primary:hover { background: var(--action-hover); }
-  .btn-ghost { border-color: var(--action); color: var(--action); background: transparent; }
-  :root[data-theme="dark"] .btn-ghost { color: var(--link); border-color: var(--link); }
-  @media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) .btn-ghost { color: var(--link); border-color: var(--link); } }
-  .btn-ghost:hover:not(:disabled) { background: var(--action); border-color: var(--action); color: var(--on-action); }
-  .btn-sm { padding: 7px 15px; font-size: 13px; }
+  .btn svg { transition: transform .2s; } .btn:hover svg { transform: translateX(2px); }
+  .btn-primary { background: #fafafa; color: #09090b; }
+  .btn-primary:hover { background: #fff; }
+  .btn-ghost { background: transparent; color: #e4e4e7; }
+  .btn-ghost:hover:not(:disabled) { background: rgba(255, 255, 255, 0.06); }
+  .btn-sm { height: 34px; padding: 0 14px; font-size: 13px; }
   .btn-icon { padding: 0; width: 40px; height: 40px; }
-  .more { color: var(--link); text-decoration: none; font-weight: 500; white-space: nowrap; }
-  .more::after { content: ' ›'; font-size: 1.15em; line-height: 0; transition: margin-left .2s ease; }
-  .more:hover { text-decoration: underline; text-underline-offset: 3px; }
-  .more:hover::after { margin-left: 2px; }
+  .more { color: #e4e4e7; text-decoration: none; font-weight: 500; white-space: nowrap; }
+  .more::after { content: ' →'; transition: margin-left .2s ease; }
+  .more:hover { color: #fff; } .more:hover::after { margin-left: 3px; }
   .more-row { display: flex; gap: 26px; flex-wrap: wrap; align-items: center; }
-  .figures { display: grid; grid-template-columns: repeat(4, 1fr); gap: 0; margin-top: 40px; border-top: 1px solid var(--line); }
-  @media (max-width: 600px) { .figures { grid-template-columns: 1fr 1fr; } }
-  .fig { padding: 16px 16px 0 0; }
-  .fig .n { font-family: var(--serif); font-weight: 600; font-size: 34px; line-height: 1.1; letter-spacing: -0.01em; }
-  .fig .l { font-size: 12px; color: var(--ink-3); margin-top: 4px; line-height: 1.4; }
+  /* the hero's numbers: Faultline's row (a tag, a big number, how to read it) */
+  .figures { position: relative; display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); margin: 72px auto 0; max-width: 1240px; padding: 0 32px;
+    border-top: 1px solid var(--line); }
+  @media (max-width: 860px) { .figures { grid-template-columns: 1fr 1fr; } }
+  @media (max-width: 640px) { .figures { padding: 0 20px; } }
+  .fig { padding: 28px 24px 40px 0; }
+  .fig .t { font: 11px var(--mono); letter-spacing: .12em; text-transform: uppercase; color: var(--ink-3); }
+  .fig .n { font-family: var(--hero); font-weight: 800; font-stretch: 112%; font-variation-settings: "wdth" 112; letter-spacing: -0.04em; font-size: clamp(34px, 4vw, 48px); line-height: 1; margin-top: 14px; color: #fafafa; }
+  .fig .n small { font-size: .45em; color: var(--ink-3); letter-spacing: -0.01em; }
+  .fig .l { font-size: 13.5px; color: #8a8f98; margin-top: 10px; line-height: 1.45; max-width: 24ch; }
 
   .fleet-card { background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); padding: 18px; box-shadow: var(--shadow); }
   .fleet-head { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 12px; gap: 10px; }
@@ -183,16 +180,30 @@
   .fleet-legend { display: flex; gap: 14px; flex-wrap: wrap; margin-top: 12px; font-size: 11.5px; color: var(--ink-3); }
   .fleet-legend i { display: inline-block; width: 9px; height: 9px; border-radius: 2px; margin-right: 6px; vertical-align: -1px; }
 
-  /* ---------- sections ---------- */
-  section.block { padding: 88px 0; border-bottom: 1px solid var(--line); scroll-margin-top: 60px; }
-  @media (max-width: 600px) { section.block { padding: 60px 0; } }
-  .sec-head { display: grid; grid-template-columns: 220px 1fr; gap: 40px; margin-bottom: 40px; }
-  @media (max-width: 880px) { .sec-head { grid-template-columns: 1fr; gap: 10px; } }
-  .sec-num { font-family: var(--mono); font-size: 12px; color: var(--ink-3); letter-spacing: .04em; padding-top: 10px; }
-  .sec-num b { color: var(--ink); font-weight: 700; display: block; margin-top: 2px; font-family: var(--sans); font-size: 14px; letter-spacing: 0; }
-  .sec-head h2 { font-family: var(--serif); font-weight: 600; font-size: clamp(32px, 4.2vw, 48px); line-height: 1.06; letter-spacing: -0.015em; margin: 0 0 14px; }
-  .sec-head p { margin: 0; color: var(--ink-2); max-width: 720px; font-size: 16px; }
-  .panel { background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); box-shadow: var(--shadow); }
+  /* ---------- sections: Faultline's statement headings, hairline seams with "+" marks, cards with a pointer light ---------- */
+  section.block { position: relative; isolation: isolate; padding: 112px 0; scroll-margin-top: 56px; }
+  @media (max-width: 640px) { section.block { padding: 80px 0; } }
+  .sec-head { margin-bottom: 56px; max-width: 980px; }
+  .sec-num { font: 11px var(--mono); letter-spacing: .12em; text-transform: uppercase; color: var(--ink-3); margin: 0 0 18px; }
+  .sec-head h2 { font-family: var(--sans); font-weight: 510; font-size: clamp(1.9rem, 4.2vw, 3rem); line-height: 1.08; letter-spacing: -0.022em; margin: 0; color: #fafafa; }
+  .sec-head h2 .mute { color: #8a8f98; }
+  .rule { position: relative; max-width: 1280px; height: 1px; margin: 0 auto; padding: 0 32px; pointer-events: none; }
+  .rule::before { content: ""; display: block; height: 1px; background: var(--line); }
+  .rule .plus { top: 50%; width: 11px; height: 11px; color: #71717a; }
+  .rule .plus.l { left: 32px; transform: translate(-50%, -50%); } .rule .plus.r { right: 32px; transform: translate(50%, -50%); }
+  @media (max-width: 640px) { .rule { padding: 0 20px; } .rule .plus.l { left: 20px; } .rule .plus.r { right: 20px; } }
+  .marquee { position: relative; overflow: hidden; border-block: 1px solid rgba(255,255,255,.06); padding: 22px 0; margin-top: 8px;
+    -webkit-mask-image: linear-gradient(90deg, transparent, #000 12%, #000 88%, transparent); mask-image: linear-gradient(90deg, transparent, #000 12%, #000 88%, transparent); }
+  .marquee .track { display: flex; width: max-content; animation: marquee 70s linear infinite; }
+  .marquee:hover .track { animation-play-state: paused; }
+  .marquee ul { display: flex; align-items: center; gap: 40px; padding: 0 40px 0 0; margin: 0; list-style: none; flex-shrink: 0; }
+  .marquee li { display: flex; align-items: center; gap: 40px; white-space: nowrap; font: 13px var(--mono); color: #8a8f98; }
+  .marquee li::after { content: ""; width: 4px; height: 4px; border-radius: 50%; background: rgba(255,255,255,.2); }
+  @keyframes marquee { to { transform: translateX(-50%); } }
+  .panel { position: relative; background-color: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); box-shadow: var(--shadow);
+    background-image: radial-gradient(420px circle at var(--mx, -999px) var(--my, -999px), rgba(255,255,255,.06), transparent 45%), linear-gradient(rgba(255,255,255,.025), rgba(255,255,255,.01));
+    transition: border-color .16s var(--ease-quick); }
+  .panel:hover { border-color: rgba(255, 255, 255, 0.14); }
   .pad { padding: 24px; }
   @media (max-width: 600px) { .pad { padding: 18px; } }
   .tag {
@@ -436,14 +447,50 @@
 
   .links-row { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 28px; }
 
-  footer { padding: 48px 0 64px; }
-  footer .wrap { display: flex; justify-content: space-between; gap: 24px; flex-wrap: wrap; align-items: flex-start; }
-  footer p { margin: 0; color: var(--ink-3); font-size: 13px; max-width: 520px; }
-  footer .chips { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 14px; }
-  footer .chips span { font: 600 11.5px var(--sans); color: var(--ink-2); border: 1px solid var(--line); border-radius: 999px; padding: 5px 11px; }
-  footer nav { display: flex; gap: 18px; flex-wrap: wrap; }
-  footer nav a { font-size: 13px; color: var(--ink-2); text-decoration: none; }
-  footer nav a:hover { color: var(--ink); }
+  /* ---------- footer: Faultline's close (run it yourself), site map, and the white panel with the wordmark ---------- */
+  footer { position: relative; isolation: isolate; overflow: hidden; }
+  .close { position: relative; max-width: 920px; margin: 0 auto; padding: 144px 32px 120px; text-align: center; }
+  .close::before { content: ""; position: absolute; left: 0; right: 0; top: 40px; z-index: -1; max-width: 640px; height: 256px; margin: 0 auto; border-radius: 50%;
+    background: radial-gradient(closest-side, rgba(255,255,255,.07), transparent); }
+  .close h2 { font-weight: 510; font-size: clamp(2.2rem, 5.4vw, 4rem); line-height: 1.04; letter-spacing: -0.03em; margin: 0; }
+  .close p { max-width: 30rem; margin: 20px auto 0; font-size: 17px; line-height: 1.6; color: #8a8f98; }
+  .codes { display: grid; gap: 12px; max-width: 600px; margin: 36px auto 0; text-align: left; }
+  .code { border: 1px solid var(--line); border-radius: 14px; background: var(--surface); overflow: hidden; }
+  .code header { display: flex; align-items: center; justify-content: space-between; gap: 10px; padding: 9px 12px 9px 16px; border-bottom: 1px solid var(--line); }
+  .code header b { font: 500 12.5px var(--sans); color: #e4e4e7; } .code header span { font: 11px var(--mono); color: var(--ink-3); margin-left: 8px; }
+  .code header button { font: 500 12px var(--sans); color: #a1a1aa; background: transparent; border: 1px solid rgba(255,255,255,.1); border-radius: 999px; padding: 4px 10px; cursor: pointer; }
+  .code header button:hover { color: #fafafa; background: rgba(255,255,255,.05); }
+  .code pre { margin: 0; padding: 14px 16px; font: 12.5px/1.65 var(--mono); color: #d4d4d8; overflow-x: auto; white-space: pre; }
+  .code pre .p { color: #52525b; user-select: none; }
+  .close .cta-row { justify-content: center; margin-top: 32px; }
+  .sitemap { border-top: 1px solid rgba(255,255,255,.06); }
+  .sitemap .wrap { display: grid; grid-template-columns: 1fr 3fr; align-items: start; gap: 48px; padding-top: 64px; padding-bottom: 64px; max-width: 1200px; }
+  @media (max-width: 860px) { .sitemap .wrap { grid-template-columns: 1fr; } }
+  .sitemap nav { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 40px 24px; }
+  @media (max-width: 640px) { .sitemap nav { grid-template-columns: 1fr 1fr; } }
+  .sitemap h3 { margin: 0; font: 510 13px var(--sans); color: #e4e4e7; }
+  .sitemap ul { list-style: none; margin: 16px 0 0; padding: 0; display: grid; gap: 10px; font-size: 13px; }
+  .sitemap a { color: #8a8f98; text-decoration: none; transition: color .15s; } .sitemap a:hover { color: #fafafa; }
+  .sitemap li span { color: #8a8f98; }
+  .light-close { position: relative; overflow: hidden; margin: 0 12px; border-radius: 40px 40px 0 0; background: #f4f4f2; color: #09090b; }
+  @media (max-width: 640px) { .light-close { margin: 0 8px; border-radius: 28px 28px 0 0; } }
+  .light-close ::selection { background: #0b0b0c; color: #f4f4f2; }
+  .light-close .top { display: flex; flex-wrap: wrap; align-items: flex-end; justify-content: space-between; gap: 24px; max-width: 1200px; margin: 0 auto; padding: 64px 32px 0; }
+  .light-close .top p { margin: 0; max-width: 16ch; font-family: var(--hero); font-weight: 800; font-stretch: 112%; font-variation-settings: "wdth" 112; letter-spacing: -0.045em;
+    font-size: clamp(1.9rem, 4.4vw, 3.4rem); line-height: 1.02; }
+  .light-close .top p span { color: #7a7f87; }
+  .light-close ul { display: flex; flex-wrap: wrap; gap: 8px 24px; list-style: none; margin: 0; padding: 0; font: 510 14px var(--sans); }
+  .light-close ul a { position: relative; color: #18181b; text-decoration: none; }
+  .light-close ul a::after { content: ""; position: absolute; left: 0; bottom: -2px; width: 100%; height: 1.5px; background: #18181b; transform: scaleX(0); transform-origin: left; transition: transform .5s var(--ease-slide); }
+  .light-close ul a:hover::after { transform: scaleX(1); }
+  .wordmark { display: block; width: calc(100% - 32px); height: auto; margin: 32px auto 0; user-select: none; }
+  .wordmark text { font-family: var(--hero); font-weight: 800; font-stretch: 112%; font-variation-settings: "wdth" 112; }
+  .light-close .bottom { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 12px; max-width: 1200px; margin: 0 auto; padding: 20px 32px; border-top: 1px solid rgba(0,0,0,.1); font-size: 12px; color: #52525b; }
+  @supports (animation-timeline: view()) {
+    .light-close { animation: riseIn linear both; animation-timeline: view(); animation-range: entry 0% entry 70%; }
+  }
+  @keyframes riseIn { from { transform: translateY(14%) scale(.96); border-radius: 64px 64px 0 0; } to { transform: none; } }
+  @media (prefers-reduced-motion: reduce) { .light-close, .ring, .marquee .track, .scroll-cue b::after { animation: none !important; } .js .hero h1 > span > span { transform: none; animation: none; } }
 
   .js .reveal { opacity: 0; transform: translateY(12px); transition: opacity .6s ease, transform .6s ease; }
   .js .reveal.in { opacity: 1; transform: none; }
@@ -456,76 +503,78 @@
 
 <header class="nav">
   <div class="wrap">
-    <a class="brand" href="#top" aria-label="VM Mitigation, back to top">
-      <span class="brand-mark" aria-hidden="true"><i></i><i></i><i></i><i></i></span>
-      VM Mitigation
-    </a>
+    <a class="brand" href="#top" aria-label="VM Mitigation, back to top"><svg viewBox="0 0 32 32" fill="currentColor" aria-hidden="true"><rect x="4" y="4" width="11" height="11" rx="3"/><rect x="17" y="4" width="11" height="11" rx="3" opacity=".5"/><rect x="4" y="17" width="11" height="11" rx="3" opacity=".5"/><rect x="19" y="19" width="11" height="11" rx="3" fill="var(--ember)"/></svg><span>VM Mitigation</span></a>
     <nav class="nav-links" id="navLinks" aria-label="Sections">
       <a href="#how">How it works</a>
       <a href="#demo">Live model</a>
       <a href="#findings">v1 results</a>
       <a href="#comparison">Models</a>
-      <a href="#research">Research<span class="new">V2</span></a>
+      <a href="#research">Research<span class="new">v2</span></a>
     </nav>
-    <button class="icon-btn menu-btn" id="menuBtn" aria-label="Open menu" aria-expanded="false" aria-controls="navLinks">
-      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="4" y1="7" x2="20" y2="7"/><line x1="4" y1="12" x2="20" y2="12"/><line x1="4" y1="17" x2="20" y2="17"/></svg>
-    </button>
-    <button class="icon-btn" id="themeBtn" aria-label="Switch colour theme" title="Switch colour theme">
-      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="4.5"/><path d="M12 2v2.5M12 19.5V22M4.2 4.2l1.8 1.8M18 18l1.8 1.8M2 12h2.5M19.5 12H22M4.2 19.8 6 18M18 6l1.8-1.8"/></svg>
-    </button>
-    <a class="icon-btn" href="https://github.com/Rag2102/ccproject" target="_blank" rel="noopener">
-      <svg width="15" height="15" viewBox="0 0 16 16" fill="currentColor"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.01 8.01 0 0 0 16 8c0-4.42-3.58-8-8-8z"/></svg>
-      <span class="gh-label">GitHub</span>
-    </a>
+    <div class="nav-right">
+      <a class="status-pill" href="#plan" title="Week 18 of the 60-week plan is done"><i></i><span>v2 · Week 18 of 60</span></a>
+      <a class="icon-btn" href="https://github.com/Rag2102/ccproject" target="_blank" rel="noopener" aria-label="Repository on GitHub"><svg width="15" height="15" viewBox="0 0 16 16" fill="currentColor" aria-hidden="true"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.01 8.01 0 0 0 16 8c0-4.42-3.58-8-8-8z"/></svg><span class="gh-label">GitHub</span></a>
+      <button class="icon-btn menu-btn" id="menuBtn" aria-label="Open menu" aria-expanded="false" aria-controls="navLinks">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><line x1="4" y1="7" x2="20" y2="7"/><line x1="4" y1="12" x2="20" y2="12"/><line x1="4" y1="17" x2="20" y2="17"/></svg>
+      </button>
+    </div>
   </div>
 </header>
 
 <main id="top">
 
 <!-- ======================================================= hero -->
-<section class="hero">
+<section class="hero" aria-labelledby="hero-title">
+  <div class="aurora" aria-hidden="true"></div>
+  <div class="beam" aria-hidden="true"></div>
+  <canvas class="contours" id="contours" aria-hidden="true"></canvas>
+  <div class="frame" aria-hidden="true"><span class="plus l"></span><span class="plus r"></span><div class="scroll-cue"><span>Scroll to explore</span><b></b></div></div>
   <div class="wrap">
     <div>
-      <span class="eyebrow"><span class="pulse"></span>Live model · v2 research in progress</span>
-      <h1>Move the <em>right</em> VMs before the hardware fails.</h1>
-      <p class="lede">When a server is likely to fail, a cloud can live-migrate its VMs away, but every migration
-        costs bandwidth and a short pause, and the budget is finite. This project asks which VMs are worth moving:
-        a policy that weighs failure probability, time to failure, workload criticality and migration cost,
-        against the industry habit of moving anything above a probability threshold.</p>
+      <a class="ring" href="#research"><span>New: avoiding risky hosts beat every migration rule · exploratory <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><polyline points="9 6 15 12 9 18"/></svg></span></a>
+      <h1 id="hero-title"><span><span>Move the right VMs</span></span><span><span class="gradient-text">before they fail.</span></span></h1>
+      <p class="lede">A cloud can live-migrate VMs off a server that is about to fail, but every move costs bandwidth and a pause, and the budget is finite.
+        This project asks <b>which VMs are worth moving</b>: a policy that weighs failure probability, time to failure, criticality and migration cost,
+        against the habit of moving anything above a probability threshold.</p>
       <div class="cta-row">
-        <a class="btn btn-primary" href="#demo">Try the live model
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg></a>
+        <a class="btn btn-primary" href="#demo">Try the live model <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg></a>
         <a class="btn btn-ghost" href="#research">What v2 has found</a>
       </div>
-      <div class="figures">
-        <div class="fig"><div class="n">2.0M+</div><div class="l">real VMs, Azure public trace</div></div>
-        <div class="fig"><div class="n">744M</div><div class="l">drive-days of Backblaze telemetry, 2013–2026</div></div>
-        <div class="fig"><div class="n">3</div><div class="l">Google 2019 cluster cells measured</div></div>
-        <div class="fig"><div class="n">18<span style="font-size:18px;color:var(--ink-3)">/60</span></div><div class="l">weeks of the v2 plan done; code ready to Week 28</div></div>
+    </div>
+    <div class="hero-art">
+      <div class="cube-box" id="cubeBox" role="button" tabindex="0" aria-pressed="false"
+           aria-label="Click the cube: a black cube of 27 blocks, the 60-week plan so far. Press to split it into the project's claims graph and watch which claims hold.">
+        <div class="cube-mask"><canvas id="planCube"></canvas></div>
+        <div class="cube-label" data-k="rec" aria-hidden="true">W3 · a counting artifact</div>
+        <div class="cube-label" data-k="email" aria-hidden="true">option to wait · refuted</div>
+        <div class="cube-label ember" data-k="pay" aria-hidden="true">G1 · ρ ≈ 0 measured</div>
+        <div class="cube-label check" data-k="check" aria-hidden="true">W18 benchmark</div>
+        <div class="cube-label hover" data-k="hover" aria-hidden="true"></div>
+        <p class="cube-hint" id="cubeHint" aria-hidden="true"><i></i><span>Click the cube</span></p>
       </div>
     </div>
-    <div class="cube-box" id="cubeBox" role="button" tabindex="0" aria-pressed="false"
-         aria-label="Click the cube: a black cube of 27 blocks, the 60-week plan so far. Press to split it into the project's claims graph and watch which claims hold.">
-      <div class="cube-mask"><canvas id="planCube"></canvas></div>
-      <div class="cube-label" data-k="rec" aria-hidden="true">W3 · a counting artifact</div>
-      <div class="cube-label" data-k="email" aria-hidden="true">option to wait · refuted</div>
-      <div class="cube-label ember" data-k="pay" aria-hidden="true">G1 · ρ ≈ 0 measured</div>
-      <div class="cube-label check" data-k="check" aria-hidden="true">W18 benchmark</div>
-      <div class="cube-label hover" data-k="hover" aria-hidden="true"></div>
-      <p class="cube-hint" id="cubeHint" aria-hidden="true"><i></i><span>Click the cube</span></p>
-    </div>
+  </div>
+  <div class="figures">
+    <div class="fig"><div class="t">Data</div><div class="n">2.0M+</div><div class="l">real VMs in the Azure public trace</div></div>
+    <div class="fig"><div class="t">Data</div><div class="n">744M</div><div class="l">drive-days of Backblaze telemetry, 2013–2026</div></div>
+    <div class="fig"><div class="t">Measured</div><div class="n">3</div><div class="l">Google 2019 cells: criticality and host risk essentially uncorrelated</div></div>
+    <div class="fig"><div class="t">Progress</div><div class="n">18<small>/60</small></div><div class="l">weeks of the v2 plan done; code ready well beyond</div></div>
   </div>
 </section>
+
+<div class="marquee" aria-label="Methods and data in use">
+  <div class="track">
+    <ul><li>Backblaze SMART telemetry</li><li>Azure VM trace</li><li>Google Borg 2019</li><li>calibrated HistGBM</li><li>survival curves</li><li>common random numbers</li><li>Holm over 30 comparisons</li><li>BCa intervals</li><li>pre-registered protocol</li><li>oracle predictor</li><li>budget-aware ranking</li><li>live-migration cost model</li><li>AWS Lambda</li><li>Step Functions</li></ul>
+    <ul aria-hidden="true"><li>Backblaze SMART telemetry</li><li>Azure VM trace</li><li>Google Borg 2019</li><li>calibrated HistGBM</li><li>survival curves</li><li>common random numbers</li><li>Holm over 30 comparisons</li><li>BCa intervals</li><li>pre-registered protocol</li><li>oracle predictor</li><li>budget-aware ranking</li><li>live-migration cost model</li><li>AWS Lambda</li><li>Step Functions</li></ul>
+  </div>
+</div>
 
 <!-- ======================================================= how -->
 <section class="block" id="how">
   <div class="wrap">
     <div class="sec-head reveal">
-      <div class="sec-num">01<b>How it works</b></div>
-      <div>
-        <h2>Four signals, one decision.</h2>
-        <p>Each signal comes from a model or a real dataset. The cost-sensitive policy uses all four; the threshold baseline uses only the first, which is the comparison this project is about.</p>
-      </div>
+      <p class="sec-num">01 · How it works</p>
+      <h2>Four signals, one decision. <span class="mute">Each signal comes from a model or a real dataset. The cost-sensitive policy uses all four; the threshold baseline uses only the first, which is the comparison this project is about.</span></h2>
     </div>
     <div class="panel pipeline reveal">
       <div class="step">
@@ -560,15 +609,14 @@
   </div>
 </section>
 
+<div class="rule" aria-hidden="true"><span class="plus l"></span><span class="plus r"></span></div>
+
 <!-- ======================================================= demo -->
 <section class="block" id="demo">
   <div class="wrap">
     <div class="sec-head reveal">
-      <div class="sec-num">02<b>Live model</b></div>
-      <div>
-        <h2>Ask the model about one VM.</h2>
-        <p>Every change runs a real forward pass on the server: the v1 course-project models, or the v2 ensemble trained on SMART telemetry (the model chosen in ADR-006). Both policies always see exactly the same inputs.</p>
-      </div>
+      <p class="sec-num">02 · Live model</p>
+      <h2>Ask the model about one VM. <span class="mute">Every change runs a real forward pass on the server: the v1 course-project models, or the v2 ensemble trained on SMART telemetry (the model chosen in ADR-006). Both policies always see exactly the same inputs.</span></h2>
     </div>
     <div class="demo">
       <div class="panel pad reveal" id="controls">
@@ -706,15 +754,14 @@
   </div>
 </section>
 
+<div class="rule" aria-hidden="true"><span class="plus l"></span><span class="plus r"></span></div>
+
 <!-- ======================================================= v1 findings -->
 <section class="block" id="findings">
   <div class="wrap">
     <div class="sec-head reveal">
-      <div class="sec-num">03<b>v1 results</b></div>
-      <div>
-        <h2>What the course project found.</h2>
-        <p>A full historical replay over the Backblaze and Azure datasets, at a matched migration budget. These are the frozen v1 numbers (tag <span class="mono">v1.0-course</span>); the box below says what v2 learned about them.</p>
-      </div>
+      <p class="sec-num">03 · v1 results</p>
+      <h2>What the course project found. <span class="mute">A full historical replay over the Backblaze and Azure datasets, at a matched migration budget. These are the frozen v1 numbers (tag <span class="mono">v1.0-course</span>); the box below says what v2 learned about them.</span></h2>
     </div>
     <div class="two">
       <div class="panel pad reveal">
@@ -747,15 +794,14 @@
   </div>
 </section>
 
+<div class="rule" aria-hidden="true"><span class="plus l"></span><span class="plus r"></span></div>
+
 <!-- ======================================================= model comparison -->
 <section class="block" id="comparison">
   <div class="wrap">
     <div class="sec-head reveal">
-      <div class="sec-num">04<b>Models</b></div>
-      <div>
-        <h2>Does a deep attention model beat a calibrated tree model?</h2>
-        <p>Both scored on the same held-out test rows. The gradient-boosted hazard model wins on every metric, most clearly on calibration, which is what a decision rule needs from a probability.</p>
-      </div>
+      <p class="sec-num">04 · Models</p>
+      <h2>Does a deep attention model beat a calibrated tree model? <span class="mute">Both scored on the same held-out test rows. The gradient-boosted hazard model wins on every metric, most clearly on calibration, which is what a decision rule needs from a probability.</span></h2>
     </div>
     <div class="panel pad reveal">
       <div class="table-scroll">
@@ -772,15 +818,14 @@
   </div>
 </section>
 
+<div class="rule" aria-hidden="true"><span class="plus l"></span><span class="plus r"></span></div>
+
 <!-- ======================================================= v2 research -->
 <section class="block" id="research">
   <div class="wrap">
     <div class="sec-head reveal">
-      <div class="sec-num">05<b>v2 research</b></div>
-      <div>
-        <h2>Turning a course project into research.</h2>
-        <p>A 60-week plan (Oct 2026 to Nov 2027) asks whether the idea holds up under real data, a validated simulator, theory and pre-registered statistics. Everything below is work in progress; each number carries where it comes from.</p>
-      </div>
+      <p class="sec-num">05 · v2 research</p>
+      <h2>Turning a course project into research. <span class="mute">A 60-week plan (Oct 2026 to Nov 2027) asks whether the idea holds up under real data, a validated simulator, theory and pre-registered statistics. Everything below is work in progress; each number carries where it comes from.</span></h2>
     </div>
 
     <div class="panel pad reveal">
@@ -940,19 +985,48 @@
 
 </main>
 
+<div class="rule" aria-hidden="true"><span class="plus l"></span><span class="plus r"></span></div>
+
 <footer>
-  <div class="wrap">
-    <div>
-      <a class="brand" href="#top"><span class="brand-mark" aria-hidden="true"><i></i><i></i><i></i><i></i></span>VM Mitigation</a>
-      <p style="margin-top:12px">Started as a Cloud Computing course project; now a research programme. The same prediction code runs here on Render and on a serverless AWS stack. Every number on this page comes from real datasets, trained models or the cited documents.</p>
-      <div class="chips"><span>Python</span><span>scikit-learn</span><span>NumPy</span><span>DuckDB</span><span>Flask</span><span>AWS Lambda</span><span>Step Functions</span><span>Terraform</span><span>Chart.js</span></div>
+  <section class="close" aria-labelledby="close-title">
+    <h2 id="close-title"><span class="gradient-text">Don't trust this page.</span><br><span class="gradient-text">Rerun it.</span></h2>
+    <p>The v2 numbers are generated from committed results, never typed in. A reduced version of every main figure and table reruns in minutes on a laptop.</p>
+    <div class="codes">
+      <div class="code"><header><div><b>Reproduce, small</b><span>minutes on a laptop</span></div><button type="button" data-copy>Copy</button></header><pre><span class="p">$ </span>git clone -b v2-research https://github.com/Rag2102/ccproject.git
+<span class="p">$ </span>cd ccproject
+<span class="p">$ </span>python3 -m venv .venv && .venv/bin/pip install -r requirements.txt
+<span class="p">$ </span>make reproduce-small</pre></div>
+      <div class="code"><header><div><b>Run this site</b><span>localhost:5000</span></div><button type="button" data-copy>Copy</button></header><pre><span class="p">$ </span>cd webapp && pip install flask
+<span class="p">$ </span>python3 app.py</pre></div>
     </div>
-    <nav aria-label="Footer">
-      <a href="https://github.com/Rag2102/ccproject" target="_blank" rel="noopener">Repository</a>
-      <a href="https://github.com/Rag2102/ccproject/blob/main/docs/cloud_architecture.md" target="_blank" rel="noopener">AWS architecture</a>
-      <a href="https://github.com/Rag2102/ccproject/blob/main/docs/VM_Mitigation_Policy_Report.docx" target="_blank" rel="noopener">v1 report</a>
-      <a href="#top">Back to top ↑</a>
-    </nav>
+    <div class="cta-row">
+      <a class="btn btn-primary" href="https://github.com/Rag2102/ccproject/blob/main/docs/v2/PROTOCOL.md" target="_blank" rel="noopener">Read the pre-registered protocol <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg></a>
+      <a class="btn btn-ghost" href="https://github.com/Rag2102/ccproject" target="_blank" rel="noopener">Source</a>
+    </div>
+  </section>
+
+  <div class="sitemap">
+    <div class="wrap">
+      <a class="brand" href="#top"><svg viewBox="0 0 32 32" fill="currentColor" aria-hidden="true"><rect x="4" y="4" width="11" height="11" rx="3"/><rect x="17" y="4" width="11" height="11" rx="3" opacity=".5"/><rect x="4" y="17" width="11" height="11" rx="3" opacity=".5"/><rect x="19" y="19" width="11" height="11" rx="3" fill="var(--ember)"/></svg><span>VM Mitigation</span></a>
+      <nav aria-label="Site">
+        <div><h3>On this page</h3><ul><li><a href="#how">How it works</a></li><li><a href="#demo">Live model</a></li><li><a href="#findings">v1 results</a></li><li><a href="#comparison">Models</a></li><li><a href="#research">Research v2</a></li></ul></div>
+        <div><h3>Evidence</h3><ul><li><a href="https://github.com/Rag2102/ccproject/blob/main/docs/v2/THEORY.md" target="_blank" rel="noopener">Theory</a></li><li><a href="https://github.com/Rag2102/ccproject/blob/main/docs/v2/PROTOCOL.md" target="_blank" rel="noopener">Protocol</a></li><li><a href="https://github.com/Rag2102/ccproject/blob/main/docs/v2/LOG.md" target="_blank" rel="noopener">Weekly log</a></li><li><a href="https://github.com/Rag2102/ccproject/tree/main/docs/v2/DECISIONS" target="_blank" rel="noopener">Decision records</a></li></ul></div>
+        <div><h3>Data</h3><ul><li><a href="https://www.backblaze.com/cloud-storage/resources/hard-drive-test-data" target="_blank" rel="noopener">Backblaze drive stats</a></li><li><a href="https://github.com/Azure/AzurePublicDataset" target="_blank" rel="noopener">Azure public dataset</a></li><li><a href="https://github.com/google/cluster-data" target="_blank" rel="noopener">Google cluster data 2019</a></li></ul></div>
+        <div><h3>Repo</h3><ul><li><a href="https://github.com/Rag2102/ccproject" target="_blank" rel="noopener">Repository</a></li><li><a href="https://github.com/Rag2102/ccproject/blob/main/docs/cloud_architecture.md" target="_blank" rel="noopener">AWS architecture</a></li><li><a href="https://github.com/Rag2102/ccproject/blob/main/docs/VM_Mitigation_Policy_Report.docx" target="_blank" rel="noopener">v1 report</a></li><li><a href="#top">Back to top ↑</a></li></ul></div>
+      </nav>
+    </div>
+  </div>
+
+  <div class="light-close">
+    <div class="top">
+      <p>Move the right VMs,<br><span>before they fail.</span></p>
+      <ul><li><a href="#demo">Live model</a></li><li><a href="#research">Research</a></li><li><a href="#plan">The plan</a></li><li><a href="https://github.com/Rag2102/ccproject" target="_blank" rel="noopener">GitHub</a></li></ul>
+    </div>
+    <svg class="wordmark" viewBox="0 0 1000 186" aria-hidden="true" focusable="false">
+      <defs><linearGradient id="wmFill" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#09090b"/><stop offset="1" stop-color="#71717a"/></linearGradient></defs>
+      <text x="0" y="138" textLength="1000" lengthAdjust="spacingAndGlyphs" font-size="176" fill="url(#wmFill)">VM Mitigation</text>
+    </svg>
+    <div class="bottom"><span>Started as a Cloud Computing course project; now a 60-week research programme.</span><span>Public data only · Python, scikit-learn, Flask, AWS Lambda</span></div>
   </div>
 </footer>
 
@@ -964,19 +1038,8 @@ const CORR = {{ corr_sweep | tojson }};
 const $ = (id) => document.getElementById(id);
 const css = (v) => getComputedStyle(document.documentElement).getPropertyValue(v).trim();
 
-/* ---------------- theme + nav ---------------- */
-function currentTheme() {
-  const set = document.documentElement.getAttribute('data-theme');
-  if (set) return set;
-  return matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
-}
-$('themeBtn').addEventListener('click', () => {
-  const next = currentTheme() === 'dark' ? 'light' : 'dark';
-  document.documentElement.setAttribute('data-theme', next);
-  try { localStorage.setItem('vm-theme', next); } catch (e) {}
-  redrawCharts(); drawFleet(true);
-});
-matchMedia('(prefers-color-scheme: dark)').addEventListener('change', () => { redrawCharts(); drawFleet(true); });
+/* ---------------- nav ---------------- */
+function currentTheme() { return 'dark'; }   // the page is dark only, like Faultline
 $('menuBtn').addEventListener('click', () => {
   const open = $('navLinks').classList.toggle('open');
   $('menuBtn').setAttribute('aria-expanded', open);
@@ -997,6 +1060,99 @@ if ('IntersectionObserver' in window) {
   const rev = new IntersectionObserver((es) => es.forEach(e => { if (e.isIntersecting) { e.target.classList.add('in'); rev.unobserve(e.target); } }), { rootMargin: '0px 0px -8% 0px' });
   document.querySelectorAll('.reveal').forEach(el => rev.observe(el));
 } else document.querySelectorAll('.reveal').forEach(el => el.classList.add('in'));
+
+/* ---------------- Faultline touches: hero contours, a light on cards under the pointer, copy buttons ---------------- */
+// Hero background: slow-moving contour lines, like a geological map of a fault. A noise field is traced with
+// marching squares a few times a second; the pointer raises a gentle ridge where it is.
+const F2 = 0.5 * (Math.sqrt(3) - 1), G2 = (3 - Math.sqrt(3)) / 6;
+const GRAD = [[1, 1], [-1, 1], [1, -1], [-1, -1], [1, 0], [-1, 0], [0, 1], [0, -1]];
+const perm = new Uint8Array(512);
+{ const p = [...Array(256).keys()]; let s = 7; for (let i = 255; i > 0; i--) { s = (s * 16807) % 2147483647; const j = s % (i + 1); [p[i], p[j]] = [p[j], p[i]]; } for (let i = 0; i < 512; i++) perm[i] = p[i & 255]; }
+
+// 2D simplex noise (the standard skew/unskew construction), in [-1, 1]
+function noise(x, y) {
+  const s = (x + y) * F2, i = Math.floor(x + s), j = Math.floor(y + s), t = (i + j) * G2;
+  const x0 = x - (i - t), y0 = y - (j - t);
+  const i1 = x0 > y0 ? 1 : 0, j1 = 1 - i1;
+  const x1 = x0 - i1 + G2, y1 = y0 - j1 + G2, x2 = x0 - 1 + 2 * G2, y2 = y0 - 1 + 2 * G2;
+  const ii = i & 255, jj = j & 255;
+  let n = 0;
+  for (const [dx, dy, gi] of [[x0, y0, perm[ii + perm[jj]]], [x1, y1, perm[ii + i1 + perm[jj + j1]]], [x2, y2, perm[ii + 1 + perm[jj + 1]]]]) {
+    let tt = 0.5 - dx * dx - dy * dy;
+    if (tt > 0) { tt *= tt; const g = GRAD[gi & 7]; n += tt * tt * (g[0] * dx + g[1] * dy); }
+  }
+  return 70 * n;
+}
+
+function mountContours(canvas) {
+  const ctx = canvas.getContext("2d");
+  let W = 0, H = 0, cols = 0, rows = 0, field = null, mx = -1e4, my = -1e4;
+  const CELL = 18, LEVELS = [-0.55, -0.35, -0.15, 0.05, 0.25, 0.45, 0.65];
+  const size = () => {
+    const dpr = Math.min(2, devicePixelRatio || 1);
+    W = canvas.clientWidth; H = canvas.clientHeight;
+    canvas.width = W * dpr; canvas.height = H * dpr;
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    cols = Math.ceil(W / CELL) + 1; rows = Math.ceil(H / CELL) + 1;
+    field = new Float32Array(cols * rows);
+  };
+  new ResizeObserver(size).observe(canvas);
+  size();
+  addEventListener("pointermove", (e) => { const r = canvas.getBoundingClientRect(); mx = e.clientX - r.left; my = e.clientY - r.top; }, { passive: true });
+
+  let visible = true, last = 0;
+  new IntersectionObserver(([x]) => { visible = x.isIntersecting; }).observe(canvas);
+  const reduce = matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+  const draw = (now) => {
+    requestAnimationFrame(draw);
+    if (!visible || now - last < 50) return;                 // ~20 fps is plenty for drifting lines
+    last = now;
+    const t = reduce ? 0 : now / 26000;
+    for (let j = 0; j < rows; j++) for (let i = 0; i < cols; i++) {
+      const x = i * CELL, y = j * CELL;
+      const d = Math.hypot(x - mx, y - my);
+      field[j * cols + i] = noise(x / 520 + t, y / 520 - t * 0.6) * 0.8 + noise(x / 190 - t, y / 190) * 0.22 + Math.exp(-(d * d) / 26000) * 0.45;
+    }
+    ctx.clearRect(0, 0, W, H);
+    LEVELS.forEach((lv, li) => {
+      ctx.beginPath();
+      for (let j = 0; j < rows - 1; j++) for (let i = 0; i < cols - 1; i++) {
+        const a = field[j * cols + i], b = field[j * cols + i + 1], c = field[(j + 1) * cols + i + 1], d = field[(j + 1) * cols + i];
+        const code = (a > lv) | ((b > lv) << 1) | ((c > lv) << 2) | ((d > lv) << 3);
+        if (code === 0 || code === 15) continue;
+        const x = i * CELL, y = j * CELL;
+        const top = [x + CELL * (lv - a) / (b - a), y], right = [x + CELL, y + CELL * (lv - b) / (c - b)];
+        const bot = [x + CELL * (lv - d) / (c - d), y + CELL], left = [x, y + CELL * (lv - a) / (d - a)];
+        const seg = (p, q) => { ctx.moveTo(p[0], p[1]); ctx.lineTo(q[0], q[1]); };
+        switch (code) {
+          case 1: case 14: seg(left, top); break;
+          case 2: case 13: seg(top, right); break;
+          case 3: case 12: seg(left, right); break;
+          case 4: case 11: seg(right, bot); break;
+          case 6: case 9: seg(top, bot); break;
+          case 7: case 8: seg(left, bot); break;
+          case 5: seg(left, top); seg(right, bot); break;
+          case 10: seg(top, right); seg(left, bot); break;
+        }
+      }
+      ctx.strokeStyle = li === 3 ? "rgba(255,107,74,0.22)" : `rgba(255,255,255,${0.045 + (li % 2) * 0.02})`;
+      ctx.lineWidth = li === 3 ? 1.2 : 1;
+      ctx.stroke();
+    });
+  };
+  requestAnimationFrame(draw);
+}
+mountContours($('contours'));
+document.querySelectorAll('.panel, .fcard').forEach((el) => el.addEventListener('pointermove', (e) => {
+  const r = el.getBoundingClientRect();
+  el.style.setProperty('--mx', (e.clientX - r.left) + 'px'); el.style.setProperty('--my', (e.clientY - r.top) + 'px');
+}));
+document.querySelectorAll('[data-copy]').forEach((b) => b.addEventListener('click', async () => {
+  const text = b.closest('.code').querySelector('pre').innerText.replace(/^\$ /gm, '');
+  try { await navigator.clipboard.writeText(text); b.textContent = 'Copied'; } catch (e) { b.textContent = 'Select and copy'; }
+  setTimeout(() => { b.textContent = 'Copy'; }, 1600);
+}));
 
 /* ---------------- hero fleet ---------------- */
 const COLS = 12, ROWS = 8, W = 360, H = 240, GAP = 4;
@@ -1266,7 +1422,7 @@ function updateSandbox() {
 ['sbSy', 'sbQ', 'sbLam'].forEach(id => $(id).addEventListener('input', updateSandbox));
 
 /* ---------------- charts ---------------- */
-const FONT = "'Nunito', system-ui, sans-serif", FONT_NUM = "'Fredoka', 'Nunito', sans-serif";
+const FONT = "'Inter', system-ui, sans-serif", FONT_NUM = "'Mona Sans', 'Inter', sans-serif";
 function rgba(hex, a) {               // css colour (#rrggbb) with alpha
   const h = hex.replace('#', ''); const n = parseInt(h.length === 3 ? h.split('').map(c => c + c).join('') : h, 16);
   return `rgba(${(n >> 16) & 255},${(n >> 8) & 255},${n & 255},${a})`;
@@ -1429,8 +1585,6 @@ function drawW18() {
     `<input type="radio" name="w18r" id="w18_${r}" value="${r}"${r === w18Reg ? ' checked' : ''}><label for="w18_${r}">${r}<small>${W18_REG[r].split(' · ')[1]}</small></label>`).join('');
   document.querySelectorAll('input[name=w18r]').forEach(el => el.addEventListener('change', () => { w18Reg = el.value; drawW18(); }));
   drawW18();
-  $('themeBtn').addEventListener('click', drawW18);
-  matchMedia('(prefers-color-scheme: dark)').addEventListener('change', drawW18);
 })();
 
 /* ---------------- timeline ---------------- */
