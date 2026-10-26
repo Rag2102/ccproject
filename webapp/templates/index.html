@@ -406,44 +406,33 @@
   .phase b { font-size: 13.5px; font-weight: 600; display: block; }
   .phase span { font-size: 12px; color: var(--ink-3); }
   .phase .w { font-family: var(--mono); font-size: 11px; color: var(--ink-3); }
-  /* the plan as a cube: one block per week, five layers of twelve */
+  /* the plan cube: the Faultline hero cube (27 glossy blocks that split into a graph), told as this project's process */
   .plan3d { display: grid; grid-template-columns: minmax(0, 1.25fr) minmax(0, 1fr); gap: 8px 28px; align-items: stretch; margin-top: 8px; }
   .plan3d .phases { grid-template-columns: 1fr; margin-top: 0; align-content: start; }
-  .plan3d .phase { padding: 8px 6px 8px 0; cursor: default; transition: background .2s; border-radius: 10px; }
-  .plan3d .phase:hover, .plan3d .phase:focus-visible, .plan3d .phase.lit { background: var(--surface-2); }
-  .cube-box { position: relative; min-height: 460px; display: none; }
+  .plan3d .phase { padding: 8px 6px 8px 0; }
+  .cube-box { position: relative; min-height: 480px; display: none; cursor: pointer; touch-action: pan-y; user-select: none; -webkit-user-select: none;
+    border-radius: 24px; outline: none; }
+  .cube-box:focus-visible { box-shadow: 0 0 0 2px #38bdf8; }
   .has-cube .cube-box { display: block; }
   .has-cube .tl-track, .has-cube .tl-scale, .has-cube #planSub { display: none; }
   .cube-only { display: none; } .has-cube .cube-only { display: block; }
-  #planCube { position: absolute; inset: 0 0 44px 0; width: 100%; height: calc(100% - 44px); display: block; cursor: grab; touch-action: pan-y; }
-  #planCube:active { cursor: grabbing; }
-  .cube-tip { position: absolute; z-index: 3; width: 260px; padding: 12px 14px; border-radius: 14px; pointer-events: none;
-    background: color-mix(in srgb, var(--surface) 92%, transparent); border: 1px solid var(--line-2); box-shadow: var(--shadow);
-    backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); font-size: 12.5px; }
-  .cube-tip .wk { display: flex; justify-content: space-between; gap: 8px; font: 600 11px var(--mono); color: var(--ink-3); }
-  .cube-tip b { display: block; margin: 5px 0 6px; font-size: 14px; font-weight: 700; line-height: 1.3; color: var(--ink); }
-  .cube-tip p { margin: 6px 0 0; color: var(--ink-2); line-height: 1.45; }
-  .cube-tip .st { display: inline-flex; align-items: center; gap: 6px; font: 600 11px var(--mono); padding: 3px 8px; border-radius: 99px; background: var(--bg-2); color: var(--ink-2); }
-  .cube-tip .st i { width: 7px; height: 7px; border-radius: 50%; background: var(--ink-3); }
-  .cube-tip .st.done i { background: var(--cs); } .cube-tip .st.prep i { background: var(--amber); }
-  .cube-tip .gate { color: var(--th); }
-  .cube-tags { position: absolute; inset: 0; pointer-events: none; transition: opacity .4s; opacity: 0; overflow: hidden; }
-  .cube-tags.on { opacity: 1; }
-  .cube-tags span { position: absolute; left: 0; top: 0; padding: 2px 7px; border-radius: 6px; font: 600 10.5px var(--mono); letter-spacing: .02em;
-    background: color-mix(in srgb, var(--surface) 85%, transparent); border: 1px solid var(--line-2); color: var(--ink-2); white-space: nowrap; }
-  .cube-tags span.gate { color: var(--th); border-color: color-mix(in srgb, var(--th) 40%, transparent); }
-  .cube-bar { position: absolute; left: 0; right: 0; bottom: 0; display: flex; align-items: center; justify-content: space-between; gap: 10px; flex-wrap: wrap; pointer-events: none; }
-  .cube-bar > * { pointer-events: auto; }
-  .cube-hint { display: flex; align-items: center; gap: 8px; margin: 0; font: 500 11px var(--mono); letter-spacing: .08em; text-transform: uppercase; color: var(--ink-3); }
-  .cube-hint i { width: 6px; height: 6px; border-radius: 50%; background: var(--amber); animation: blink 1.6s infinite; }
-  .cube-btn { font: 600 12px var(--sans); padding: 7px 12px; border-radius: 99px; border: 1px solid var(--line-2); background: var(--surface); color: var(--ink); cursor: pointer; }
-  .cube-btn:hover { border-color: var(--cs); }
-  .cube-key { display: flex; flex-wrap: wrap; gap: 6px 14px; margin: 10px 0 0; font-size: 12px; color: var(--ink-3); }
-  .cube-key span { display: inline-flex; align-items: center; gap: 6px; }
-  .cube-key i { width: 11px; height: 11px; border-radius: 3px; background: var(--bg-2); border: 1px solid var(--line-2); }
-  .cube-key i.done { background: var(--cs); border-color: transparent; } .cube-key i.prep { background: var(--amber); border-color: transparent; }
-  .cube-key i.now { background: transparent; border: 2px solid var(--ink); }
-  @media (max-width: 880px) { .plan3d { grid-template-columns: 1fr; } .cube-box { min-height: 380px; } }
+  /* the open graph fades out towards the edges instead of being cut off by the canvas */
+  .cube-mask { position: absolute; inset: 0; -webkit-mask-image: radial-gradient(ellipse 70% 75% at 50% 50%, #000 55%, transparent 100%);
+    mask-image: radial-gradient(ellipse 70% 75% at 50% 50%, #000 55%, transparent 100%); }
+  #planCube { width: 100%; height: 100%; display: block; }
+  .cube-label { position: absolute; left: 0; top: 0; white-space: nowrap; pointer-events: none; opacity: 0; transition: opacity .5s;
+    border-radius: 5px; border: 1px solid rgba(255,255,255,.15); background: rgba(0,0,0,.7); padding: 2px 6px;
+    font: 10.5px var(--mono); color: #a1a1aa; backdrop-filter: blur(4px); -webkit-backdrop-filter: blur(4px); }
+  .cube-label.ember { border-color: rgba(255,107,44,.5); color: #ffb08a; }
+  .cube-label.hover { border-color: rgba(255,255,255,.25); color: #f4f4f5; }
+  .cube-label.check { color: #d4d4d8; }
+  .cube-label.check[data-state="proved"] { border-color: rgba(94,240,180,.5); color: #a9f7d6; }
+  .cube-hint { position: absolute; left: 0; right: 0; bottom: 12px; margin: 0; display: flex; align-items: center; justify-content: center; gap: 8px;
+    pointer-events: none; font: 11px var(--mono); text-transform: uppercase; letter-spacing: .22em; color: #71717a; }
+  .cube-hint i { width: 6px; height: 6px; border-radius: 50%; background: var(--ink); animation: cubePulse 2s cubic-bezier(.4,0,.6,1) infinite; }
+  .cube-hint.open i { background: #71717a; animation: none; }
+  @keyframes cubePulse { 50% { opacity: .5; } }
+  @media (max-width: 880px) { .plan3d { grid-template-columns: 1fr; } .cube-box { min-height: 400px; } }
   @media (prefers-reduced-motion: reduce) { .cube-hint i { animation: none; } }
 
   .links-row { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 28px; }
@@ -912,34 +901,34 @@
     </div>
 
     <div class="panel pad timeline reveal" id="plan">
-      <div class="panel-head"><div><h3>The 60-week plan</h3><p id="planSub">Each square is a week: done in blue; code written and tested, runs or reviews pending, in amber.</p><p class="cube-only">Each block is a week, stacked twelve to a layer from Week 1 at the bottom. Drag to turn it; lay it out to see the weeks in order with the gates marked; hover a block for its week.</p></div></div>
+      <div class="panel-head"><div><h3>The 60-week plan</h3><p id="planSub">Each square is a week: done in blue; code written and tested, runs or reviews pending, in amber.</p><p class="cube-only">Twenty-seven blocks, the plan so far. Click the cube: it splits into the project's claims graph, the two leads that did not hold go dark, and the path that did lights up. Hover a block for its name; drag to turn it.</p></div></div>
       <div class="tl-track" id="tlTrack" aria-hidden="true"></div>
       <div class="tl-scale"><span>Oct 2026</span><span>Apr 2027</span><span>Nov 2027</span></div>
       <div class="plan3d">
         <div>
-          <div class="cube-box" id="cubeBox">
-            <canvas id="planCube" role="img" aria-label="The 60-week plan as a cube of 60 blocks, one per week, stacked in five layers of twelve from Week 1 at the bottom. Drag to turn it; use the button to lay the weeks out in order."></canvas>
-            <div class="cube-tags" id="cubeTags" aria-hidden="true"></div>
-            <div class="cube-tip" id="cubeTip" hidden></div>
-            <div class="cube-bar">
-              <p class="cube-hint" id="cubeHint"><i></i> Click the cube</p>
-              <button type="button" class="cube-btn" id="cubeBtn" aria-pressed="false">Lay out the weeks</button>
-            </div>
+          <div class="cube-box" id="cubeBox" role="button" tabindex="0" aria-pressed="false"
+               aria-label="Click the cube: a black cube of 27 blocks, the 60-week plan so far. Press to split it into the project's claims graph and watch which claims hold.">
+            <div class="cube-mask"><canvas id="planCube"></canvas></div>
+            <div class="cube-label" data-k="rec" aria-hidden="true">W3 · a counting artifact</div>
+            <div class="cube-label" data-k="email" aria-hidden="true">option to wait · refuted</div>
+            <div class="cube-label ember" data-k="pay" aria-hidden="true">G1 · ρ ≈ 0 measured</div>
+            <div class="cube-label check" data-k="check" aria-hidden="true">W18 benchmark</div>
+            <div class="cube-label hover" data-k="hover" aria-hidden="true"></div>
+            <p class="cube-hint" id="cubeHint" aria-hidden="true"><i></i><span>Click the cube</span></p>
           </div>
-          <div class="cube-key" aria-hidden="true"><span><i class="done"></i>done</span><span><i class="prep"></i>built, waiting on runs or reviews</span><span><i></i>not started</span><span><i class="now"></i>this calendar week</span></div>
         </div>
         <div class="phases" id="phaseList">
-          <div class="phase done" data-w="1-3" tabindex="0"><span class="dot"></span><div><b>Foundation and claim</b><span class="w">W1–3</span> <span>· v1 frozen, protocol</span></div></div>
-          <div class="phase done" data-w="4-8" tabindex="0"><span class="dot"></span><div><b>Real data</b><span class="w">W4–8</span> <span>· Backblaze, Google trace, G1</span></div></div>
-          <div class="phase done" data-w="9-13" tabindex="0"><span class="dot"></span><div><b>Simulator</b><span class="w">W9–13</span> <span>· validated at G2</span></div></div>
-          <div class="phase done" data-w="14-17" tabindex="0"><span class="dot"></span><div><b>Policies and theory</b><span class="w">W14–17</span> <span>· protocol frozen</span></div></div>
-          <div class="phase now" data-w="18-21" tabindex="0"><span class="dot"></span><div><b>Benchmark runs</b><span class="w">W18–21</span> <span>· W18 done, rest queued</span></div></div>
-          <div class="phase now" data-w="22-26" tabindex="0"><span class="dot"></span><div><b>Paper, artifact, console</b><span class="w">W22–26</span> <span>· drafted</span></div></div>
-          <div class="phase now" data-w="27-40" tabindex="0"><span class="dot"></span><div><b>Polish and submit paper A</b><span class="w">W27–40</span> <span>· tools built, waiting on runs</span></div></div>
-          <div class="phase" data-w="41-46" tabindex="0"><span class="dot"></span><div><b>Ground the cost model</b><span class="w">W41–46</span></div></div>
-          <div class="phase" data-w="47-50" tabindex="0"><span class="dot"></span><div><b>Failure physics</b><span class="w">W47–50</span></div></div>
-          <div class="phase" data-w="51-54" tabindex="0"><span class="dot"></span><div><b>Open benchmark v1.0</b><span class="w">W51–54</span></div></div>
-          <div class="phase" data-w="55-60" tabindex="0"><span class="dot"></span><div><b>Journal extension</b><span class="w">W55–60</span></div></div>
+          <div class="phase done"><span class="dot"></span><div><b>Foundation and claim</b><span class="w">W1–3</span> <span>· v1 frozen, protocol</span></div></div>
+          <div class="phase done"><span class="dot"></span><div><b>Real data</b><span class="w">W4–8</span> <span>· Backblaze, Google trace, G1</span></div></div>
+          <div class="phase done"><span class="dot"></span><div><b>Simulator</b><span class="w">W9–13</span> <span>· validated at G2</span></div></div>
+          <div class="phase done"><span class="dot"></span><div><b>Policies and theory</b><span class="w">W14–17</span> <span>· protocol frozen</span></div></div>
+          <div class="phase now"><span class="dot"></span><div><b>Benchmark runs</b><span class="w">W18–21</span> <span>· W18 done, rest queued</span></div></div>
+          <div class="phase now"><span class="dot"></span><div><b>Paper, artifact, console</b><span class="w">W22–26</span> <span>· drafted</span></div></div>
+          <div class="phase now"><span class="dot"></span><div><b>Polish and submit paper A</b><span class="w">W27–40</span> <span>· tools built, waiting on runs</span></div></div>
+          <div class="phase"><span class="dot"></span><div><b>Ground the cost model</b><span class="w">W41–46</span></div></div>
+          <div class="phase"><span class="dot"></span><div><b>Failure physics</b><span class="w">W47–50</span></div></div>
+          <div class="phase"><span class="dot"></span><div><b>Open benchmark v1.0</b><span class="w">W51–54</span></div></div>
+          <div class="phase"><span class="dot"></span><div><b>Journal extension</b><span class="w">W55–60</span></div></div>
         </div>
       </div>
       <div class="links-row more-row">
@@ -1457,257 +1446,247 @@ function drawW18() {
 
 <script type="module">
 /* ---------------- the plan cube ----------------
-   60 weeks as a 4 x 3 x 5 block, one layer per twelve weeks, Week 1 at the bottom. Drag to turn it; click
-   (or the button) to lay the weeks out as a rising path in order, with the gates marked; hover or tap a
-   block for that week's card. Status per week is set by hand below, from docs/v2/LOG.md and TASKS_*.md. */
+   Ported from Faultline's hero (reference/faultline-prashant/frontend/src/components/home/HeroGraph3D.tsx): a solid,
+   glossy black cube of 27 blocks. Click it (or press Enter/Space) and it splits: nine blocks fly out into this
+   project's claims graph and the decision plays (the v1 anomaly has no path to the paper; the "option to wait"
+   explanation is refuted; a light draws real data -> simulator -> the Week 18 benchmark; the source glows, the
+   benchmark turns mint); the other eighteen drift out as the rest of the plan. Click again and it closes. Leans
+   toward the pointer; drag to turn it. Reduced motion: no tweening, a still frame. No WebGL: the flat track. */
 import * as THREE from 'three';
 import { RoundedBoxGeometry } from 'three/addons/geometries/RoundedBoxGeometry.js';
 import { RoomEnvironment } from 'three/addons/environments/RoomEnvironment.js';
 
-const TITLES = ['Freeze v1, set up v2', 'Lock the thesis; read the core papers', 'Explain the v1 anomaly; write the protocol; define gates',
-  'Backblaze ingest pipeline', 'Finish the ingest; failure rates and life tables', 'Pick the placement trace; define the empirical ρ',
-  'Temporal hazard model v2', 'Empirical ρ from real traces', 'Citable v1 technical report (optional)', 'Simulator v2 design spec',
-  'Entities and placement modules', 'Failure process and predictor hooks', 'Migration mechanics, accounting, v1 regression',
-  'Reference policies and the budget definition', 'BAM and the Narya-inspired baseline', 'Uncertainty, drift and the safe-adaptive policy',
-  'Theory, protocol freeze, code freeze', 'Main comparison: synthetic ρ sweep', 'Real-trace and adversarial regimes; Pareto frontiers',
-  'Ablations, robustness and sensitivity', 'Adaptive policy, replication, external validity', 'Paper draft v1: results and method first',
-  'Paper draft v2: complete', 'Outside review and revision', 'Artifact and preprint', 'Buffer, submission pack, retrospective',
-  'Collect and triage all feedback', 'Fix the must-fix items', 'Strengthen the weakest claim I: data', 'Strengthen the weakest claim II: runs',
-  'Strengthen the weakest claim III: integrate; Console S5', 'Rewrite abstract and introduction', 'Rewrite evaluation and polish figures',
-  'Related work refresh; Console S6 and polish', 'Artifact dry run on a different machine', 'Anonymisation, statements and licences',
-  'Venue format and page cut', 'Second mock review', 'Final fixes', 'Submit, or retarget along the ladder',
-  'KVM/QEMU testbed; first live migration measured', 'Instrumentation: a migration recorder', 'Workload generator and design of experiments',
-  'Measurement sweep', 'Fit the pre-copy model to measurements', 'Grounded-cost re-run', 'Rack-level correlated failures',
-  'Two budget resources: memory and NIC time', 'Hazard families and policy re-tests', 'Run the v4 grids and write the results',
-  'VMMBench packaging and the plug-in path', 'Hidden-seed protocol and versioning rules', 'Leaderboard and Console S7–S9',
-  'VMMBench v1.0 release', 'Choose the extension target and outline', 'Write the testbed and grounded-cost sections',
-  'Write correlation, multi-resource and benchmark sections', 'Integrate the full manuscript', 'Review, cover letter, permissions',
-  'Submit paper B; close the project'];
-const PHASES = [[1, 3, 'Phase 0 · Foundation and claim'], [4, 8, 'Phase 1 · Real data'], [9, 13, 'Phase 2 · Simulator'],
-  [14, 17, 'Phase 3 · Policies and theory'], [18, 21, 'Phase 4 · Benchmark runs'], [22, 26, 'Phase 5 · Paper, artifact, console'],
-  [27, 40, 'Phase 6 · Polish and submit paper A'], [41, 46, 'Phase 7 · Ground the cost model'], [47, 50, 'Phase 8 · Failure physics'],
-  [51, 54, 'Phase 9 · Open benchmark v1.0'], [55, 60, 'Phase 10 · Journal extension']];
-const GATES = { 3: 'M1', 8: 'G1', 13: 'G2', 17: 'Freeze', 21: 'G3', 26: 'M7', 40: 'Submit A', 46: 'G4', 54: 'G5', 60: 'G6' };
-function status(w) {
-  if (w <= 18) return ['done', 'Done', w === 18 ? 'All 30 evaluation seeds of the A and E regimes; avoidance baselines added after.' : ''];
-  if (w <= 21) return ['prep', 'Code ready, runs queued', 'Waits on the long run (run_rest.sh, about 9.5 hours).'];
-  if (w <= 26) return ['prep', 'Drafted', 'Paper, artifact and console drafted; finished once the runs are in.'];
-  if (w <= 28) return ['prep', 'Prepared early', 'Waits on outside feedback.'];
-  if (w === 35 || w === 38) return ['todo', 'Left out for now', ''];
-  if (w <= 39) return ['prep', 'Tools built early', 'Checks and scripts done; waits on runs, sources or the venue.'];
-  return ['todo', 'Not started', ''];
+const NODES = {
+  rec: { p: [-2.35, 1.3, 0.3], s: 0.58 }, email: { p: [-2.55, 0.05, -0.55], s: 0.58 }, pay: { p: [-2.2, -1.25, 0.55], s: 0.62 },
+  srec: { p: [-0.05, 1.35, -0.4], s: 0.7 }, semail: { p: [0.15, 0.2, 0.75], s: 0.7 }, spay: { p: [-0.1, -1.1, -0.15], s: 0.74 },
+  cart: { p: [0.45, -0.25, -1.3], s: 0.6 }, front: { p: [2.25, 0.95, 0.15], s: 0.78 }, check: { p: [2.1, -0.65, -0.3], s: 0.92 },
+};
+const ROLES = Object.keys(NODES);
+// what each of the nine blocks is in this project (left: where a claim came from; middle: what it rests on; right: where it lands)
+const INFO = {
+  rec: 'W3 · the v1 anomaly · a counting artifact', email: 'P5 · "option to wait" · refuted by the audit',
+  pay: 'W4–8 · real data · gate G1 passed', srec: 'v1 · the loss it reported', semail: 'P5 · why it wins',
+  spay: 'W9–13 · simulator · gate G2 passed', cart: 'W14–17 · theory and protocol · frozen',
+  front: 'W40 · paper A · not yet', check: 'W18 · main benchmark · done',
+};
+// the rest of the plan, in order; weight 1-3 sizes the block like betweenness sizes Faultline's
+const OTHERS = [
+  ['W1 · v1 frozen · done', 2], ['W2 · thesis locked · done', 1], ['W5 · Backblaze ingest · done', 2], ['W6 · placement trace chosen · done', 1],
+  ['W7 · hazard model v2 · done', 2], ['W10 · simulator spec · done', 1], ['W13 · v1 reproduced exactly · done', 2],
+  ['W15 · BAM and the Narya-inspired baseline · done', 2], ['W16 · safe-adaptive policy · done', 1], ['W17 · code freeze · done', 3],
+  ['W19–21 · B, C and D regimes · queued', 2], ['W21 · gate G3 · next', 3], ['W22–26 · paper, artifact, console · drafted', 2],
+  ['W29–39 · strengthen and polish · tools built', 2], ['W41–46 · ground the cost model · G4', 1], ['W47–50 · failure physics', 1],
+  ['W51–54 · open benchmark v1.0 · G5', 1], ['W55–60 · journal extension · G6', 1],
+];
+const EDGES = [['rec', 'srec'], ['email', 'semail'], ['pay', 'spay'], ['srec', 'front'], ['semail', 'check'],
+  ['spay', 'check'], ['check', 'front'], ['cart', 'spay'], ['cart', 'check']];
+const PROOF = ['pay', 'spay', 'check'];
+const LOOP = 8.5, BLOCK = 0.76, GAP = 0.8;
+const EMBER = new THREE.Color('#ff6b2c'), MINT = new THREE.Color('#5ef0b4');
+const smooth = (x) => x * x * x * (x * (x * 6 - 15) + 10);
+const clamp01 = (x) => Math.min(1, Math.max(0, x));
+// decision timeline while open: 0 alert · 1.3 first lead dark · 2.2 second · 3.0-4.8 the proof draws · 4.8 proved · 7.6-8.5 reset
+function phase(t) {
+  const k = t % LOOP, draw = clamp01((k - 3.0) / 1.8), fade = k > 7.6 ? 1 - (k - 7.6) / 0.9 : 1;
+  return { draw: draw * fade, g2: k > 1.3 && k < 7.9, g5: k > 2.2 && k < 7.9, proved: k > 4.8 && k < 7.9, fade };
 }
-const START = new Date(2026, 9, 5);                                  // Monday of Week 1
-const MON = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
-function dates(w) {
-  const a = new Date(START); a.setDate(a.getDate() + 7 * (w - 1));
-  const b = new Date(a); b.setDate(b.getDate() + 6);
-  return a.getMonth() === b.getMonth() ? `${a.getDate()}–${b.getDate()} ${MON[b.getMonth()]} ${b.getFullYear()}`
-    : `${a.getDate()} ${MON[a.getMonth()]} – ${b.getDate()} ${MON[b.getMonth()]} ${b.getFullYear()}`;
-}
-const TODAY = Math.floor((Date.now() - START) / (7 * 864e5)) + 1;   // the calendar week; the work runs ahead of it
-const WEEKS = TITLES.map((t, i) => {
-  const w = i + 1, ph = PHASES.findIndex(([a, b]) => w >= a && w <= b), [st, label, note] = status(w);
-  return { w, title: t, phase: ph, phaseName: PHASES[ph][2], st, label, note, gate: GATES[w] || '', dates: dates(w) };
-});
+const FINAL = { draw: 1, g2: true, g5: true, proved: true, fade: 1 }, CLOSED = { draw: 0, g2: false, g5: false, proved: false, fade: 1 };
+function rng(seed) { let s = seed >>> 0; return () => ((s = (s * 1664525 + 1013904223) >>> 0) / 4294967296); }
 
-const box = document.getElementById('cubeBox'), canvas = document.getElementById('planCube');
-const tip = document.getElementById('cubeTip'), hint = document.getElementById('cubeHint'), btn = document.getElementById('cubeBtn');
-const tags = document.getElementById('cubeTags');
-const esc = (x) => String(x).replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
-const cssv = (v) => getComputedStyle(document.documentElement).getPropertyValue(v).trim();
-const isDark = () => { const t = document.documentElement.getAttribute('data-theme'); return t ? t === 'dark' : matchMedia('(prefers-color-scheme: dark)').matches; };
-const ease = (t) => (t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2);
-const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+const box = document.getElementById('cubeBox'), canvas = document.getElementById('planCube'), hint = document.getElementById('cubeHint');
+const labels = {}; box.querySelectorAll('.cube-label').forEach((el) => { labels[el.dataset.k] = el; });
+const still = matchMedia('(prefers-reduced-motion: reduce)').matches;
+const place = (k, x, y, show, proved, text) => {
+  const el = labels[k];
+  el.style.transform = `translate(-50%, 0) translate(${x}px, ${y}px)`;
+  el.style.opacity = show ? '1' : '0';
+  if (k === 'check') { el.dataset.state = proved ? 'proved' : 'alert'; el.textContent = proved ? 'W18 · done' : 'W18 benchmark'; }
+  if (text !== undefined && el.textContent !== text) el.textContent = text;
+};
 
 try {
-  const renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: true, powerPreference: 'high-performance' });
+  if (!('WebGL2RenderingContext' in window || 'WebGLRenderingContext' in window)) throw new Error('no WebGL');
+  const gl = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: true, powerPreference: 'high-performance' });
   document.getElementById('plan').classList.add('has-cube');
-  renderer.setPixelRatio(Math.min(2, devicePixelRatio || 1));
-  renderer.toneMapping = THREE.ACESFilmicToneMapping;
-  renderer.toneMappingExposure = 1.2;
-  const scene = new THREE.Scene();
-  scene.environment = new THREE.PMREMGenerator(renderer).fromScene(new RoomEnvironment(), 0.04).texture;
-  const camera = new THREE.PerspectiveCamera(30, 1, 0.1, 100);
-  camera.position.set(0, 0.6, 15);
-  const key = new THREE.DirectionalLight(0xffffff, 1.3); key.position.set(4, 6, 5); scene.add(key);
-  const rim = new THREE.PointLight(0x4ee597, 16, 22); rim.position.set(-5, -2, 4); scene.add(rim);
+  gl.setPixelRatio(Math.min(1.5, Math.max(1, devicePixelRatio || 1)));
+  gl.outputColorSpace = THREE.SRGBColorSpace;
+  gl.toneMapping = THREE.ACESFilmicToneMapping;               // react-three-fiber's default, which the original renders with
+  const scene = new THREE.Scene(), camera = new THREE.PerspectiveCamera(36, 1, 0.1, 100);
+  camera.position.set(0, 0.3, 8.4);
+  const pm = new THREE.PMREMGenerator(gl);
+  scene.environment = pm.fromScene(new RoomEnvironment(), 0.04).texture;
+  scene.add(new THREE.AmbientLight(0xffffff, 0.15));
+  const d1 = new THREE.DirectionalLight(0xffffff, 1.6); d1.position.set(4, 6, 5); scene.add(d1);
+  const d2 = new THREE.DirectionalLight('#c9d0ff', 0.35); d2.position.set(-6, 1, -5); scene.add(d2);
 
-  const group = new THREE.Group();
-  group.rotation.set(0.42, -0.62, 0);
-  scene.add(group);
-  const geo = new RoundedBoxGeometry(0.9, 0.9, 0.9, 4, 0.12);
-  const edges = new THREE.EdgesGeometry(new THREE.BoxGeometry(1.02, 1.02, 1.02));
-
-  // assembled: x 4 wide, z 3 deep, y 5 layers of 12; laid out: a rising spiral in week order, a gap between phases
-  const turns = 2.35, R = 3.7, H = 7.4, S = 60 + (PHASES.length - 1) * 1.4;
-  const meshes = WEEKS.map((wk, i) => {
-    const layer = Math.floor(i / 12), r = i % 12, col = r % 4, row = Math.floor(r / 4);
-    const home = new THREE.Vector3(col - 1.5, layer - 2, row - 1);
-    const s = i + wk.phase * 1.4, a = (s / S) * turns * Math.PI * 2;
-    const far = new THREE.Vector3(Math.cos(a) * R, -H / 2 + (s / S) * H, Math.sin(a) * R);
-    const m = new THREE.Mesh(geo, new THREE.MeshPhysicalMaterial({ metalness: 0.45, roughness: 0.28, clearcoat: 1, clearcoatRoughness: 0.06,
-      envMapIntensity: 1.6, emissiveIntensity: 0, transparent: wk.label === 'Left out for now', opacity: 1 }));
-    m.position.copy(home);
-    m.userData = { home, far, wk, i };
-    if (wk.w === TODAY) m.add(m.userData.ring = new THREE.LineSegments(edges, new THREE.LineBasicMaterial({ transparent: true })));
-    group.add(m);
-    return m;
+  // ---- the world (buildWorld) ----
+  const root = new THREE.Group(); scene.add(root);
+  const v = (k) => new THREE.Vector3(...NODES[k].p);
+  const block = new RoundedBoxGeometry(BLOCK, BLOCK, BLOCK, 3, 0.1);
+  const glossy = () => new THREE.MeshPhysicalMaterial({ color: '#0c0c0e', metalness: 0.5, roughness: 0.28, clearcoat: 1, clearcoatRoughness: 0.16, emissive: '#000000', envMapIntensity: 0.85 });
+  const dustMat = glossy(), mats = {};
+  for (const k of ROLES) mats[k] = glossy();
+  const maxW = 3;
+  const cells = [];
+  for (const x of [-1, 0, 1]) for (const y of [-1, 0, 1]) for (const z of [-1, 0, 1]) cells.push(new THREE.Vector3(x, y, z).multiplyScalar(GAP));
+  const roleCell = [6, 2, 0, 16, 13, 9, 11, 24, 18];   // rec, email, pay, srec, semail, spay, cart, front, check
+  const rand = rng(417), pieces = [], byRole = {}, otherAt = [];
+  let o = 0;
+  cells.forEach((from, i) => {
+    const r = roleCell.indexOf(i), role = r >= 0 ? ROLES[r] : undefined;
+    let to, scaleTo, info;
+    if (role) { to = v(role); scaleTo = NODES[role].s / BLOCK; info = INFO[role]; }
+    else {
+      // the rest of the plan: a loose shell around the graph, sized by weight
+      const [text, w] = OTHERS[o++];
+      const dir = from.clone().add(new THREE.Vector3(rand() - 0.5, rand() - 0.5, rand() - 0.5)).normalize();
+      to = dir.multiplyScalar(3.2 + rand() * 1.3).multiply(new THREE.Vector3(1.15, 0.8, 0.9));
+      scaleTo = 0.28 + 0.34 * Math.log1p(w) / Math.log1p(maxW);
+      info = text; otherAt.push(to);
+    }
+    const mesh = new THREE.Mesh(block, role ? mats[role] : dustMat);
+    mesh.position.copy(from); root.add(mesh);
+    const p = { mesh, from, to, scaleTo, delay: rand() * 0.22, spin: new THREE.Vector3(rand() - 0.5, rand() - 0.5, rand() - 0.5).multiplyScalar(5), role, info };
+    pieces.push(p); if (role) byRole[role] = p;
   });
-  // the path through the weeks, drawn once the cube is laid out
-  const pathPts = new THREE.CatmullRomCurve3(meshes.map((m) => m.userData.far)).getPoints(600);
-  const pathGeo = new THREE.BufferGeometry().setFromPoints(pathPts);
-  const pathMat = new THREE.LineBasicMaterial({ vertexColors: true, transparent: true, opacity: 0 });
-  const path = new THREE.Line(pathGeo, pathMat);
-  group.add(path);
+  // edges appear once the cube has split: the claims graph bright, the rest of the plan a faint chain in week order
+  const edgeMat = new THREE.MeshStandardMaterial({ color: '#2e3035', metalness: 0.85, roughness: 0.35, transparent: true, opacity: 0 });
+  const faintMat = new THREE.MeshBasicMaterial({ color: '#ffffff', transparent: true, opacity: 0 });
+  const tube = (a, b, r, m) => root.add(new THREE.Mesh(new THREE.TubeGeometry(new THREE.LineCurve3(a, b), 1, r, 6, false), m));
+  for (const [a, b] of EDGES) tube(v(a), v(b), 0.016, edgeMat);
+  for (let n = 1; n < otherAt.length; n++) tube(otherAt[n - 1], otherAt[n], 0.006, faintMat);
+  const curve = new THREE.CatmullRomCurve3(PROOF.map(v), false, 'centripetal');
+  const proof = new THREE.TubeGeometry(curve, 96, 0.04, 10, false);
+  const proofMat = new THREE.MeshBasicMaterial({ color: '#ffffff', toneMapped: false, transparent: true });
+  root.add(new THREE.Mesh(proof, proofMat));
+  const pulse = new THREE.Mesh(new THREE.SphereGeometry(0.09, 20, 20), new THREE.MeshBasicMaterial({ color: '#ffffff', toneMapped: false }));
+  root.add(pulse);
+  const w = { e: 0, h: 0, t: 0 }, ray = new THREE.Raycaster();
 
-  function paint() {
-    const dark = isDark();
-    const C = { done: new THREE.Color(cssv('--cs')), prep: new THREE.Color(cssv('--amber')), todo: new THREE.Color(dark ? 0x1f2b25 : 0xdde6e1) };
-    const glow = new THREE.Color(cssv('--good'));
-    meshes.forEach((m) => {
-      const { wk } = m.userData, mat = m.material;
-      mat.color.copy(C[wk.st]); mat.emissive.copy(wk.st === 'todo' ? glow : C[wk.st]);
-      mat.metalness = wk.st === 'todo' ? (dark ? 0.6 : 0.15) : 0.3;
-      mat.opacity = wk.label === 'Left out for now' ? 0.35 : 1;
-      if (m.userData.ring) m.userData.ring.material.color.set(dark ? 0xffffff : 0x0c1912);
-    });
-    const done = new THREE.Color(cssv('--cs')), rest = new THREE.Color(cssv('--ink-3')), cols = [];
-    const cut = (pathPts.length - 1) * 17.5 / 59;                     // the path is blue up to the end of Week 18
-    pathPts.forEach((_, k) => { const c = k <= cut ? done : rest; cols.push(c.r, c.g, c.b); });
-    pathGeo.setAttribute('color', new THREE.Float32BufferAttribute(cols, 3));
-  }
-  paint();
-  new MutationObserver(paint).observe(document.documentElement, { attributes: true, attributeFilter: ['data-theme'] });
-  matchMedia('(prefers-color-scheme: dark)').addEventListener('change', paint);
-
-  // gate and phase labels, placed over their blocks while laid out
-  const tagEls = meshes.filter((m) => /^[GFS]/.test(m.userData.wk.gate) || m.userData.wk.w === 1 || m.userData.wk.w === TODAY).map((m) => {
-    const el = document.createElement('span'), wk = m.userData.wk;
-    el.textContent = wk.gate ? `${wk.gate} · W${wk.w}` : wk.w === TODAY ? `today · W${wk.w}` : 'start · W1';
-    if (wk.gate) el.className = 'gate';
-    tags.appendChild(el);
-    return { el, m };
-  });
-
-  let baseZ = 15;
-  const resize = () => {
-    const w = canvas.clientWidth, h = canvas.clientHeight;
-    if (!w || !h) return;
-    renderer.setSize(w, h, false);
-    camera.aspect = w / h;
-    baseZ = w / h < 0.9 ? 18 : 15;
-    camera.updateProjectionMatrix();
-  };
-  new ResizeObserver(resize).observe(canvas);
-  resize();
-
-  let open = false, k = 0, t0 = 0, from = 0;                        // k: 0 stacked .. 1 laid out (camera, path, labels)
-  let velX = 0, velY = reduce ? 0 : 0.003, down = null, hovered = null, pinned = null, lit = null;
-  const ray = new THREE.Raycaster(), ndc = new THREE.Vector2();
-  const pick = (e) => {
-    const r = canvas.getBoundingClientRect();
-    ndc.set(((e.clientX - r.left) / r.width) * 2 - 1, -((e.clientY - r.top) / r.height) * 2 + 1);
-    ray.setFromCamera(ndc, camera);
-    const hit = ray.intersectObjects(meshes, false)[0];
-    return hit ? hit.object : null;
-  };
-  const show = (m, x, y) => {
-    if (!m) { tip.hidden = true; return; }
-    const wk = m.userData.wk;
-    tip.innerHTML = `<div class="wk"><span>WEEK ${wk.w}${wk.w === TODAY ? ' · THIS WEEK' : ''}</span><span>${esc(wk.dates)}</span></div>`
-      + `<b>${esc(wk.title)}</b><span class="st ${wk.st}"><i></i>${esc(wk.label)}</span>`
-      + `<p>${esc(wk.phaseName)}${wk.gate ? ` · <span class="gate">${esc(wk.gate)}</span>` : ''}${wk.note ? '<br>' + esc(wk.note) : ''}</p>`;
-    tip.hidden = false;
-    tip.style.left = `${Math.max(8, Math.min(box.clientWidth - 268, x + 16))}px`;
-    tip.style.top = `${Math.max(8, Math.min(box.clientHeight - 150, y - 24))}px`;
-  };
+  // ---- control (the component's handlers) ----
+  const c = { open: false, openedAt: 0, now: 0, hover: false, drag: { x: 0, y: 0 } };
+  const pointer = new THREE.Vector2(0, 0);
+  let from = null, dirty = true;
   const toggle = () => {
-    open = !open; from = k; t0 = performance.now();
-    meshes.forEach((m) => { m.userData.from = m.userData.f || 0; });
-    pinned = null; show(null);
-    btn.textContent = open ? 'Stack the weeks' : 'Lay out the weeks';
-    btn.setAttribute('aria-pressed', open);
-    hint.innerHTML = open ? '<i></i> Hover or tap a week · click outside to stack' : '<i></i> Click the cube';
-    tags.classList.toggle('on', open);
+    c.open = !c.open; c.openedAt = c.now + 0.9;   // the decision starts as the blocks land
+    box.setAttribute('aria-pressed', c.open);
+    box.setAttribute('aria-label', c.open
+      ? "Click to close. The plan as a claims graph: the v1 anomaly has no path to the paper, the option-to-wait explanation is refuted, and the path real data → simulator → Week 18 benchmark lights up. Hover a block for its name. Press to close it back into a cube."
+      : "Click the cube: a black cube of 27 blocks, the 60-week plan so far. Press to split it into the project's claims graph and watch which claims hold.");
+    hint.classList.toggle('open', c.open);
+    hint.querySelector('span').textContent = c.open ? 'Click to close' : 'Click the cube';
+    dirty = true;
   };
-  btn.addEventListener('click', toggle);
-
-  canvas.addEventListener('pointerdown', (e) => {
-    down = { x: e.clientX, y: e.clientY, t: performance.now(), lx: e.clientX, ly: e.clientY, type: e.pointerType };
-    if (e.pointerType === 'mouse') canvas.setPointerCapture(e.pointerId);
+  box.addEventListener('keydown', (e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); toggle(); } });
+  box.addEventListener('pointerenter', () => { c.hover = true; dirty = true; });
+  box.addEventListener('pointerleave', () => { c.hover = false; dirty = true; });
+  box.addEventListener('pointerdown', (e) => { box.setPointerCapture(e.pointerId); from = { x: e.clientX, y: e.clientY, dx: c.drag.x, dy: c.drag.y, moved: false }; });
+  box.addEventListener('pointermove', (e) => {
+    const r = canvas.getBoundingClientRect();
+    pointer.set(((e.clientX - r.left) / r.width) * 2 - 1, -((e.clientY - r.top) / r.height) * 2 + 1);
+    dirty = true;
+    if (!from) return;
+    if (Math.hypot(e.clientX - from.x, e.clientY - from.y) > 6) from.moved = true;
+    c.drag.x = from.dx + (e.clientX - from.x) * 0.006;
+    c.drag.y = THREE.MathUtils.clamp(from.dy + (e.clientY - from.y) * 0.004, -0.5, 0.5);
   });
-  canvas.addEventListener('pointermove', (e) => {
-    if (down) {
-      const dx = e.clientX - down.lx, dy = e.clientY - down.ly;
-      down.lx = e.clientX; down.ly = e.clientY;
-      velY = dx * 0.006; velX = down.type === 'mouse' ? dy * 0.006 : 0;   // on touch, vertical swipes scroll the page
-      return;
+  box.addEventListener('pointerup', () => { if (from && !from.moved) toggle(); from = null; });
+  box.addEventListener('pointercancel', () => { from = null; });
+
+  let W = 1, H = 1;
+  const resize = () => {
+    W = canvas.clientWidth; H = canvas.clientHeight;
+    if (!W || !H) return;
+    gl.setSize(W, H, false); camera.aspect = W / H; camera.updateProjectionMatrix(); dirty = true;
+  };
+  new ResizeObserver(resize).observe(canvas); resize();
+
+  // ---- one frame (tick) ----
+  const tmp = new THREE.Vector3(), arc = new THREE.Vector3();
+  function tick(dt) {
+    w.t += dt; const t = w.t; c.now = t;
+    const target = c.open ? 1 : 0;
+    w.e = still ? target : w.e + (target - w.e) * (1 - Math.exp(-dt * 2.6));
+    if (Math.abs(target - w.e) < 0.001) w.e = target;
+    w.h += ((!c.open && c.hover && !still ? 1 : 0) - w.h) * (1 - Math.exp(-dt * 8));
+    const breathe = 1 + 0.06 * w.h;
+    for (const p of pieces) {
+      const k = smooth(clamp01((w.e - p.delay) / (1 - 0.22)));
+      p.mesh.position.lerpVectors(p.from, p.to, k);
+      arc.copy(p.from).normalize().multiplyScalar(Math.sin(Math.PI * k) * 0.9);   // a little outward arc mid-flight
+      p.mesh.position.add(arc);
+      if (k === 0) p.mesh.position.multiplyScalar(breathe);
+      const tumble = Math.sin(Math.PI * k);                                          // a tumble that settles
+      p.mesh.rotation.set(p.spin.x * tumble, p.spin.y * tumble + (k === 1 && !still ? Math.sin(t * 0.6 + p.delay * 20) * 0.12 : 0), p.spin.z * tumble);
+      p.mesh.scale.setScalar(THREE.MathUtils.lerp(1, p.scaleTo, k));
     }
-    if (e.pointerType !== 'mouse') return;
-    const m = pick(e);
-    hovered = m;
-    if (!pinned) { const r = canvas.getBoundingClientRect(); show(m, e.clientX - r.left, e.clientY - r.top); }
-    canvas.style.cursor = m ? 'pointer' : 'grab';
-  });
-  canvas.addEventListener('pointerup', (e) => {
-    if (!down) return;
-    const moved = Math.hypot(e.clientX - down.x, e.clientY - down.y), quick = performance.now() - down.t < 450;
-    down = null;
-    if (moved > 6 || !quick) return;
-    if (!open) return toggle();
-    const m = pick(e);
-    if (!m) return toggle();                                            // click empty space: stack it again
-    pinned = m; const r = canvas.getBoundingClientRect(); show(m, e.clientX - r.left, e.clientY - r.top);
-  });
-  canvas.addEventListener('pointercancel', () => { down = null; });
-  canvas.addEventListener('pointerleave', () => { hovered = null; if (!pinned) show(null); });
+    root.scale.setScalar(THREE.MathUtils.lerp(1, 0.84, smooth(w.e)));
+    // pose: the closed cube turns slowly to show three faces; the open graph sways; both lean toward the pointer
+    const yaw = (still ? -0.6 : c.open ? Math.sin(t * 0.22) * 0.32 - 0.25 : t * 0.25 - 0.6) + pointer.x * 0.22 + c.drag.x;
+    const pitch = (still ? 0.35 : c.open ? Math.sin(t * 0.17) * 0.06 + 0.1 : 0.42) - pointer.y * 0.12 + c.drag.y;
+    if (still) root.rotation.set(pitch, yaw, 0);
+    else {
+      const ry = root.rotation.y;
+      const want = c.open ? yaw + Math.round((ry - yaw) / (Math.PI * 2)) * Math.PI * 2 : yaw;
+      const ease = 1 - Math.exp(-dt * 3.7);
+      root.rotation.y += (want - ry) * ease;
+      root.rotation.x += (pitch - root.rotation.x) * ease;
+    }
+    // the decision plays once the cube is open
+    const vis = smooth(clamp01((w.e - 0.82) / 0.18));
+    const ph = still ? (c.open ? FINAL : CLOSED) : c.open ? phase(t - c.openedAt) : CLOSED;
+    edgeMat.opacity = vis; faintMat.opacity = 0.06 * vis;
+    const count = proof.index ? proof.index.count : 0, draw = ph.draw * vis;
+    proof.setDrawRange(0, Math.floor((count * draw) / 6) * 6);
+    proofMat.opacity = 0.95 * ph.fade;
+    pulse.scale.setScalar(draw > 0 && draw < 1 ? 1 : 0.0001);
+    curve.getPointAt(Math.min(0.999, draw), pulse.position);
+    const alert = 0.5 + 0.5 * Math.sin(t * 5);
+    mats.check.emissive.copy(ph.proved ? MINT : EMBER);
+    mats.check.emissiveIntensity = vis * (ph.proved ? 0.28 : still ? 0.3 : 0.12 + 0.26 * alert);
+    mats.pay.emissive.copy(EMBER);
+    mats.pay.emissiveIntensity = ph.proved ? 0.32 * vis : 0;
+    mats.spay.emissive.set('#ffffff');
+    mats.spay.emissiveIntensity = draw > 0.45 ? 0.08 * ph.fade : 0;
+    for (const k of ['rec', 'email']) {
+      const out = k === 'rec' ? ph.g2 : ph.g5;
+      mats[k].color.set(out ? '#050506' : '#0c0c0e'); mats[k].roughness = out ? 0.7 : 0.28;
+    }
+    dustMat.roughness = 0.28 + 0.35 * vis;
+    const show = { rec: ph.g2, email: ph.g5, pay: ph.proved, check: true };
+    for (const k of Object.keys(show)) {
+      byRole[k].mesh.getWorldPosition(tmp); tmp.y -= NODES[k].s * 0.75; tmp.project(camera);
+      place(k, (tmp.x * 0.5 + 0.5) * W, (-tmp.y * 0.5 + 0.5) * H, show[k] && vis > 0.95, ph.proved);
+    }
+    // open: the block under the pointer names itself
+    let named;
+    if (vis > 0.95 && c.hover && !still) {
+      ray.setFromCamera(pointer, camera);
+      const hit = ray.intersectObjects(pieces.map((p) => p.mesh), false)[0];
+      named = hit ? pieces.find((p) => p.mesh === hit.object && p.info) : undefined;
+    }
+    if (named) {
+      named.mesh.getWorldPosition(tmp); tmp.y += named.mesh.scale.y * BLOCK * 0.7; tmp.project(camera);
+      place('hover', (tmp.x * 0.5 + 0.5) * W, (-tmp.y * 0.5 + 0.5) * H - 26, true, false, named.info);
+    } else place('hover', 0, 0, false, false);
+  }
 
-  // the phase list lights its weeks in the cube
-  document.querySelectorAll('#phaseList .phase').forEach((el) => {
-    const [a, b] = el.dataset.w.split('-').map(Number);
-    const on = () => { lit = [a, b]; el.classList.add('lit'); };
-    const off = () => { lit = null; el.classList.remove('lit'); };
-    el.addEventListener('mouseenter', on); el.addEventListener('mouseleave', off);
-    el.addEventListener('focus', on); el.addEventListener('blur', off);
-  });
-
+  // compile every shader first, then show the scene, so the first split never pays for a compile mid-animation
+  root.visible = false;
+  let ready = false;
+  (gl.compileAsync ? gl.compileAsync(scene, camera) : Promise.resolve()).catch(() => undefined).then(() => { root.visible = true; ready = true; dirty = true; });
   let visible = true;
-  new IntersectionObserver(([x]) => { visible = x.isIntersecting; }).observe(canvas);
-  const v = new THREE.Vector3();
-  const tick = (now) => {
-    requestAnimationFrame(tick);
-    if (!visible) return;
-    const dur = reduce ? 1 : 1300, target = open ? 1 : 0, p = Math.min(1, (now - t0) / dur);
-    k = from + (target - from) * ease(p);
-    meshes.forEach((m) => {
-      const { home, far, wk, i } = m.userData;
-      // the weeks unfold in order, and stack back in reverse
-      const lag = ((open ? i : 59 - i) / 59) * 0.45, q = Math.max(0, Math.min(1, (p - lag) / 0.55));
-      const f = m.userData.f = (m.userData.from || 0) + (target - (m.userData.from || 0)) * ease(q);
-      m.position.lerpVectors(home, far, f);
-      m.scale.setScalar(1 - 0.18 * f);
-      const hl = m === hovered || m === pinned || (lit && wk.w >= lit[0] && wk.w <= lit[1]);
-      m.material.emissiveIntensity = hl ? 0.5 : wk.st === 'todo' ? 0 : 0.08;
-      if (m.userData.ring) m.userData.ring.material.opacity = reduce ? 1 : 0.55 + 0.45 * Math.sin(now / 380);
-    });
-    pathMat.opacity = Math.max(0, (k - 0.6) / 0.4) * 0.8;
-    if (!down) { velX *= 0.93; velY = velY * 0.95 + (reduce ? 0 : 0.0026) * 0.05; }
-    group.rotation.y += velY;
-    group.rotation.x = Math.max(-1.1, Math.min(1.1, group.rotation.x + velX));
-    group.position.y = reduce ? 0 : Math.sin(now / 1500) * 0.06;
-    camera.position.z = baseZ + 9 * k;
-    renderer.render(scene, camera);
-    if (k > 0.01) {
-      const w = canvas.clientWidth, h = canvas.clientHeight;
-      tagEls.forEach(({ el, m }) => {
-        m.getWorldPosition(v); v.project(camera);
-        el.style.transform = `translate(${(v.x * 0.5 + 0.5) * w + 14}px, ${(-v.y * 0.5 + 0.5) * h - 22}px)`;
-        el.style.visibility = v.z < 1 ? 'visible' : 'hidden';
-      });
-    }
+  new IntersectionObserver(([e]) => { visible = e.isIntersecting; dirty = true; }, { threshold: 0.01 }).observe(box);
+  let last = performance.now();
+  const loop = (now) => {
+    requestAnimationFrame(loop);
+    const dt = Math.min((now - last) / 1000, 0.05); last = now;
+    if (!visible || !ready) return;
+    if (still && !dirty) return;                  // reduced motion: a fresh still frame only when something changes
+    dirty = false;
+    tick(dt); gl.render(scene, camera);
   };
-  requestAnimationFrame(tick);
+  requestAnimationFrame(loop);
 } catch (err) {
   // no WebGL: the flat track above stays
   document.getElementById('plan').classList.remove('has-cube');
