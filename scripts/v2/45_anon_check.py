@@ -83,6 +83,18 @@ def png_meta(p: Path) -> str:
         return ""
 
 
+def office_text(p: Path) -> str:
+    """Author metadata and text of a .docx, .pptx or .xlsx (zipped XML)."""
+    import zipfile
+
+    try:
+        with zipfile.ZipFile(p) as z:
+            names = [n for n in z.namelist() if n.endswith(".xml")]
+            return "\n".join(z.read(n).decode("utf-8", "ignore") for n in names)
+    except (zipfile.BadZipFile, OSError):
+        return ""
+
+
 def main() -> None:
     ap = argparse.ArgumentParser(description=__doc__.splitlines()[0])
     ap.add_argument("--root", type=Path, default=ROOT, help="tree to check (default: this repo)")
@@ -141,7 +153,12 @@ def main() -> None:
             continue
         if p.stat().st_size > 2_000_000:
             continue
-        if find(p.read_text(errors="ignore"), ts):
+        text = (
+            office_text(p)
+            if p.suffix in (".docx", ".pptx", ".xlsx")
+            else p.read_text(errors="ignore")
+        )
+        if find(text, ts):
             repo_hits.append(f)
     for f in repo_hits:
         (fails if a.repo_strict else notes).append(f"repo    {f}")
