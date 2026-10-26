@@ -234,45 +234,83 @@
   /* ---------- demo ---------- */
   .demo { display: grid; grid-template-columns: 380px 1fr; gap: 20px; align-items: start; }
   @media (max-width: 960px) { .demo { grid-template-columns: 1fr; } }
-  .field { margin-bottom: 20px; }
-  .field:last-of-type { margin-bottom: 0; }
-  .field-label { display: flex; justify-content: space-between; align-items: baseline; font-size: 12.5px; font-weight: 600; color: var(--ink); margin-bottom: 8px; }
-  .field-label span { font-weight: 500; color: var(--ink-3); font-family: var(--mono); font-size: 12px; }
-  .seg { display: flex; padding: 4px; gap: 4px; border-radius: 999px; background: var(--bg-2); border: 1px solid var(--line); }
+  /* ---------- the model's controls: a settings panel (groups, a radio list, segmented controls, a counter list, switches) ---------- */
+  #controls { padding: 0; }
+  .set-group { padding: 20px 22px; border-bottom: 1px solid var(--line); }
+  .set-group:last-of-type { border-bottom: 0; }
+  .set-head { margin: 0 0 14px; font: 500 11px var(--mono); letter-spacing: .12em; text-transform: uppercase; color: var(--ink-3); }
+  .field { margin-bottom: 18px; }
+  .field:last-child { margin-bottom: 0; }
+  #v1Fields, #v2Fields { margin-bottom: 18px; }
+  .field-label { display: flex; justify-content: space-between; align-items: baseline; gap: 10px; font-size: 13px; font-weight: 500; color: #e4e4e7; margin-bottom: 8px; }
+  .field-label span { font-weight: 400; color: var(--ink-3); font-family: var(--mono); font-size: 11.5px; white-space: nowrap; }
+  /* segmented control: one row, square corners, the chosen segment raised */
+  .seg { display: flex; padding: 3px; gap: 2px; border-radius: 10px; background: rgba(255,255,255,.03); border: 1px solid var(--line); }
   .seg input { position: absolute; opacity: 0; pointer-events: none; }
-  .seg label {
-    flex: 1; text-align: center; padding: 9px 8px; border-radius: 999px; font-size: 13px; font-weight: 500; color: var(--ink-2);
-    cursor: pointer; transition: background .15s, color .15s, box-shadow .15s; user-select: none;
-  }
-  .seg input:checked + label { background: var(--surface); color: var(--ink); box-shadow: 0 1px 2px rgba(0,0,0,.08), 0 0 0 1px var(--line-2); font-weight: 600; }
-  .seg input:focus-visible + label { outline: 2px solid var(--cs); outline-offset: 1px; }
-  .seg label small { display: block; font-size: 10.5px; color: var(--ink-3); font-weight: 500; }
-  select {
-    width: 100%; appearance: none; -webkit-appearance: none; padding: 12px 40px 12px 18px; border-radius: 999px; border: 1px solid var(--line-2);
-    background: var(--surface) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%237a808c' stroke-width='2.5'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E") no-repeat right 12px center;
-    color: var(--ink); font: 500 14px var(--mono);
-  }
-  select:focus { outline: none; border-color: var(--cs); box-shadow: 0 0 0 3px var(--cs-soft); }
-  input[type=range] { width: 100%; -webkit-appearance: none; appearance: none; height: 4px; border-radius: 99px; background: var(--line-2); margin: 10px 0 4px; }
-  input[type=range]::-webkit-slider-thumb { -webkit-appearance: none; width: 18px; height: 18px; border-radius: 50%; background: var(--surface); border: 2px solid var(--ink); cursor: pointer; }
-  input[type=range]::-moz-range-thumb { width: 14px; height: 14px; border-radius: 50%; background: var(--surface); border: 2px solid var(--ink); cursor: pointer; }
-  .seg-models label { font-size: 12.5px; }
-  .smart-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 10px; }
-  @media (max-width: 420px) { .smart-grid { grid-template-columns: 1fr; } }
-  .smart { display: flex; flex-direction: column; gap: 6px; padding: 10px 12px; border: 1px solid var(--line); border-radius: var(--radius-sm); background: var(--surface-2); cursor: text; }
-  .smart span { font-size: 12px; font-weight: 700; color: var(--ink-2); line-height: 1.25; }
-  .smart small { display: block; font-weight: 600; color: var(--ink-3); font-size: 10.5px; }
-  .smart input { width: 100%; border: none; background: transparent; color: var(--ink); font: 600 18px var(--serif); padding: 0; outline: none; }
-  .smart:focus-within { border-color: var(--action); box-shadow: 0 0 0 3px color-mix(in srgb, var(--action) 18%, transparent); }
+  .seg label { flex: 1; min-width: 0; text-align: center; padding: 6px 8px; border-radius: 7px; font-size: 13px; font-weight: 500; line-height: 1.3; color: #a1a1aa;
+    white-space: nowrap; overflow: hidden; text-overflow: ellipsis; cursor: pointer; user-select: none; transition: background-color .15s var(--ease-quick), color .15s; }
+  .seg label:hover { color: #e4e4e7; }
+  .seg input:checked + label { background: #1d1e21; color: #fafafa; box-shadow: inset 0 1px 0 rgba(255,255,255,.06), 0 0 0 1px rgba(255,255,255,.08), 0 1px 2px rgba(0,0,0,.4); }
+  .seg input:focus-visible + label { outline: 2px solid #38bdf8; outline-offset: 1px; }
+  /* the failure model: a list of choices, each with a radio, a name and what it uses */
+  .choices { display: grid; gap: 6px; }
+  .choices input { position: absolute; opacity: 0; pointer-events: none; }
+  .choices label { display: grid; grid-template-columns: 16px 1fr auto; align-items: center; gap: 12px; padding: 10px 12px; border-radius: 10px; cursor: pointer;
+    border: 1px solid var(--line); background: rgba(255,255,255,.015); transition: border-color .15s, background-color .15s; }
+  .choices label:hover { border-color: rgba(255,255,255,.14); }
+  .choices .dot { width: 16px; height: 16px; border-radius: 50%; border: 1.5px solid #52525b; transition: border-color .15s, box-shadow .15s; }
+  .choices b { display: block; font-size: 13.5px; font-weight: 500; color: #e4e4e7; }
+  .choices small { display: block; font-size: 12px; color: var(--ink-3); margin-top: 1px; }
+  .choices .tag-mini { font: 500 10.5px var(--mono); color: var(--ink-3); border: 1px solid var(--line); border-radius: 6px; padding: 2px 6px; }
+  .choices input:checked + label { border-color: rgba(255,255,255,.22); background: rgba(255,255,255,.04); }
+  .choices input:checked + label .dot { border-color: #fafafa; box-shadow: inset 0 0 0 3.5px #0f1011, inset 0 0 0 8px #fafafa; }
+  .choices input:focus-visible + label { outline: 2px solid #38bdf8; outline-offset: 2px; }
+  select { width: 100%; height: 36px; appearance: none; -webkit-appearance: none; padding: 0 36px 0 12px; border-radius: 8px; border: 1px solid var(--line-2);
+    background: rgba(255,255,255,.03) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%23a1a1aa' stroke-width='2.5'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E") no-repeat right 12px center;
+    color: #f4f4f5; font: 500 13px var(--mono); cursor: pointer; transition: border-color .15s; }
+  select:hover { border-color: rgba(255,255,255,.22); }
+  select:focus { outline: none; border-color: #38bdf8; box-shadow: 0 0 0 3px rgba(56,189,248,.18); }
+  select option { background: #141516; color: #f4f4f5; }
+  /* sliders fill up to the thumb (--p is set by the page script) */
+  input[type=range] { width: 100%; -webkit-appearance: none; appearance: none; height: 4px; border-radius: 99px; margin: 10px 0 6px; cursor: pointer;
+    background: linear-gradient(90deg, #e4e4e7 var(--p, 50%), rgba(255,255,255,.12) var(--p, 50%)); }
+  input[type=range]::-webkit-slider-thumb { -webkit-appearance: none; width: 16px; height: 16px; border-radius: 50%; background: #fafafa; border: 0;
+    box-shadow: 0 0 0 4px rgba(255,255,255,.08), 0 1px 3px rgba(0,0,0,.5); transition: box-shadow .15s; }
+  input[type=range]:hover::-webkit-slider-thumb, input[type=range]:focus-visible::-webkit-slider-thumb { box-shadow: 0 0 0 6px rgba(255,255,255,.12), 0 1px 3px rgba(0,0,0,.5); }
+  input[type=range]::-moz-range-thumb { width: 16px; height: 16px; border-radius: 50%; background: #fafafa; border: 0; box-shadow: 0 0 0 4px rgba(255,255,255,.08); }
+  input[type=range]:focus-visible { outline: none; }
+  /* SMART counters: a list, the name and attribute on the left, the count on the right */
+  .smart-grid { margin-top: 10px; border: 1px solid var(--line); border-radius: 10px; overflow: hidden; }
+  .smart { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 8px 8px 8px 12px; cursor: text; transition: background-color .15s; }
+  .smart + .smart { border-top: 1px solid var(--line); }
+  .smart:hover { background: rgba(255,255,255,.02); }
+  .smart span { min-width: 0; font-size: 13px; font-weight: 400; color: #d4d4d8; line-height: 1.3; }
+  .smart small { display: block; font: 11px var(--mono); color: var(--ink-3); margin-top: 1px; }
+  .smart input { width: 84px; height: 30px; flex: none; border-radius: 7px; border: 1px solid var(--line-2); background: rgba(255,255,255,.03); color: #fafafa;
+    font: 500 13px var(--mono); text-align: right; padding: 0 10px; outline: none; transition: border-color .15s, box-shadow .15s; -moz-appearance: textfield; }
+  .smart input::-webkit-inner-spin-button, .smart input::-webkit-outer-spin-button { -webkit-appearance: none; margin: 0; }
+  .smart input:focus { border-color: #38bdf8; box-shadow: 0 0 0 3px rgba(56,189,248,.18); }
+  .smart:focus-within { background: rgba(255,255,255,.025); }
   .ro .band { font-size: 11.5px; color: var(--ink-3); margin-top: 8px; font-family: var(--mono); }
   .meter .band { position: absolute; top: 1px; bottom: 1px; border-radius: 99px; background: color-mix(in srgb, var(--ink-2) 28%, transparent); }
   .range-scale { display: flex; justify-content: space-between; font-size: 11px; color: var(--ink-3); font-family: var(--mono); }
-  .demo-actions { display: flex; gap: 8px; margin-top: 22px; align-items: center; }
-  .live-toggle { display: flex; align-items: center; gap: 8px; font-size: 12.5px; color: var(--ink-2); margin-right: auto; cursor: pointer; user-select: none; }
-  .live-toggle input { accent-color: var(--cs); width: 15px; height: 15px; }
-  .btn-run { background: var(--action); color: var(--on-action); border: none; padding: 11px 24px; box-shadow: 0 8px 28px -10px var(--action); }
-  .btn-run:hover { background: var(--action-hover); }
-  .btn-run .spin { width: 13px; height: 13px; border-radius: 50%; border: 2px solid color-mix(in srgb, var(--on-action) 35%, transparent); border-top-color: var(--on-action); display: none; animation: spin .7s linear infinite; }
+  .demo-actions { display: flex; gap: 8px; align-items: center; padding: 14px 22px; border-top: 1px solid var(--line); background: rgba(255,255,255,.015); border-radius: 0 0 var(--radius) var(--radius); }
+  /* the live-update switch */
+  .live-toggle { display: flex; align-items: center; gap: 10px; font-size: 13px; color: #d4d4d8; margin-right: auto; cursor: pointer; user-select: none; }
+  .live-toggle input { -webkit-appearance: none; appearance: none; position: relative; width: 32px; height: 18px; margin: 0; flex: none; border-radius: 99px; cursor: pointer;
+    background: rgba(255,255,255,.14); transition: background-color .2s var(--ease-quick); }
+  .live-toggle input::after { content: ""; position: absolute; top: 2px; left: 2px; width: 14px; height: 14px; border-radius: 50%; background: #fafafa;
+    box-shadow: 0 1px 2px rgba(0,0,0,.4); transition: transform .2s var(--ease); }
+  .live-toggle input:checked { background: #34d399; }
+  .live-toggle input:checked::after { transform: translateX(14px); }
+  .live-toggle input:focus-visible { outline: 2px solid #38bdf8; outline-offset: 2px; }
+  .demo-actions .btn { height: 34px; border-radius: 8px; font-size: 13px; }
+  .demo-actions .btn-icon { width: 34px; border: 1px solid var(--line-2); color: #d4d4d8; }
+  .demo-actions .btn-icon:hover { background: rgba(255,255,255,.05); }
+  .btn-run { background: #fafafa; color: #09090b; border: none; padding: 0 16px; gap: 7px; box-shadow: none; }
+  .btn-run:hover { background: #fff; }
+  .btn-run kbd { font: 500 10.5px var(--mono); color: #71717a; border: 1px solid #d4d4d8; border-radius: 4px; padding: 0 4px; margin-left: 2px; }
+  .btn-run .spin { width: 12px; height: 12px; border-radius: 50%; border: 2px solid rgba(9,9,11,.25); border-top-color: #09090b; display: none; animation: spin .7s linear infinite; }
   .btn-run.loading .spin { display: inline-block; }
   .btn-run.loading .play { display: none; }
   @keyframes spin { to { transform: rotate(360deg); } }
@@ -672,15 +710,17 @@
       <h2>Ask the model about one VM. <span class="mute">Every change runs a real forward pass on the server: the v1 course-project models, or the v2 ensemble trained on SMART telemetry (the model chosen in ADR-006). Both policies always see exactly the same inputs.</span></h2>
     </div>
     <div class="demo">
-      <div class="panel pad reveal" id="controls">
-        <div class="field">
-          <div class="field-label">Failure model</div>
-          <div class="seg seg-models" role="radiogroup" aria-label="Failure model">
-            {% if v2 %}<input type="radio" name="which_model" id="m-v2" value="v2" checked><label for="m-v2">v2 Ensemble<small>SMART · 20 models</small></label>{% endif %}
-            <input type="radio" name="which_model" id="m-hgb" value="histgbm" {% if not v2 %}checked{% endif %}><label for="m-hgb">v1 HistGBM<small>age · model</small></label>
-            <input type="radio" name="which_model" id="m-gqat" value="gqat"><label for="m-gqat">v1 GQAT-Net<small>experimental</small></label>
+      <div class="panel reveal" id="controls">
+        <div class="set-group">
+          <p class="set-head">Failure model</p>
+          <div class="choices" role="radiogroup" aria-label="Failure model">
+            {% if v2 %}<input type="radio" name="which_model" id="m-v2" value="v2" checked><label for="m-v2"><span class="dot"></span><span><b>v2 ensemble</b><small>SMART telemetry · 20 models</small></span><span class="tag-mini">default</span></label>{% endif %}
+            <input type="radio" name="which_model" id="m-hgb" value="histgbm" {% if not v2 %}checked{% endif %}><label for="m-hgb"><span class="dot"></span><span><b>v1 HistGBM</b><small>drive age and model only</small></span><span class="tag-mini">v1</span></label>
+            <input type="radio" name="which_model" id="m-gqat" value="gqat"><label for="m-gqat"><span class="dot"></span><span><b>v1 GQAT-Net</b><small>attention model, experimental</small></span><span class="tag-mini">v1</span></label>
           </div>
         </div>
+        <div class="set-group">
+          <p class="set-head">Drive</p>
         <div class="field" id="v1Fields">
           <div class="field-label"><label for="model_grp">Drive model</label><span>2013–2017 models</span></div>
           <select id="model_grp">
@@ -728,26 +768,30 @@
           <input type="range" id="age_days" min="0" max="{{ max_age_days }}" step="{{ bin_days }}" value="900" aria-describedby="age_val">
           <div class="range-scale"><span>new</span><span>{{ (max_age_days / 365) | round(1) }} yr</span></div>
         </div>
-        <div class="field">
-          <div class="field-label">Workload criticality</div>
-          <div class="seg" role="radiogroup" aria-label="Workload criticality">
-            {% for c in criticality_tiers %}<input type="radio" name="criticality_tier" id="c-{{ c }}" value="{{ c }}" {% if loop.first %}checked{% endif %}><label for="c-{{ c }}">{{ c | capitalize }}</label>{% endfor %}
-          </div>
         </div>
-        <div class="field">
-          <div class="field-label">VM size</div>
-          <div class="seg" role="radiogroup" aria-label="VM size">
-            {% for s in ['small', 'medium', 'large'] if s in size_tiers %}<input type="radio" name="size_tier" id="s-{{ s }}" value="{{ s }}" {% if s == 'medium' %}checked{% endif %}><label for="s-{{ s }}">{{ s | capitalize }}</label>{% endfor %}
+        <div class="set-group">
+          <p class="set-head">Workload</p>
+          <div class="field">
+            <div class="field-label">Workload criticality</div>
+            <div class="seg" role="radiogroup" aria-label="Workload criticality">
+              {% for c in criticality_tiers %}<input type="radio" name="criticality_tier" id="c-{{ c }}" value="{{ c }}" {% if loop.first %}checked{% endif %}><label for="c-{{ c }}">{{ c | capitalize }}</label>{% endfor %}
+            </div>
+          </div>
+          <div class="field">
+            <div class="field-label">VM size</div>
+            <div class="seg" role="radiogroup" aria-label="VM size">
+              {% for s in ['small', 'medium', 'large'] if s in size_tiers %}<input type="radio" name="size_tier" id="s-{{ s }}" value="{{ s }}" {% if s == 'medium' %}checked{% endif %}><label for="s-{{ s }}">{{ s | capitalize }}</label>{% endfor %}
+            </div>
           </div>
         </div>
         <div class="demo-actions">
-          <label class="live-toggle"><input type="checkbox" id="autoRun" checked> Update as I change inputs</label>
+          <label class="live-toggle" title="Run the model again whenever an input changes"><input type="checkbox" id="autoRun" checked role="switch"> Live update</label>
           <button class="btn btn-ghost btn-icon" type="button" onclick="resetForm()" title="Reset to defaults" aria-label="Reset to defaults">
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="1 4 1 10 7 10"/><path d="M3.5 15a9 9 0 1 0 2.1-9.4L1 10"/></svg>
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><polyline points="1 4 1 10 7 10"/><path d="M3.5 15a9 9 0 1 0 2.1-9.4L1 10"/></svg>
           </button>
           <button class="btn btn-run" type="button" id="runBtn" onclick="runPredict()">
             <span class="spin"></span>
-            <svg class="play" width="12" height="12" viewBox="0 0 24 24" fill="currentColor"><polygon points="6 4 20 12 6 20"/></svg>
+            <svg class="play" width="11" height="11" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><polygon points="6 4 20 12 6 20"/></svg>
             Run
           </button>
         </div>
@@ -1343,7 +1387,11 @@ if (!matchMedia('(prefers-reduced-motion: reduce)').matches) fleetTimer = setInt
 
 /* ---------------- live demo ---------------- */
 const age = $('age_days');
-function ageLabel() { $('age_val').textContent = age.value + ' days · ' + (age.value / 365).toFixed(1) + ' yr'; }
+// sliders fill up to the thumb: --p is the share of the track to the left of it
+function fillRange(r) { r.style.setProperty('--p', ((r.value - r.min) / ((r.max - r.min) || 1) * 100) + '%'); }
+document.addEventListener('input', (e) => { if (e.target.type === 'range') fillRange(e.target); });
+document.querySelectorAll('input[type=range]').forEach(fillRange);
+function ageLabel() { $('age_val').textContent = age.value + ' days · ' + (age.value / 365).toFixed(1) + ' yr'; fillRange(age); }
 ageLabel();
 const radio = (n) => document.querySelector(`input[name=${n}]:checked`).value;
 let lastResult = null, lastInputs = null, debounce = null, inflight = 0;
@@ -1378,7 +1426,7 @@ if (HAS_V2) {
   $('v2_model').addEventListener('input', changed);
   $('temp').addEventListener('input', () => { tempLabel(); changed(); });
 }
-function tempLabel() { if (HAS_V2) $('temp_val').textContent = $('temp').value + ' °C'; }
+function tempLabel() { if (HAS_V2) { $('temp_val').textContent = $('temp').value + ' °C'; fillRange($('temp')); } }
 tempLabel();
 document.querySelectorAll('input[name=which_model]').forEach(r => r.addEventListener('change', syncModelFields));
 syncModelFields();
