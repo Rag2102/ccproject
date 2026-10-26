@@ -1,0 +1,27 @@
+% Week 36, task 3: ethics, data availability and artifact statements. Dataset terms are as
+% recorded in docs/v2/data_sources.md (re-read on each download day); re-check them for the
+% venue's own wording before submission (Week 37).
+\section*{Ethics}
+This work uses only public, anonymised data: drive-level reliability statistics (Backblaze Drive
+Stats), machine and task events from Google's 2019 cluster trace, and VM-level statistics from
+the Azure Public Dataset. None of them identifies a person, and nothing in this study tries to
+link records to people, customers or tenants. All policy results come from simulation; no
+production system was changed, and no experiment involved human participants.
+
+\section*{Data availability}
+Every dataset is used under its published terms and cited as its providers ask.
+Backblaze Drive Stats~\cite{backblaze2026drivestats} is fetched from the provider by a script rather than
+redistributed, and cited as the source. Google ClusterData 2019~\cite{googleclusterdata2019} is
+licensed CC-BY 4.0; the measurement extracts used here are derived from it and are fetched or
+rebuilt by script. The Azure Public Dataset~\cite{cortez2017resource} is dual-licensed CC-BY 4.0
+and MIT; the cleaned extract the simulator samples VMs from is included, with that licence, and
+the Resource Central paper is cited as its users are asked. Checksums of every input and of the
+processed extracts are part of the artifact.
+
+\section*{Artifact}
+The simulator, the frozen protocol and its scenario cards, every evaluation run's summary and
+the scripts that rebuild every figure, table and number in this paper from those summaries are
+available as an anonymised artifact for review, and will be archived with a DOI on publication.
+A reduced reproduction of the main figures runs in under an hour on a laptop; the full study
+takes about 14 hours on eight cores. Every number in the text is generated from the result files,
+and a test fails if any macro the paper uses is undefined.

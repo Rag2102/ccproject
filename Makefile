@@ -48,6 +48,11 @@ audit: numbers
 	$(PY) scripts/v2/43_report_audit.py
 	$(PY) scripts/v2/44_grayscale_check.py
 
+# Week 36: nothing in the submission names the authors (paper, PDF, figures, anonymous Console);
+# lists the tracked files the anonymous repository view must hide
+anon-check:
+	$(PY) scripts/v2/45_anon_check.py
+
 # Week 22: number macros for the paper (paper/numbers.tex); a test fails if a macro is missing
 numbers:
 	$(PY) scripts/v2/40_numbers.py
