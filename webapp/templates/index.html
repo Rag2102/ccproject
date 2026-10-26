@@ -406,16 +406,14 @@
   .phase b { font-size: 13.5px; font-weight: 600; display: block; }
   .phase span { font-size: 12px; color: var(--ink-3); }
   .phase .w { font-family: var(--mono); font-size: 11px; color: var(--ink-3); }
-  /* the plan cube: the Faultline hero cube (27 glossy blocks that split into a graph), told as this project's process */
-  .plan3d { display: grid; grid-template-columns: minmax(0, 1.25fr) minmax(0, 1fr); gap: 8px 28px; align-items: stretch; margin-top: 8px; }
+  /* the hero cube: Faultline's hero cube (27 glossy blocks that split into a graph), told as this project's process */
+  .plan3d { display: grid; grid-template-columns: minmax(0, 1.15fr) minmax(0, 1fr); gap: 8px 28px; align-items: start; margin-top: 8px; }
   .plan3d .phases { grid-template-columns: 1fr; margin-top: 0; align-content: start; }
   .plan3d .phase { padding: 8px 6px 8px 0; }
-  .cube-box { position: relative; min-height: 480px; display: none; cursor: pointer; touch-action: pan-y; user-select: none; -webkit-user-select: none;
+  .cube-box { position: relative; min-height: 520px; display: none; cursor: pointer; touch-action: pan-y; user-select: none; -webkit-user-select: none;
     border-radius: 24px; outline: none; }
   .cube-box:focus-visible { box-shadow: 0 0 0 2px #38bdf8; }
   .has-cube .cube-box { display: block; }
-  .has-cube .tl-track, .has-cube .tl-scale, .has-cube #planSub { display: none; }
-  .cube-only { display: none; } .has-cube .cube-only { display: block; }
   /* the open graph fades out towards the edges instead of being cut off by the canvas */
   .cube-mask { position: absolute; inset: 0; -webkit-mask-image: radial-gradient(ellipse 70% 75% at 50% 50%, #000 55%, transparent 100%);
     mask-image: radial-gradient(ellipse 70% 75% at 50% 50%, #000 55%, transparent 100%); }
@@ -432,7 +430,8 @@
   .cube-hint i { width: 6px; height: 6px; border-radius: 50%; background: var(--ink); animation: cubePulse 2s cubic-bezier(.4,0,.6,1) infinite; }
   .cube-hint.open i { background: #71717a; animation: none; }
   @keyframes cubePulse { 50% { opacity: .5; } }
-  @media (max-width: 880px) { .plan3d { grid-template-columns: 1fr; } .cube-box { min-height: 400px; } }
+  @media (max-width: 880px) { .plan3d { grid-template-columns: 1fr; } }
+  @media (max-width: 960px) { .cube-box { min-height: 420px; } }
   @media (prefers-reduced-motion: reduce) { .cube-hint i { animation: none; } }
 
   .links-row { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 28px; }
@@ -505,15 +504,15 @@
         <div class="fig"><div class="n">18<span style="font-size:18px;color:var(--ink-3)">/60</span></div><div class="l">weeks of the v2 plan done; code ready to Week 28</div></div>
       </div>
     </div>
-    <div class="fleet-card" aria-label="Illustration: hosts coloured by failure risk; VMs move off risky hosts before they fail">
-      <div class="fleet-head"><b>A fleet, simulated</b><span id="fleetClock">day 0</span></div>
-      <svg id="fleet" viewBox="0 0 360 240" role="img" aria-label="Animated grid of hosts"></svg>
-      <div class="fleet-legend">
-        <span><i style="background:var(--cs)"></i>low risk</span>
-        <span><i style="background:var(--th)"></i>high risk</span>
-        <span><i style="background:var(--bad)"></i>failed</span>
-        <span><i style="background:var(--good)"></i>VM moved in time</span>
-      </div>
+    <div class="cube-box" id="cubeBox" role="button" tabindex="0" aria-pressed="false"
+         aria-label="Click the cube: a black cube of 27 blocks, the 60-week plan so far. Press to split it into the project's claims graph and watch which claims hold.">
+      <div class="cube-mask"><canvas id="planCube"></canvas></div>
+      <div class="cube-label" data-k="rec" aria-hidden="true">W3 · a counting artifact</div>
+      <div class="cube-label" data-k="email" aria-hidden="true">option to wait · refuted</div>
+      <div class="cube-label ember" data-k="pay" aria-hidden="true">G1 · ρ ≈ 0 measured</div>
+      <div class="cube-label check" data-k="check" aria-hidden="true">W18 benchmark</div>
+      <div class="cube-label hover" data-k="hover" aria-hidden="true"></div>
+      <p class="cube-hint" id="cubeHint" aria-hidden="true"><i></i><span>Click the cube</span></p>
     </div>
   </div>
 </section>
@@ -901,20 +900,18 @@
     </div>
 
     <div class="panel pad timeline reveal" id="plan">
-      <div class="panel-head"><div><h3>The 60-week plan</h3><p id="planSub">Each square is a week: done in blue; code written and tested, runs or reviews pending, in amber.</p><p class="cube-only">Twenty-seven blocks, the plan so far. Click the cube: it splits into the project's claims graph, the two leads that did not hold go dark, and the path that did lights up. Hover a block for its name; drag to turn it.</p></div></div>
-      <div class="tl-track" id="tlTrack" aria-hidden="true"></div>
-      <div class="tl-scale"><span>Oct 2026</span><span>Apr 2027</span><span>Nov 2027</span></div>
+      <div class="panel-head"><div><h3>The 60-week plan</h3><p>Eleven phases from October 2026 to November 2027: done in blue, under way in amber. Beside them, the problem the plan is about: a fleet in which VMs move off risky hosts before they fail.</p></div></div>
       <div class="plan3d">
         <div>
-          <div class="cube-box" id="cubeBox" role="button" tabindex="0" aria-pressed="false"
-               aria-label="Click the cube: a black cube of 27 blocks, the 60-week plan so far. Press to split it into the project's claims graph and watch which claims hold.">
-            <div class="cube-mask"><canvas id="planCube"></canvas></div>
-            <div class="cube-label" data-k="rec" aria-hidden="true">W3 · a counting artifact</div>
-            <div class="cube-label" data-k="email" aria-hidden="true">option to wait · refuted</div>
-            <div class="cube-label ember" data-k="pay" aria-hidden="true">G1 · ρ ≈ 0 measured</div>
-            <div class="cube-label check" data-k="check" aria-hidden="true">W18 benchmark</div>
-            <div class="cube-label hover" data-k="hover" aria-hidden="true"></div>
-            <p class="cube-hint" id="cubeHint" aria-hidden="true"><i></i><span>Click the cube</span></p>
+          <div class="fleet-card" aria-label="Illustration: hosts coloured by failure risk; VMs move off risky hosts before they fail">
+            <div class="fleet-head"><b>A fleet, simulated</b><span id="fleetClock">day 0</span></div>
+            <svg id="fleet" viewBox="0 0 360 240" role="img" aria-label="Animated grid of hosts"></svg>
+            <div class="fleet-legend">
+              <span><i style="background:var(--cs)"></i>low risk</span>
+              <span><i style="background:var(--th)"></i>high risk</span>
+              <span><i style="background:var(--bad)"></i>failed</span>
+              <span><i style="background:var(--good)"></i>VM moved in time</span>
+            </div>
           </div>
         </div>
         <div class="phases" id="phaseList">
@@ -1437,15 +1434,10 @@ function drawW18() {
 })();
 
 /* ---------------- timeline ---------------- */
-// the flat track: shown only when the 3D plan cube cannot load (no WebGL, or three.js blocked)
-(function () {
-  let h = ''; for (let w = 1; w <= 60; w++) h += `<i class="${w <= 18 ? 'done' : w <= 39 && w !== 35 && w !== 38 ? 'prep' : ''}" title="Week ${w}"></i>`;
-  $('tlTrack').innerHTML = h;
-})();
 </script>
 
 <script type="module">
-/* ---------------- the plan cube ----------------
+/* ---------------- the hero cube ----------------
    Ported from Faultline's hero (reference/faultline-prashant/frontend/src/components/home/HeroGraph3D.tsx): a solid,
    glossy black cube of 27 blocks. Click it (or press Enter/Space) and it splits: nine blocks fly out into this
    project's claims graph and the decision plays (the v1 anomaly has no path to the paper; the "option to wait"
@@ -1507,7 +1499,7 @@ const place = (k, x, y, show, proved, text) => {
 try {
   if (!('WebGL2RenderingContext' in window || 'WebGLRenderingContext' in window)) throw new Error('no WebGL');
   const gl = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: true, powerPreference: 'high-performance' });
-  document.getElementById('plan').classList.add('has-cube');
+  document.documentElement.classList.add('has-cube');
   gl.setPixelRatio(Math.min(1.5, Math.max(1, devicePixelRatio || 1)));
   gl.outputColorSpace = THREE.SRGBColorSpace;
   gl.toneMapping = THREE.ACESFilmicToneMapping;               // react-three-fiber's default, which the original renders with
@@ -1688,8 +1680,8 @@ try {
   };
   requestAnimationFrame(loop);
 } catch (err) {
-  // no WebGL: the flat track above stays
-  document.getElementById('plan').classList.remove('has-cube');
+  // no WebGL: the hero shows its text alone
+  document.documentElement.classList.remove('has-cube');
 }
 </script>
 </body>
