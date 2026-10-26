@@ -427,6 +427,7 @@ function draw() {
       ds.data.forEach(p => { if (p.lo == null) return; const px = x.getPixelForValue(p.x); ctx.beginPath(); ctx.moveTo(px, y.getPixelForValue(p.lo)); ctx.lineTo(px, y.getPixelForValue(p.hi)); ctx.stroke(); }); });
     const z = y.getPixelForValue(0); ctx.setLineDash([5, 5]); ctx.strokeStyle = cssv('--ink-3'); ctx.beginPath(); ctx.moveTo(c.chartArea.left, z); ctx.lineTo(c.chartArea.right, z); ctx.stroke();
     ctx.setLineDash([]); ctx.fillStyle = cssv('--ink-2'); ctx.font = "700 11px Nunito";
+    if (c.data.datasets.some((ds, i) => ds.data.some(p => p.x < 0) && !c.getDatasetMeta(i).hidden)) { ctx.textAlign = 'center'; ctx.textBaseline = 'top'; ctx.fillStyle = cssv('--ink-3'); ctx.fillText('E', x.getPixelForValue(-0.03), c.chartArea.top + 4); ctx.textAlign = 'start'; ctx.textBaseline = 'alphabetic'; ctx.fillStyle = cssv('--ink-2'); }
     if (base === 'P0') ctx.fillText('never migrating', c.chartArea.right - 92, z - 6);
     else { const one = y.getPixelForValue(1); ctx.setLineDash([5, 5]); ctx.strokeStyle = 'rgba(242,194,90,.6)'; ctx.beginPath(); ctx.moveTo(c.chartArea.left, one); ctx.lineTo(c.chartArea.right, one); ctx.stroke();
       ctx.setLineDash([]); ctx.fillStyle = cssv('--amber'); ctx.fillText('δ = 1%', c.chartArea.right - 46, one - 6); }
@@ -434,10 +435,11 @@ function draw() {
   if (chart) chart.destroy();
   chart = new Chart(document.getElementById('cx'), { type: 'line', data: { datasets: sets }, plugins: [bars], options: {
     responsive: true, maintainAspectRatio: false, devicePixelRatio: Math.max(2, devicePixelRatio || 1), animation: REDUCED ? false : {},
-    plugins: { legend: { labels: { color: cssv('--ink-2'), font: { family: 'Nunito', weight: '700' }, usePointStyle: true } },
+    plugins: { legend: { display: false },  // the checkboxes above are the legend
+      
       tooltip: { callbacks: { label: (it) => `${it.dataset.label}: ${it.raw.y >= 0 ? '+' : ''}${it.raw.y.toFixed(2)}% [${it.raw.lo.toFixed(2)}, ${it.raw.hi.toFixed(2)}], n=${it.raw.n}${it.raw.reg ? ' (' + it.raw.reg + ')' : ''}${it.raw.share != null ? `; ${Math.round(100 * it.raw.share)}% of seeds beat P0` : ''}${it.raw.expl ? '; exploratory' : ''}` } } },
-    scales: { x: { type: 'linear', min: -0.06, max: 0.95, title: { display: true, text: 'latent correlation ρL between criticality and host risk', color: cssv('--ink-3'), font: { family: 'Nunito', weight: '700' } }, ticks: { color: cssv('--ink-3') }, grid: { color: cssv('--line') } },
-      y: { title: { display: true, text: BASE[base].y, color: cssv('--ink-3'), font: { family: 'Nunito', weight: '700' } }, ticks: { color: cssv('--ink-3'), callback: v => (v > 0 ? '+' : '') + v + '%' }, grid: { color: cssv('--line') } } } } });
+    scales: { x: { type: 'linear', min: -0.06, max: 0.95, title: { display: true, text: 'latent correlation ρL between criticality and host risk', color: cssv('--ink-3'), font: { family: 'Nunito', weight: '700' } }, afterBuildTicks: ax => { ax.ticks = [0, 0.2, 0.4, 0.6, 0.8].map(value => ({ value })); }, ticks: { color: cssv('--ink-3') }, grid: { color: cssv('--line') } },
+      y: { suggestedMin: Math.min(0, ...sets.flatMap(d => d.data.map(p => p.lo ?? p.y))), suggestedMax: Math.max(0, ...sets.flatMap(d => d.data.map(p => p.hi ?? p.y))), title: { display: true, text: BASE[base].y, color: cssv('--ink-3'), font: { family: 'Nunito', weight: '700' } }, ticks: { color: cssv('--ink-3'), callback: v => (v > 0 ? '+' : '') + v + '%' }, grid: { color: cssv('--line') } } } } });
 }
 </script>
 </body>
