@@ -53,6 +53,14 @@ audit: numbers
 anon-check:
 	$(PY) scripts/v2/45_anon_check.py
 
+# Week 39: rebuild every summary and number from a clean clone and require identical files;
+# then the supplementary zip (anonymous Console, summaries, current figures, tables)
+final-check:
+	scripts/v2/final_check.sh
+
+supplementary:
+	$(PY) scripts/v2/47_supplementary.py
+
 # Week 22: number macros for the paper (paper/numbers.tex); a test fails if a macro is missing
 numbers:
 	$(PY) scripts/v2/40_numbers.py
