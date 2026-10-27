@@ -945,7 +945,7 @@
   .close::before { content: ""; position: absolute; left: 0; right: 0; top: 40px; z-index: -1; max-width: 640px; height: 256px; margin: 0 auto; border-radius: 50%;
     background: radial-gradient(closest-side, rgba(255,255,255,.07), transparent); }
   .close h2 { font-weight: 510; font-size: clamp(2.2rem, 5.4vw, 4rem); line-height: 1.04; letter-spacing: -0.03em; margin: 0; }
-  .close p { max-width: 30rem; margin: 20px auto 0; font-size: 17px; line-height: 1.6; color: #8a8f98; }
+  .close p { max-width: 38rem; margin: 20px auto 0; font-size: 17px; line-height: 1.6; color: #8a8f98; }
   .codes { display: grid; gap: 12px; max-width: 600px; margin: 36px auto 0; text-align: left; }
   .code { border: 1px solid var(--line); border-radius: 14px; background: var(--surface); overflow: hidden; }
   .code header { display: flex; align-items: center; justify-content: space-between; gap: 10px; padding: 9px 12px 9px 16px; border-bottom: 1px solid var(--line); }
@@ -1854,19 +1854,19 @@
     <div class="mark-svg" aria-hidden="true"><svg viewBox="0 0 1000 200" focusable="false"><text x="0" y="168" textLength="1000" lengthAdjust="spacingAndGlyphs" font-size="200" fill="rgba(255,255,255,0.05)">VM Mitigation</text></svg></div>
   </div>
   <section class="close" aria-labelledby="close-title">
-    <h2 id="close-title"><span class="gradient-text">Don't trust this page.</span><br><span class="gradient-text">Rerun it.</span></h2>
-    <p>The v2 numbers are generated from committed results, never typed in. A reduced version of every main figure and table reruns in minutes on a laptop.</p>
+    <h2 id="close-title"><span class="gradient-text">Every result is reproducible.</span><br><span class="gradient-text">Verify it independently.</span></h2>
+    <p>All v2 figures are generated directly from the committed results; no value on this site is entered by hand. A reduced-scale version of every principal figure and table can be regenerated on a standard laptop in approximately four minutes.</p>
     <div class="codes">
-      <div class="code"><header><div><b>Reproduce, small</b><span>minutes on a laptop</span></div><button type="button" data-copy>Copy</button></header><pre><span class="p">$ </span>git clone -b v2-research https://github.com/Rag2102/ccproject.git
+      <div class="code"><header><div><b>Reproduce the results at reduced scale</b><span>approx. 4 min on a laptop</span></div><button type="button" data-copy>Copy</button></header><pre><span class="p">$ </span>git clone -b v2-research https://github.com/Rag2102/ccproject.git
 <span class="p">$ </span>cd ccproject
 <span class="p">$ </span>python3 -m venv .venv && .venv/bin/pip install -r requirements.txt
 <span class="p">$ </span>make reproduce-small</pre></div>
-      <div class="code"><header><div><b>Run this site</b><span>localhost:5000</span></div><button type="button" data-copy>Copy</button></header><pre><span class="p">$ </span>cd webapp && pip install flask
+      <div class="code"><header><div><b>Run this website locally</b><span>http://localhost:5000</span></div><button type="button" data-copy>Copy</button></header><pre><span class="p">$ </span>cd webapp && pip install flask
 <span class="p">$ </span>python3 app.py</pre></div>
     </div>
     <div class="cta-row">
-      <a class="btn btn-primary" href="https://github.com/Rag2102/ccproject/blob/main/docs/v2/PROTOCOL.md" target="_blank" rel="noopener">Read the pre-registered protocol <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg></a>
-      <a class="btn btn-ghost" href="https://github.com/Rag2102/ccproject" target="_blank" rel="noopener">Source</a>
+      <a class="btn btn-primary" href="https://github.com/Rag2102/ccproject/blob/main/docs/v2/PROTOCOL.md" target="_blank" rel="noopener">View the pre-registered protocol <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg></a>
+      <a class="btn btn-ghost" href="https://github.com/Rag2102/ccproject" target="_blank" rel="noopener">View the source code</a>
     </div>
   </section>
 
