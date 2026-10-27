@@ -6,33 +6,35 @@
 <title>Research Console · VM Mitigation v2</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;600&family=Nunito:wght@400;600;700;800&family=JetBrains+Mono:wght@500&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Mona+Sans:wdth,wght@75..125,400..900&family=Geist+Mono:wght@400;500&display=swap" rel="stylesheet">
 <style>
   /* design tokens shared with the project site (webapp/templates/index.html) */
   :root {
-    --bg: #040806; --bg-2: #0a120e; --surface: #0b1410; --surface-2: #101b16;
-    --line: rgba(140,255,195,.08); --line-2: rgba(140,255,195,.16);
-    --ink: #e7f3ec; --ink-2: #a2b8ad; --ink-3: #6c8579;
-    --good: #4ee597; --th: #ff9a66; --amber: #f2c25a; --cs: #7cc4ff;
+    --bg: #08090a; --bg-2: #111214; --surface: #0f1011; --surface-2: #17181a;
+    --line: rgba(255,255,255,.08); --line-2: rgba(255,255,255,.14);
+    --ink: #f7f8f8; --ink-2: #9ba0a8; --ink-3: #7a7f87;
+    --good: #5ef0b4; --th: #ff7b39; --amber: #f2c25a; --cs: #7cc4ff;
+    --ember: oklch(0.72 0.19 45); --iris: oklch(0.66 0.19 290); --hl: rgba(255,255,255,.03);
     --p3: #E69F00; --p4: #009E73; --p5: #0072B2; --p6: #56B4E9;
-    --radius: 22px; --display: 'Fredoka', 'Nunito', sans-serif; --sans: 'Nunito', system-ui, sans-serif;
-    --mono: 'JetBrains Mono', ui-monospace, monospace;
+    --radius: 16px; --display: 'Inter', system-ui, sans-serif; --sans: 'Inter', system-ui, -apple-system, sans-serif;
+    --mono: 'Geist Mono', ui-monospace, monospace;
   }
   /* Week 34: light theme (system setting, or the header toggle) */
   @media (prefers-color-scheme: light) { :root:not([data-theme="dark"]) {
-    --bg: #f6faf7; --bg-2: #eaf2ed; --surface: #ffffff; --surface-2: #f1f6f3;
-    --line: rgba(10,40,25,.09); --line-2: rgba(10,40,25,.17);
-    --ink: #0c1912; --ink-2: #3f5248; --ink-3: #5f7368;
-    --good: #0f8a52; --th: #c2410c; --amber: #8a5d00; --cs: #1d5fd1; } }
+    --bg: #fafafa; --bg-2: #f1f1f3; --surface: #ffffff; --surface-2: #f5f5f6;
+    --line: rgba(9,9,11,.08); --line-2: rgba(9,9,11,.15);
+    --ink: #09090b; --ink-2: #3f3f46; --ink-3: #5f5f69;
+    --good: #0f8a52; --th: #c2410c; --amber: #8a5d00; --cs: #1d5fd1; --hl: rgba(255,255,255,.6); } }
   :root[data-theme="light"] {
-    --bg: #f6faf7; --bg-2: #eaf2ed; --surface: #ffffff; --surface-2: #f1f6f3;
-    --line: rgba(10,40,25,.09); --line-2: rgba(10,40,25,.17);
-    --ink: #0c1912; --ink-2: #3f5248; --ink-3: #5f7368;
-    --good: #0f8a52; --th: #c2410c; --amber: #8a5d00; --cs: #1d5fd1; }
+    --bg: #fafafa; --bg-2: #f1f1f3; --surface: #ffffff; --surface-2: #f5f5f6;
+    --line: rgba(9,9,11,.08); --line-2: rgba(9,9,11,.15);
+    --ink: #09090b; --ink-2: #3f3f46; --ink-3: #5f5f69;
+    --good: #0f8a52; --th: #c2410c; --amber: #8a5d00; --cs: #1d5fd1; --hl: rgba(255,255,255,.6); }
   @media (prefers-reduced-motion: reduce) { *, *::before, *::after { transition: none !important; animation: none !important; scroll-behavior: auto !important; } }
   * { box-sizing: border-box; }
-  body { margin: 0; font-family: var(--sans); color: var(--ink); line-height: 1.55; min-height: 100vh;
-    background: radial-gradient(1000px 560px at 8% -10%, rgba(34,197,94,.14), transparent 60%), var(--bg); }
+  body { margin: 0; font-family: var(--sans); color: var(--ink); line-height: 1.55; min-height: 100vh; letter-spacing: -0.011em; -webkit-font-smoothing: antialiased;
+    background: radial-gradient(55% 420px at 50% -120px, color-mix(in srgb, var(--ink) 7%, transparent), transparent 80%),
+                radial-gradient(30% 360px at 18% -80px, color-mix(in oklch, var(--iris, #7c6cf0) 14%, transparent), transparent 80%), var(--bg); }
   .wrap { max-width: 1320px; margin: 0 auto; padding: 0 32px; }
   @media (max-width: 600px) { .wrap { padding: 0 16px; } }
   header { display: flex; align-items: center; gap: 14px; height: 64px; border-bottom: 1px solid var(--line); padding: 0 28px; }
@@ -126,11 +128,50 @@
   .fig .kv b { color: var(--ink); font-weight: 500; text-align: right; }
   .fig code { display: block; font: 500 11.5px var(--mono); background: var(--bg-2); border: 1px solid var(--line); border-radius: 10px; padding: 8px 10px; color: var(--ink-2); overflow-x: auto; white-space: nowrap; }
   @media (max-width: 600px) { header { padding: 0 16px; height: auto; min-height: 64px; flex-wrap: wrap; padding-top: 10px; padding-bottom: 10px; } .grid { gap: 14px; } .panel { padding: 16px; } .slider { grid-template-columns: 1fr 60px; } .slider span:first-child { grid-column: 1 / -1; } .verdict { grid-template-columns: 1fr; } }
+  /* ---------- the site's look (Faultline's base, as on the project site) ---------- */
+  ::selection { background: color-mix(in oklch, var(--iris, #7c6cf0) 55%, transparent); color: #fff; }
+  header { position: sticky; top: 0; z-index: 20; height: 56px; padding: 0 24px; gap: 12px; border-bottom: 1px solid var(--line);
+    background: color-mix(in srgb, var(--bg) 72%, transparent); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); }
+  header .brand { display: flex; align-items: center; gap: 8px; color: var(--ink); text-decoration: none; }
+  header .brand svg { width: 26px; height: 26px; }
+  header .brand b { font: 590 15px var(--sans); letter-spacing: -0.01em; }
+  header .tag { font: 12px var(--mono); color: var(--ink-3); padding: 3px 8px; border: 1px solid var(--line-2); border-radius: 6px; white-space: nowrap; }
+  nav a { position: relative; border-radius: 8px; padding: 6px 11px; font-size: 13.5px; font-weight: 500; color: var(--ink-2); transition: color .15s; }
+  nav a:hover { color: var(--ink); }
+  nav a.on { color: var(--ink); background: transparent; }
+  nav a.on::after { content: ""; position: absolute; left: 11px; right: 11px; bottom: -11px; height: 2px; border-radius: 2px; background: linear-gradient(90deg, var(--ember, #ff7b39), var(--iris, #7c6cf0)); }
+  nav a:focus-visible, button:focus-visible, input:focus-visible { outline: 2px solid #38bdf8; outline-offset: 2px; }
+  .icon-btn { border-radius: 999px; border-color: var(--line-2); color: var(--ink-2); }
+  .icon-btn:hover { background: var(--line); color: var(--ink); }
+  .eyebrow { margin: 44px 0 14px; font: 500 12px var(--mono); letter-spacing: .26em; text-transform: uppercase; color: var(--ink-2); }
+  h1 { margin: 0 0 12px; font: 600 clamp(28px, 3.6vw, 44px)/1.06 var(--sans); letter-spacing: -0.032em;
+    background-image: linear-gradient(90deg, var(--ink) 55%, color-mix(in srgb, var(--ink) 55%, transparent)); -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent; color: transparent; }
+  .lede { color: var(--ink-2); font-size: 16px; line-height: 1.6; max-width: 70ch; margin-bottom: 30px; }
+  .panel { border-radius: var(--radius); box-shadow: inset 0 1px 0 var(--hl);
+    background-image: radial-gradient(420px circle at var(--mx, -999px) var(--my, -999px), color-mix(in srgb, var(--ink) 5%, transparent), transparent 45%);
+    transition: border-color .16s; }
+  .panel:hover { border-color: var(--line-2); }
+  .panel h2 { font: 500 16px var(--sans); letter-spacing: -0.01em; }
+  .seg { padding: 3px; gap: 2px; border-radius: 10px; background: color-mix(in srgb, var(--ink) 3%, transparent); }
+  .seg button { border-radius: 7px; font: 500 13px var(--sans); padding: 6px 11px; color: var(--ink-2); }
+  .seg button:hover { color: var(--ink); }
+  .seg button.on { background: var(--surface-2); color: var(--ink); box-shadow: inset 0 1px 0 var(--hl), 0 0 0 1px var(--line-2); }
+  .pol { font-weight: 500; }
+  .badge { font: 500 10.5px var(--mono); letter-spacing: .06em; border-radius: 6px; padding: 3px 7px; }
+  .chip { border-radius: 6px; font: 500 10.5px var(--mono); }
+  .banner { position: relative; overflow: hidden; border-radius: 12px; padding: 12px 18px 12px 22px; font-weight: 500; background: color-mix(in srgb, var(--amber) 8%, var(--surface)); border-color: color-mix(in srgb, var(--amber) 30%, transparent); }
+  .banner::before { content: ""; position: absolute; left: 0; top: 0; bottom: 0; width: 3px; background: var(--amber); }
+  th { font: 500 11px var(--sans); letter-spacing: .02em; text-transform: none; }
+  .verdict div, .fig code { border-radius: 12px; }
+  .verdict b, .rho-row b, .fig h3 { font-family: var(--sans); font-weight: 600; letter-spacing: -0.01em; }
+  footer { margin: 48px 0 0; padding: 16px 0 40px; border-top: 1px solid var(--line); font-size: 12.5px; }
+  footer a { color: var(--ink-2); } footer a:hover { color: var(--ink); }
+  @media (max-width: 600px) { header { padding: 10px 16px; } nav a.on::after { display: none; } .eyebrow { margin-top: 28px; } }
 </style>
 </head>
 <body>
 <header>
-  <b>Research Console</b><span style="color:var(--ink-3);font-size:13px">VM Mitigation v2 · read-only</span>
+  <a class="brand" href="#s1" aria-label="Research Console, first section"><svg viewBox="0 0 32 32" fill="currentColor" aria-hidden="true"><rect x="4" y="4" width="11" height="11" rx="3"/><rect x="17" y="4" width="11" height="11" rx="3" opacity=".5"/><rect x="4" y="17" width="11" height="11" rx="3" opacity=".5"/><rect x="19" y="19" width="11" height="11" rx="3" fill="#ff7b39"/></svg><b>Research Console</b></a><span class="tag">v2 · read-only</span>
   <nav aria-label="Sections">
     <a href="#s1" data-tab="s1" class="on">S1 Crossover</a><a href="#s2" data-tab="s2">S2 Trace Lens</a><a href="#s3" data-tab="s3">S3 Policy Lab</a><a href="#s4" data-tab="s4">S4 Run Matrix</a><a href="#s5" data-tab="s5">S5 Paired Seeds</a><a href="#s6" data-tab="s6">S6 Figures</a>
   </nav>
@@ -139,7 +180,8 @@
 <main class="wrap">
   <div class="banner" id="banner" hidden></div>
   <div class="tab" id="tab-s1">
-  <h1 id="s1-h1">How much does each policy save over never migrating?</h1>
+  
+  <p class="eyebrow">S1 · Crossover</p><h1 id="s1-h1">How much does each policy save over never migrating?</h1>
   <p class="lede" id="s1-lede">Paired seeds, regression-adjusted Δ against the budget-tuned threshold P2, 95% BCa intervals. Synthetic placement (A1–A7) along the latent correlation ρ<sub>L</sub>; cost spread only (E1–E3) at ρ<sub>L</sub> = 0. Every number comes from <span class="mono">console/data/console.json</span>, generated from <span class="mono">results/summary</span> at the commit shown below.</p>
   <div class="grid">
     <section class="panel">
@@ -169,7 +211,8 @@
   </div>
 
   <div class="tab" id="tab-s2" hidden>
-    <h1>Where does real placement sit?</h1>
+    
+  <p class="eyebrow">S2 · Trace Lens</p><h1>Where does real placement sit?</h1>
     <p class="lede">Kendall's τ-b between task criticality and machine risk in Google's 2019 trace, mapped to the latent axis ρ<sub>L</sub> the simulator uses. Every combination of tier mapping (M1–M3), risk proxy and weighting is shown. Cell f was chosen by a fixed rule and analysed separately; it never entered the G1 class, which is final.</p>
     <section class="panel">
       <h2>S2 · Trace Lens <span class="badge b-meas">MEASURED</span></h2>
@@ -181,7 +224,8 @@
   </div>
 
   <div class="tab" id="tab-s3" hidden>
-    <h1>Why does a policy move this VM, or not?</h1>
+    
+  <p class="eyebrow">S3 · Policy Lab</p><h1>Why does a policy move this VM, or not?</h1>
     <p class="lede">One VM on one host, through each rule. BAM moves a VM when its expected benefit b = p·c·e − m is positive and its density b / w clears the day's cut-off. The threshold moves it when the host's p clears τ, whatever the VM is.</p>
     <section class="panel">
       <h2>S3 · Policy Lab <span class="badge b-ill">ILLUSTRATIVE</span></h2>
@@ -193,7 +237,8 @@
   </div>
 
   <div class="tab" id="tab-s4" hidden>
-    <h1>Is every cell present?</h1>
+    
+  <p class="eyebrow">S4 · Run Matrix</p><h1>Is every cell present?</h1>
     <p class="lede">The frozen matrix: each regime × budget × policy cell and how many evaluation seeds its summary holds. P0 and P2 are the references every cell is compared with, so they have no row of their own.</p>
     <section class="panel">
       <h2>S4 · Run Matrix <span class="badge b-sim">SIMULATED</span></h2>
@@ -202,7 +247,8 @@
     </section>
   </div>
   <div class="tab" id="tab-s5" hidden>
-    <h1>Does every seed agree?</h1>
+    
+  <p class="eyebrow">S5 · Paired Seeds</p><h1>Does every seed agree?</h1>
     <p class="lede">The 30 pre-registered comparisons, one row each, with every evaluation seed as a dot. A comparison wins when its mean Δ against the tuned threshold P2 is at least 1% and its Holm-adjusted p is below 0.05. The SD rule (ADR-007) extends a regime to 50 seeds when the seed-to-seed spread is above its bound. The other view shows the same cells against never migrating.</p>
     <section class="panel">
       <h2>S5 · Paired Seeds <span class="badge b-sim">SIMULATED</span></h2>
@@ -215,7 +261,8 @@
   </div>
 
   <div class="tab" id="tab-s6" hidden>
-    <h1>Where does each figure come from?</h1>
+    
+  <p class="eyebrow">S6 · Figures</p><h1>Where does each figure come from?</h1>
     <p class="lede">Every figure in the paper with the numbers its caption quotes, the result file it is drawn from and the command that rebuilds it. A figure is pending until its result file exists, even if an older or dry-run copy is on disk.</p>
     <div class="figs" id="figs"></div>
   </div>
@@ -426,7 +473,7 @@ function draw() {
     c.data.datasets.forEach((ds, i) => { if (c.getDatasetMeta(i).hidden) return; ctx.strokeStyle = ds.borderColor; ctx.lineWidth = 1.5;
       ds.data.forEach(p => { if (p.lo == null) return; const px = x.getPixelForValue(p.x); ctx.beginPath(); ctx.moveTo(px, y.getPixelForValue(p.lo)); ctx.lineTo(px, y.getPixelForValue(p.hi)); ctx.stroke(); }); });
     const z = y.getPixelForValue(0); ctx.setLineDash([5, 5]); ctx.strokeStyle = cssv('--ink-3'); ctx.beginPath(); ctx.moveTo(c.chartArea.left, z); ctx.lineTo(c.chartArea.right, z); ctx.stroke();
-    ctx.setLineDash([]); ctx.fillStyle = cssv('--ink-2'); ctx.font = "700 11px Nunito";
+    ctx.setLineDash([]); ctx.fillStyle = cssv('--ink-2'); ctx.font = "600 11px Inter";
     if (c.data.datasets.some((ds, i) => ds.data.some(p => p.x < 0) && !c.getDatasetMeta(i).hidden)) { ctx.textAlign = 'center'; ctx.textBaseline = 'top'; ctx.fillStyle = cssv('--ink-3'); ctx.fillText('E', x.getPixelForValue(-0.03), c.chartArea.top + 4); ctx.textAlign = 'start'; ctx.textBaseline = 'alphabetic'; ctx.fillStyle = cssv('--ink-2'); }
     if (base === 'P0') ctx.fillText('never migrating', c.chartArea.right - 92, z - 6);
     else { const one = y.getPixelForValue(1); ctx.setLineDash([5, 5]); ctx.strokeStyle = 'rgba(242,194,90,.6)'; ctx.beginPath(); ctx.moveTo(c.chartArea.left, one); ctx.lineTo(c.chartArea.right, one); ctx.stroke();
@@ -438,9 +485,15 @@ function draw() {
     plugins: { legend: { display: false },  // the checkboxes above are the legend
       
       tooltip: { callbacks: { label: (it) => `${it.dataset.label}: ${it.raw.y >= 0 ? '+' : ''}${it.raw.y.toFixed(2)}% [${it.raw.lo.toFixed(2)}, ${it.raw.hi.toFixed(2)}], n=${it.raw.n}${it.raw.reg ? ' (' + it.raw.reg + ')' : ''}${it.raw.share != null ? `; ${Math.round(100 * it.raw.share)}% of seeds beat P0` : ''}${it.raw.expl ? '; exploratory' : ''}` } } },
-    scales: { x: { type: 'linear', min: -0.06, max: 0.95, title: { display: true, text: 'latent correlation ρL between criticality and host risk', color: cssv('--ink-3'), font: { family: 'Nunito', weight: '700' } }, afterBuildTicks: ax => { ax.ticks = [0, 0.2, 0.4, 0.6, 0.8].map(value => ({ value })); }, ticks: { color: cssv('--ink-3') }, grid: { color: cssv('--line') } },
-      y: { suggestedMin: Math.min(0, ...sets.flatMap(d => d.data.map(p => p.lo ?? p.y))), suggestedMax: Math.max(0, ...sets.flatMap(d => d.data.map(p => p.hi ?? p.y))), title: { display: true, text: BASE[base].y, color: cssv('--ink-3'), font: { family: 'Nunito', weight: '700' } }, ticks: { color: cssv('--ink-3'), callback: v => (v > 0 ? '+' : '') + v + '%' }, grid: { color: cssv('--line') } } } } });
+    scales: { x: { type: 'linear', min: -0.06, max: 0.95, title: { display: true, text: 'latent correlation ρL between criticality and host risk', color: cssv('--ink-3'), font: { family: 'Inter', weight: '700' } }, afterBuildTicks: ax => { ax.ticks = [0, 0.2, 0.4, 0.6, 0.8].map(value => ({ value })); }, ticks: { color: cssv('--ink-3') }, grid: { color: cssv('--line') } },
+      y: { suggestedMin: Math.min(0, ...sets.flatMap(d => d.data.map(p => p.lo ?? p.y))), suggestedMax: Math.max(0, ...sets.flatMap(d => d.data.map(p => p.hi ?? p.y))), title: { display: true, text: BASE[base].y, color: cssv('--ink-3'), font: { family: 'Inter', weight: '700' } }, ticks: { color: cssv('--ink-3'), callback: v => (v > 0 ? '+' : '') + v + '%' }, grid: { color: cssv('--line') } } } } });
 }
+// a soft light follows the pointer across the cards, as on the project site
+document.addEventListener('pointermove', (e) => {
+  const el = e.target.closest && e.target.closest('.panel'); if (!el) return;
+  const r = el.getBoundingClientRect();
+  el.style.setProperty('--mx', (e.clientX - r.left) + 'px'); el.style.setProperty('--my', (e.clientY - r.top) + 'px');
+}, { passive: true });
 </script>
 </body>
 </html>
