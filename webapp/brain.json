@@ -1,0 +1,470 @@
+{
+ "built": "2026-10-27",
+ "source": "v2-research@9bcabd4",
+ "claims": [
+  {
+   "id": "C1",
+   "kind": "claim",
+   "title": "In three Google 2019 cells, critical work is essentially uncorrelated with machine risk",
+   "evidence": "G1_decision.md; trace F3",
+   "size": "|τ-b| ≤ 0.075 under every mapping and proxy; latent upper bound ≤ 0.082",
+   "family": "G1 (pre-registered gate)",
+   "caveat": "Removal proxy, not failures; 79-166 long removals per cell; the sign depends on the mapping; no second source yet",
+   "status": "ready"
+  },
+  {
+   "id": "C2a",
+   "kind": "claim",
+   "title": "Under calibrated probabilities, the same budget and horizon-matched accounting, budget-aware selection never loses in expectation to a probability threshold",
+   "evidence": "THEORY.md T1, T2",
+   "size": "Proved; smallest no-noise Δ in the grid +0.06%",
+   "family": "Theory",
+   "caveat": "One-shot model; fixed e; A1-A4",
+   "status": "ready"
+  },
+  {
+   "id": "C2b",
+   "kind": "claim",
+   "title": "Its advantage is driven by the spread of costs and is largest near ρ = 0, not above a break-even correlation",
+   "evidence": "THEORY.md T3; theory_check.json (3,024 / 3,024 points)",
+   "size": "Closed form; MC within max(3 SE, 0.001). Simulation (W18): at ρ = 0 BAM's saving against P0 rises with σ_κ (−2.4 → +1.6 → +5.3%); T3 gets the direction against P2 right but under-predicts it by 7-24 points",
+   "family": "Theory + exploratory simulation",
+   "caveat": "One-shot; the simulator breaks it on purpose (Section 6 of THEORY.md); the budget never binds in simulation",
+   "status": "ready"
+  },
+  {
+   "id": "C2c",
+   "kind": "claim",
+   "title": "Noise in p alone does not reverse the advantage at ρ ≥ 0; flattening miscalibration can",
+   "evidence": "THEORY.md T4",
+   "size": "0 of 576 points negative at ρ ≥ 0 with γ = 1; down to −4.2% at γ = 0.5",
+   "family": "Theory",
+   "caveat": "T4 as stated in the plan is partly false: reported as such",
+   "status": "ready"
+  },
+  {
+   "id": "C3a",
+   "kind": "claim",
+   "title": "In the realistic regimes (B1, B2), BAM [does / does not] beat the budget-tuned threshold by ≥ 1%",
+   "evidence": "Table 3; etc.",
+   "size": "Bonferroni-simultaneous BCa, n = 30, Holm over 30",
+   "family": "Confirmatory",
+   "caveat": "P2 is tuned to use the budget (ADR-005) and costs 29-772% more than never migrating in every A/E seed; the wording must lead with the saving against P0 (W18: BAM +5.0% at ρ_L = 0, up to +10.8% at 0.3). A3/A5 SD extension pending",
+   "status": "open (A done; B, C pending)"
+  },
+  {
+   "id": "C3b",
+   "kind": "claim",
+   "title": "The guard P6 [captures ≥ 90% of the better policy's benefit on D and never loses > 1% to P2]",
+   "evidence": "F8; adaptive_D.json",
+   "size": "Per seed, n = 30",
+   "family": "Confirmatory (D) / exploratory",
+   "caveat": "The fallback is the expensive P2 (owner decision). W18: the guard is worse than never migrating in most A/E cells (−0.3% to −143%)",
+   "status": "open, at risk"
+  },
+  {
+   "id": "C3c",
+   "kind": "claim",
+   "title": "The guard never switches on a control whose scores carry no information",
+   "evidence": "P6 smoke; Week 18 noise control",
+   "size": "0 of 5 dev seeds (smoke); eval to come",
+   "family": "Exploratory",
+   "caveat": "Smoke on dev seeds",
+   "status": "partly ready"
+  },
+  {
+   "id": "C3d",
+   "kind": "claim",
+   "title": "SMART telemetry, not model class, carries the failure signal",
+   "evidence": "failure_model_v2.md; ADR-006",
+   "size": "PR-AUC 0.0018 → 0.074 (single) → 0.103 (ensemble, deployed); forward-in-time test",
+   "family": "Exploratory",
+   "caveat": "Drive-level; host-level composition assumed",
+   "status": "ready"
+  },
+  {
+   "id": "C4",
+   "kind": "claim",
+   "title": "An open benchmark: scenario cards, hashed worlds, a result schema and a one-command reproduction",
+   "evidence": "VMMBench, make reproduce-small (3.6 min)",
+   "size": "n/a",
+   "family": "Artifact",
+   "caveat": "v0.9 at Week 25; hidden seeds at Week 53",
+   "status": "partly ready"
+  },
+  {
+   "id": "C5",
+   "kind": "claim",
+   "title": "A read-only console shows every number with its provenance",
+   "evidence": "console/",
+   "size": "n/a",
+   "family": "Artifact, not a claim",
+   "caveat": "Built from vmconsole.json at the tagged commit",
+   "status": "built: S1-S6 (S5 paired seeds, S6 figures, Weeks 31 and 34)"
+  },
+  {
+   "id": "C6",
+   "kind": "claim",
+   "title": "Robustness: which assumptions the conclusions depend on most",
+   "evidence": "F6, F7, Morris (w20_morris.json)",
+   "size": "μ* ranking",
+   "family": "Exploratory",
+   "caveat": "Morris on A3 only, 3 seeds per point, fast P2 tuner",
+   "status": "open"
+  },
+  {
+   "id": "C7",
+   "kind": "claim",
+   "title": "Results replicate on fresh seeds",
+   "evidence": "confirmatory_replication.json",
+   "size": "n = 30 (seeds 1001-1030)",
+   "family": "Replication",
+   "caveat": "Tests luck, not simulator misspecification",
+   "status": "open"
+  },
+  {
+   "id": "C8",
+   "kind": "claim",
+   "title": "A Narya-inspired bandit that learns from realised outcomes saves more than BAM and migrates far less",
+   "evidence": "F4b; vs_p0.json",
+   "size": "W18: in every A and E cell P5's interval lies above BAM's (A1, 2%: +8.6% against +5.0%; 699 against 23,827 migrations)",
+   "family": "Exploratory",
+   "caveat": "Oracle probabilities for both. Diagnosed (dev seeds): the gap is P5's avoid-allocation action; confirmed on the eval seeds (C9, RESULTS_AVOID.md), so \"learns from realised outcomes\" is not the reason and the wording must say so; B, C pending",
+   "status": "open (wording)"
+  },
+  {
+   "id": "C9",
+   "kind": "claim",
+   "title": "Keeping new VMs off the riskiest hosts, with no migration, saves more than any migration policy",
+   "evidence": "F4b; RESULTS_AVOID.md; explore_avoid.json",
+   "size": "Eval seeds 1-30, every A and E cell: +11% to +20% against P0, 95% BCa; 6-13 points above BAM, 2-3 above P5",
+   "family": "Exploratory (ADR-010, post-freeze)",
+   "caveat": "Oracle probabilities; one marking share (2%); rejected arrivals rise up to about a quarter in tight regimes and stranded capacity is not charged",
+   "status": "ready (A, E); B, C, D after run_rest.sh"
+  }
+ ],
+ "decisions": [
+  {
+   "id": "ADR-001",
+   "kind": "decision",
+   "title": "AWS is off the critical path",
+   "status": "accepted",
+   "date": "2026-10-04",
+   "file": "ADR-001-aws-off-critical-path.md",
+   "context": {
+    "text": "v1 shipped an AWS serverless deployment (cloud/: CloudFront, API Gateway, Lambda, Step Functions). The research result and both papers do not need it, and it can consume light weeks. An existing AWS support case is open; the reply to it is still the owner's to send (never open a duplicate).",
+    "items": []
+   },
+   "decision": {
+    "text": "No v2 deliverable depends on AWS. Runs are sharded locally with joblib (weeks 17-21). The cloud/ tree stays as v1 and is touched only if it breaks.",
+    "items": []
+   },
+   "alternatives": {
+    "text": "Move the simulator onto the Step Functions fan-out used for the v1 sweep (rejected: adds cost, credentials and a verification dependency to the critical path).",
+    "items": []
+   },
+   "consequences": {
+    "text": "An AWS outage or support delay cannot block a gate. The Step Functions fan-out may be reused later only by a new ADR.",
+    "items": []
+   }
+  },
+  {
+   "id": "ADR-002",
+   "kind": "decision",
+   "title": "The Console is a read-only view and never blocks the paper",
+   "status": "accepted",
+   "date": "2026-10-04",
+   "file": "ADR-002-console-is-read-only.md",
+   "context": {
+    "text": "The Research Console (v5 Part I section 7) is an artifact, not a scientific claim, and it is the first item cut if time runs short.",
+    "items": []
+   },
+   "decision": {
+    "text": "The Console reads frozen results/summary/*.json only, shows a provenance badge on every number, and is capped at 16 hours before submission.",
+    "items": []
+   },
+   "alternatives": {
+    "text": "Make the Console interactive and let it compute results (rejected: a number could differ between the paper and the Console).",
+    "items": []
+   },
+   "consequences": {
+    "text": "No result is created or changed in the Console. If it slips, paper A is unaffected.",
+    "items": []
+   }
+  },
+  {
+   "id": "ADR-003",
+   "kind": "decision",
+   "title": "Benchmark-first",
+   "status": "accepted",
+   "date": "2026-10-04",
+   "file": "ADR-003-benchmark-first.md",
+   "context": {
+    "text": "Every run should be reusable for VMMBench, not only for paper A.",
+    "items": []
+   },
+   "decision": {
+    "text": "Every run writes a vmmbench/1 record (schema frozen in week 10). Policies see only Observation objects. Seed families (dev 101-110, pilot 201-205, eval 1-n, replication 1001+, hidden 9001-9100) are never mixed.",
+    "items": []
+   },
+   "alternatives": {
+    "text": "Build the experiments first and package a benchmark afterwards (rejected: results would need regenerating in a different format).",
+    "items": []
+   },
+   "consequences": {
+    "text": "The same summary.json feeds the paper macros, the Console and the leaderboard, so a number cannot differ between them.",
+    "items": []
+   }
+  },
+  {
+   "id": "ADR-004",
+   "kind": "decision",
+   "title": "v2 targets Python 3.12",
+   "status": "accepted",
+   "date": "2026-10-04",
+   "file": "ADR-004-python-3.12.md",
+   "context": {
+    "text": "v1's .python-version said 3.11.15, while ci.yml, the README badge and the Lambda image use 3.12 (the Lambda base image could not install the pinned wheels on 3.11). The v1 checks on 4 Oct 2026 ran on 3.12.14 and passed (42 tests). The plan allows 3.11 or 3.12.",
+    "items": []
+   },
+   "decision": {
+    "text": "v2 pins Python 3.12 (.python-version, requires-python in pyproject.toml). v1 model pickles stay tied to the exact pins in requirements.txt (scikit-learn 1.8.0).",
+    "items": []
+   },
+   "alternatives": {
+    "text": "Stay on 3.11 (rejected: it already conflicts with CI and the Lambda image).",
+    "items": []
+   },
+   "consequences": {
+    "text": "One interpreter for CI, Lambda and local work. Any change of the scikit-learn pin requires re-verifying the v1 .joblib models.",
+    "items": []
+   }
+  },
+  {
+   "id": "ADR-005",
+   "kind": "decision",
+   "title": "P2 is tuned to use the budget, as the protocol says",
+   "status": "accepted (owner, 4 Oct 2026)",
+   "date": "2026-10-04",
+   "file": "ADR-005-p2-tuning.md",
+   "context": {
+    "text": "PROTOCOL.md defines P2, the comparator for the win criterion, as a threshold policy \"tuned to use the budget\": on the dev seeds, the threshold and within-host order that bring budget utilisation to about 95%. The Week 14 pilot (2,000 hosts × 365 days, 2% budget) showed what that comparator costs. At A1, P2 costs 123,643 against 31,906 for never migrating (about 3.9×), because migration cost dominates under v1's cost constants and the rule forces the budget to be spent on low-risk VMs. A cost-tuned alternative (P2c: the threshold and order with the lowest cost on dev seeds) was proposed and run in the pilot. At A1 it never migrates (equal to P0); at A3 it is 2.4% below P0.",
+    "items": []
+   },
+   "decision": {
+    "text": "keep the protocol's rule. P2 is tuned to use the budget (tune_p2(..., criterion=\"budget\"), target utilisation 0.95), per cell and budget, on dev seeds 101-110. P2c is not a comparator, primary or secondary. The pilot outputs that contain it (results/v2/pilot_w14*.json) stay as recorded.",
+    "items": []
+   },
+   "alternatives": {
+    "text": "",
+    "items": [
+     "Tune on cost (P2c) as the comparator. Rejected by the owner: it would change a pre-registered rule after seeing pilot results.",
+     "Report both, with budget-tuned primary. Not chosen."
+    ]
+   },
+   "consequences": {
+    "text": "",
+    "items": [
+     "The win criterion (PROTOCOL.md: mean Delta ≥ 1% and Holm-adjusted lower bound > 0) is measured against budget-tuned P2. Because P2 can cost more than never migrating, a win over P2 does not by itself show that a policy beats doing nothing. Every results table therefore shows P0 and P3 next to P2, so the reader can see that.",
+     "P6's base policy is the budget-tuned P2. The Week 16 guard smoke (scripts/v2/20_guard_smoke.py) used the cost-tuned threshold and is rerun with the budget-tuned one.",
+     "The scale decision uses the SD of Delta against P2, not P2c.",
+     "Expected reviewer objection: \"BAM wins against a straw man\". The answer is the pre-registration, plus the P0 and P3 columns. It goes in the paper's threats section."
+    ]
+   }
+  },
+  {
+   "id": "ADR-006",
+   "kind": "decision",
+   "title": "the simulator's failure model is chosen on validation PR-AUC",
+   "status": "accepted (owner, 4 Oct 2026). Rule committed (0b05ff3) before the validation scores were computed; result appended below. Winner: the ensemble.",
+   "date": "2026-10-04",
+   "file": "ADR-006-model-choice-rule.md",
+   "context": {
+    "text": "TrainedModel (the simulator's model-based predictor) needs one Week 7-style model at H = 30. There are three candidates, all on Week 7's split (train 2023-07-01..2025-08-05, validation 2025-08-06..2026-01-16, test 2026-01-17..2026-06-30, v2 features): Their test PR-AUC is already known: 0.074, 0.091 and 0.131 after isotonic calibration. Choosing on those numbers would make the test period part of the model choice. The choice is therefore made on the validation period. This is not blind, since the test results have been seen, but the rule below is fixed before any validation score exists.",
+    "items": [
+     "boosted: the single gradient-boosting model of Week 7 (data/v2/models/v2_h30.joblib)",
+     "logit: logistic regression on the same features (logit_h30.joblib)",
+     "ensemble: the mean of the 20 bootstrap-trained boosted models of Week 16 (scripts/v2/21_uncertainty_drift.py, seed 16)."
+    ]
+   },
+   "decision": {
+    "text": "1. Score. Drive-day-weighted PR-AUC (12_train.metrics) on the validation period at H = 30, computed on raw scores (before isotonic calibration), because the isotonic maps are fitted on this same period. The ensemble's raw score is the mean of its members' raw probabilities. Boosted and logit are the saved Week 7 models. The ensemble's members were not saved, so they are refitted exactly as in Week 16 (same data, features, hyperparameters and bootstrap seed). 2. Winner. The highest validation PR-AUC. If the 95% interval of the difference between the top two contains 0 (Poisson bootstrap over drives, 1,000 replicates, as in Week 7), take the simpler of the two. The order of simplicity is logit, then boosted, then ensemble. 3. Afterwards. The winner is calibrated isotonically on the validation period, as in Week 7. Its test-period numbers are reported, not used. 4. Whatever the result, the losing candidates appear in the paper's model table. The choice is not revisited after the policy results are seen.",
+    "items": []
+   },
+   "notes": {
+    "text": "scripts/v2/22_model_choice.py → results/v2/model_choice.json.",
+    "items": []
+   },
+   "consequences": {
+    "text": "TrainedModel and the failure worlds for evaluation seeds 1-30 wait only for this result. The risk-averse BAM variant (Week 16) uses the ensemble's interval if the ensemble wins, and otherwise a bootstrap of the winner.",
+    "items": []
+   },
+   "result": {
+    "text": "Run 4 Oct 2026, 21:59 (scripts/v2/22_model_choice.py, results/v2/model_choice.json, logs/model_choice.log). Validation period 2025-08-06..2026-01-16, 930,869 rows, H = 30, raw scores: | Candidate | Validation PR-AUC [95% CI] | | --- | --- | | ensemble (20 bootstrap boosted models, mean) | 0.0939 [0.0827, 0.1100] | | logit | 0.0720 [0.0621, 0.0845] | | boosted (Week 7 single model) | 0.0704 [0.0614, 0.0819] | The top two (ensemble vs logit) differ by 0.013 to 0.032 (paired bootstrap over drives). The interval excludes 0, so the tie rule does not apply. The simulator uses the ensemble, calibrated isotonically on the validation period. Its test numbers, reported and not used for the choice: PR-AUC 0.131, ROC-AUC 0.898 (results/v2/uncertainty_w16.json). The ensemble's 5-95% interval serves the risk-averse BAM variant. On validation, unlike test, logit and boosted are indistinguishable (0.072 vs 0.070). Week 7's test-period lead of logit (0.091 vs 0.074) therefore did not carry over to validation. Deployed calibration (5 Oct 2026). The ensemble exported for the web demo (scripts/v2/25_export_ensemble.py, models/v2_ensemble/ on the site branch) follows step 3: one isotonic map fitted on validation to the mean of the 20 members' raw probabilities. Its validation PR-AUC on raw scores is 0.0939, which reproduces this rule's run exactly. Its test PR-AUC is 0.103 (ROC-AUC 0.894). Week 16's 0.131 came from a different calibration: each member calibrated separately, then averaged. That variant was not chosen here, and switching to it because it scores better on test would be selection on the test set. The model choice itself used raw scores and is unaffected. Wherever the deployed model is quoted, the number is 0.103.",
+    "items": []
+   }
+  },
+  {
+   "id": "ADR-007",
+   "kind": "decision",
+   "title": "scale of the evaluation runs (hosts, horizon, eval seeds)",
+   "status": "accepted (owner, 4 Oct 2026): the recommendation below, 2,000 hosts × 365 days, n = 30 with the SD-triggered extension to 50.",
+   "date": "2026-10-04",
+   "file": "ADR-007-scale.md",
+   "context": {
+    "text": "PROTOCOL.md section 6. The pilot (seeds 201-205; cells A3 and B1 at a 2% budget; 2,000 hosts × 365 days + 30 warm-up) measures SD(Delta) of P3 vs P2 as a proxy. n, hosts and horizon are chosen so that this SD is below the Bonferroni column (30 seeds: 1.6%; 50: 2.1%; 100: 3.1%). delta = 1% never moves. Under ADR-005, P2 is the budget-tuned threshold. Evidence (results/v2/pilot_w14b.json; arrival blend calibrated, so A3 achieves 0.250 against the 0.256 target under P0): | Cell | SD(Delta), P3 vs P2 | 95% upper bound of the SD (4 df) | Bonferroni bound, n = 30 | | --- | --- | --- | --- | | A3 | 0.67% | 1.59% | 1.6% | | B1 | 1.22% | 2.89% | 1.6% | For comparison, the first pilot (uncalibrated A3) gave 1.0% at A3 against budget-tuned P2. Run time is 3-9 s per (policy, seed) at 2,000 hosts on one core, with 10 processes sharing the machine. Recommendation: 2,000 hosts, 365 days + 30 warm-up, n = 30 eval seeds (1-30), with a pre-specified extension:",
+    "items": [
+     "If, after the run, the observed SD(Delta) of any confirmatory comparison exceeds 1.6%, that cell's regime is extended to n = 50 (seeds 31-50) for every policy.",
+     "The decision then uses n = 50 and its Bonferroni bound of 2.1%.",
+     "The extension depends only on the SD, never on the sign or size of Delta."
+    ]
+   },
+   "why": {
+    "text": "",
+    "items": [
+     "The point estimates meet the rule at n = 30, with a margin of 2.4× (A3) and 1.3× (B1).",
+     "A 5-seed SD is imprecise: B1's upper bound is above 1.6%. The extension covers that case without paying for it in advance.",
+     "2,000 hosts keeps the main matrix (10 cells × 4 budgets × about 10 policies × 30 seeds) at an estimated 6-8 hours on 8 cores. P2 tuning (40 cell-budget pairs on dev seeds) adds about 2 hours."
+    ]
+   },
+   "alternatives": {
+    "text": "",
+    "items": [
+     "5,000 hosts × 365 days, n = 30. SD falls by about √2.5, so B1's upper bound is about 1.8%. Compute is about 2.5× larger (roughly a day for the main matrix).",
+     "2,000 hosts, n = 50 from the start (bound 2.1%). Compute is about 1.7×.",
+     "180 days. Not considered: the drift study and regime D need a year."
+    ]
+   },
+   "consequences": {
+    "text": "SIM_SPEC section 11 (\"hosts per cluster 2,000-5,000, set by the pilot\") becomes 2,000. Replication seeds are 1001-1030, extended to 1050 under the same rule.",
+    "items": []
+   }
+  },
+  {
+   "id": "ADR-008",
+   "kind": "decision",
+   "title": "the main matrix uses the oracle on the validated hazards; model-based worlds are a robustness run",
+   "status": "accepted (owner, 4 Oct 2026)",
+   "date": "2026-10-04",
+   "file": "ADR-008-main-predictor.md",
+   "context": {
+    "text": "SIM_SPEC section 7 describes drives replayed from Backblaze with daily scores from the v2 model. As built and validated at G2, drive hazards come from v1's lookup (model group and age, failure.drive_hazard_v1) plus a Weibull non-disk term, and the oracle predictor gives each host its true conditional probability (A1 holds by construction). ADR-006 chose the 20-model ensemble. Replaying it needs: That is about a day of work and compute.",
+    "items": [
+     "full daily features (the stored features are a ~2% sample of drive-days: about 670k rows per quarter for 300k drives)",
+     "scoring about 330 million drive-days with 20 models",
+     "drive replay in the engine."
+    ]
+   },
+   "decision": {
+    "text": "the confirmatory matrix (A1-A7, E1-E3, B1, B2, C, D) uses the validated hazards and the oracle predictor, with the noisy, miscal, drift and noise predictors where the protocol names them. Model-based worlds (drive hazards and scores from the ensemble) are a pre-registered robustness run in Week 20, on B1, B2 and C at 1% and 2%, labelled exploratory. They are not part of the 30-comparison family.",
+    "items": []
+   },
+   "alternatives": {
+    "text": "",
+    "items": [
+     "Build model replay first. Rejected by the owner: delays Week 18 by about a day.",
+     "Add the model-replay variants to the confirmatory family. Rejected: more comparisons for Holm, and the variants would be specified before they exist."
+    ]
+   },
+   "consequences": {
+    "text": "",
+    "items": [
+     "The spread of host risk in the main matrix is that of v1's lookup hazards. The ensemble ranks drives much more sharply (test ROC-AUC 0.90 against 0.63 for v1's features), so the main matrix probably understates how far p is spread across hosts (σ_x in THEORY.md T3).",
+     "The paper states this as a limitation, and the Week 20 run measures its size.",
+     "SIM_SPEC section 9's model predictor stays specified and unbuilt until Week 20."
+    ]
+   }
+  },
+  {
+   "id": "ADR-009",
+   "kind": "decision",
+   "title": "the strengthening experiment is a published migration-cost range (Week 27, task 3)",
+   "status": "accepted (owner, 26 Oct 2026; drafted 5 Oct 2026, before the B/C results exist)",
+   "date": "2026-10-05",
+   "file": "ADR-009-strengthening-experiment.md",
+   "context": {
+    "text": "plan Week 27 asks for one experiment that strengthens the weakest claim (WEAKEST_CLAIM.md). It offers two paths: The migration constants (link 10 Gb/s with 50% usable, dirty rate 150 MB/s at full CPU, 2 concurrent migrations, 1 s / 60 s blackout) are assumptions carried over from the prototype (SIM_SPEC.md section 11). Today they are varied only around their own defaults: estimation error ×0.5 and ×1.5, and the Morris ranges.",
+    "items": [
+     "A second placement trace. Done in Week 21: Google 2019 cell f, chosen by a fixed rule, τ-b −0.004, would-be class C0, which agrees with G1.",
+     "A measured range for migration cost. Published live-migration measurements now, a testbed later (RQ6, Weeks 41-46)."
+    ]
+   },
+   "decision": {
+    "text": "build a migration-cost range from published measurements and rerun the confirmatory regimes at its ends, as exploratory work logged in CHANGES_AFTER_FREEZE.md. Concretely, in Week 29: 1. From each source below, extract the measured total migration time, downtime, effective bandwidth and dirty-rate behaviour, with the setup (hypervisor, link, VM size, workload). Cite each number to a table or figure. 2. Turn them into a low / central / high setting for usable bandwidth, dirty rate and blackout. The setting is written before any rerun. 3. Rerun B1, B2 and C at 1% and 2% (P0, P2, P4, P6), seeds 1-30, at the low and high settings. That is about 2 h on 8 cores. 4. Report how far Δ and the saving against P0 move, beside the main result. Sources (each checked on 5 Oct 2026 to exist with this title, venue and year; numbers not yet extracted, and authors marked * still to be checked against the paper itself): | Source | Venue | Why | | --- | --- | --- | | Clark et al., \"Live Migration of Virtual Machines\" (already in refs.bib) | NSDI 2005 | Pre-copy downtime and total time; the model the simulator uses | | Voorsluys, Broberg, Venugopal, Buyya, \"Cost of Virtual Machine Live Migration in Clouds: A Performance Evaluation\" | CloudCom 2009 (LNCS; arXiv 1109.4974) | Application-level overhead of migration on Web 2.0 workloads | | Akoush, Sohan, Rice, Moore, Hopper, \"Predicting the Performance of Virtual Machine Migration\" | MASCOTS 2010, pp. 37-46 | Link speed and page-dirty rate as the main determinants of migration time | | Liu, Xu, Jin, Gong, Liao, \"Performance and energy modeling for live migration of virtual machines\" | HPDC 2011 (journal version: Cluster Computing, doi 10.1007/s10586-011-0194-3) | Measured cost across five workloads on Xen | | Hu et al.*, \"A quantitative study of virtual machine live migration\" | CAC 2013, doi 10.1145/2494621.2494622 | Comparison across hypervisors (KVM, Xen, VMware, Hyper-V) | | \"Towards a comprehensive performance model of virtual machine live migration\"* | SoCC 2015, doi 10.1145/2806777.2806838 | Published at the target venue; reviewers will know it |",
+    "items": []
+   },
+   "alternatives": {
+    "text": "",
+    "items": [
+     "A third placement trace. Rejected for now: two sources already agree on C0, and the claim most exposed to reviewers is the cost model, not the correlation.",
+     "Model-based worlds (ADR-008, deferred). They remain a candidate for Week 30 if the reviews press on the oracle (R2.1). They address a different weakness and take about a day of compute and work.",
+     "Testbed measurements now. That is RQ6 in Weeks 41-46 and needs hardware; it is out of scope for Phase 6's polish cycle."
+    ]
+   },
+   "consequences": {
+    "text": "",
+    "items": [
+     "Everything this adds is exploratory and outside the 30-comparison family.",
+     "If the published range moves the B-regime result across the 1% bar, the paper says so in the Evaluation section, not only in the Discussion.",
+     "The bibliography gains up to five entries. Each is checked against its publisher page before it enters refs.bib, as the Week 24 rule requires."
+    ]
+   },
+   "implementation": {
+    "text": "",
+    "items": [
+     "The rule for turning measurements into the low and high settings is written in configs/v2/cost_range.yaml (before any rerun): G0-low takes the highest usable share, lowest dirty rate and shortest downtime among the extracted values; G0-high the opposite; at least four sources must be extracted first.",
+     "Clark et al. (2005) is extracted (sections 6.2-6.5, Figures 8-12). The other five sources are pending.",
+     "scripts/v2/38_cost_range.py derives the settings; a regime B1@G0-low is B1 with them (vmsim/scenarios.py); 39_dev_precheck.py checks them on dev seeds; run_w30.sh runs B1, B2 and C at both ends (P0, P2, P4, P6; 1% and 2%; seeds 1-30) as group S, then stats, the saving against P0 and Table 3's exploratory rows. Tested end to end at small scale with placeholder settings."
+    ]
+   }
+  },
+  {
+   "id": "ADR-010",
+   "kind": "decision",
+   "title": "add placement-time avoidance as an exploratory baseline (proposed)",
+   "status": "accepted (owner, 13 Oct 2026; drafted after the post-freeze diagnosis DIAG_P5_VS_BAM.md)",
+   "date": "2026-10-13",
+   "file": "ADR-010-avoidance-baseline.md",
+   "context": {
+    "text": "The Week 18 run found the Narya-inspired P5 ahead of BAM against never migrating. On dev seeds, the diagnosis traced all of P5's advantage to avoid-allocation (marking risky hosts so they take no new VMs), an action no other policy has. Avoidance alone, with no migration, saved 10.6-21.9% against never migrating, more than any migration policy, and BAM added at most about one point on top of it. The frozen matrix has no avoidance-only baseline, so the reader cannot see this.",
+    "items": []
+   },
+   "decision": {
+    "text": "",
+    "items": [
+     "Add two exploratory policies: P0+avoid (mark the riskiest 2% of hosts each day; never migrate) and P4+avoid (BAM plus the same marks).",
+     "Run them on the evaluation seeds of every regime (A-E, 1-30), with the same worlds and budgets, as an exploratory group after the confirmatory runs finish.",
+     "Report them beside P0, P2 and P3 in the companion table against P0 and in F4b.",
+     "They stay outside the 30-comparison family and the G3 rule. Nothing pre-registered changes."
+    ]
+   },
+   "cost": {
+    "text": "Neither needs tuning, and each run takes about 1 s. All 16 regimes × 30 seeds × 3 runs take about 5 min on 8 cores.",
+    "items": []
+   },
+   "implementation": {
+    "text": "",
+    "items": [
+     "scripts/v2/37_explore_avoid.py runs P0+avoid at 2% and P4+avoid at 1% and 2%, on the same worlds and with the same predictor pairing as the frozen runner.",
+     "Output: results/explore/avoid/, plus results/summary/explore_avoid.json (saving against never migrating, with BCa intervals, beside P4 and P5).",
+     "Queued in run_rest.sh after the ADR-007 extension.",
+     "The frozen runner (24_run_matrix.py) is unchanged."
+    ]
+   },
+   "alternatives": {
+    "text": "",
+    "items": [
+     "Leave it to the Discussion, with dev-seed numbers only. Rejected: five dev seeds are too few for a result this central, and a reviewer would ask why the strongest baseline appears only in prose.",
+     "Make P0+avoid the comparator for G3. Rejected: that would change a pre-registered rule after seeing results."
+    ]
+   },
+   "consequences": {
+    "text": "",
+    "items": [
+     "The paper's policy contribution changes shape. \"Where new VMs go matters more than which VMs move\" becomes a candidate headline, decided at G3 with the advisor.",
+     "Marking share (2%) and the noisy-predictor case become natural Week 20-style sensitivity runs for avoidance."
+    ]
+   }
+  }
+ ]
+}

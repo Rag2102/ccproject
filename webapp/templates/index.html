@@ -500,6 +500,7 @@
   .xcard .go svg { transition: transform .2s var(--ease); }
   .xcard:hover .go { color: #fafafa; } .xcard:hover .go svg { transform: translateX(3px); }
   .xcard:last-child { grid-column: span 1; }
+  @media (min-width: 901px) { .xgrid .xcard:last-child:nth-child(3n+1) { grid-column: 1 / -1; min-height: 160px; } }
   /* the end of each page: previous, and the next page as a large link */
   .pager { display: grid; grid-template-columns: auto 1fr; align-items: stretch; gap: 12px; padding-bottom: 96px; }
   .pg { display: flex; flex-direction: column; justify-content: center; gap: 6px; padding: 22px 26px; border: 1px solid var(--line); border-radius: 16px; text-decoration: none; color: inherit;
@@ -753,6 +754,108 @@
   .ex-table td:first-child button:hover { text-decoration: underline; }
   .ex-table tr.sel td { background: rgba(255,255,255,.035); }
 
+  /* ---------- v1 results: a verdict banner, KPI cards, metric bars, a timeline (Faultline's On-call page) ---------- */
+  .v1-banner::before { background: var(--th); }
+  .v1-banner .b-ico { color: var(--th); background: rgba(255,123,57,.08); border-color: rgba(255,123,57,.25); }
+  .v1-banner .v1-why { align-self: center; white-space: nowrap; }
+  .row-head { display: flex; flex-wrap: wrap; align-items: center; gap: 10px 16px; margin: 40px 0 16px; }
+  .row-head h2 { margin: 0; font-size: 19px; font-weight: 500; letter-spacing: -0.01em; color: #fafafa; }
+  .row-head .via { margin-left: auto; }
+  .kpis { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 14px; }
+  @media (max-width: 960px) { .kpis { grid-template-columns: 1fr 1fr; } }
+  @media (max-width: 520px) { .kpis { grid-template-columns: 1fr; } }
+  .kpi { padding: 20px 22px; }
+  .kpi .k { display: flex; align-items: center; gap: 8px; margin: 0; font-size: 14px; color: #d4d4d8; }
+  .kpi .k svg { color: #a1a1aa; }
+  .kpi .n { margin: 14px 0 0; font: 600 34px/1 var(--sans); letter-spacing: -0.03em; color: #fafafa; }
+  .kpi .vs { margin: 10px 0 0; font-size: 12.5px; color: #8a8f98; }
+  .kpi .d { display: inline-flex; margin-left: 6px; padding: 1px 7px; border-radius: 6px; font: 500 12px var(--mono); }
+  .kpi .d.better { color: #a7f3d0; background: rgba(16,185,129,.12); } .kpi .d.worse { color: #fed7aa; background: rgba(255,123,57,.12); } .kpi .d.same { color: #d4d4d8; background: rgba(255,255,255,.06); }
+  .v1-note { margin: 12px 0 0; }
+  .v1-two { margin-top: 24px; }
+  .mrows { display: grid; gap: 14px; }
+  .mrow .top { display: flex; justify-content: space-between; gap: 10px; font-size: 13.5px; color: #e4e4e7; }
+  .mrow .top span { font: 12px var(--mono); color: #8a8f98; }
+  .mrow .mbars { display: grid; gap: 4px; margin-top: 6px; }
+  .mrow .mb { display: grid; grid-template-columns: 104px minmax(0, 1fr) 84px; align-items: center; gap: 10px; font-size: 12px; color: #8a8f98; }
+  .mrow .mb i { display: block; height: 6px; border-radius: 99px; background: rgba(255,255,255,.07); position: relative; overflow: hidden; }
+  .mrow .mb i b { position: absolute; left: 0; top: 0; bottom: 0; border-radius: 99px; background: #71717a; transition: width .5s var(--ease); }
+  .mrow .mb.cs i b { background: var(--cs); } .mrow .mb.cs.better i b { background: var(--good); } .mrow .mb.cs.worse i b { background: var(--th); }
+  .mrow .mb em { font: normal 500 12px var(--mono); color: #e4e4e7; text-align: right; white-space: nowrap; }
+  .v1-base label { flex: none; overflow: visible; }
+  .corr-read { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 8px; margin-top: 14px; }
+  @media (max-width: 600px) { .corr-read { grid-template-columns: 1fr 1fr; } }
+  .corr-read div { padding: 10px 12px; border-radius: 10px; background: rgba(255,255,255,.03); border: 1px solid var(--line); }
+  .corr-read span { display: block; font: 11.5px var(--mono); color: #8a8f98; }
+  .corr-read b { display: block; margin-top: 4px; font: 600 17px var(--mono); }
+  .corr-read b.pos { color: var(--good); } .corr-read b.neg { color: var(--th); }
+  .diag { margin-top: 24px; }
+  .tline { list-style: none; margin: 8px 0 18px; padding: 0; display: grid; gap: 0; }
+  .tline li { display: grid; grid-template-columns: 18px 1fr; gap: 14px; position: relative; padding-bottom: 18px; }
+  .tline li:not(:last-child)::before { content: ""; position: absolute; left: 5px; top: 16px; bottom: 0; width: 1px; background: var(--line-2); }
+  .tline .dot { width: 11px; height: 11px; margin-top: 5px; border-radius: 50%; background: #71717a; box-shadow: 0 0 0 4px rgba(255,255,255,.04); }
+  .tline .dot.warn { background: var(--th); } .tline .dot.ok { background: var(--good); }
+  .tline .k { margin: 0; font: 500 12px var(--mono); letter-spacing: .04em; color: #8a8f98; }
+  .tline p { margin: 4px 0 0; font-size: 15px; line-height: 1.6; color: #d4d4d8; }
+  .tline b { color: #fafafa; font-weight: 600; }
+  .full-table { margin-top: 24px; }
+  .full-table summary { cursor: pointer; font-size: 14.5px; font-weight: 500; color: #e4e4e7; }
+  .full-table[open] summary { margin-bottom: 14px; }
+  /* ---------- Brain (Faultline's company brain): ask the records; a decision tracer; a claims board ---------- */
+  .brain { display: grid; grid-template-columns: minmax(0, 1fr) 300px; gap: 20px; align-items: start; }
+  @media (max-width: 960px) { .brain { grid-template-columns: 1fr; } }
+  .ask { display: flex; gap: 10px; }
+  .ask-box { flex: 1; display: flex; align-items: center; gap: 10px; height: 48px; padding: 0 16px; border-radius: 12px; border: 1px solid var(--line-2); background: rgba(255,255,255,.03); color: #a1a1aa; }
+  .ask-box:focus-within { border-color: #38bdf8; box-shadow: 0 0 0 3px rgba(56,189,248,.18); }
+  .ask-box input { flex: 1; min-width: 0; border: 0; background: transparent; color: #fafafa; font: 16px var(--sans); outline: none; }
+  .ask .btn { height: 48px; }
+  @media (max-width: 520px) { .ask { flex-direction: column; } }
+  .examples { display: flex; flex-wrap: wrap; gap: 8px; margin: 14px 0 22px; }
+  .examples button { height: 30px; padding: 0 12px; border-radius: 99px; border: 1px solid var(--line-2); background: transparent; color: #d4d4d8; font: 13px var(--sans); cursor: pointer; }
+  .examples button:hover { background: rgba(255,255,255,.05); color: #fafafa; }
+  .ans { padding: 24px 26px; }
+  .ans .k { margin: 0; font-size: 13px; color: #8a8f98; }
+  .ans h3 { margin: 6px 0 0; font-size: 21px; font-weight: 500; line-height: 1.35; letter-spacing: -0.015em; color: #fafafa; }
+  .ans h3 .cite { font: 500 14px var(--mono); color: var(--iris); margin-right: 6px; }
+  .ans .blk { margin-top: 18px; }
+  .ans .blk p { margin: 4px 0 0; font-size: 15px; line-height: 1.6; color: #d4d4d8; }
+  .ans ul { margin: 6px 0 0; padding-left: 18px; color: #d4d4d8; font-size: 14.5px; line-height: 1.55; }
+  .ans .meta { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 14px; }
+  .ans .via-line { display: flex; flex-wrap: wrap; align-items: center; gap: 6px 10px; margin-top: 18px; padding-top: 16px; border-top: 1px solid var(--line); font: 12px var(--mono); color: #8a8f98; }
+  .ans .also { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 6px; }
+  .cite-btn { height: 28px; padding: 0 10px; border-radius: 7px; border: 1px solid var(--line-2); background: rgba(255,255,255,.03); color: #e4e4e7; font: 12.5px var(--sans); cursor: pointer; }
+  .cite-btn b { font: 500 12px var(--mono); color: var(--iris); margin-right: 6px; }
+  .cite-btn:hover { background: rgba(255,255,255,.07); }
+  .ans.none h3 { color: #d4d4d8; }
+  .brain-side { padding: 18px; position: sticky; top: 76px; }
+  .hist { list-style: none; margin: 0; padding: 0; display: grid; gap: 4px; }
+  .hist button { width: 100%; padding: 7px 8px; border: 0; border-radius: 7px; background: rgba(255,255,255,.03); color: #d4d4d8; font: 13px var(--sans); text-align: left; cursor: pointer; }
+  .hist button:hover { background: rgba(255,255,255,.07); }
+  .brain-side .k { margin: 18px 0 0; font-size: 12.5px; color: #8a8f98; }
+  .src-line { margin: 4px 0 0; font: 12px var(--mono); color: #d4d4d8; line-height: 1.6; }
+  .widgets { display: grid; grid-template-columns: minmax(0, 1.25fr) minmax(0, 1fr); gap: 20px; margin-top: 40px; align-items: start; }
+  @media (max-width: 1060px) { .widgets { grid-template-columns: 1fr; } }
+  .tracer { display: grid; grid-template-columns: 220px minmax(0, 1fr); gap: 16px; }
+  @media (max-width: 640px) { .tracer { grid-template-columns: 1fr; } }
+  .adr-list { display: grid; gap: 4px; align-content: start; }
+  .adr-list button { display: grid; gap: 2px; padding: 8px 10px; border: 1px solid transparent; border-radius: 8px; background: none; color: #d4d4d8; font: 13px var(--sans); text-align: left; cursor: pointer; }
+  .adr-list button b { font: 500 11.5px var(--mono); color: #8a8f98; }
+  .adr-list button:hover { background: rgba(255,255,255,.04); }
+  .adr-list button[aria-selected="true"] { background: rgba(255,255,255,.05); border-color: var(--line-2); color: #fafafa; }
+  .adr-body h3 { margin: 0; font-size: 18px; font-weight: 500; line-height: 1.35; color: #fafafa; }
+  .adr-body .meta { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 8px; }
+  .adr-body .k { margin: 16px 0 0; font-size: 12.5px; color: #8a8f98; }
+  .adr-body p, .adr-body li { font-size: 14px; line-height: 1.6; color: #d4d4d8; }
+  .adr-body p { margin: 4px 0 0; } .adr-body ul { margin: 4px 0 0; padding-left: 18px; }
+  .health { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; margin-bottom: 14px; }
+  .health div { padding: 10px 12px; border-radius: 10px; background: rgba(255,255,255,.03); border: 1px solid var(--line); }
+  .health b { display: block; font: 600 22px var(--sans); color: #fafafa; } .health span { font-size: 12px; color: #8a8f98; }
+  .claims { list-style: none; margin: 0; padding: 0; display: grid; gap: 2px; }
+  .claims button { display: grid; grid-template-columns: 44px 1fr auto; gap: 10px; align-items: start; width: 100%; padding: 9px 8px; border: 0; border-radius: 8px; background: none; color: #d4d4d8;
+    font: 13.5px/1.45 var(--sans); text-align: left; cursor: pointer; }
+  .claims button:hover { background: rgba(255,255,255,.04); }
+  .claims button b { font: 500 12px var(--mono); color: var(--iris); padding-top: 1px; }
+
   /* ---------- the status pill opens a panel of facts (Faultline's "FalkorDB ready" menu) ---------- */
   .status-wrap { position: relative; }
   .status-pill { cursor: pointer; font-family: var(--sans); }
@@ -848,6 +951,7 @@
       <a href="/v1">v1 results</a>
       <a href="/models">Models</a>
       <a href="/research">Research<span class="new">v2</span></a>
+      <a href="/brain">Brain</a>
       <a href="/explore">Explore</a>
     </nav>
     <div class="nav-right">
@@ -992,7 +1096,7 @@
   <div class="wrap">
     <div class="sec-head">
       <p class="sec-num">Contents</p>
-      <h2 id="explore-title">Six pages, one question. <span class="mute">Which VMs are worth moving off failing hardware, and when does it matter? Start with how the decision works, or go straight to what the research has found.</span></h2>
+      <h2 id="explore-title">Seven pages, one question. <span class="mute">Which VMs are worth moving off failing hardware, and when does it matter? Start with how the decision works, or go straight to what the research has found.</span></h2>
     </div>
     <div class="xgrid">
       <a class="xcard" href="/how"><span class="t">01 · How it works</span><b>Four signals, one decision.</b><span class="go">Open <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg></span></a>
@@ -1000,7 +1104,8 @@
       <a class="xcard" href="/v1"><span class="t">03 · v1 results</span><b>What the course project found.</b><span class="go">Open <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg></span></a>
       <a class="xcard" href="/models"><span class="t">04 · Models</span><b>A deep attention model against a calibrated tree.</b><span class="go">Open <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg></span></a>
       <a class="xcard" href="/research"><span class="t">05 · Research v2</span><b>Turning a course project into research.</b><span class="go">Open <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg></span></a>
-      <a class="xcard" href="/explore"><span class="t">06 · Explore</span><b>Every part of the project, and how it connects.</b><span class="go">Open <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg></span></a>
+      <a class="xcard" href="/brain"><span class="t">06 · Brain</span><b>What the project claims, decided and why.</b><span class="go">Open <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg></span></a>
+      <a class="xcard" href="/explore"><span class="t">07 · Explore</span><b>Every part of the project, and how it connects.</b><span class="go">Open <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg></span></a>
     </div>
   </div>
 </section>
@@ -1280,9 +1385,53 @@
       <h1 class="page-title">What the course project found.</h1>
       <p class="page-lede">A full historical replay over the Backblaze and Azure datasets, at a matched migration budget. These are the frozen v1 numbers (tag <span class="mono">v1.0-course</span>); the box below says what v2 learned about them.</p>
     </header>
-    <div class="two">
+    <div class="panel pad banner v1-banner reveal">
+      <div class="status">
+        <span class="b-ico" aria-hidden="true"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 17l6-6 4 4 8-8"/><path d="M14 7h7v7"/></svg></span>
+        <div>
+          <h2 id="v1Head">At a matched budget, the cost-sensitive policy cost 3.1% more.</h2>
+          <p>Random placement (ρ ≈ 0), a full historical replay over Backblaze and Azure, with the threshold's budget matched as closely as possible (5,116 against 5,522 migrations). Frozen at tag <span class="mono">v1.0-course</span>.</p>
+        </div>
+        <a class="btn btn-ghost v1-why" href="#v1-diag">Why: a counting artifact ↓</a>
+      </div>
+    </div>
+
+    <div class="row-head reveal">
+      <h2>The replay</h2>
+      <div class="seg v1-base" role="radiogroup" aria-label="Compare with">
+        <input type="radio" name="v1base" id="vb-m" value="threshold_matched" checked><label for="vb-m">Matched budget</label>
+        <input type="radio" name="v1base" id="vb-n" value="threshold"><label for="vb-n">Naive τ</label>
+      </div>
+      <span class="via"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><ellipse cx="12" cy="5" rx="8" ry="3"/><path d="M4 5v14c0 1.7 3.6 3 8 3s8-1.3 8-3V5M4 12c0 1.7 3.6 3 8 3s8-1.3 8-3"/></svg>via data/processed · simulation_headline_summary.csv</span>
+    </div>
+    <div class="kpis reveal" id="v1Kpis"></div>
+    <p class="fine v1-note" id="v1Note"></p>
+
+    <div class="two v1-two">
       <div class="panel pad reveal">
-        <div class="panel-head"><div><h2>Headline replay</h2><p>Random workload placement</p></div><span class="tag v1">v1 · precomputed</span></div>
+        <div class="panel-head"><div><h2>Metric by metric</h2><p>Cost-sensitive against the threshold; green where cost-sensitive is better.</p></div><span class="tag v1">v1 · precomputed</span></div>
+        <div class="mrows" id="v1Rows"></div>
+      </div>
+      <div class="panel pad reveal">
+        <div class="panel-head"><div><h2>Correlation sensitivity</h2><p>Advantage as criticality and host risk become correlated</p></div><span class="tag v1">v1 · precomputed</span></div>
+        <div class="chart-box"><canvas id="corrChart" aria-label="v1 advantage of the cost-sensitive policy against correlation"></canvas></div>
+        <div class="corr-read" id="corrRead"></div>
+      </div>
+    </div>
+
+    <div class="panel pad diag reveal" id="v1-diag">
+      <div class="panel-head"><div><h2>What v2 found</h2><p>The −3.1% was re-examined in Week 3, before any v2 runs.</p></div><span class="via"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><ellipse cx="12" cy="5" rx="8" ry="3"/><path d="M4 5v14c0 1.7 3.6 3 8 3s8-1.3 8-3V5M4 12c0 1.7 3.6 3 8 3s8-1.3 8-3"/></svg>via docs/v2/v1_anomaly.md</span></div>
+      <ol class="tline">
+        <li><span class="dot"></span><div><p class="k">v1 · the headline</p><p>At random placement the cost-sensitive policy cost <b>3.1% more</b> than a threshold with a matched budget.</p></div></li>
+        <li><span class="dot warn"></span><div><p class="k">Week 3 · the diagnosis</p><p>Mostly a counting effect: the threshold got <b>8% more migrations</b>, and every migration was credited with failures a <b>median 170 days later</b>, while the decision used a 30-day probability.</p></div></li>
+        <li><span class="dot ok"></span><div><p class="k">Corrected accounting</p><p>With the budget matched and credit limited to the decision's own window, the cost-sensitive rule is <b>ahead by about 0.2%</b>.</p></div></li>
+        <li><span class="dot ok"></span><div><p class="k">Theory and gate G1</p><p>The v2 theory predicts no break-even near ρ ≈ 0.3: the advantage comes from the spread of costs and is largest near ρ = 0. Real placement in three Google cells sits at <b>ρ ≈ 0</b>, the regime that matters.</p></div></li>
+      </ol>
+      <a class="more" href="https://github.com/Rag2102/ccproject/blob/main/docs/v2/v1_anomaly.md" target="_blank" rel="noopener">Read the diagnosis</a>
+    </div>
+
+    <details class="panel pad full-table">
+      <summary>The full v1 table</summary>
         <div class="table-scroll">
           <table>
             <tr><th>Metric</th><th>Cost-sensitive</th><th>Threshold<br>matched budget</th><th>Threshold<br>naive τ</th></tr>
@@ -1294,20 +1443,8 @@
             {% endfor %}
           </table>
         </div>
-        <p class="fine">At nearly the same number of migrations (5,522 vs 5,116, the closest achievable match) the cost-sensitive policy cost about 3.1% more than the threshold. The naive column migrates far more and is not like-for-like.</p>
-      </div>
-      <div class="panel pad reveal">
-        <div class="panel-head"><div><h2>Correlation sensitivity</h2><p>Advantage as criticality and host risk become correlated</p></div><span class="tag v1">v1 · precomputed</span></div>
-        <div class="chart-box"><canvas id="corrChart" aria-label="v1 advantage of the cost-sensitive policy against correlation"></canvas></div>
-      </div>
-    </div>
-    <div class="callout reveal">
-      <div class="ci">v2</div>
-      <div>
-        <b>v2 re-examined the −3.1% at ρ = 0.</b>
-        <p>It was mostly a counting effect, not a weakness of cost-awareness: the threshold got 8% more migrations, and every migration was credited with failures a median 170 days later, while the decision used a 30-day probability. With the budget matched and credit limited to the decision's own window, the cost-sensitive rule is ahead by about 0.2%. The v2 theory also predicts no break-even near ρ ≈ 0.3 (see below). <a class="more" href="https://github.com/Rag2102/ccproject/blob/main/docs/v2/v1_anomaly.md" target="_blank" rel="noopener">Read the diagnosis</a></p>
-      </div>
-    </div>
+      <p class="fine">At nearly the same number of migrations (5,522 vs 5,116, the closest achievable match) the cost-sensitive policy cost about 3.1% more than the threshold. The naive column migrates far more and is not like-for-like.</p>
+    </details>
   </div>
 </section>
   <nav class="pager wrap" aria-label="More pages">
@@ -1511,6 +1648,51 @@
 </section>
   <nav class="pager wrap" aria-label="More pages">
     <a class="pg prev" href="/models"><span>← Models</span></a>
+    <a class="pg next" href="/brain"><span class="k">Next · Brain</span><b>What the project claims, decided and why.</b><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg></a>
+  </nav>
+</div>
+
+<div class="page" data-page="brain"{% if page != 'brain' %} hidden{% endif %}>
+<section class="block" id="brain">
+  <div class="wrap">
+    <header class="page-head">
+      <p class="eyebrow-mono">Brain</p>
+      <h1 class="page-title">What the project claims, decided and why.</h1>
+      <p class="page-lede">Ask in plain English. Answers come only from the project's own records, the claims ledger and the decision records, quoted with their ids. It is a search over those records, not a language model, so it never says more than they do.</p>
+    </header>
+    <div class="brain reveal">
+      <div class="brain-main">
+        <form class="ask" id="askForm" role="search">
+          <label class="ask-box"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
+            <input id="askQ" type="search" placeholder="Why is the threshold tuned to use the budget?" aria-label="Ask about the project" autocomplete="off"></label>
+          <button class="btn btn-primary" type="submit">Ask <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg></button>
+        </form>
+        <div class="examples" id="askEx" aria-label="Example questions"></div>
+        <div class="answer" id="askOut" aria-live="polite"></div>
+      </div>
+      <aside class="panel brain-side">
+        <div class="room-h"><h2>This visit</h2><span class="muted" id="askCount"></span></div>
+        <ol class="hist" id="askHist"><li class="muted">Questions you ask show up here.</li></ol>
+        <p class="k">Records</p>
+        <p class="src-line" id="brainSrc">loading…</p>
+      </aside>
+    </div>
+
+    <div class="widgets reveal">
+      <div class="panel pad widget">
+        <div class="panel-head"><div><h2>Decision tracer</h2><p>Pick a decision: what was chosen, why, and what it changed.</p></div><span class="via"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><ellipse cx="12" cy="5" rx="8" ry="3"/><path d="M4 5v14c0 1.7 3.6 3 8 3s8-1.3 8-3V5M4 12c0 1.7 3.6 3 8 3s8-1.3 8-3"/></svg>via docs/v2/DECISIONS</span></div>
+        <div class="tracer"><div class="adr-list" id="adrList" role="listbox" aria-label="Decision records"></div><div class="adr-body" id="adrBody"></div></div>
+      </div>
+      <div class="panel pad widget">
+        <div class="panel-head"><div><h2>Claims board</h2><p>Every claim the paper may make, with its status. Open ones wait for runs.</p></div><span class="via"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><ellipse cx="12" cy="5" rx="8" ry="3"/><path d="M4 5v14c0 1.7 3.6 3 8 3s8-1.3 8-3V5M4 12c0 1.7 3.6 3 8 3s8-1.3 8-3"/></svg>via CLAIMS_LEDGER.md</span></div>
+        <div class="health" id="claimHealth"></div>
+        <ul class="claims" id="claimList"></ul>
+      </div>
+    </div>
+  </div>
+</section>
+  <nav class="pager wrap" aria-label="More pages">
+    <a class="pg prev" href="/research"><span>← Research v2</span></a>
     <a class="pg next" href="/explore"><span class="k">Next · Explore</span><b>Every part of the project, and how it connects.</b><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg></a>
   </nav>
 </div>
@@ -1548,7 +1730,7 @@
   </div>
 </section>
   <nav class="pager wrap" aria-label="More pages">
-    <a class="pg prev" href="/research"><span>← Research v2</span></a>
+    <a class="pg prev" href="/brain"><span>← Brain</span></a>
     <a class="pg next" href="/"><span class="k">Next · Back to the start</span><b>Move the right VMs before they fail.</b><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg></a>
   </nav>
 </div>
@@ -1561,7 +1743,7 @@
   <div class="foot-compact">
     <div class="row">
       <a class="brand" href="/"><svg viewBox="0 0 32 32" fill="currentColor" aria-hidden="true"><rect x="4" y="4" width="11" height="11" rx="3"/><rect x="17" y="4" width="11" height="11" rx="3" opacity=".5"/><rect x="4" y="17" width="11" height="11" rx="3" opacity=".5"/><rect x="19" y="19" width="11" height="11" rx="3" fill="var(--ember)"/></svg><span>VM Mitigation</span></a>
-      <nav aria-label="Site"><a href="/">Home</a><a href="/how">How it works</a><a href="/model">Live model</a><a href="/v1">v1 results</a><a href="/models">Models</a><a href="/research">Research v2</a><a href="/explore">Explore</a><a href="https://github.com/Rag2102/ccproject/blob/main/docs/v2/PROTOCOL.md" target="_blank" rel="noopener">Protocol</a><a href="https://github.com/Rag2102/ccproject" target="_blank" rel="noopener">Source</a></nav>
+      <nav aria-label="Site"><a href="/">Home</a><a href="/how">How it works</a><a href="/model">Live model</a><a href="/v1">v1 results</a><a href="/models">Models</a><a href="/research">Research v2</a><a href="/brain">Brain</a><a href="/explore">Explore</a><a href="https://github.com/Rag2102/ccproject/blob/main/docs/v2/PROTOCOL.md" target="_blank" rel="noopener">Protocol</a><a href="https://github.com/Rag2102/ccproject" target="_blank" rel="noopener">Source</a></nav>
       <span class="note">Public data only · a course project turned research</span>
     </div>
     <div class="mark-svg" aria-hidden="true"><svg viewBox="0 0 1000 200" focusable="false"><text x="0" y="168" textLength="1000" lengthAdjust="spacingAndGlyphs" font-size="200" fill="rgba(255,255,255,0.05)">VM Mitigation</text></svg></div>
@@ -1587,7 +1769,7 @@
     <div class="wrap">
       <a class="brand" href="/"><svg viewBox="0 0 32 32" fill="currentColor" aria-hidden="true"><rect x="4" y="4" width="11" height="11" rx="3"/><rect x="17" y="4" width="11" height="11" rx="3" opacity=".5"/><rect x="4" y="17" width="11" height="11" rx="3" opacity=".5"/><rect x="19" y="19" width="11" height="11" rx="3" fill="var(--ember)"/></svg><span>VM Mitigation</span></a>
       <nav aria-label="Site">
-        <div><h3>Pages</h3><ul><li><a href="/how">How it works</a></li><li><a href="/model">Live model</a></li><li><a href="/v1">v1 results</a></li><li><a href="/models">Models</a></li><li><a href="/research">Research v2</a></li><li><a href="/explore">Explore</a></li></ul></div>
+        <div><h3>Pages</h3><ul><li><a href="/how">How it works</a></li><li><a href="/model">Live model</a></li><li><a href="/v1">v1 results</a></li><li><a href="/models">Models</a></li><li><a href="/research">Research v2</a></li><li><a href="/brain">Brain</a></li><li><a href="/explore">Explore</a></li></ul></div>
         <div><h3>Evidence</h3><ul><li><a href="https://github.com/Rag2102/ccproject/blob/main/docs/v2/THEORY.md" target="_blank" rel="noopener">Theory</a></li><li><a href="https://github.com/Rag2102/ccproject/blob/main/docs/v2/PROTOCOL.md" target="_blank" rel="noopener">Protocol</a></li><li><a href="https://github.com/Rag2102/ccproject/blob/main/docs/v2/LOG.md" target="_blank" rel="noopener">Weekly log</a></li><li><a href="https://github.com/Rag2102/ccproject/tree/main/docs/v2/DECISIONS" target="_blank" rel="noopener">Decision records</a></li></ul></div>
         <div><h3>Data</h3><ul><li><a href="https://www.backblaze.com/cloud-storage/resources/hard-drive-test-data" target="_blank" rel="noopener">Backblaze drive stats</a></li><li><a href="https://github.com/Azure/AzurePublicDataset" target="_blank" rel="noopener">Azure public dataset</a></li><li><a href="https://github.com/google/cluster-data" target="_blank" rel="noopener">Google cluster data 2019</a></li></ul></div>
         <div><h3>Repo</h3><ul><li><a href="https://github.com/Rag2102/ccproject" target="_blank" rel="noopener">Repository</a></li><li><a href="https://github.com/Rag2102/ccproject/blob/main/docs/cloud_architecture.md" target="_blank" rel="noopener">AWS architecture</a></li><li><a href="https://github.com/Rag2102/ccproject/blob/main/docs/VM_Mitigation_Policy_Report.docx" target="_blank" rel="noopener">v1 report</a></li><li><a href="#main">Back to top ↑</a></li></ul></div>
@@ -1636,8 +1818,8 @@ function whenPageShown(name, fn) {
   if (document.documentElement.dataset.page === name) fn();
   else (PAGE_HOOKS[name] = PAGE_HOOKS[name] || []).push(fn);
 }
-const PAGE_OF = { '/': 'home', '/how': 'how', '/model': 'model', '/v1': 'v1', '/models': 'models', '/research': 'research', '/explore': 'explore' };
-const PAGE_TITLE = { home: 'VM Mitigation: move the right VMs before hardware fails', how: 'How it works', model: 'Live model', v1: 'v1 results', models: 'Models', research: 'Research v2', explore: 'Explore' };
+const PAGE_OF = { '/': 'home', '/how': 'how', '/model': 'model', '/v1': 'v1', '/models': 'models', '/research': 'research', '/brain': 'brain', '/explore': 'explore' };
+const PAGE_TITLE = { home: 'VM Mitigation: move the right VMs before hardware fails', how: 'How it works', model: 'Live model', v1: 'v1 results', models: 'Models', research: 'Research v2', brain: 'Brain', explore: 'Explore' };
 const stillPages = matchMedia('(prefers-reduced-motion: reduce)').matches;
 function markNav(k) {
   document.querySelectorAll('#navLinks a').forEach(a => {
@@ -1934,6 +2116,138 @@ safely(function () {
   document.querySelectorAll('input[name=exl]').forEach(r => r.addEventListener('change', () => { layout = r.value; (layout === 'cols' ? layoutCols : layoutForce)(); draw(); fit(); }));
   ['exCard', 'exTable'].forEach(id => $(id).addEventListener('click', (e) => { const b = e.target.closest('[data-go]'); if (b) select(b.dataset.go); }));
   layoutForce(); draw(); card(); table(); fit();
+});
+
+// ---------------- v1 results: cards, bars and the correlation readout, all from the replay's own numbers ----------------
+safely(function () {
+  const H = {{ headline | tojson }};
+  if (!$('v1Kpis')) return;
+  const ICON = {
+    cost: '<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>',
+    fail: '<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M10.3 3.9 1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0z"/><path d="M12 9v4M12 17h.01"/></svg>',
+    waste: '<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M3 6h18M8 6V4h8v2M6 6l1 14h10l1-14"/></svg>',
+    move: '<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M17 1l4 4-4 4"/><path d="M3 11V9a4 4 0 0 1 4-4h14M7 23l-4-4 4-4"/><path d="M21 13v2a4 4 0 0 1-4 4H3"/></svg>' };
+  // [key, label, which way is better, unit, icon]
+  const M = [['total_cost_impact_min', 'Total cost impact', 'lower', 'min', 'cost'], ['customer_impacting_failures', 'Customer-impacting failures', 'lower', '', 'fail'],
+    ['unnecessary_migrations', 'Unnecessary migrations', 'lower', '', 'waste'], ['total_migrations', 'Total migrations', 'none', '', 'move'],
+    ['necessary_migrations', 'Necessary migrations', 'higher', ''], ['correct_inactions', 'Correct inactions', 'higher', ''],
+    ['customer_impacting_failure_rate', 'Customer-impacting failure rate', 'lower', '%'], ['unnecessary_migration_rate', 'Unnecessary migration rate', 'lower', '%']].filter(m => H[m[0]]);
+  const fmt = (v, u) => u === '%' ? (v * 100).toFixed(1) + '%' : Math.round(v).toLocaleString('en-GB') + (u ? ' ' + u : '');
+  const verdict = (cs, b, dir) => { const d = (cs - b) / b; return { d, cls: dir === 'none' || Math.abs(d) < 0.0005 ? 'same' : (dir === 'lower') === (d < 0) ? 'better' : 'worse' }; };
+  const sign = (d) => (d > 0 ? '+' : d < 0 ? '−' : '') + Math.abs(d * 100).toFixed(1) + '%';
+  function draw() {
+    const base = document.querySelector('input[name=v1base]:checked').value, bname = base === 'threshold' ? 'the naive threshold' : 'the threshold';
+    $('v1Kpis').innerHTML = M.slice(0, 4).map(([k, label, dir, u, ic]) => { const r = H[k], v = verdict(r.cost_sensitive, r[base], dir);
+      return `<div class="panel kpi"><p class="k">${ICON[ic]}${label}</p><p class="n">${fmt(r.cost_sensitive, u)}</p><p class="vs">cost-sensitive · vs ${fmt(r[base], u)} for ${bname}<span class="d ${v.cls}">${sign(v.d)}</span></p></div>`; }).join('');
+    const tm = H.total_migrations, tc = H.total_cost_impact_min;
+    $('v1Note').textContent = base === 'threshold'
+      ? `The naive threshold makes ${Math.round(tm.threshold).toLocaleString('en-GB')} migrations, ${Math.round((tm.threshold - tm.cost_sensitive) / tm.cost_sensitive * 100)}% more than the cost-sensitive policy, so this column is not like-for-like; it is shown for completeness.`
+      : `At nearly the same number of migrations (${Math.round(tm.cost_sensitive).toLocaleString('en-GB')} against ${Math.round(tm.threshold_matched).toLocaleString('en-GB')}, the closest match achievable), the cost-sensitive policy's total cost is ${sign((tc.cost_sensitive - tc.threshold_matched) / tc.threshold_matched)} against the threshold's.`;
+    $('v1Rows').innerHTML = M.map(([k, label, dir, u]) => { const r = H[k], v = verdict(r.cost_sensitive, r[base], dir), mx = Math.max(r.cost_sensitive, r[base]) || 1;
+      return `<div class="mrow"><div class="top">${label}<span>${dir === 'none' ? '' : dir + ' is better'}</span></div><div class="mbars">
+        <div class="mb cs ${v.cls}"><span>Cost-sensitive</span><i><b style="width:${(r.cost_sensitive / mx * 100).toFixed(1)}%"></b></i><em>${fmt(r.cost_sensitive, u)}</em></div>
+        <div class="mb"><span>Threshold</span><i><b style="width:${(r[base] / mx * 100).toFixed(1)}%"></b></i><em>${fmt(r[base], u)}</em></div></div></div>`; }).join('');
+  }
+  document.querySelectorAll('input[name=v1base]').forEach(r => r.addEventListener('change', draw));
+  draw();
+  $('corrRead').innerHTML = CORR.map(c => `<div><span>ρ ≈ ${Math.abs(c.rho_achieved) < 0.005 ? '0.00' : c.rho_achieved.toFixed(2)}</span><b class="${c.cost_sensitive_advantage_pct >= 0 ? 'pos' : 'neg'}">${sign(c.cost_sensitive_advantage_pct)}</b></div>`).join('');
+});
+
+// ---------------- Brain: answers only from the claims ledger and the decision records ----------------
+safely(function () {
+  if (!$('askForm')) return;
+  const esc = (x) => String(x ?? '').replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+  // words people use for the project's names; each expands the query, never the records
+  const SYN = { threshold: ['p2', 'tau', 'τ'], p2: ['threshold'], tuned: ['tuning', 'tune'], bam: ['budget-aware', 'p4'], p4: ['bam'], budget: ['budget-aware'],
+    never: ['p0'], p0: ['never'], avoid: ['avoidance', 'avoid-allocation', 'p0+avoid', 'risky'], avoiding: ['avoid', 'avoidance', 'risky'], avoidance: ['avoid', 'p0+avoid'],
+    correlated: ['correlation', 'uncorrelated', 'τ-b', 'rho'], correlation: ['uncorrelated', 'τ-b', 'rho', 'ρ'], rho: ['ρ', 'correlation'],
+    seeds: ['seed', 'n', 'eval'], hosts: ['host', 'scale'], scale: ['hosts', 'horizon', 'seeds'], guard: ['p6'], p6: ['guard'], narya: ['p5', 'bandit'], p5: ['narya', 'bandit'],
+    oracle: ['predictor'], model: ['ensemble', 'failure'], smart: ['telemetry'], aws: ['cloud', 'lambda'], console: ['read-only'], python: ['3.12'], cost: ['migration'],
+    migrating: ['migration', 'migrate'], migration: ['migrating'], replicate: ['replication', 'fresh'], robust: ['robustness', 'morris'] };
+  const STOP = new Set('a an and are as at be by does do did for from how in into is it its of on or that the this to was what when where which who why with than then there their they not no can will would should'.split(' '));
+  const words = (t) => (String(t).toLowerCase().match(/[a-z0-9τρ+.-]+/g) || []).map(w => w.replace(/^[.-]+|[.-]+$/g, '')).filter(w => w && !STOP.has(w));
+  let REC = [], IDF = {}, DATA = null, history = [];
+  function index(d) {
+    REC = [...d.claims, ...d.decisions].map(r => {
+      const parts = r.kind === 'claim' ? [r.evidence, r.size, r.family, r.caveat, r.status] : [r.status, ...['context', 'decision', 'why', 'alternatives', 'consequences', 'cost', 'implementation', 'result'].map(k => r[k] ? r[k].text + ' ' + r[k].items.join(' ') : '')];
+      return { r, title: new Set(words(r.id + ' ' + r.title)), body: new Set(words(parts.join(' '))) };
+    });
+    const df = {}; REC.forEach(x => new Set([...x.title, ...x.body]).forEach(w => { df[w] = (df[w] || 0) + 1; }));
+    Object.keys(df).forEach(w => { IDF[w] = Math.log(1 + REC.length / df[w]); });
+  }
+  function search(q) {
+    const id = q.match(/\b(c\d+[a-z]?)\b|\badr[- ]?0*(\d+)\b/i);
+    if (id) { const want = id[1] ? id[1].toUpperCase() : 'ADR-' + String(id[2]).padStart(3, '0'); const hit = REC.filter(x => x.r.id === want || x.r.id.startsWith(want)); if (hit.length) return { hits: hit.map(x => ({ x, s: 99 })), terms: [want] }; }
+    const base = words(q), terms = [...new Set([...base, ...base.flatMap(w => SYN[w] || [])])];
+    const hits = REC.map(x => { let s = 0; terms.forEach(t => { const w = IDF[t] || 0, own = base.includes(t) ? 1 : 0.6; if (x.title.has(t)) s += 3 * w * own; else if (x.body.has(t)) s += w * own; }); return { x, s }; })
+      .filter(h => h.s > 0).sort((a, b) => b.s - a.s);
+    return { hits, terms: base.filter(t => IDF[t]) };
+  }
+  const chipFor = (st) => /open/i.test(st) ? 'chip bad' : /partly|pending|proposed/i.test(st) ? 'chip warn' : 'chip';
+  // whole sentences up to about `max` characters; a sentence ends at . ! or ? followed by a space and a capital,
+  // so "0.95" or "tune_p2(...)" never cut one short. "…" says the text was shortened (the tracer has all of it).
+  const firstSentences = (t, max = 420) => { const all = String(t), parts = all.split(/(?<=[.!?])\s+(?=[A-Z("'])/); let out = '';
+    for (const p of parts) { if (out && (out + ' ' + p).length > max) break; out = out ? out + ' ' + p : p; } return out.length < all.length ? out + ' …' : out; };
+  function card(r, terms) {
+    if (r.kind === 'claim') return `<div class="panel ans"><p class="k">Answer · from the claims ledger</p><h3><span class="cite">[${esc(r.id)}]</span>${esc(r.title)}</h3>
+      <div class="meta"><span class="${chipFor(r.status)}">${esc(r.status)}</span><span class="chip chip-dim">${esc(r.family)}</span></div>
+      ${r.size ? `<div class="blk"><p class="k">How big, how sure</p><p>${esc(r.size)}</p></div>` : ''}
+      <div class="blk"><p class="k">Evidence</p><p>${esc(r.evidence)}</p></div>
+      ${r.caveat ? `<div class="blk"><p class="k">Caveat</p><p>${esc(r.caveat)}</p></div>` : ''}
+      <div class="via-line">via CLAIMS_LEDGER.md · ${esc(r.id)}${terms.length ? ' · matched: ' + terms.slice(0, 6).map(esc).join(', ') : ''}</div></div>`;
+    const sec = (k, label, n) => r[k] && (r[k].text || r[k].items.length) ? `<div class="blk"><p class="k">${label}</p>${r[k].text ? `<p>${esc(n ? firstSentences(r[k].text, n) : r[k].text)}</p>` : ''}${r[k].items.length ? `<ul>${r[k].items.slice(0, 4).map(i => `<li>${esc(i)}</li>`).join('')}</ul>` : ''}</div>` : '';
+    return `<div class="panel ans"><p class="k">Answer · from the decision records</p><h3><span class="cite">[${esc(r.id)}]</span>${esc(r.title)}</h3>
+      <div class="meta"><span class="${chipFor(r.status)}">${esc(r.status.split(/[(:;]/)[0].trim() || 'recorded')}</span><span class="chip chip-dim">${esc(r.date)}</span></div>
+      ${r.decision ? sec('decision', 'What was decided', 600) : `<div class="blk"><p class="k">What was decided</p><p>${esc(r.status)}</p></div>`}
+      ${sec('why', 'Why', 0)}${sec('context', 'Context', 420)}${sec('alternatives', 'Alternatives considered', 0)}${sec('consequences', 'What it changed', 0)}
+      <div class="via-line">via DECISIONS/${esc(r.file)}${terms.length ? ' · matched: ' + terms.slice(0, 6).map(esc).join(', ') : ''}</div></div>`;
+  }
+  function ask(q, record = true) {
+    q = q.trim(); if (!q || !DATA) return;
+    $('askQ').value = q;
+    const { hits, terms } = search(q);
+    const top = hits[0];
+    if (!top || top.s < 2.2) {
+      $('askOut').innerHTML = `<div class="panel ans none"><p class="k">No answer in the records</p><h3>The claims ledger and the decision records don't say that.</h3>
+        <div class="blk"><p>The Brain only repeats what those records state, so it won't guess. Try naming a policy (P2, BAM, avoidance), a gate (G1, G3), a claim (C9) or a decision (ADR-005), or pick an example above.</p></div></div>`;
+    } else {
+      const also = hits.slice(1, 4).filter(h => h.s >= top.s * 0.4);
+      $('askOut').innerHTML = card(top.x.r, terms) + (also.length ? `<p class="k" style="margin:16px 0 0;color:#8a8f98;font-size:13px">Also in the records</p><div class="ans also">${also.map(h => `<button type="button" class="cite-btn" data-id="${esc(h.x.r.id)}"><b>${esc(h.x.r.id)}</b>${esc(h.x.r.title.slice(0, 70))}${h.x.r.title.length > 70 ? '…' : ''}</button>`).join('')}</div>` : '');
+    }
+    if (record) { history = [q, ...history.filter(h => h !== q)].slice(0, 8);
+      $('askHist').innerHTML = history.map(h => `<li><button type="button">${esc(h)}</button></li>`).join(''); $('askCount').textContent = history.length + ' asked'; }
+  }
+  const EX = ['Why is the threshold tuned to use the budget?', 'Does avoiding risky hosts beat migrating?', 'How was the failure model chosen?', 'Is criticality correlated with host risk?',
+    'Why does the main matrix use the oracle?', 'How many seeds and hosts?', 'Do the results replicate?', 'Why is AWS off the critical path?'];
+  $('askEx').innerHTML = EX.map(q => `<button type="button">${esc(q)}</button>`).join('');
+  $('askEx').addEventListener('click', (e) => { const b = e.target.closest('button'); if (b) ask(b.textContent); });
+  $('askHist').addEventListener('click', (e) => { const b = e.target.closest('button'); if (b) ask(b.textContent, false); });
+  $('askForm').addEventListener('submit', (e) => { e.preventDefault(); ask($('askQ').value); });
+  $('askOut').addEventListener('click', (e) => { const b = e.target.closest('[data-id]'); if (b) ask(b.dataset.id); });
+  function widgets() {
+    const D = DATA.decisions;
+    $('adrList').innerHTML = D.map((r, i) => `<button type="button" role="option" aria-selected="${i === 4}" data-i="${i}"><b>${esc(r.id)}</b>${esc(r.title)}</button>`).join('');
+    const showAdr = (i) => {
+      const r = D[i];
+      $('adrList').querySelectorAll('button').forEach(b => b.setAttribute('aria-selected', +b.dataset.i === i));
+      const sec = (k, label) => r[k] && (r[k].text || r[k].items.length) ? `<p class="k">${label}</p>${r[k].text ? `<p>${esc(r[k].text)}</p>` : ''}${r[k].items.length ? `<ul>${r[k].items.map(x => `<li>${esc(x)}</li>`).join('')}</ul>` : ''}` : '';
+      $('adrBody').innerHTML = `<h3>${esc(r.id)}: ${esc(r.title)}</h3><div class="meta"><span class="${chipFor(r.status)}">${esc(r.status.split(/[(:;]/)[0].trim())}</span><span class="chip chip-dim">${esc(r.date)}</span></div>
+        ${r.decision ? sec('decision', 'What was decided') : `<p class="k">What was decided</p><p>${esc(r.status)}</p>`}${sec('why', 'Why')}${sec('context', 'Context')}${sec('alternatives', 'Alternatives considered')}${sec('consequences', 'What it changed')}${sec('implementation', 'Implementation')}`;
+    };
+    $('adrList').addEventListener('click', (e) => { const b = e.target.closest('[data-i]'); if (b) showAdr(+b.dataset.i); });
+    showAdr(4);
+    const C = DATA.claims, bucket = (st) => /open/i.test(st) ? 'open' : /partly/i.test(st) ? 'part' : 'ready';
+    const n = { ready: 0, part: 0, open: 0 }; C.forEach(c => n[bucket(c.status)]++);
+    $('claimHealth').innerHTML = `<div><b>${n.ready}</b><span>ready or built</span></div><div><b>${n.part}</b><span>partly ready</span></div><div><b>${n.open}</b><span>open, wait for runs</span></div>`;
+    $('claimList').innerHTML = C.map(c => `<li><button type="button" data-id="${esc(c.id)}"><b>${esc(c.id)}</b><span>${esc(c.title)}</span><span class="${chipFor(c.status)}">${esc(bucket(c.status) === 'ready' ? 'ready' : bucket(c.status) === 'part' ? 'partly' : 'open')}</span></button></li>`).join('');
+    $('claimList').addEventListener('click', (e) => { const b = e.target.closest('[data-id]'); if (b) { ask(b.dataset.id); $('askOut').scrollIntoView({ behavior: 'smooth', block: 'start' }); } });
+  }
+  // the records load only when the Brain is opened
+  whenPageShown('brain', () => fetch('/api/brain').then(r => { if (!r.ok) throw new Error('HTTP ' + r.status); return r.json(); }).then(d => {
+    DATA = d; index(d); widgets();
+    $('brainSrc').textContent = `${d.claims.length} claims · ${d.decisions.length} decisions · built ${d.built} from ${d.source}`;
+    ask(EX[0], false);
+  }).catch(e => { $('askOut').innerHTML = `<div class="panel ans none"><h3>The records could not be loaded (${esc(e.message)}).</h3></div>`; }));
 });
 
 // ---------------- How it works: the decision room ----------------

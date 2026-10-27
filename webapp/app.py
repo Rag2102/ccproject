@@ -35,7 +35,7 @@ app = Flask(__name__)
 # One template, one page per section: every path renders the same document with that page shown, and
 # the page script switches between them in place (with a transition) after the first load.
 PAGES = {"how": "How it works", "model": "Live model", "v1": "v1 results", "models": "Models", "research": "Research v2",
-         "explore": "Explore"}
+         "brain": "Brain", "explore": "Explore"}
 
 
 def render(page, title=None):
@@ -47,9 +47,16 @@ def index():
     return render("home")
 
 
-@app.route("/<any(how, model, v1, models, research, explore):name>")
+@app.route("/<any(how, model, v1, models, research, brain, explore):name>")
 def section(name):
     return render(name, PAGES[name])
+
+
+@app.route("/api/brain")
+def api_brain():
+    """The records the Brain page answers from (built by scripts/build_brain.py from the claims ledger and the
+    decision records); fetched only when that page is opened."""
+    return send_from_directory(os.path.dirname(os.path.abspath(__file__)), "brain.json", mimetype="application/json", max_age=300)
 
 
 @app.route("/api/status")
