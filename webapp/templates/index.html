@@ -907,6 +907,62 @@
   .claims button:hover { background: rgba(255,255,255,.04); }
   .claims button b { font: 500 12px var(--mono); color: var(--iris); padding-top: 1px; }
 
+  /* ---------- home: "How it decides" (Faultline's proof story): steps scroll past a pinned figure that follows them ---------- */
+  .story-grid { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.1fr); gap: 0 48px; margin-top: 24px; }
+  .story-pin { order: 2; position: sticky; top: 56px; align-self: start; height: calc(100vh - 56px); display: flex; flex-direction: column; justify-content: center; }
+  .story-steps { order: 1; list-style: none; margin: 0; padding: 0; }
+  @media (max-width: 1000px) {
+    .story-grid { display: block; }
+    .story-pin { top: 56px; height: auto; z-index: 5; margin: 0 -20px; padding: 10px 20px 12px; background: color-mix(in srgb, var(--bg) 90%, transparent); backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px); }
+    .story-fig svg { max-height: 30vh; }
+  }
+  .story-bar .sb-top { display: flex; justify-content: space-between; font: 11px var(--mono); color: #a1a1aa; }
+  .story-bar .sb-top span:first-child { text-transform: uppercase; letter-spacing: .16em; }
+  .story-bar ol { display: flex; gap: 3px; list-style: none; margin: 8px 0 0; padding: 0; }
+  .story-bar li { min-width: 0; }
+  .story-bar li.rest { flex: 1; padding-top: 6px; } .story-bar li.rest::before { content: ""; display: block; height: 6px; background: repeating-linear-gradient(90deg, rgba(255,255,255,.22) 0 2px, transparent 2px 5px); }
+  .story-bar button { display: block; width: 100%; padding: 6px 0 2px; border: 0; background: none; cursor: pointer; text-align: left; color: #a1a1aa; }
+  .story-bar button i { position: relative; display: block; height: 6px; border-radius: 1px; background: rgba(255,255,255,.16); overflow: hidden; transition: background-color .15s; }
+  .story-bar button:hover i { background: rgba(255,255,255,.3); }
+  .story-bar button i b { position: absolute; inset: 0; background: #fafafa; transform: scaleX(0); transform-origin: left; transition: transform .5s cubic-bezier(.35,0,0,1), opacity .3s; }
+  .story-bar button.done i b { transform: scaleX(1); opacity: .72; } .story-bar button.on i b { transform: scaleX(1); opacity: 1; }
+  .story-bar button span { display: block; margin-top: 8px; font: 11px var(--mono); text-transform: uppercase; letter-spacing: .1em; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .story-bar button.on span { color: #fafafa; }
+  .story-fig { position: relative; margin: 12px 0 0; padding: 14px 16px 10px; border-radius: 20px; border: 1px solid var(--line); background: var(--surface); box-shadow: inset 0 1px 0 rgba(255,255,255,.03);
+    background-image: radial-gradient(rgba(255,255,255,.06) 1px, transparent 1px); background-size: 20px 20px; }
+  .story-fig figcaption { display: flex; justify-content: space-between; gap: 16px; font: 11px var(--mono); color: #a1a1aa; }
+  .story-fig figcaption span:last-child { text-transform: uppercase; letter-spacing: .14em; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  #storyFig { display: block; width: 100%; height: auto; margin-top: 6px; }
+  #storyFig .cols text { font: 10px var(--mono); letter-spacing: .18em; fill: #8a8f98; text-anchor: middle; }
+  #storyFig .e { fill: none; stroke: rgba(255,255,255,.12); stroke-width: 1.2; transition: stroke .5s, stroke-width .5s; }
+  #storyFig .e.lit { stroke: color-mix(in oklch, var(--iris) 70%, transparent); stroke-width: 1.5; }
+  #storyFig .e.cur { stroke: var(--ember); stroke-width: 2; stroke-dasharray: 5 5; animation: flowDash 1s linear infinite; }
+  #storyFig .nd rect { fill: #111214; stroke: rgba(255,255,255,.14); stroke-width: 1.2; transition: stroke .5s, fill .5s; }
+  #storyFig .nd text { font: 500 12.5px var(--sans); fill: #8a8f98; text-anchor: middle; transition: fill .5s; }
+  #storyFig .nd .v { font: 500 11px var(--mono); fill: #71717a; }
+  #storyFig .nd.lit rect { stroke: rgba(255,255,255,.32); } #storyFig .nd.lit text { fill: #e4e4e7; } #storyFig .nd.lit .v { fill: #a1a1aa; }
+  #storyFig .nd.cur rect { stroke: var(--ember); stroke-width: 2; fill: color-mix(in oklch, var(--ember) 10%, #111214); } #storyFig .nd.cur text { fill: #fafafa; } #storyFig .nd.cur .v { fill: #ffb08a; }
+  #storyFig .nd.win rect { stroke: var(--proof); stroke-width: 2; fill: color-mix(in oklch, var(--proof) 10%, #111214); } #storyFig .nd.win .v { fill: #a9f7d6; }
+  #storyFig #sfNodes, #storyFig #sfEdges { transition: opacity .5s; }
+  #storyFig #sfRank { transition: opacity .5s; }
+  #storyFig #sfRank text { font: 11px var(--mono); fill: #a1a1aa; }
+  #storyFig #sfRank .tk { fill: color-mix(in oklch, var(--proof) 75%, transparent); } #storyFig #sfRank .lf { fill: rgba(255,255,255,.14); }
+  #storyFig #sfRank .bud { stroke: var(--amber); stroke-width: 1.5; stroke-dasharray: 5 4; }
+  .st { min-height: 80vh; display: flex; flex-direction: column; justify-content: center; padding: 40px 0; }
+  .st:first-child { padding-top: 16px; }
+  @media (max-width: 1000px) { .st { min-height: 70vh; } }
+  .st-in { opacity: .35; transition: opacity .6s cubic-bezier(.65,.05,0,1); }
+  .st.on .st-in { opacity: 1; }
+  .st-h { display: flex; align-items: baseline; gap: 16px; }
+  .st-h .n { font: 14px var(--mono); color: var(--ember); }
+  .st-h h3 { margin: 0; font-size: clamp(30px, 3.4vw, 40px); font-weight: 510; letter-spacing: -0.025em; color: #fafafa; }
+  .st-tag { margin: 8px 0 0; font: 11px var(--mono); text-transform: uppercase; letter-spacing: .2em; color: #8a8f98; }
+  .st-body { margin: 20px 0 0; max-width: 36rem; font-size: 16px; line-height: 1.65; color: #9ba0a8; }
+  .st-body .v { color: #fafafa; font-family: var(--mono); font-weight: 500; font-size: 14.5px; }
+  .st .code { margin-top: 24px; max-width: 36rem; }
+  .code pre.py .kw { color: #7dd3fc; } .code pre.py .fn { color: var(--ember); } .code pre.py .str { color: #86efac; } .code pre.py .num { color: #c4b5fd; } .code pre.py .cm { color: #71717a; }
+  @media (prefers-reduced-motion: reduce) { .st-in { opacity: 1; transition: none; } .story-bar button i b { transition: none; } }
+
   /* ---------- the status pill opens a panel of facts (Faultline's "FalkorDB ready" menu) ---------- */
   .status-wrap { position: relative; }
   .status-pill { cursor: pointer; font-family: var(--sans); }
@@ -1138,6 +1194,99 @@
     </div>
     <div class="map-cap"><i id="mapDot"></i><p id="mapCap"></p></div>
     <div class="map-list" id="mapList"></div>
+  </div>
+</section>
+
+<div class="rule" aria-hidden="true"><span class="plus l"></span><span class="plus r"></span></div>
+
+<section class="block story" aria-labelledby="story-title">
+  <div class="wrap">
+    <div class="sec-head">
+      <h2 id="story-title">How it decides. <span class="mute">One VM, step by step: every decision, and the code that made it.</span></h2>
+    </div>
+    <div class="story-grid">
+      <div class="story-pin">
+        <nav class="story-bar" aria-label="Decision steps">
+          <div class="sb-top"><span>One decision</span><span>numbers from the live model</span></div>
+          <ol><li style="width:12%"><button type="button" data-go="0" aria-label="Step 01: Signal"><i><b></b></i><span>Signal</span></button></li><li style="width:12%"><button type="button" data-go="1" aria-label="Step 02: Time"><i><b></b></i><span>Time</span></button></li><li style="width:15%"><button type="button" data-go="2" aria-label="Step 03: Price"><i><b></b></i><span>Price</span></button></li><li style="width:13%"><button type="button" data-go="3" aria-label="Step 04: Weigh"><i><b></b></i><span>Weigh</span></button></li><li style="width:15%"><button type="button" data-go="4" aria-label="Step 05: Decide"><i><b></b></i><span>Decide</span></button></li><li style="width:14%"><button type="button" data-go="5" aria-label="Step 06: Rank"><i><b></b></i><span>Rank</span></button></li><li class="rest" aria-hidden="true"></li></ol>
+        </nav>
+        <figure class="story-fig">
+          <figcaption><span id="sfNum">Fig 3.1</span><span id="sfTag">SMART TELEMETRY · V2 ENSEMBLE</span></figcaption>
+          <svg id="storyFig" viewBox="0 0 600 380" role="img" aria-label="The decision for one VM: inputs, models, costs and the two decisions, lit step by step">
+              <g class="cols"><text x="78" y="26">INPUTS</text><text x="250" y="26">MODELS</text><text x="412" y="26">COSTS</text><text x="540" y="26">DECISION</text></g>
+              <g id="sfEdges"></g><g id="sfNodes"></g>
+              <g id="sfRank" opacity="0"></g>
+            </svg>
+        </figure>
+      </div>
+      <ol class="story-steps">
+        <li class="st" data-step="0" id="st-0">
+          <div class="st-in">
+            <div class="st-h"><span class="n">01</span><h3>Signal</h3></div>
+            <p class="st-tag">SMART telemetry · v2 ensemble</p>
+            <p class="st-body">The host's drive reports <b class="v" data-k="smart">8 pending sectors</b>. Twenty gradient-boosted trees trained on Backblaze telemetry each estimate the probability that it fails within 30 days; their calibrated mean is <b class="v" data-k="p">p</b>.</p>
+            <div class="code"><header><div><b>PREDICT-V2</b><span>webapp/core.py · run_predict_v2</span></div><button type="button" data-copy>Copy</button></header><pre class="py">x = _v2_features(req)
+raw = np.array([m.predict_proba(x)[0, 1] for m in V2[&quot;members&quot;]])
+iso = V2[&quot;isotonic&quot;]
+p = float(iso.predict([raw.mean()])[0])</pre></div>
+          </div>
+        </li>
+        <li class="st" data-step="1" id="st-1">
+          <div class="st-in">
+            <div class="st-h"><span class="n">02</span><h3>Time</h3></div>
+            <p class="st-tag">constant hazard</p>
+            <p class="st-body">The probability is converted into time. Under a constant daily hazard the drive's median time to failure is <b class="v" data-k="ttf">–</b>. A failure beyond the 30-day window adds no urgency, so the weight remains <b class="v" data-k="urg">×1</b>.</p>
+            <div class="code"><header><div><b>TIME-TO-FAILURE</b><span>webapp/core.py · run_predict_v2</span></div><button type="button" data-copy>Copy</button></header><pre class="py">daily = -np.log1p(-min(p, 0.999999)) / h if p &gt; 0 else 0.0
+expected_ttf = float(1 / daily) if daily &gt; 0 else float(&quot;inf&quot;)
+median_ttf = float(np.log(2) / daily) if daily &gt; 0 else None</pre></div>
+          </div>
+        </li>
+        <li class="st" data-step="2" id="st-2">
+          <div class="st-in">
+            <div class="st-h"><span class="n">03</span><h3>Price</h3></div>
+            <p class="st-tag">pre-copy model · Clark et al.</p>
+            <p class="st-body">Moving the VM means copying its <b class="v" data-k="gb">112 GB</b> of memory while it runs, then pausing it briefly to copy what changed. At this size the copy takes <b class="v" data-k="mt">–</b>, priced at <b class="v" data-k="mv">–</b> impact-minutes.</p>
+            <div class="code"><header><div><b>MIGRATION-COST</b><span>webapp/core.py · migration_and_failure_cost</span></div><button type="button" data-copy>Copy</button></header><pre class="py">dirty_rate_mbps = (avg_cpu / 100.0) * MAX_DIRTY_RATE_MBPS_AT_100PCT_CPU
+converges = dirty_rate_mbps &lt; 0.9 * MIGRATION_BANDWIDTH_MBPS
+if converges:
+    migration_time_s = memory_mb / (MIGRATION_BANDWIDTH_MBPS - dirty_rate_mbps)
+    blackout_s = BASE_BLACKOUT_S</pre></div>
+          </div>
+        </li>
+        <li class="st" data-step="3" id="st-3">
+          <div class="st-in">
+            <div class="st-h"><span class="n">04</span><h3>Weigh</h3></div>
+            <p class="st-tag">expected cost of waiting</p>
+            <p class="st-body">Leaving the VM in place costs the failure probability, times the minutes a failure costs at high criticality, times the urgency weight: <b class="v" data-k="wait">–</b> impact-minutes, in the same unit as the move.</p>
+            <div class="code"><header><div><b>COST-OF-WAITING</b><span>scripts/policy.py · cost_sensitive_decision</span></div><button type="button" data-copy>Copy</button></header><pre class="py">urgency = urgency_weight(ttf_days, lookahead_days)
+expected_cost_of_inaction = np.asarray(p_fail, dtype=float) * failure_cost * urgency
+migrate = expected_cost_of_inaction &gt; migration_cost</pre></div>
+          </div>
+        </li>
+        <li class="st" data-step="4" id="st-4">
+          <div class="st-in">
+            <div class="st-h"><span class="n">05</span><h3>Decide</h3></div>
+            <p class="st-tag">cost-sensitive rule · threshold baseline</p>
+            <p class="st-body">Waiting costs <b class="v" data-k="wait">–</b>; moving costs <b class="v" data-k="mv">–</b>. The cost-sensitive policy therefore <b class="v" data-k="dec">–</b>. <span data-k="thrSent">The threshold rule considers only p.</span></p>
+            <div class="code"><header><div><b>DECIDE</b><span>scripts/policy.py · threshold_decision</span></div><button type="button" data-copy>Copy</button></header><pre class="py">def threshold_decision(p_fail, threshold):
+    &quot;&quot;&quot;The baseline being benchmarked: migrate iff P(failure) exceeds a
+    fixed threshold, full stop -- no urgency, criticality, or cost term.&quot;&quot;&quot;
+    return np.asarray(p_fail, dtype=float) &gt; threshold</pre></div>
+          </div>
+        </li>
+        <li class="st" data-step="5" id="st-5">
+          <div class="st-in">
+            <div class="st-h"><span class="n">06</span><h3>Rank</h3></div>
+            <p class="st-tag">BAM · benefit per GB · v2</p>
+            <p class="st-body">Across a fleet, the v2 policy ranks every candidate VM by its expected benefit per GB moved, b / w, and selects them while the migration budget lasts. Each selection lengthens that host's queue, so the next VM on it is re-scored before it is taken.</p>
+            <div class="code"><header><div><b>BAM-DENSITY</b><span>vmsim/policies/bam.py · _greedy_queue</span></div><button type="button" data-copy>Copy</button></header><pre class="py">def density(i):
+    t = ahead.get(int(host[i]), 0.0) + dur_d[i]
+    b = p[i] * c[i] * np.exp(-lam[i] * t) - m[i]
+    return b, b / w[i]</pre></div>
+          </div>
+        </li>
+      </ol>
+    </div>
   </div>
 </section>
 
@@ -2221,6 +2370,80 @@ safely(function () {
   document.querySelectorAll('input[name=exl]').forEach(r => r.addEventListener('change', () => { layout = r.value; (layout === 'cols' ? layoutCols : layoutForce)(); draw(); fit(); }));
   ['exCard', 'exTable'].forEach(id => $(id).addEventListener('click', (e) => { const b = e.target.closest('[data-go]'); if (b) select(b.dataset.go); }));
   layoutForce(); draw(); card(); table(); fit();
+});
+
+// ---------------- home: "How it decides" (steps scroll past a pinned figure; numbers from the live model) ----------------
+safely(function () {
+  const fig = $('storyFig'); if (!fig) return;
+  const steps = [...document.querySelectorAll('.story-steps .st')], bars = [...document.querySelectorAll('.story-bar button')];
+  const still = matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const TAGS = steps.map(st => st.querySelector('.st-tag').textContent.toUpperCase());
+  // the figure: inputs, models, costs, decisions
+  const N = { smart: [78, 70, 'SMART counters'], age: [78, 140, 'Drive age'], crit: [78, 222, 'Criticality'], size: [78, 300, 'VM size'],
+    fm: [250, 105, 'v2 ensemble'], haz: [250, 190, 'Hazard → days'], pre: [250, 300, 'Pre-copy model'],
+    wait: [412, 190, 'Cost of waiting'], move: [412, 300, 'Cost of moving'], thr: [540, 90, 'Threshold'], dec: [540, 245, 'Cost-sensitive'] };
+  const W = { thr: 104, dec: 112 }, w = (k) => W[k] || 132;
+  const E = [['smart', 'fm'], ['age', 'fm'], ['fm', 'haz'], ['size', 'pre'], ['pre', 'move'], ['fm', 'wait'], ['haz', 'wait'], ['crit', 'wait'], ['wait', 'dec'], ['move', 'dec'], ['fm', 'thr']];
+  const SCENE = [{ n: ['smart', 'age', 'fm'], e: ['smart-fm', 'age-fm'] }, { n: ['haz'], e: ['fm-haz'] }, { n: ['size', 'pre', 'move'], e: ['size-pre', 'pre-move'] },
+    { n: ['crit', 'wait'], e: ['fm-wait', 'haz-wait', 'crit-wait'] }, { n: ['dec', 'thr'], e: ['wait-dec', 'move-dec', 'fm-thr'] }, { n: [], e: [] }];
+  const V = { smart: '8 pending', age: '2.5 years', crit: 'high', size: '112 GB', fm: 'p = …', haz: '…', pre: '…', wait: '…', move: '…', thr: '…', dec: '…' };
+  let active = 0, d = null;
+  function draw() {
+    const lit = new Set(), litE = new Set(), cur = SCENE[active];
+    SCENE.slice(0, active + 1).forEach(sc => { sc.n.forEach(n => lit.add(n)); sc.e.forEach(e => litE.add(e)); });
+    $('sfEdges').innerHTML = E.map(([a, b]) => { const A = N[a], B = N[b], x1 = A[0] + w(a) / 2, x2 = B[0] - w(b) / 2, mx = (x1 + x2) / 2, k = a + '-' + b;
+      return `<path class="e${cur.e.includes(k) ? ' cur' : litE.has(k) ? ' lit' : ''}" d="M ${x1} ${A[1]} C ${mx} ${A[1]}, ${mx} ${B[1]}, ${x2} ${B[1]}"/>`; }).join('');
+    $('sfNodes').innerHTML = Object.entries(N).map(([k, [x, y, t]]) => {
+      const won = active >= 4 && k === 'dec', cls = cur.n.includes(k) ? (won ? ' win' : ' cur') : lit.has(k) ? (won ? ' win' : ' lit') : '';
+      return `<g class="nd${cls}"><rect x="${x - w(k) / 2}" y="${y - 23}" width="${w(k)}" height="46" rx="12"/><text x="${x}" y="${y - 3}">${t}</text><text class="v" x="${x}" y="${y + 13}">${V[k]}</text></g>`; }).join('');
+    const rank = active === 5;
+    $('sfNodes').style.opacity = $('sfEdges').style.opacity = rank ? 0.08 : 1;
+    $('sfRank').setAttribute('opacity', rank ? 1 : 0);
+    $('sfNum').textContent = 'Fig 3.' + (active + 1); $('sfTag').textContent = TAGS[active];
+    steps.forEach((st, i) => st.classList.toggle('on', i === active));
+    bars.forEach((b, i) => { b.classList.toggle('on', i === active); b.classList.toggle('done', i < active); if (i === active) b.setAttribute('aria-current', 'step'); else b.removeAttribute('aria-current'); });
+  }
+  // scene 6: an illustrative ranking by benefit per GB, cut where the budget runs out
+  const R = [['vm-17 · 2 GB', .92], ['vm-04 · 4 GB', .78], ['vm-31 · 14 GB', .61], ['vm-09 · 8 GB', .49], ['vm-22 · 112 GB', .3], ['vm-12 · 14 GB', .22], ['vm-40 · 2 GB', .12]];
+  $('sfRank').innerHTML = '<text x="40" y="60">RANK BY b / w · ILLUSTRATIVE</text>' + R.map(([t, v], i) => `<text x="40" y="${100 + i * 36}">${t}</text><rect class="${i < 4 ? 'tk' : 'lf'}" x="200" y="${88 + i * 36}" width="${(v * 340).toFixed(0)}" height="16" rx="4"/>`).join('')
+    + '<line class="bud" x1="30" y1="236" x2="570" y2="236"/><text x="470" y="230" style="fill:var(--amber)">GB budget</text>';
+  draw();
+  // the step in the middle of the screen is the active one
+  const io = 'IntersectionObserver' in window ? new IntersectionObserver((es) => es.forEach(e => { if (e.isIntersecting) { active = +e.target.dataset.step; draw(); } }), { rootMargin: '-50% 0px -45% 0px' }) : null;
+  if (io) steps.forEach(st => io.observe(st));
+  bars.forEach((b, i) => b.addEventListener('click', () => { active = i; draw(); steps[i].scrollIntoView({ block: 'center', behavior: still ? 'auto' : 'smooth' }); }));
+  // numbers: the live model on this one VM, fetched once, when the section first comes into view
+  const DM = '{{ v2.default_drive_model if v2 else "" }}';
+  const pct = (x) => (x * 100 >= 1 ? (x * 100).toFixed(2) : (x * 100).toFixed(3)) + '%';
+  const days = (x) => x == null ? 'beyond 10 years' : x > 730 ? (x / 365).toFixed(1) + ' years' : Math.round(x) + ' days';
+  function fill(r) {
+    const c = r.costs, cs = r.cost_sensitive, set = (k, t) => document.querySelectorAll(`.story [data-k="${k}"]`).forEach(el => { el.textContent = t; });
+    set('p', 'p = ' + pct(r.p_fail_within_window)); set('ttf', days(r.median_ttf_days)); set('urg', '×' + cs.urgency_weight);
+    set('gb', c.size_tier_profile.memory_gb + ' GB'); set('mt', Math.round(c.migration_time_s) + ' s'); set('mv', cs.migration_cost.toFixed(3)); set('wait', cs.expected_cost_of_inaction.toFixed(3));
+    set('dec', cs.migrate ? 'moves the VM' : 'leaves the VM where it is');
+    const t = r.threshold;
+    set('thrSent', `The threshold rule, which considers only p, would ${t.migrate ? 'move' : 'leave'} it, since p = ${pct(r.p_fail_within_window)} is ${t.migrate ? 'above' : 'below'} τ = ${pct(t.tau)}.`);
+    Object.assign(V, { fm: 'p = ' + pct(r.p_fail_within_window), haz: 'median ' + days(r.median_ttf_days), pre: Math.round(c.migration_time_s) + ' s + ' + c.migration_blackout_s + ' s',
+      wait: cs.expected_cost_of_inaction.toFixed(3), move: cs.migration_cost.toFixed(3), thr: t.migrate ? 'MOVE' : 'WAIT', dec: cs.migrate ? 'MOVE' : 'WAIT', size: c.size_tier_profile.memory_gb + ' GB' });
+    draw();
+  }
+  let asked = false;
+  const ask = () => { if (asked || !DM) return; asked = true;
+    fetch('/api/predict', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ which_model: 'v2', drive_model: DM, age_days: 900, criticality_tier: 'high', size_tier: 'large', trend: 'stable', temp: 30, s5: 0, s187: 0, s188: 0, s197: 8, s198: 0 }) })
+      .then(r => r.ok ? r.json() : Promise.reject(new Error('HTTP ' + r.status))).then(fill).catch(() => {}); };
+  if ('IntersectionObserver' in window) new IntersectionObserver((es, o) => { if (es[0].isIntersecting) { o.disconnect(); ask(); } }, { rootMargin: '200px' }).observe(document.querySelector('.story'));
+  else ask();
+});
+
+// a light highlighter for the Python snippets: keywords, calls, strings, numbers, comments
+document.querySelectorAll('.code pre.py').forEach(pre => {
+  const esc = (t) => t.replace(/[&<>]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;' }[c]));
+  pre.innerHTML = pre.textContent.split('\n').map(line => esc(line)
+    .replace(/(&quot;|"|')(.*?)\1/g, m => `\u0001str\u0002${m}\u0003`)
+    .replace(/\b(def|return|if|else|for|in|and|or|not|None|True|False)\b/g, '\u0001kw\u0002$1\u0003')
+    .replace(/\b([A-Za-z_][A-Za-z0-9_]*)(?=\()/g, '\u0001fn\u0002$1\u0003')
+    .replace(/\b(\d+(?:\.\d+)?)\b/g, '\u0001num\u0002$1\u0003')
+    .replace(/\u0001(\w+)\u0002/g, '<span class="$1">').replace(/\u0003/g, '</span>')).join('\n');
 });
 
 // ---------------- home: the glass gallery (a snapping rail; arrows step one card; dots follow the scroll) ----------------
