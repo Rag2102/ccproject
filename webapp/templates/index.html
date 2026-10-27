@@ -260,8 +260,8 @@
   .choices label:hover { border-color: rgba(255,255,255,.14); }
   .choices .dot { width: 16px; height: 16px; border-radius: 50%; border: 1.5px solid #52525b; transition: border-color .15s, box-shadow .15s; }
   .choices b { display: block; font-size: 13.5px; font-weight: 500; color: #e4e4e7; }
-  .choices small { display: block; font-size: 12px; color: var(--ink-3); margin-top: 1px; }
-  .choices .tag-mini { font: 500 10.5px var(--mono); color: var(--ink-3); border: 1px solid var(--line); border-radius: 6px; padding: 2px 6px; }
+  .choices small { display: block; font-size: 12px; color: #8a8f98; margin-top: 1px; }
+  .choices .tag-mini { font: 500 10.5px var(--mono); color: #8a8f98; border: 1px solid var(--line); border-radius: 6px; padding: 2px 6px; }
   .choices input:checked + label { border-color: rgba(255,255,255,.22); background: rgba(255,255,255,.04); }
   .choices input:checked + label .dot { border-color: #fafafa; box-shadow: inset 0 0 0 3.5px #0f1011, inset 0 0 0 8px #fafafa; }
   .choices input:focus-visible + label { outline: 2px solid #38bdf8; outline-offset: 2px; }
@@ -370,7 +370,7 @@
   .table-scroll { overflow-x: auto; -webkit-overflow-scrolling: touch; }
   .chart-box { position: relative; height: 340px; }
   .panel-head { display: flex; justify-content: space-between; align-items: flex-start; gap: 12px; margin-bottom: 14px; }
-  .panel-head h3 { margin: 0; font-size: 15px; font-weight: 600; letter-spacing: -0.01em; }
+  .panel-head :is(h2, h3) { margin: 0; font-size: 15px; font-weight: 600; letter-spacing: -0.01em; }
   .panel-head p { margin: 4px 0 0; font-size: 13px; color: var(--ink-3); }
   .callout {
     display: grid; grid-template-columns: auto 1fr; gap: 14px; margin-top: 20px; padding: 18px 20px; border-radius: var(--radius);
@@ -385,7 +385,7 @@
   /* ---------- v2 research ---------- */
   .status { display: grid; grid-template-columns: 1fr auto; gap: 24px; align-items: center; }
   @media (max-width: 760px) { .status { grid-template-columns: 1fr; } }
-  .status h3 { margin: 0 0 4px; font-size: 16px; font-weight: 600; }
+  .status :is(h2, h3) { margin: 0 0 4px; font-size: 16px; font-weight: 600; }
   .status p { margin: 0; font-size: 13.5px; color: var(--ink-2); }
   .progress { height: 10px; border-radius: 99px; background: var(--bg-2); overflow: hidden; margin-top: 16px; display: flex; }
   .progress span { display: block; height: 100%; }
@@ -405,7 +405,7 @@
   .fcard h3 { margin: 0; font-size: 15px; font-weight: 600; line-height: 1.35; letter-spacing: -0.01em; }
   .fcard p { margin: 0; font-size: 13.5px; color: var(--ink-2); flex: 1; }
   .fcard .src { font: 500 11px var(--mono); color: var(--ink-3); border-top: 1px solid var(--line); padding-top: 10px; margin-top: 4px; }
-  .fcard .src .more { font-family: var(--sans); font-size: 13px; }
+  .fcard .src .more { font-family: var(--sans); font-size: 13px; display: inline-block; padding: 4px 0; }
 
   .sandbox { display: grid; grid-template-columns: 300px minmax(0, 1fr); gap: 0; margin-top: 20px; }
   @media (max-width: 880px) { .sandbox { grid-template-columns: minmax(0, 1fr); } }
@@ -535,7 +535,7 @@
   /* ---------- the models page (Faultline's Break-it page): pick on the left, the selection explained on the right ---------- */
   .picker { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.12fr); gap: 24px; align-items: start; }
   @media (max-width: 960px) { .picker { grid-template-columns: 1fr; } }
-  .picker h3.pick-title { margin: 0 0 14px; font-size: 19px; font-weight: 500; letter-spacing: -0.01em; color: #fafafa; }
+  .picker .pick-title { margin: 0 0 14px; font-size: 19px; font-weight: 500; letter-spacing: -0.01em; color: #fafafa; }
   .mchoices { display: grid; gap: 10px; }
   .mchoices input { position: absolute; opacity: 0; pointer-events: none; }
   .mchoices label { display: grid; grid-template-columns: 20px 1fr; gap: 14px; padding: 18px 20px; border-radius: 14px; border: 1px solid var(--line); background: var(--surface); cursor: pointer;
@@ -545,7 +545,7 @@
   .mchoices b { display: block; font-size: 16px; font-weight: 500; color: #f4f4f5; letter-spacing: -0.01em; }
   .mchoices .meta { display: flex; flex-wrap: wrap; align-items: center; gap: 6px 8px; margin-top: 8px; font: 12.5px var(--mono); color: #d4d4d8; }
   .mchoices .meta .k { font-family: var(--sans); color: var(--ink-3); font-size: 13px; }
-  .mchoices .meta .sep { color: #52525b; }
+  .mchoices .meta .sep { color: #8a8f98; }
   .mchoices input:checked + label { border-color: color-mix(in oklch, var(--iris) 70%, transparent); background: color-mix(in oklch, var(--iris) 7%, var(--surface));
     box-shadow: 0 0 0 1px color-mix(in oklch, var(--iris) 35%, transparent); }
   .mchoices input:checked + label .dot { border-color: var(--iris); box-shadow: inset 0 0 0 4px #121216, inset 0 0 0 10px var(--iris); }
@@ -647,14 +647,14 @@
   .room-dec { border-left: 0 !important; border-top: 1px solid var(--line); }
   @media (max-width: 860px) { .room-col + .room-col { border-left: 0; border-top: 1px solid var(--line); } }
   .room-h { display: flex; align-items: center; justify-content: space-between; gap: 10px; margin-bottom: 14px; }
-  .room-h h3 { margin: 0; font-size: 15.5px; font-weight: 500; color: #fafafa; }
+  .room-h :is(h2, h3) { margin: 0; font-size: 15.5px; font-weight: 500; color: #fafafa; }
   .steps { list-style: none; margin: 0; padding: 0; display: grid; gap: 2px; }
   .steps li button { display: grid; grid-template-columns: 12px 1fr auto; gap: 4px 10px; align-items: baseline; width: 100%; padding: 8px 8px; border: 0; border-radius: 8px;
     background: none; color: inherit; text-align: left; cursor: pointer; transition: background-color .15s, opacity .3s; }
   .steps li button:hover { background: rgba(255,255,255,.04); }
   .steps .dot { width: 8px; height: 8px; border-radius: 50%; background: #3f3f46; transform: translateY(-1px); transition: background-color .3s, box-shadow .3s; }
   .steps b { font-size: 14px; font-weight: 500; color: #e4e4e7; }
-  .steps .n { font: 11.5px var(--mono); color: #71717a; }
+  .steps .n { font: 11.5px var(--mono); color: #8a8f98; }
   .steps .r { grid-column: 2 / -1; font-size: 12.5px; line-height: 1.45; color: #8a8f98; }
   .steps .r code { font: 12px var(--mono); color: #d4d4d8; }
   .steps li.done .dot { background: #a1a1aa; }
@@ -690,7 +690,7 @@
   .chain span { padding: 4px 8px; border-radius: 6px; font: 500 12px var(--mono); color: #e4e4e7; background: rgba(255,255,255,.05); border: 1px solid var(--line); }
   .chain span.hot { color: #ffb08a; background: rgba(255,107,44,.10); border-color: rgba(255,107,44,.35); }
   .chain span.cool { color: #bae6fd; background: rgba(124,196,255,.08); border-color: rgba(124,196,255,.3); }
-  .chain em { font-style: normal; color: #52525b; }
+  .chain em { font-style: normal; color: #8a8f98; }
   .pipe-head { margin-top: 8px; }
   .gloss { margin-bottom: 56px; }
   .gloss-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 1px; margin: 0; overflow: hidden; border: 1px solid var(--line); border-radius: 16px; background: var(--line); }
@@ -734,7 +734,7 @@
   .ex-card { padding: 20px; align-self: start; position: sticky; top: 76px; }
   .ex-card .kind { display: inline-flex; align-items: center; gap: 7px; font: 500 11.5px var(--mono); letter-spacing: .08em; text-transform: uppercase; color: #a1a1aa; }
   .ex-card .kind i { width: 8px; height: 8px; border-radius: 50%; }
-  .ex-card h3 { margin: 10px 0 0; font-size: 21px; font-weight: 500; letter-spacing: -0.015em; color: #fafafa; }
+  .ex-card :is(h2, h3) { margin: 10px 0 0; font-size: 21px; font-weight: 500; letter-spacing: -0.015em; color: #fafafa; }
   .ex-card p { margin: 10px 0 0; font-size: 14px; line-height: 1.6; color: #a1a1aa; }
   .ex-card .k { margin-top: 18px; font-size: 12.5px; color: var(--ink-3); }
   .ex-card ul { list-style: none; margin: 8px 0 0; padding: 0; display: grid; gap: 4px; }
@@ -773,9 +773,9 @@
   /* ---------- the footer on every page but home (Faultline's compact footer, over a faint wordmark) ---------- */
   .foot-compact { margin-top: 48px; border-top: 1px solid rgba(255,255,255,.05); }
   .foot-compact .row { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 24px; max-width: 1400px; margin: 0 auto; padding: 16px 32px 6px; font-size: 13px; }
-  .foot-compact .brand { font-size: 14px; color: #7a7f87; } .foot-compact .brand svg { width: 18px; height: 18px; opacity: .75; }
+  .foot-compact .brand { font-size: 14px; color: #8a8f98; padding: 3px 0; } .foot-compact .brand svg { width: 18px; height: 18px; opacity: .75; }
   .foot-compact nav { display: flex; flex-wrap: wrap; gap: 6px 18px; }
-  .foot-compact nav a { color: #7a7f87; text-decoration: none; transition: color .15s; } .foot-compact nav a:hover { color: #e4e4e7; }
+  .foot-compact nav a { display: inline-block; padding: 3px 0; color: #8a8f98; text-decoration: none; transition: color .15s; } .foot-compact nav a:hover { color: #e4e4e7; }
   .foot-compact .note { margin-left: auto; font-size: 12px; color: #7a7f87; }
   .foot-compact .mark-svg { display: block; max-width: 1400px; margin: 0 auto; padding: 0 32px; }
   .foot-compact .mark-svg svg { display: block; width: min(46vw, 520px); height: auto; }
@@ -799,7 +799,7 @@
   .code header button { font: 500 12px var(--sans); color: #a1a1aa; background: transparent; border: 1px solid rgba(255,255,255,.1); border-radius: 999px; padding: 4px 10px; cursor: pointer; }
   .code header button:hover { color: #fafafa; background: rgba(255,255,255,.05); }
   .code pre { margin: 0; padding: 14px 16px; font: 12.5px/1.65 var(--mono); color: #d4d4d8; overflow-x: auto; white-space: pre; }
-  .code pre .p { color: #52525b; user-select: none; }
+  .code pre .p { color: #8a8f98; user-select: none; }
   .close .cta-row { justify-content: center; margin-top: 32px; }
   .sitemap { border-top: 1px solid rgba(255,255,255,.06); }
   .sitemap .wrap { display: grid; grid-template-columns: 1fr 3fr; align-items: start; gap: 48px; padding-top: 64px; padding-bottom: 64px; max-width: 1200px; }
@@ -1029,17 +1029,17 @@
       </div>
       <div class="room-grid">
         <div class="room-col">
-          <div class="room-h"><h3>Steps</h3><button type="button" class="chip-btn" id="roomPlay"><svg width="11" height="11" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><polygon points="6 4 20 12 6 20"/></svg><span>Play</span></button></div>
+          <div class="room-h"><h2>Steps</h2><button type="button" class="chip-btn" id="roomPlay"><svg width="11" height="11" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><polygon points="6 4 20 12 6 20"/></svg><span>Play</span></button></div>
           <ol class="steps" id="roomSteps"></ol>
         </div>
         <div class="room-col room-flow">
-          <div class="room-h"><h3>Decision flow</h3><span class="muted" id="flowNote">click a box or a step</span></div>
+          <div class="room-h"><h2>Decision flow</h2><span class="muted" id="flowNote">click a box or a step</span></div>
           <svg id="flow" viewBox="0 0 960 380" role="img" aria-label="How the inputs flow through the failure model and the migration model into the two decisions"></svg>
           <div class="flow-legend"><span><i class="lg-in"></i>input</span><span><i class="lg-model"></i>model</span><span><i class="lg-val"></i>result</span><span><i class="lg-dec"></i>decision</span></div>
         </div>
         <div class="room-col room-dec">
           <div class="panel dec-card">
-            <div class="room-h"><h3>Decision</h3><span class="chip" id="decChip"></span></div>
+            <div class="room-h"><h2>Decision</h2><span class="chip" id="decChip"></span></div>
             <p class="k">Cost-sensitive policy</p>
             <p class="dec-big" id="decBig">–</p>
             <p class="dec-why" id="decWhy"></p>
@@ -1047,13 +1047,13 @@
             <div class="chain" id="decChain"></div>
           </div>
           <div class="panel dec-card">
-            <div class="room-h"><h3 id="stepName">This step</h3><span class="chip chip-dim" id="stepModel"></span></div>
+            <div class="room-h"><h2 id="stepName">This step</h2><span class="chip chip-dim" id="stepModel"></span></div>
             <p class="dec-step" id="stepWhat"></p>
             <p class="k" id="stepMeansK">What it means here</p>
             <p class="dec-step" id="stepMeans"></p>
           </div>
           <div class="panel dec-card">
-            <div class="room-h"><h3>Threshold baseline</h3><span class="chip" id="baseChip"></span></div>
+            <div class="room-h"><h2>Threshold baseline</h2><span class="chip" id="baseChip"></span></div>
             <p class="dec-step" id="baseWhy"></p>
           </div>
         </div>
@@ -1061,7 +1061,7 @@
     </div>
 
     <div class="gloss reveal">
-      <div class="panel-head"><div><h3>Words used on this site</h3><p>What each model and each number means, in one or two lines.</p></div></div>
+      <div class="panel-head"><div><h2>Words used on this site</h2><p>What each model and each number means, in one or two lines.</p></div></div>
       <dl class="gloss-grid">
         <div><dt>Failure model</dt><dd>Predicts the chance a drive fails soon. v2 uses 20 gradient-boosted trees trained on Backblaze SMART telemetry; v1 used drive age and model only.</dd></div>
         <div><dt>p (fail within 30 days)</dt><dd>The model's probability that this drive fails in the next 30 days, with the spread between the 20 members as its uncertainty.</dd></div>
@@ -1282,7 +1282,7 @@
     </header>
     <div class="two">
       <div class="panel pad reveal">
-        <div class="panel-head"><div><h3>Headline replay</h3><p>Random workload placement</p></div><span class="tag v1">v1 · precomputed</span></div>
+        <div class="panel-head"><div><h2>Headline replay</h2><p>Random workload placement</p></div><span class="tag v1">v1 · precomputed</span></div>
         <div class="table-scroll">
           <table>
             <tr><th>Metric</th><th>Cost-sensitive</th><th>Threshold<br>matched budget</th><th>Threshold<br>naive τ</th></tr>
@@ -1297,7 +1297,7 @@
         <p class="fine">At nearly the same number of migrations (5,522 vs 5,116, the closest achievable match) the cost-sensitive policy cost about 3.1% more than the threshold. The naive column migrates far more and is not like-for-like.</p>
       </div>
       <div class="panel pad reveal">
-        <div class="panel-head"><div><h3>Correlation sensitivity</h3><p>Advantage as criticality and host risk become correlated</p></div><span class="tag v1">v1 · precomputed</span></div>
+        <div class="panel-head"><div><h2>Correlation sensitivity</h2><p>Advantage as criticality and host risk become correlated</p></div><span class="tag v1">v1 · precomputed</span></div>
         <div class="chart-box"><canvas id="corrChart" aria-label="v1 advantage of the cost-sensitive policy against correlation"></canvas></div>
       </div>
     </div>
@@ -1326,13 +1326,13 @@
     </header>
     <div class="picker reveal">
       <div>
-        <h3 class="pick-title">Pick one model</h3>
+        <h2 class="pick-title">Pick one model</h2>
         <div class="mchoices" role="radiogroup" aria-label="Model" id="mPick"></div>
       </div>
       <div class="panel selected" id="mSel" aria-live="polite"></div>
     </div>
     <div class="cmp-more">
-      <div class="panel-head"><div><h3>All three v1 models on one table</h3><p>Same held-out test rows; best value per column in green.</p></div><span class="via"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><ellipse cx="12" cy="5" rx="8" ry="3"/><path d="M4 5v14c0 1.7 3.6 3 8 3s8-1.3 8-3V5M4 12c0 1.7 3.6 3 8 3s8-1.3 8-3"/></svg>via data/processed · comparison.csv</span></div>
+      <div class="panel-head"><div><h2>All three v1 models on one table</h2><p>Same held-out test rows; best value per column in green.</p></div><span class="via"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><ellipse cx="12" cy="5" rx="8" ry="3"/><path d="M4 5v14c0 1.7 3.6 3 8 3s8-1.3 8-3V5M4 12c0 1.7 3.6 3 8 3s8-1.3 8-3"/></svg>via data/processed · comparison.csv</span></div>
     <div class="panel pad reveal">
       <div class="table-scroll">
         <table id="cmpTable">
@@ -1367,7 +1367,7 @@
       <div class="status">
         <span class="b-ico" aria-hidden="true"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg></span>
         <div>
-          <h3>{{ status.headline }}</h3>
+          <h2>{{ status.headline }}</h2>
           <p>{{ status.summary }}</p>
           <div class="progress" aria-label="{{ status.weeks_done }} of {{ status.weeks_total }} weeks done, code ready to week {{ status.code_ready_to }}"><span style="width:{{ status.done_pct }}%;background:var(--cs)"></span><span style="width:{{ status.ready_pct }}%;background:var(--amber);opacity:.55"></span></div>
           <div class="progress-scale" style="position:relative;height:16px"><span style="position:absolute;left:0">Week 1</span><span style="position:absolute;left:{{ status.paper_pct }}%;transform:translateX(-50%)">Paper A · W{{ status.paper_week }}</span><span style="position:absolute;right:0">Week {{ status.weeks_total }}</span></div>
@@ -1481,7 +1481,7 @@
     </div>
 
     <div class="panel pad timeline reveal" id="plan">
-      <div class="panel-head"><div><h3>The 60-week plan</h3><p>Eleven phases from October 2026 to November 2027: done in blue, under way in amber. Beside them, the problem the plan is about: a fleet in which VMs move off risky hosts before they fail.</p></div></div>
+      <div class="panel-head"><div><h2>The 60-week plan</h2><p>Eleven phases from October 2026 to November 2027: done in blue, under way in amber. Beside them, the problem the plan is about: a fleet in which VMs move off risky hosts before they fail.</p></div></div>
       <div class="plan3d">
         <div>
           <div class="fleet-card" aria-label="Illustration: hosts coloured by failure risk; VMs move off risky hosts before they fail">
@@ -1629,6 +1629,13 @@ addEventListener('keydown', (e) => { if (e.key === 'Escape' && $('navLinks').cla
 // pages: every section is its own page (/how, /model, ...). The server renders the one asked for; after that,
 // links switch pages in place: the old page fades out, the new one rises in, the address and title follow,
 // and back/forward work. A link with a #fragment scrolls to it on its page.
+// work a page needs only once it is seen (a call to the model, say) waits for the page: it runs the first time
+// that page is shown, or at once if the page is already open
+const PAGE_HOOKS = {};
+function whenPageShown(name, fn) {
+  if (document.documentElement.dataset.page === name) fn();
+  else (PAGE_HOOKS[name] = PAGE_HOOKS[name] || []).push(fn);
+}
 const PAGE_OF = { '/': 'home', '/how': 'how', '/model': 'model', '/v1': 'v1', '/models': 'models', '/research': 'research', '/explore': 'explore' };
 const PAGE_TITLE = { home: 'VM Mitigation: move the right VMs before hardware fails', how: 'How it works', model: 'Live model', v1: 'v1 results', models: 'Models', research: 'Research v2', explore: 'Explore' };
 const stillPages = matchMedia('(prefers-reduced-motion: reduce)').matches;
@@ -1660,6 +1667,7 @@ function showPage(k, hash) {
     const h = next.querySelector('h1, h2');
     if (h) { h.setAttribute('tabindex', '-1'); h.focus({ preventScroll: true }); }
     fitCharts();
+    (PAGE_HOOKS[k] || []).splice(0).forEach(fn => fn());
   };
   if (stillPages || !cur) swap();
   else { cur.classList.add('leaving'); switching = setTimeout(swap, 170); }
@@ -1880,17 +1888,17 @@ safely(function () {
       const c = KINDS[n.kind][1], r = n.kind === 'finding' || n.kind === 'data' ? 9 : 8;
       const dim = near && !near.has(n.id);
       h += `<g class="nd${n.id === sel ? ' sel' : ''}${dim ? ' dim' : ''}${match(n) ? ' match' : ''}" data-id="${n.id}" transform="translate(${n.x} ${n.y})" tabindex="0" role="button" aria-label="${n.name} (${KINDS[n.kind][0]})">
-        <circle r="${n.id === sel ? r + 3 : r}" fill="color-mix(in srgb, ${c} 25%, #0f1011)" stroke="${c}"/><text x="${r + 7}" y="4">${n.name}</text></g>`;
+        <rect class="hit" x="-16" y="-22" width="${n.name.length * 7.2 + r + 30}" height="44" rx="8" fill="transparent"/><circle r="${n.id === sel ? r + 3 : r}" fill="color-mix(in srgb, ${c} 25%, #0f1011)" stroke="${c}"/><text x="${r + 7}" y="4">${n.name}</text></g>`;
     });
     svg.innerHTML = `<defs><marker id="exArrow" viewBox="0 0 10 10" refX="16" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M 0 2 L 8 5 L 0 8 z" fill="rgba(255,255,255,0.35)"/></marker></defs>` + h;
     $('exCount').textContent = `${NODES.filter(n => shown.has(n.kind)).length} nodes · ${EDGES.filter(e => shown.has(byId[e.a].kind) && shown.has(byId[e.b].kind)).length} edges`;
   }
   function card() {
     const n = byId[sel];
-    if (!n) { $('exCard').innerHTML = `<span class="kind">Start here</span><h3>Pick a node</h3><p>Data on the left trains the models; the models feed the policies; the methods test them; the findings on the right are what came out. Click any node, or search above.</p>
+    if (!n) { $('exCard').innerHTML = `<span class="kind">Start here</span><h2>Pick a node</h2><p>Data on the left trains the models; the models feed the policies; the methods test them; the findings on the right are what came out. Click any node, or search above.</p>
       <p class="k">Good first clicks</p><ul>${['ens', 'p2', 'w18', 'f_rho'].map(id => `<li><button type="button" data-go="${id}"><i style="background:${KINDS[byId[id].kind][1]}"></i>${byId[id].name}</button></li>`).join('')}</ul>`; return; }
     const ext = /^https?:/.test(n.href);
-    $('exCard').innerHTML = `<span class="kind"><i style="background:${KINDS[n.kind][1]}"></i>${KINDS[n.kind][0].replace(/s$/, '')}</span><h3>${n.name}</h3><p>${n.desc}</p>
+    $('exCard').innerHTML = `<span class="kind"><i style="background:${KINDS[n.kind][1]}"></i>${KINDS[n.kind][0].replace(/s$/, '')}</span><h2>${n.name}</h2><p>${n.desc}</p>
       <p class="k">Connects to</p><ul>${nb(n.id).map(x => `<li><button type="button" data-go="${x.id}"><i style="background:${KINDS[byId[x.id].kind][1]}"></i>${byId[x.id].name}<span>${x.out ? '' : '← '}${x.rel}${x.out ? ' →' : ''}</span></button></li>`).join('')}</ul>
       <a class="btn btn-primary" href="${n.href}"${ext ? ' target="_blank" rel="noopener"' : ''}>${ext ? 'Open the source' : 'Open its page'} <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg></a>`;
   }
@@ -2087,12 +2095,13 @@ safely(function () {
     $(sc.inp.trend === 'rising' ? 't-rising' : 't-stable').checked = true;
     const cr = document.querySelector(`input[name=criticality_tier][value="${sc.inp.crit}"]`); if (cr) cr.checked = true;
     const sz = document.querySelector(`input[name=size_tier][value="${sc.inp.size}"]`); if (sz) sz.checked = true;
-    syncModelFields(); ageLabel(); tempLabel(); runPredict();
+    syncModelFields(); ageLabel(); tempLabel();
+    if (!(PAGE_HOOKS.model || []).length) runPredict();   // otherwise opening the page runs it
   }, true);
   // the first time the room comes into view it plays itself
   let inView = false;
   const auto = () => { if (inView && d && !played && !still) { played = true; go(0); play(); } };
-  load(sc.id, false).then(auto);
+  whenPageShown('how', () => load(sc.id, false).then(auto));
   if ('IntersectionObserver' in window) new IntersectionObserver(([e]) => { inView = e.isIntersecting; auto(); }, { threshold: 0.35 }).observe(room);
 });
 
@@ -2526,7 +2535,7 @@ function downloadResult() {
   const a = document.createElement('a'); a.href = url; a.download = 'vm_mitigation_result_' + Date.now() + '.txt';
   document.body.appendChild(a); a.click(); a.remove(); URL.revokeObjectURL(url);
 }
-runPredict();
+whenPageShown('model', runPredict);   // no call to the model until someone opens it
 
 /* ---------------- theory (vmsim/theory.py, T3) ---------------- */
 function erf(x) { const s = Math.sign(x); x = Math.abs(x); const t = 1 / (1 + 0.3275911 * x);
