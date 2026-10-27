@@ -500,8 +500,6 @@
   .xcard .go svg { transition: transform .2s var(--ease); }
   .xcard:hover .go { color: #fafafa; } .xcard:hover .go svg { transform: translateX(3px); }
   .xcard:last-child { grid-column: span 1; }
-  .xgrid .xcard:nth-child(4), .xgrid .xcard:nth-child(5) { min-height: 180px; }
-  @media (min-width: 901px) { .xgrid .xcard:nth-child(4) { grid-column: span 2; } }
   /* the end of each page: previous, and the next page as a large link */
   .pager { display: grid; grid-template-columns: auto 1fr; align-items: stretch; gap: 12px; padding-bottom: 96px; }
   .pg { display: flex; flex-direction: column; justify-content: center; gap: 6px; padding: 22px 26px; border: 1px solid var(--line); border-radius: 16px; text-decoration: none; color: inherit;
@@ -618,6 +616,143 @@
     .map-list button span { margin-left: auto; font-size: 13px; color: #a1a1aa; }
   }
 
+  /* ---------- How it works: the decision room (Faultline's incident room: steps, a flow that lights up, the verdict) ---------- */
+  .chip { display: inline-flex; align-items: center; gap: 6px; height: 24px; padding: 0 9px; border-radius: 7px; font: 500 12.5px var(--sans); white-space: nowrap; vertical-align: middle;
+    color: #a7f3d0; background: rgba(16,185,129,.10); border: 1px solid rgba(52,211,153,.32); }
+  .chip:empty { display: none; }
+  .chip.warn { color: #fde68a; background: rgba(245,158,11,.10); border-color: rgba(251,191,36,.32); }
+  .chip.bad { color: #fecaca; background: rgba(239,68,68,.10); border-color: rgba(248,113,113,.32); }
+  .chip.chip-dim { color: #d4d4d8; background: rgba(255,255,255,.04); border-color: rgba(255,255,255,.12); font-family: var(--mono); font-size: 11.5px; }
+  .chip-btn { display: inline-flex; align-items: center; gap: 6px; height: 26px; padding: 0 10px; border-radius: 7px; border: 1px solid var(--line-2); background: rgba(255,255,255,.03);
+    color: #e4e4e7; font: 500 12.5px var(--sans); cursor: pointer; }
+  .chip-btn:hover { background: rgba(255,255,255,.07); }
+  .muted { color: var(--ink-3); font-size: 12.5px; }
+  .room { border: 1px solid var(--line); border-radius: 18px; background: rgba(255,255,255,.012); overflow: hidden; margin-bottom: 56px; }
+  .room-top { display: flex; justify-content: space-between; align-items: flex-start; gap: 20px; padding: 26px 28px 18px; flex-wrap: wrap; }
+  .room-id { margin: 0 0 8px; font-size: 12px; color: var(--ink-3); }
+  .room-title { margin: 0; font-size: clamp(24px, 3vw, 34px); font-weight: 500; letter-spacing: -0.02em; line-height: 1.2; color: #fafafa; }
+  .room-title .chip { margin-left: 8px; }
+  .room-sum { margin: 12px 0 0; max-width: 80ch; font-size: 16px; line-height: 1.6; color: #d4d4d8; }
+  .room-sum code { font: 500 14px var(--mono); color: #fafafa; }
+  .room-sum .em { color: var(--ember); font-family: var(--mono); font-weight: 500; }
+  .room-bar { display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap; padding: 0 28px 18px; border-bottom: 1px solid var(--line); }
+  .room-scen { flex: 0 1 auto; flex-wrap: wrap; }
+  .room-scen label { flex: 0 1 auto; padding: 6px 12px; }
+  /* steps beside a full-width flow; the decision, the step and the baseline as a row of cards beneath */
+  .room-grid { display: grid; grid-template-columns: 250px minmax(0, 1fr); }
+  .room-dec { grid-column: 1 / -1; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; }
+  @media (max-width: 860px) { .room-grid { grid-template-columns: 1fr; } .room-dec { grid-template-columns: 1fr; } }
+  .room-col { padding: 20px; min-width: 0; }
+  .room-col + .room-col { border-left: 1px solid var(--line); }
+  .room-dec { border-left: 0 !important; border-top: 1px solid var(--line); }
+  @media (max-width: 860px) { .room-col + .room-col { border-left: 0; border-top: 1px solid var(--line); } }
+  .room-h { display: flex; align-items: center; justify-content: space-between; gap: 10px; margin-bottom: 14px; }
+  .room-h h3 { margin: 0; font-size: 15.5px; font-weight: 500; color: #fafafa; }
+  .steps { list-style: none; margin: 0; padding: 0; display: grid; gap: 2px; }
+  .steps li button { display: grid; grid-template-columns: 12px 1fr auto; gap: 4px 10px; align-items: baseline; width: 100%; padding: 8px 8px; border: 0; border-radius: 8px;
+    background: none; color: inherit; text-align: left; cursor: pointer; transition: background-color .15s, opacity .3s; }
+  .steps li button:hover { background: rgba(255,255,255,.04); }
+  .steps .dot { width: 8px; height: 8px; border-radius: 50%; background: #3f3f46; transform: translateY(-1px); transition: background-color .3s, box-shadow .3s; }
+  .steps b { font-size: 14px; font-weight: 500; color: #e4e4e7; }
+  .steps .n { font: 11.5px var(--mono); color: #71717a; }
+  .steps .r { grid-column: 2 / -1; font-size: 12.5px; line-height: 1.45; color: #8a8f98; }
+  .steps .r code { font: 12px var(--mono); color: #d4d4d8; }
+  .steps li.done .dot { background: #a1a1aa; }
+  .steps li.cur button { background: rgba(255,255,255,.05); }
+  .steps li.cur .dot { background: var(--iris); box-shadow: 0 0 0 4px color-mix(in oklch, var(--iris) 22%, transparent); }
+  .steps li.todo button { opacity: .45; }
+  #flow { display: block; width: 100%; height: auto; }
+  #flow .nd rect { fill: #111214; stroke: rgba(255,255,255,.16); transition: stroke .3s, fill .3s; }
+  #flow .nd text { font: 500 13px var(--sans); fill: #a1a1aa; transition: fill .3s; }
+  #flow .nd .v { font: 500 12px var(--mono); fill: #71717a; }
+  #flow .nd .kind { font: 9.5px var(--mono); letter-spacing: .1em; fill: #52525b; }
+  #flow .nd { cursor: pointer; transition: opacity .3s; outline: none; }
+  #flow .nd.on rect { stroke: var(--c); fill: color-mix(in srgb, var(--c) 10%, #111214); }
+  #flow .nd.on text { fill: #fafafa; } #flow .nd.on .v { fill: #e4e4e7; }
+  #flow .nd.cur rect { stroke-width: 1.6; }
+  #flow .nd:focus-visible rect { stroke: #38bdf8; stroke-dasharray: 4 3; }
+  #flow .nd.off { opacity: .45; }
+  #flow .ed { fill: none; stroke: rgba(255,255,255,.14); stroke-width: 1.2; transition: stroke .3s; }
+  #flow .ed.on { stroke: var(--c); stroke-width: 1.6; stroke-dasharray: 4 5; animation: flowDash 1s linear infinite; }
+  @keyframes flowDash { to { stroke-dashoffset: -18; } }
+  .flow-legend { display: flex; flex-wrap: wrap; gap: 6px 16px; margin-top: 10px; font-size: 12px; color: var(--ink-3); }
+  .flow-legend i { display: inline-block; width: 10px; height: 10px; border-radius: 3px; margin-right: 6px; vertical-align: -1px; border: 1.5px solid; }
+  .lg-in { border-color: #a1a1aa; } .lg-model { border-color: var(--iris); } .lg-val { border-color: var(--cs); } .lg-dec { border-color: var(--ember); }
+  .room-dec { display: grid; gap: 12px; align-content: start; }
+  .dec-card { padding: 18px; }
+  .dec-card .k { margin: 12px 0 0; font-size: 13px; color: var(--ink-3); }
+  .dec-card .room-h { margin-bottom: 4px; }
+  .dec-big { margin: 4px 0 0; font: 600 30px var(--mono); letter-spacing: -0.02em; color: var(--ember); }
+  .dec-big.wait { color: var(--cs); }
+  .dec-why, .dec-step { margin: 6px 0 0; font-size: 13.5px; line-height: 1.55; color: #a1a1aa; }
+  .dec-step b { color: #f4f4f5; font-weight: 500; }
+  .chain { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; margin-top: 8px; }
+  .chain span { padding: 4px 8px; border-radius: 6px; font: 500 12px var(--mono); color: #e4e4e7; background: rgba(255,255,255,.05); border: 1px solid var(--line); }
+  .chain span.hot { color: #ffb08a; background: rgba(255,107,44,.10); border-color: rgba(255,107,44,.35); }
+  .chain span.cool { color: #bae6fd; background: rgba(124,196,255,.08); border-color: rgba(124,196,255,.3); }
+  .chain em { font-style: normal; color: #52525b; }
+  .pipe-head { margin-top: 8px; }
+  .gloss { margin-bottom: 56px; }
+  .gloss-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 1px; margin: 0; overflow: hidden; border: 1px solid var(--line); border-radius: 16px; background: var(--line); }
+  @media (max-width: 960px) { .gloss-grid { grid-template-columns: 1fr 1fr; } }
+  @media (max-width: 600px) { .gloss-grid { grid-template-columns: 1fr; } }
+  .gloss-grid > div { padding: 18px 20px; background: var(--bg); }
+  .gloss-grid dt { font-size: 14.5px; font-weight: 500; color: #f4f4f5; }
+  .gloss-grid dd { margin: 6px 0 0; font-size: 13.5px; line-height: 1.55; color: #8a8f98; }
+
+  /* ---------- Explore: the project as a graph (Faultline's Explore page) ---------- */
+  .ex-bar { display: flex; flex-wrap: wrap; align-items: center; gap: 10px 14px; margin-bottom: 14px; }
+  .ex-search { display: flex; align-items: center; gap: 8px; flex: 1 1 240px; max-width: 340px; height: 36px; padding: 0 12px; border-radius: 8px; border: 1px solid var(--line-2); background: rgba(255,255,255,.03); color: #a1a1aa; }
+  .ex-search:focus-within { border-color: #38bdf8; box-shadow: 0 0 0 3px rgba(56,189,248,.18); }
+  .ex-search input { flex: 1; min-width: 0; border: 0; background: transparent; color: #f4f4f5; font: 13.5px var(--sans); outline: none; }
+  .ex-types { display: flex; flex-wrap: wrap; gap: 6px; }
+  .ex-types button { display: inline-flex; align-items: center; gap: 7px; height: 30px; padding: 0 11px; border-radius: 99px; border: 1px solid var(--line-2); background: rgba(255,255,255,.03);
+    color: #e4e4e7; font: 500 12.5px var(--sans); cursor: pointer; transition: opacity .15s, background-color .15s; }
+  .ex-types button i { width: 8px; height: 8px; border-radius: 50%; }
+  .ex-types button[aria-pressed="false"] { opacity: .45; }
+  .ex-layout { margin-left: auto; flex: none; }
+  .ex-layout label { flex: none; overflow: visible; }
+  .ex-main { display: grid; grid-template-columns: minmax(0, 1fr) 320px; gap: 14px; align-items: stretch; }
+  @media (max-width: 960px) { .ex-main { grid-template-columns: 1fr; } }
+  .ex-canvas { position: relative; overflow: hidden; min-height: 520px; padding: 0; background-image: radial-gradient(rgba(255,255,255,.07) 1px, transparent 1px); background-size: 22px 22px; }
+  #exG { display: block; width: 100%; height: 100%; min-height: 520px; cursor: grab; touch-action: none; user-select: none; }
+  #exG.panning { cursor: grabbing; }
+  #exG .ed { fill: none; stroke: rgba(255,255,255,.14); stroke-width: 1.2; transition: stroke .2s, opacity .2s; }
+  #exG .ed.hl { stroke: rgba(255,255,255,.55); stroke-width: 1.6; }
+  #exG .el { font: 10px var(--mono); fill: #a1a1aa; opacity: 0; transition: opacity .2s; pointer-events: none; }
+  #exG .el.hl { opacity: 1; }
+  #exG .nd { cursor: pointer; transition: opacity .2s; outline: none; }
+  #exG .nd circle { stroke-width: 1.5; transition: r .2s, stroke-width .2s; }
+  #exG .nd text { font: 500 12.5px var(--sans); fill: #d4d4d8; paint-order: stroke; stroke: #0f1011; stroke-width: 4px; stroke-linejoin: round; pointer-events: none; }
+  #exG .nd.sel circle { stroke-width: 3; } #exG .nd.sel text { fill: #fff; }
+  #exG .nd:focus-visible circle { stroke: #38bdf8; stroke-width: 3; }
+  #exG .dim { opacity: .18; }
+  #exG .match circle { stroke: #fde68a; stroke-width: 3; }
+  .ex-zoom { position: absolute; left: 12px; bottom: 12px; display: flex; gap: 6px; }
+  .ex-zoom .chip-btn { min-width: 30px; justify-content: center; }
+  .ex-count { position: absolute; right: 14px; bottom: 14px; font-size: 11.5px; color: var(--ink-3); }
+  .ex-card { padding: 20px; align-self: start; position: sticky; top: 76px; }
+  .ex-card .kind { display: inline-flex; align-items: center; gap: 7px; font: 500 11.5px var(--mono); letter-spacing: .08em; text-transform: uppercase; color: #a1a1aa; }
+  .ex-card .kind i { width: 8px; height: 8px; border-radius: 50%; }
+  .ex-card h3 { margin: 10px 0 0; font-size: 21px; font-weight: 500; letter-spacing: -0.015em; color: #fafafa; }
+  .ex-card p { margin: 10px 0 0; font-size: 14px; line-height: 1.6; color: #a1a1aa; }
+  .ex-card .k { margin-top: 18px; font-size: 12.5px; color: var(--ink-3); }
+  .ex-card ul { list-style: none; margin: 8px 0 0; padding: 0; display: grid; gap: 4px; }
+  .ex-card li button { display: flex; align-items: center; gap: 8px; width: 100%; padding: 7px 8px; border: 0; border-radius: 7px; background: rgba(255,255,255,.03); color: #e4e4e7;
+    font: 13px var(--sans); text-align: left; cursor: pointer; }
+  .ex-card li button:hover { background: rgba(255,255,255,.07); }
+  .ex-card li button i { width: 7px; height: 7px; border-radius: 50%; flex: none; }
+  .ex-card li button span { margin-left: auto; font: 11px var(--mono); color: #71717a; }
+  .ex-card .btn { margin-top: 18px; height: 36px; font-size: 13.5px; }
+  .ex-table-wrap { margin-top: 18px; }
+  .ex-table { width: 100%; border-collapse: collapse; font-size: 13.5px; }
+  .ex-table th { text-align: left; font: 500 12px var(--sans); color: var(--ink-3); padding: 8px 10px; border-bottom: 1px solid var(--line); }
+  .ex-table td, .ex-table th { text-align: left !important; }
+  .ex-table td { padding: 8px 10px; border-bottom: 1px solid rgba(255,255,255,.05); color: #a1a1aa; vertical-align: top; }
+  .ex-table td:first-child button { border: 0; background: none; padding: 0; color: #f4f4f5; font: 500 13.5px var(--sans); cursor: pointer; text-align: left; }
+  .ex-table td:first-child button:hover { text-decoration: underline; }
+  .ex-table tr.sel td { background: rgba(255,255,255,.035); }
+
   /* ---------- the status pill opens a panel of facts (Faultline's "FalkorDB ready" menu) ---------- */
   .status-wrap { position: relative; }
   .status-pill { cursor: pointer; font-family: var(--sans); }
@@ -713,6 +848,7 @@
       <a href="/v1">v1 results</a>
       <a href="/models">Models</a>
       <a href="/research">Research<span class="new">v2</span></a>
+      <a href="/explore">Explore</a>
     </nav>
     <div class="nav-right">
       <div class="status-wrap">
@@ -855,7 +991,7 @@
   <div class="wrap">
     <div class="sec-head">
       <p class="sec-num">Contents</p>
-      <h2 id="explore-title">Five pages, one question. <span class="mute">Which VMs are worth moving off failing hardware, and when does it matter? Start with how the decision works, or go straight to what the research has found.</span></h2>
+      <h2 id="explore-title">Six pages, one question. <span class="mute">Which VMs are worth moving off failing hardware, and when does it matter? Start with how the decision works, or go straight to what the research has found.</span></h2>
     </div>
     <div class="xgrid">
       <a class="xcard" href="/how"><span class="t">01 · How it works</span><b>Four signals, one decision.</b><span class="go">Open <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg></span></a>
@@ -863,6 +999,7 @@
       <a class="xcard" href="/v1"><span class="t">03 · v1 results</span><b>What the course project found.</b><span class="go">Open <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg></span></a>
       <a class="xcard" href="/models"><span class="t">04 · Models</span><b>A deep attention model against a calibrated tree.</b><span class="go">Open <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg></span></a>
       <a class="xcard" href="/research"><span class="t">05 · Research v2</span><b>Turning a course project into research.</b><span class="go">Open <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg></span></a>
+      <a class="xcard" href="/explore"><span class="t">06 · Explore</span><b>Every part of the project, and how it connects.</b><span class="go">Open <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg></span></a>
     </div>
   </div>
 </section>
@@ -876,6 +1013,71 @@
       <h1 class="page-title">Four signals, one decision.</h1>
       <p class="page-lede">Each signal comes from a model or a real dataset. The cost-sensitive policy uses all four; the threshold baseline uses only the first, which is the comparison this project is about.</p>
     </header>
+    <div class="room reveal" id="room">
+      <div class="room-top">
+        <div>
+          <p class="room-id mono" id="roomId">scenario</p>
+          <h2 class="room-title"><span id="roomTitle">Loading the model…</span> <span class="chip" id="roomChip"></span></h2>
+          <p class="room-sum" id="roomSum"></p>
+        </div>
+        <a class="btn btn-primary" href="/model" id="roomOpen">Open in the live model <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg></a>
+      </div>
+      <div class="room-bar">
+        <div class="seg room-scen" role="radiogroup" aria-label="Scenario" id="roomScen"></div>
+        <span class="via"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><ellipse cx="12" cy="5" rx="8" ry="3"/><path d="M4 5v14c0 1.7 3.6 3 8 3s8-1.3 8-3V5M4 12c0 1.7 3.6 3 8 3s8-1.3 8-3"/></svg>via /api/predict · v2 ensemble</span>
+      </div>
+      <div class="room-grid">
+        <div class="room-col">
+          <div class="room-h"><h3>Steps</h3><button type="button" class="chip-btn" id="roomPlay"><svg width="11" height="11" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><polygon points="6 4 20 12 6 20"/></svg><span>Play</span></button></div>
+          <ol class="steps" id="roomSteps"></ol>
+        </div>
+        <div class="room-col room-flow">
+          <div class="room-h"><h3>Decision flow</h3><span class="muted" id="flowNote">click a box or a step</span></div>
+          <svg id="flow" viewBox="0 0 960 380" role="img" aria-label="How the inputs flow through the failure model and the migration model into the two decisions"></svg>
+          <div class="flow-legend"><span><i class="lg-in"></i>input</span><span><i class="lg-model"></i>model</span><span><i class="lg-val"></i>result</span><span><i class="lg-dec"></i>decision</span></div>
+        </div>
+        <div class="room-col room-dec">
+          <div class="panel dec-card">
+            <div class="room-h"><h3>Decision</h3><span class="chip" id="decChip"></span></div>
+            <p class="k">Cost-sensitive policy</p>
+            <p class="dec-big" id="decBig">–</p>
+            <p class="dec-why" id="decWhy"></p>
+            <p class="k">Mechanism</p>
+            <div class="chain" id="decChain"></div>
+          </div>
+          <div class="panel dec-card">
+            <div class="room-h"><h3 id="stepName">This step</h3><span class="chip chip-dim" id="stepModel"></span></div>
+            <p class="dec-step" id="stepWhat"></p>
+            <p class="k" id="stepMeansK">What it means here</p>
+            <p class="dec-step" id="stepMeans"></p>
+          </div>
+          <div class="panel dec-card">
+            <div class="room-h"><h3>Threshold baseline</h3><span class="chip" id="baseChip"></span></div>
+            <p class="dec-step" id="baseWhy"></p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="gloss reveal">
+      <div class="panel-head"><div><h3>Words used on this site</h3><p>What each model and each number means, in one or two lines.</p></div></div>
+      <dl class="gloss-grid">
+        <div><dt>Failure model</dt><dd>Predicts the chance a drive fails soon. v2 uses 20 gradient-boosted trees trained on Backblaze SMART telemetry; v1 used drive age and model only.</dd></div>
+        <div><dt>p (fail within 30 days)</dt><dd>The model's probability that this drive fails in the next 30 days, with the spread between the 20 members as its uncertainty.</dd></div>
+        <div><dt>SMART counters</dt><dd>Self-monitoring numbers a drive reports: reallocated, pending and uncorrectable sectors, command timeouts. Rising counts are the strongest warning sign.</dd></div>
+        <div><dt>Time to failure</dt><dd>Expected and median days until failure, from p under a constant-hazard assumption. Sooner means more urgent.</dd></div>
+        <div><dt>Criticality</dt><dd>How much an outage of this VM hurts: high, medium or low. It scales the cost of a failure.</dd></div>
+        <div><dt>Pre-copy live migration</dt><dd>Moving a running VM: copy its memory while it runs, then pause briefly to copy what changed. Bigger VMs take longer and cost more.</dd></div>
+        <div><dt>Cost of waiting</dt><dd>p × the cost of a failure for this criticality × urgency, in impact-minutes: what leaving the VM in place is expected to cost.</dd></div>
+        <div><dt>Cost of moving</dt><dd>What the migration itself costs: the pause users feel plus the bandwidth and CPU it uses, in the same impact-minutes.</dd></div>
+        <div><dt>Threshold τ</dt><dd>The common rule: move when p is above a fixed number ({ '%.2f'|format(tau_default * 100) }% here), whatever the VM's size or importance.</dd></div>
+        <div><dt>Cost-sensitive policy</dt><dd>Moves a VM only when waiting is expected to cost more than moving. This project asks when that beats the threshold.</dd></div>
+        <div><dt>Budget-aware ranking (BAM)</dt><dd>The v2 policy: with a limited migration budget, move the VMs with the most expected benefit per GB first.</dd></div>
+        <div><dt>Pre-registered</dt><dd>The comparisons, seeds and the bar for a win were written down before the runs, so the results cannot be tuned after the fact.</dd></div>
+      </dl>
+    </div>
+
+    <div class="panel-head pipe-head"><div><h3>The four signals at a glance</h3></div></div>
     <div class="panel pipeline reveal">
       <div class="step">
         <div class="k">STEP 1</div>
@@ -1317,6 +1519,44 @@
 </section>
   <nav class="pager wrap" aria-label="More pages">
     <a class="pg prev" href="/models"><span>← Models</span></a>
+    <a class="pg next" href="/explore"><span class="k">Next · Explore</span><b>Every part of the project, and how it connects.</b><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg></a>
+  </nav>
+</div>
+
+<div class="page" data-page="explore"{% if page != 'explore' %} hidden{% endif %}>
+<section class="block" id="explore">
+  <div class="wrap">
+    <header class="page-head">
+      <p class="eyebrow-mono">Explore</p>
+      <h1 class="page-title">Every part of the project, and how it connects.</h1>
+      <p class="page-lede">The data, the models, the policies, the methods and the findings as one graph. Click a node to see what it is, what it feeds and where to read more. Drag to move things, scroll or use the buttons to zoom.</p>
+    </header>
+    <div class="ex reveal">
+      <div class="ex-bar">
+        <label class="ex-search"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
+          <input type="search" id="exQ" placeholder="Search: SMART, threshold, G1…" aria-label="Search the graph" autocomplete="off"></label>
+        <div class="ex-types" id="exTypes" role="group" aria-label="Show kinds"></div>
+        <div class="seg ex-layout" role="radiogroup" aria-label="Layout">
+          <input type="radio" name="exl" id="exl-f" value="force" checked><label for="exl-f">Force</label>
+          <input type="radio" name="exl" id="exl-c" value="cols"><label for="exl-c">Columns</label>
+        </div>
+      </div>
+      <div class="ex-main">
+        <div class="ex-canvas panel">
+          <svg id="exG" viewBox="0 0 1000 640" role="img" aria-label="Graph of the project's data, models, policies, methods and findings; the table below lists the same nodes"></svg>
+          <div class="ex-zoom"><button type="button" class="chip-btn" id="exIn" aria-label="Zoom in">+</button><button type="button" class="chip-btn" id="exOut" aria-label="Zoom out">−</button><button type="button" class="chip-btn" id="exFit">Fit</button></div>
+          <span class="ex-count mono" id="exCount"></span>
+        </div>
+        <aside class="panel ex-card" id="exCard" aria-live="polite"></aside>
+      </div>
+      <div class="table-scroll ex-table-wrap">
+        <table class="ex-table" id="exTable"><thead><tr><th>Node</th><th>Kind</th><th>Connects to</th></tr></thead><tbody></tbody></table>
+      </div>
+    </div>
+  </div>
+</section>
+  <nav class="pager wrap" aria-label="More pages">
+    <a class="pg prev" href="/research"><span>← Research v2</span></a>
     <a class="pg next" href="/"><span class="k">Next · Back to the start</span><b>Move the right VMs before they fail.</b><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg></a>
   </nav>
 </div>
@@ -1329,7 +1569,7 @@
   <div class="foot-compact">
     <div class="row">
       <a class="brand" href="/"><svg viewBox="0 0 32 32" fill="currentColor" aria-hidden="true"><rect x="4" y="4" width="11" height="11" rx="3"/><rect x="17" y="4" width="11" height="11" rx="3" opacity=".5"/><rect x="4" y="17" width="11" height="11" rx="3" opacity=".5"/><rect x="19" y="19" width="11" height="11" rx="3" fill="var(--ember)"/></svg><span>VM Mitigation</span></a>
-      <nav aria-label="Site"><a href="/">Home</a><a href="/how">How it works</a><a href="/model">Live model</a><a href="/v1">v1 results</a><a href="/models">Models</a><a href="/research">Research v2</a><a href="https://github.com/Rag2102/ccproject/blob/main/docs/v2/PROTOCOL.md" target="_blank" rel="noopener">Protocol</a><a href="https://github.com/Rag2102/ccproject" target="_blank" rel="noopener">Source</a></nav>
+      <nav aria-label="Site"><a href="/">Home</a><a href="/how">How it works</a><a href="/model">Live model</a><a href="/v1">v1 results</a><a href="/models">Models</a><a href="/research">Research v2</a><a href="/explore">Explore</a><a href="https://github.com/Rag2102/ccproject/blob/main/docs/v2/PROTOCOL.md" target="_blank" rel="noopener">Protocol</a><a href="https://github.com/Rag2102/ccproject" target="_blank" rel="noopener">Source</a></nav>
       <span class="note">Public data only · a course project turned research</span>
     </div>
     <div class="mark-svg" aria-hidden="true"><svg viewBox="0 0 1000 200" focusable="false"><text x="0" y="168" textLength="1000" lengthAdjust="spacingAndGlyphs" font-size="200" fill="rgba(255,255,255,0.05)">VM Mitigation</text></svg></div>
@@ -1355,7 +1595,7 @@
     <div class="wrap">
       <a class="brand" href="/"><svg viewBox="0 0 32 32" fill="currentColor" aria-hidden="true"><rect x="4" y="4" width="11" height="11" rx="3"/><rect x="17" y="4" width="11" height="11" rx="3" opacity=".5"/><rect x="4" y="17" width="11" height="11" rx="3" opacity=".5"/><rect x="19" y="19" width="11" height="11" rx="3" fill="var(--ember)"/></svg><span>VM Mitigation</span></a>
       <nav aria-label="Site">
-        <div><h3>Pages</h3><ul><li><a href="/how">How it works</a></li><li><a href="/model">Live model</a></li><li><a href="/v1">v1 results</a></li><li><a href="/models">Models</a></li><li><a href="/research">Research v2</a></li></ul></div>
+        <div><h3>Pages</h3><ul><li><a href="/how">How it works</a></li><li><a href="/model">Live model</a></li><li><a href="/v1">v1 results</a></li><li><a href="/models">Models</a></li><li><a href="/research">Research v2</a></li><li><a href="/explore">Explore</a></li></ul></div>
         <div><h3>Evidence</h3><ul><li><a href="https://github.com/Rag2102/ccproject/blob/main/docs/v2/THEORY.md" target="_blank" rel="noopener">Theory</a></li><li><a href="https://github.com/Rag2102/ccproject/blob/main/docs/v2/PROTOCOL.md" target="_blank" rel="noopener">Protocol</a></li><li><a href="https://github.com/Rag2102/ccproject/blob/main/docs/v2/LOG.md" target="_blank" rel="noopener">Weekly log</a></li><li><a href="https://github.com/Rag2102/ccproject/tree/main/docs/v2/DECISIONS" target="_blank" rel="noopener">Decision records</a></li></ul></div>
         <div><h3>Data</h3><ul><li><a href="https://www.backblaze.com/cloud-storage/resources/hard-drive-test-data" target="_blank" rel="noopener">Backblaze drive stats</a></li><li><a href="https://github.com/Azure/AzurePublicDataset" target="_blank" rel="noopener">Azure public dataset</a></li><li><a href="https://github.com/google/cluster-data" target="_blank" rel="noopener">Google cluster data 2019</a></li></ul></div>
         <div><h3>Repo</h3><ul><li><a href="https://github.com/Rag2102/ccproject" target="_blank" rel="noopener">Repository</a></li><li><a href="https://github.com/Rag2102/ccproject/blob/main/docs/cloud_architecture.md" target="_blank" rel="noopener">AWS architecture</a></li><li><a href="https://github.com/Rag2102/ccproject/blob/main/docs/VM_Mitigation_Policy_Report.docx" target="_blank" rel="noopener">v1 report</a></li><li><a href="#main">Back to top ↑</a></li></ul></div>
@@ -1397,8 +1637,8 @@ addEventListener('keydown', (e) => { if (e.key === 'Escape' && $('navLinks').cla
 // pages: every section is its own page (/how, /model, ...). The server renders the one asked for; after that,
 // links switch pages in place: the old page fades out, the new one rises in, the address and title follow,
 // and back/forward work. A link with a #fragment scrolls to it on its page.
-const PAGE_OF = { '/': 'home', '/how': 'how', '/model': 'model', '/v1': 'v1', '/models': 'models', '/research': 'research' };
-const PAGE_TITLE = { home: 'VM Mitigation: move the right VMs before hardware fails', how: 'How it works', model: 'Live model', v1: 'v1 results', models: 'Models', research: 'Research v2' };
+const PAGE_OF = { '/': 'home', '/how': 'how', '/model': 'model', '/v1': 'v1', '/models': 'models', '/research': 'research', '/explore': 'explore' };
+const PAGE_TITLE = { home: 'VM Mitigation: move the right VMs before hardware fails', how: 'How it works', model: 'Live model', v1: 'v1 results', models: 'Models', research: 'Research v2', explore: 'Explore' };
 const stillPages = matchMedia('(prefers-reduced-motion: reduce)').matches;
 function markNav(k) {
   document.querySelectorAll('#navLinks a').forEach(a => {
@@ -1560,8 +1800,312 @@ document.querySelectorAll('.panel, .fcard, .xcard, .figc').forEach((el) => el.ad
   menu.addEventListener('click', (e) => { if (e.target.closest('a')) set(false); });
 }
 
+// each feature below runs on its own: if one fails, it reports the error and the rest of the page still works
+function safely(fn) { try { fn(); } catch (e) { console.error('[page] a feature failed to start:', e); } }
+
+// ---------------- Explore: the project as a graph ----------------
+// Every part of the project and how it connects, drawn as a small force layout (or in columns). Click a node for
+// its card; the table under the graph lists the same nodes for keyboard and screen-reader use.
+safely(function () {
+  const svg = $('exG'); if (!svg) return;
+  const G = 'https://github.com/Rag2102/ccproject/blob/main/docs/v2/';
+  const KINDS = { data: ['Data', '#d4d4d8'], model: ['Models', 'var(--iris)'], policy: ['Policies', 'var(--cs)'], method: ['Methods', 'var(--amber)'], finding: ['Findings', 'var(--proof)'] };
+  const NODES = [
+    ['bb', 'data', 'Backblaze drive stats', 'Daily SMART telemetry for every drive in Backblaze\'s fleet, 2013 to 2026: 744 million drive-days. Every failure model here is trained on it.', 'https://www.backblaze.com/cloud-storage/resources/hard-drive-test-data'],
+    ['az', 'data', 'Azure VM trace', 'Over 2 million real VMs from the Azure public dataset, with their sizes. It gives the simulator its VMs and the migration model their memory sizes.', 'https://github.com/Azure/AzurePublicDataset'],
+    ['gg', 'data', 'Google cluster traces 2019', 'Borg cells with real placement and priorities, used to measure how workload criticality relates to host risk (gate G1).', 'https://github.com/google/cluster-data'],
+    ['hgb', 'model', 'v1 HistGBM', 'A calibrated gradient-boosted hazard model on drive age and drive model: the v1 course project\'s failure model.', '/models'],
+    ['gqat', 'model', 'v1 GQAT-Net', 'A NumPy attention network built to test whether a deep model beats the tree. It ranks almost as well but is far worse calibrated.', '/models'],
+    ['ens', 'model', 'v2 ensemble', 'Twenty gradient-boosted trees on SMART telemetry (ADR-006). Their mean is the failure probability, their spread its uncertainty. It serves the live model.', '/model'],
+    ['pre', 'model', 'Pre-copy migration model', 'Prices a live migration from memory size and dirty rate: copy time, the pause at the end, and the cost in impact-minutes.', '/how'],
+    ['cs', 'policy', 'Cost-sensitive policy', 'Moves a VM when the expected cost of waiting exceeds the cost of moving. The policy the live model and the walkthrough show.', '/how'],
+    ['p0', 'policy', 'Never migrate (P0)', 'The do-nothing baseline: every saving in the benchmark is measured against it.', '/research'],
+    ['p2', 'policy', 'Tuned threshold (P2)', 'Moves when p is above a threshold tuned to use the budget: the industry habit, pre-registered as the main comparison.', '/research'],
+    ['p3', 'policy', 'v1 rule (P3)', 'The v1 course project\'s rule, kept as a reference point.', '/research'],
+    ['p4', 'policy', 'BAM (P4)', 'Budget-aware migration: ranks VMs by expected benefit per GB within the migration budget.', '/research'],
+    ['p5', 'policy', 'Narya-inspired (P5)', 'A baseline inspired by Narya (OSDI 2020). Its gain comes from its avoid-allocation action, not from migrating.', '/research'],
+    ['p6', 'policy', 'Guard (P6)', 'The safe-adaptive variant: a guard against bad predictions, as registered in Week 16.', '/research'],
+    ['avoid', 'policy', 'Avoid risky hosts', 'Exploratory, added after the freeze (ADR-010): keep new VMs off the riskiest 2% of hosts, with no migrations at all.', '/research'],
+    ['sim', 'method', 'Simulator (gate G2)', 'A day-stepped fleet simulator with VM churn, migration queues and repairs. It reproduces v1\'s headline costs to a relative error of 6×10⁻⁷.', '/research'],
+    ['theory', 'method', 'Closed-form theory', 'A closed form for the cost-aware rule\'s advantage over a threshold, checked by Monte Carlo at 3,024 points.', G + 'THEORY.md'],
+    ['proto', 'method', 'Pre-registered protocol', 'Thirty comparisons, 30 evaluation seeds, Holm\'s correction and intervals on every number, fixed before any run.', G + 'PROTOCOL.md'],
+    ['w18', 'method', 'Week 18 benchmark', 'The first pre-registered runs: regimes A and E, all 30 evaluation seeds. Regimes B, C and D are queued.', '/research'],
+    ['f_rho', 'finding', 'ρ ≈ 0 (gate G1)', 'In three Google 2019 cells, criticality and host risk are essentially uncorrelated (|τb| ≤ 0.075).', '/research'],
+    ['f_v1', 'finding', 'v1\'s loss was a counting artifact', 'Matching the budget and crediting migrations within the 30-day window turns v1\'s loss at ρ = 0 into a small gain.', '/v1'],
+    ['f_spread', 'finding', 'Gains come from cost spread', 'The advantage over a threshold is driven by how much cost per GB varies between VMs, not by correlation.', '/research'],
+    ['f_avoid', 'finding', 'Where new VMs go matters more', 'Exploratory: in the first benchmark, keeping arrivals off risky hosts saved more than any migration rule.', '/research'],
+  ].map(([id, kind, name, desc, href]) => ({ id, kind, name, desc, href }));
+  const EDGES = [
+    ['bb', 'hgb', 'trains'], ['bb', 'gqat', 'trains'], ['bb', 'ens', 'trains'], ['az', 'pre', 'VM sizes'], ['az', 'sim', 'VMs'], ['gg', 'f_rho', 'measures'], ['gg', 'sim', 'placement'],
+    ['gqat', 'hgb', 'compared'], ['hgb', 'cs', 'p'], ['ens', 'cs', 'p'], ['pre', 'cs', 'cost'], ['pre', 'sim', 'cost'], ['cs', 'f_v1', 'replayed'],
+    ['f_rho', 'sim', 'sets regimes'], ['sim', 'w18', 'runs'], ['proto', 'w18', 'rules'],
+    ['p0', 'w18', 'baseline'], ['p2', 'w18', 'compared'], ['p3', 'w18', 'compared'], ['p4', 'w18', 'compared'], ['p5', 'w18', 'compared'], ['p6', 'w18', 'compared'], ['avoid', 'w18', 'exploratory'],
+    ['theory', 'f_spread', 'shows'], ['theory', 'p4', 'motivates'], ['w18', 'f_avoid', 'shows'], ['avoid', 'f_avoid', 'is'],
+  ].map(([a, b, rel]) => ({ a, b, rel }));
+  const byId = Object.fromEntries(NODES.map(n => [n.id, n]));
+  const nb = (id) => EDGES.filter(e => e.a === id || e.b === id).map(e => ({ id: e.a === id ? e.b : e.a, rel: e.rel, out: e.a === id }));
+  const W = 1000, H = 640, ORDER = ['data', 'model', 'policy', 'method', 'finding'];
+  const shown = new Set(Object.keys(KINDS));
+  let sel = null, hover = null, query = '', layout = 'force', view = { x: 0, y: 0, w: W, h: H };
+
+  function layoutCols() {
+    ORDER.forEach((k, ci) => { const col = NODES.filter(n => n.kind === k); col.forEach((n, i) => { n.x = 110 + ci * 195; n.y = (H / (col.length + 1)) * (i + 1); }); });
+  }
+  function layoutForce() {
+    // seeded start in loose columns, then springs, repulsion and a gentle pull towards each kind's column
+    let r = 7; const rand = () => (r = (r * 16807) % 2147483647) / 2147483647;
+    NODES.forEach(n => { n.x = 110 + ORDER.indexOf(n.kind) * 195 + (rand() - 0.5) * 80; n.y = 60 + rand() * (H - 120); n.vx = 0; n.vy = 0; });
+    for (let it = 0; it < 500; it++) {
+      const t = 1 - it / 500;
+      for (const a of NODES) for (const b of NODES) { if (a === b) continue; const dx = a.x - b.x, dy = a.y - b.y, d2 = dx * dx + dy * dy + 0.01, f = 4200 / d2; a.vx += dx * f / Math.sqrt(d2); a.vy += dy * f / Math.sqrt(d2); }
+      for (const e of EDGES) { const a = byId[e.a], b = byId[e.b], dx = b.x - a.x, dy = b.y - a.y, d = Math.sqrt(dx * dx + dy * dy) || 1, f = (d - 150) * 0.02; a.vx += dx / d * f; a.vy += dy / d * f; b.vx -= dx / d * f; b.vy -= dy / d * f; }
+      for (const n of NODES) { n.vx += (110 + ORDER.indexOf(n.kind) * 195 - n.x) * 0.012; n.vy += (H / 2 - n.y) * 0.004;
+        n.x += Math.max(-12, Math.min(12, n.vx)) * t; n.y += Math.max(-12, Math.min(12, n.vy)) * t; n.vx *= 0.5; n.vy *= 0.5;
+        n.x = Math.max(40, Math.min(W - 40, n.x)); n.y = Math.max(30, Math.min(H - 30, n.y)); }
+    }
+  }
+  function fit() {
+    const vis = NODES.filter(n => shown.has(n.kind)); if (!vis.length) return;
+    const xs = vis.map(n => n.x), ys = vis.map(n => n.y), pad = 90;
+    const x0 = Math.min(...xs) - 40, x1 = Math.max(...xs) + 230, y0 = Math.min(...ys) - 50, y1 = Math.max(...ys) + 50;   // room on the right for labels
+    const w = Math.max(x1 - x0, (y1 - y0) * W / H), h = w * H / W;
+    view = { x: (x0 + x1) / 2 - w / 2, y: (y0 + y1) / 2 - h / 2, w, h }; applyView();
+  }
+  const applyView = () => svg.setAttribute('viewBox', `${view.x} ${view.y} ${view.w} ${view.h}`);
+  function draw() {
+    const focus = hover || sel, near = focus ? new Set([focus, ...nb(focus).map(x => x.id)]) : null;
+    const q = query.trim().toLowerCase(), match = (n) => q && (n.name.toLowerCase().includes(q) || n.desc.toLowerCase().includes(q));
+    let h = '';
+    EDGES.forEach(e => {
+      const a = byId[e.a], b = byId[e.b]; if (!shown.has(a.kind) || !shown.has(b.kind)) return;
+      const hl = focus && (e.a === focus || e.b === focus), dim = focus && !hl;
+      const mx = (a.x + b.x) / 2, my = (a.y + b.y) / 2 - 18;
+      h += `<path class="ed${hl ? ' hl' : ''}${dim ? ' dim' : ''}" d="M ${a.x} ${a.y} Q ${mx} ${my} ${b.x} ${b.y}" marker-end="url(#exArrow)"/>`;
+      h += `<text class="el${hl ? ' hl' : ''}" x="${mx}" y="${my + 6}" text-anchor="middle">${e.rel}</text>`;
+    });
+    NODES.forEach(n => {
+      if (!shown.has(n.kind)) return;
+      const c = KINDS[n.kind][1], r = n.kind === 'finding' || n.kind === 'data' ? 9 : 8;
+      const dim = near && !near.has(n.id);
+      h += `<g class="nd${n.id === sel ? ' sel' : ''}${dim ? ' dim' : ''}${match(n) ? ' match' : ''}" data-id="${n.id}" transform="translate(${n.x} ${n.y})" tabindex="0" role="button" aria-label="${n.name} (${KINDS[n.kind][0]})">
+        <circle r="${n.id === sel ? r + 3 : r}" fill="color-mix(in srgb, ${c} 25%, #0f1011)" stroke="${c}"/><text x="${r + 7}" y="4">${n.name}</text></g>`;
+    });
+    svg.innerHTML = `<defs><marker id="exArrow" viewBox="0 0 10 10" refX="16" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M 0 2 L 8 5 L 0 8 z" fill="rgba(255,255,255,0.35)"/></marker></defs>` + h;
+    $('exCount').textContent = `${NODES.filter(n => shown.has(n.kind)).length} nodes · ${EDGES.filter(e => shown.has(byId[e.a].kind) && shown.has(byId[e.b].kind)).length} edges`;
+  }
+  function card() {
+    const n = byId[sel];
+    if (!n) { $('exCard').innerHTML = `<span class="kind">Start here</span><h3>Pick a node</h3><p>Data on the left trains the models; the models feed the policies; the methods test them; the findings on the right are what came out. Click any node, or search above.</p>
+      <p class="k">Good first clicks</p><ul>${['ens', 'p2', 'w18', 'f_rho'].map(id => `<li><button type="button" data-go="${id}"><i style="background:${KINDS[byId[id].kind][1]}"></i>${byId[id].name}</button></li>`).join('')}</ul>`; return; }
+    const ext = /^https?:/.test(n.href);
+    $('exCard').innerHTML = `<span class="kind"><i style="background:${KINDS[n.kind][1]}"></i>${KINDS[n.kind][0].replace(/s$/, '')}</span><h3>${n.name}</h3><p>${n.desc}</p>
+      <p class="k">Connects to</p><ul>${nb(n.id).map(x => `<li><button type="button" data-go="${x.id}"><i style="background:${KINDS[byId[x.id].kind][1]}"></i>${byId[x.id].name}<span>${x.out ? '' : '← '}${x.rel}${x.out ? ' →' : ''}</span></button></li>`).join('')}</ul>
+      <a class="btn btn-primary" href="${n.href}"${ext ? ' target="_blank" rel="noopener"' : ''}>${ext ? 'Open the source' : 'Open its page'} <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg></a>`;
+  }
+  function table() {
+    $('exTable').querySelector('tbody').innerHTML = NODES.filter(n => shown.has(n.kind)).map(n => `<tr class="${n.id === sel ? 'sel' : ''}"><td><button type="button" data-go="${n.id}">${n.name}</button></td><td>${KINDS[n.kind][0].replace(/s$/, '')}</td><td>${nb(n.id).map(x => byId[x.id].name).join(', ')}</td></tr>`).join('');
+  }
+  function select(id) { sel = id; draw(); card(); table(); }
+  // interactions: hover, click, keyboard, drag nodes, pan the background, zoom
+  const toSvg = (e) => { const r = svg.getBoundingClientRect(); return { x: view.x + (e.clientX - r.left) / r.width * view.w, y: view.y + (e.clientY - r.top) / r.height * view.h }; };
+  let drag = null;
+  svg.addEventListener('pointerdown', (e) => {
+    const g = e.target.closest('.nd'); svg.setPointerCapture(e.pointerId);
+    drag = g ? { id: g.dataset.id, moved: false, start: toSvg(e) } : { pan: true, cx: e.clientX, cy: e.clientY, vx: view.x, vy: view.y, moved: false };
+    if (!g) svg.classList.add('panning');
+  });
+  svg.addEventListener('pointermove', (e) => {
+    if (!drag) { const g = e.target.closest('.nd'); const id = g ? g.dataset.id : null; if (id !== hover) { hover = id; draw(); } return; }
+    if (drag.pan) { const r = svg.getBoundingClientRect(); view.x = drag.vx - (e.clientX - drag.cx) / r.width * view.w; view.y = drag.vy - (e.clientY - drag.cy) / r.height * view.h; drag.moved = true; applyView(); return; }
+    const p = toSvg(e), n = byId[drag.id]; if (Math.hypot(p.x - drag.start.x, p.y - drag.start.y) > 3) drag.moved = true;
+    if (drag.moved) { n.x = p.x; n.y = p.y; draw(); }
+  });
+  svg.addEventListener('pointerup', () => { if (drag && !drag.pan && !drag.moved) select(drag.id === sel ? null : drag.id); else if (drag && drag.pan && !drag.moved) select(null); drag = null; svg.classList.remove('panning'); });
+  svg.addEventListener('pointerleave', () => { if (hover) { hover = null; draw(); } });
+  svg.addEventListener('keydown', (e) => { const g = e.target.closest('.nd'); if (g && (e.key === 'Enter' || e.key === ' ')) { e.preventDefault(); select(g.dataset.id); svg.querySelector(`[data-id="${g.dataset.id}"]`)?.focus(); } });
+  const zoom = (k, cx = view.x + view.w / 2, cy = view.y + view.h / 2) => { const w = Math.max(250, Math.min(2400, view.w * k)), h = w * H / W; view = { x: cx - (cx - view.x) * w / view.w, y: cy - (cy - view.y) * h / view.h, w, h }; applyView(); };
+  svg.addEventListener('wheel', (e) => { e.preventDefault(); const p = toSvg(e); zoom(e.deltaY > 0 ? 1.12 : 1 / 1.12, p.x, p.y); }, { passive: false });
+  $('exIn').addEventListener('click', () => zoom(1 / 1.25)); $('exOut').addEventListener('click', () => zoom(1.25)); $('exFit').addEventListener('click', fit);
+  $('exTypes').innerHTML = Object.entries(KINDS).map(([k, [name, c]]) => `<button type="button" data-k="${k}" aria-pressed="true"><i style="background:${c}"></i>${name}</button>`).join('');
+  $('exTypes').addEventListener('click', (e) => { const b = e.target.closest('button'); if (!b) return; const k = b.dataset.k; if (shown.has(k) && shown.size > 1) shown.delete(k); else shown.add(k);
+    b.setAttribute('aria-pressed', shown.has(k)); if (sel && !shown.has(byId[sel].kind)) sel = null; draw(); card(); table(); });
+  $('exQ').addEventListener('input', (e) => { query = e.target.value; draw(); });
+  $('exQ').addEventListener('keydown', (e) => { if (e.key !== 'Enter') return; const q = query.trim().toLowerCase(); const n = NODES.find(n => shown.has(n.kind) && (n.name.toLowerCase().includes(q) || n.desc.toLowerCase().includes(q))); if (n) select(n.id); });
+  document.querySelectorAll('input[name=exl]').forEach(r => r.addEventListener('change', () => { layout = r.value; (layout === 'cols' ? layoutCols : layoutForce)(); draw(); fit(); }));
+  ['exCard', 'exTable'].forEach(id => $(id).addEventListener('click', (e) => { const b = e.target.closest('[data-go]'); if (b) select(b.dataset.go); }));
+  layoutForce(); draw(); card(); table(); fit();
+});
+
+// ---------------- How it works: the decision room ----------------
+// Five scenarios run through the real model (/api/predict); seven steps light the flow hop by hop, and each step
+// says what it is, which model does it and what it means for this VM.
+safely(function () {
+  const room = $('room'); if (!room) return;
+  if (!$('v2Fields')) { room.hidden = true; return; }   // the walkthrough needs the v2 model
+  const DM = '{{ v2.default_drive_model if v2 else "" }}';
+  const Z = { s5: 0, s187: 0, s188: 0, s197: 0, s198: 0 };
+  const SCEN = [
+    { id: 'healthy', label: 'Healthy drive', title: 'A healthy drive under a medium VM', inp: { ...Z, crit: 'high', size: 'medium', trend: 'stable' } },
+    { id: 'warnsmall', label: 'Warning · small VM', title: 'Pending sectors under a small VM', inp: { ...Z, s197: 8, crit: 'high', size: 'small', trend: 'stable' } },
+    { id: 'warnlarge', label: 'Warning · large VM', title: 'Pending sectors under a 112 GB VM', inp: { ...Z, s197: 8, crit: 'high', size: 'large', trend: 'stable' } },
+    { id: 'wear', label: 'Slight wear · critical', title: 'Slight wear under a critical, small VM', inp: { ...Z, s5: 40, crit: 'high', size: 'small', trend: 'stable' } },
+    { id: 'failing', label: 'Failing drive', title: 'A failing drive under a medium VM', inp: { s5: 240, s187: 4, s188: 0, s197: 24, s198: 24, crit: 'high', size: 'medium', trend: 'rising' } },
+  ];
+  const AGE = 900, TEMP = 30;
+  const body = (sc) => ({ which_model: 'v2', drive_model: DM, age_days: AGE, criticality_tier: sc.inp.crit, size_tier: sc.inp.size, trend: sc.inp.trend, temp: TEMP,
+    s5: sc.inp.s5, s187: sc.inp.s187, s188: sc.inp.s188, s197: sc.inp.s197, s198: sc.inp.s198 });
+  const cache = {};
+  async function predict(sc) {
+    if (!cache[sc.id]) cache[sc.id] = fetch('/api/predict', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body(sc)) })
+      .then(r => { if (!r.ok) throw new Error('HTTP ' + r.status); return r.json(); });
+    return cache[sc.id];
+  }
+  const pct = (p) => p < 1e-5 ? 'below 0.001%' : (p * 100 >= 1 ? (p * 100).toFixed(2) : (p * 100).toFixed(3)) + '%';
+  const num = (x) => (Math.abs(x) >= 10 ? x.toFixed(1) : x.toFixed(3));
+  const days = (d) => d == null ? 'beyond the horizon' : d > 730 ? (d / 365).toFixed(1) + ' years' : Math.round(d) + ' days';
+  const TAU = {{ tau_default }};
+  const SMART_NAMES = { s5: 'reallocated', s187: 'uncorrectable', s188: 'timeouts', s197: 'pending', s198: 'offline uncorrectable' };
+
+  // the flow: inputs → models → results → the two decisions
+  const C = { in: '#a1a1aa', model: 'var(--iris)', val: 'var(--cs)', dec: 'var(--ember)' };
+  const N = {
+    smart: { x: 10, y: 18, w: 150, t: 'SMART counters', k: 'in' }, age: { x: 10, y: 80, w: 150, t: 'Drive age', k: 'in' }, model: { x: 10, y: 142, w: 150, t: 'Drive model', k: 'in' },
+    crit: { x: 10, y: 232, w: 150, t: 'Criticality', k: 'in' }, size: { x: 10, y: 312, w: 150, t: 'VM size', k: 'in' },
+    fm: { x: 214, y: 80, w: 168, t: 'Failure model', k: 'model' }, pre: { x: 214, y: 312, w: 168, t: 'Pre-copy model', k: 'model' },
+    p: { x: 436, y: 30, w: 150, t: 'p (30 days)', k: 'val' }, ttf: { x: 436, y: 130, w: 150, t: 'Time to failure', k: 'val' }, mv: { x: 436, y: 312, w: 150, t: 'Cost of moving', k: 'val' },
+    wait: { x: 626, y: 196, w: 150, t: 'Cost of waiting', k: 'val' },
+    dec: { x: 800, y: 262, w: 150, t: 'Cost-sensitive', k: 'dec' }, thr: { x: 800, y: 30, w: 150, t: 'Threshold p > τ', k: 'dec' },
+  };
+  const H = 52, KIND_LABEL = { in: 'INPUT', model: 'MODEL', val: 'RESULT', dec: 'DECISION' };
+  const E = [['smart', 'fm'], ['age', 'fm'], ['model', 'fm'], ['fm', 'p'], ['fm', 'ttf'], ['p', 'wait'], ['ttf', 'wait'], ['crit', 'wait'], ['size', 'pre'], ['pre', 'mv'], ['wait', 'dec'], ['mv', 'dec'], ['p', 'thr']];
+  const STEPS = [
+    { id: 'intake', name: 'Intake', nodes: ['smart', 'age', 'model', 'crit', 'size'], edges: [] },
+    { id: 'predict', name: 'Predict', nodes: ['fm', 'p'], edges: ['smart-fm', 'age-fm', 'model-fm', 'fm-p'] },
+    { id: 'ttf', name: 'Time to failure', nodes: ['ttf'], edges: ['fm-ttf'] },
+    { id: 'price', name: 'Price the move', nodes: ['pre', 'mv'], edges: ['size-pre', 'pre-mv'] },
+    { id: 'weigh', name: 'Weigh', nodes: ['wait'], edges: ['p-wait', 'ttf-wait', 'crit-wait'] },
+    { id: 'decide', name: 'Decide', nodes: ['dec'], edges: ['wait-dec', 'mv-dec'] },
+    { id: 'baseline', name: 'Baseline', nodes: ['thr'], edges: ['p-thr'] },
+  ];
+  const stepOf = {}; STEPS.forEach((st, i) => st.nodes.forEach(n => { stepOf[n] = i; }));
+  let sc = SCEN[2], d = null, cur = 0, timer = null, played = false;
+  const still = matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  function values() {
+    if (!d) return {};
+    const cs = d.cost_sensitive, c = d.costs, gb = c.size_tier_profile.memory_gb;
+    const smartOn = Object.entries(SMART_NAMES).filter(([k]) => sc.inp[k] > 0);
+    return {
+      smart: !smartOn.length ? 'all zero' : smartOn.length === 1 ? `${sc.inp[smartOn[0][0]]} ${smartOn[0][1]}` : `${smartOn.length} counters raised`, age: (AGE / 365).toFixed(1) + ' yr', model: DM, crit: sc.inp.crit, size: gb + ' GB',
+      fm: '20 trees', pre: c.migration_time_s + ' s + ' + c.migration_blackout_s + ' s',
+      p: pct(d.p_fail_within_window), ttf: 'median ' + days(d.median_ttf_days), mv: num(c.total_migration_cost_min),
+      wait: num(cs.expected_cost_of_inaction), dec: cs.migrate ? 'MOVE' : 'WAIT', thr: d.threshold.migrate ? 'MOVE' : 'WAIT',
+    };
+  }
+  function drawFlow() {
+    const V = values(), lit = new Set(), litE = new Set();
+    STEPS.forEach((st, i) => { if (i <= cur) { st.nodes.forEach(n => lit.add(n)); st.edges.forEach(e => litE.add(e)); } });
+    const curN = new Set(STEPS[cur].nodes);
+    let h = '';
+    E.forEach(([a, b]) => {
+      const A = N[a], B = N[b], x1 = A.x + A.w, y1 = A.y + H / 2, x2 = B.x, y2 = B.y + H / 2, mx = (x1 + x2) / 2;
+      const on = litE.has(a + '-' + b);
+      h += `<path class="ed${on ? ' on' : ''}" style="--c:${C[B.k]}" d="M ${x1} ${y1} C ${mx} ${y1}, ${mx} ${y2}, ${x2} ${y2}"/>`;
+    });
+    Object.entries(N).forEach(([id, n]) => {
+      const on = lit.has(id), v = on ? (V[id] ?? '') : '–';
+      h += `<g class="nd${on ? ' on' : ' off'}${curN.has(id) ? ' cur' : ''}" data-n="${id}" style="--c:${C[n.k]}" tabindex="0" role="button" aria-label="${n.t}: ${on ? v : 'not reached yet'}">
+        <rect x="${n.x}" y="${n.y}" width="${n.w}" height="${H}" rx="9"/>
+        <text class="kind" x="${n.x + 12}" y="${n.y + 15}">${KIND_LABEL[n.k]}</text>
+        <text x="${n.x + 12}" y="${n.y + 31}">${n.t}</text><text class="v" x="${n.x + 12}" y="${n.y + 45}">${v}</text></g>`;
+    });
+    $('flow').innerHTML = h;
+  }
+  function explain() {
+    if (!d) return;
+    const cs = d.cost_sensitive, c = d.costs, gb = c.size_tier_profile.memory_gb, [lo, hi] = d.p_interval_5_95 || [null, null];
+    const smartOn = Object.entries(SMART_NAMES).filter(([k]) => sc.inp[k] > 0).map(([k, nm]) => `${sc.inp[k]} ${nm}`);
+    const csMove = cs.migrate, thMove = d.threshold.migrate, agree = csMove === thMove;
+    const T = [
+      { model: 'inputs', what: 'What the drive and the VM report: five SMART counters, the drive\'s age and model; the VM\'s criticality tier and memory size.',
+        means: `This drive: ${smartOn.length ? smartOn.join(', ') + ' sectors or events' : 'all five SMART counters at zero'}, ${(AGE / 365).toFixed(1)} years old, model <b>${DM}</b>. The VM: <b>${sc.inp.crit}</b> criticality, <b>${gb} GB</b> of memory.` },
+      { model: 'v2 ensemble · 20 trees', what: 'Twenty gradient-boosted tree models trained on Backblaze SMART telemetry from 2023 to 2026. Each gives the chance this drive fails within 30 days; their mean is p, their spread is how sure they are.',
+        means: `p = <b>${pct(d.p_fail_within_window)}</b>${lo != null ? ` (the models span ${pct(lo)} to ${pct(hi)})` : ''}.` },
+      { model: 'constant hazard', what: 'Turns p into time: if the 30-day risk held steady, when would the drive fail? The sooner, the more urgent a move.',
+        means: `Expected in <b>${days(d.expected_ttf_days)}</b>, median <b>${days(d.median_ttf_days)}</b>; urgency weight ×${cs.urgency_weight}.` },
+      { model: 'pre-copy model', what: 'Live migration copies the VM\'s memory while it keeps running, then pauses it briefly to copy what changed. The bigger the VM, the longer and costlier the move.',
+        means: `${gb} GB: about <b>${c.migration_time_s} s</b> of copying and a <b>${c.migration_blackout_s} s</b> pause, priced at <b>${num(c.total_migration_cost_min)}</b> impact-minutes.` },
+      { model: 'impact-minutes', what: 'Both sides in one unit. Waiting costs p × the minutes a failure would cost at this criticality × urgency; moving costs what the migration does.',
+        means: `Waiting: ${pct(d.p_fail_within_window)} × ${c.failure_customer_cost_min} min × ${cs.urgency_weight} = <b>${num(cs.expected_cost_of_inaction)}</b>. Moving: <b>${num(c.total_migration_cost_min)}</b>.` },
+      { model: 'cost-sensitive policy', what: 'Move only if waiting is expected to cost more than moving.',
+        means: `${num(cs.expected_cost_of_inaction)} ${csMove ? '>' : '<'} ${num(c.total_migration_cost_min)}, so it <b>${csMove ? 'moves the VM' : 'leaves the VM where it is'}</b>.` },
+      { model: 'threshold τ', what: 'The usual rule: move whenever p is above a fixed threshold, whatever the VM\'s size or importance.',
+        means: `p = ${pct(d.p_fail_within_window)} is ${thMove ? 'above' : 'below'} τ = ${pct(TAU)}, so it <b>${thMove ? 'moves' : 'waits'}</b>.` },
+    ];
+    const t = T[cur];
+    $('stepName').textContent = (cur + 1) + ' · ' + STEPS[cur].name;
+    $('stepModel').textContent = t.model; $('stepWhat').innerHTML = t.what; $('stepMeans').innerHTML = t.means;
+    // the header, the decision and the baseline
+    $('roomId').textContent = `scenario · ${DM} · ${(AGE / 365).toFixed(1)} years old · ${sc.inp.crit} criticality · ${gb} GB VM`;
+    $('roomTitle').textContent = sc.title;
+    const chip = $('roomChip'); chip.className = 'chip' + (agree ? '' : ' warn');
+    chip.textContent = agree ? (csMove ? 'Both policies move' : 'Both policies wait') : 'The policies disagree';
+    $('roomSum').innerHTML = `The cost-sensitive policy <span class="em">${csMove ? 'moves' : 'waits'}</span>: waiting is expected to cost <code>${num(cs.expected_cost_of_inaction)}</code> impact-minutes, moving this ${gb} GB VM <code>${num(c.total_migration_cost_min)}</code>. The threshold baseline ${thMove ? 'moves' : 'waits'}, because p = <code>${pct(d.p_fail_within_window)}</code> is ${thMove ? 'above' : 'below'} τ = <code>${pct(TAU)}</code>.`;
+    const big = $('decBig'); big.textContent = csMove ? 'MOVE' : 'WAIT'; big.className = 'dec-big' + (csMove ? '' : ' wait');
+    $('decChip').className = 'chip' + (agree ? '' : ' warn'); $('decChip').textContent = agree ? 'agrees with the baseline' : 'differs from the baseline';
+    $('decWhy').textContent = csMove ? 'Waiting is expected to cost more than the move, so the VM leaves this host now.' : 'The move would cost more than the failure risk it removes, so the VM stays and the host is watched.';
+    $('decChain').innerHTML = `<span>p ${pct(d.p_fail_within_window)}</span><em>→</em><span class="${csMove ? 'hot' : ''}">waiting ${num(cs.expected_cost_of_inaction)}</span><em>${csMove ? '>' : '<'}</em><span class="${csMove ? '' : 'cool'}">moving ${num(c.total_migration_cost_min)}</span><em>→</em><span class="${csMove ? 'hot' : 'cool'}">${csMove ? 'MOVE' : 'WAIT'}</span>`;
+    const bc = $('baseChip'); bc.className = 'chip' + (thMove ? ' warn' : ''); bc.textContent = thMove ? 'moves' : 'waits';
+    $('baseWhy').innerHTML = agree ? `p is ${thMove ? 'above' : 'below'} τ, and here that matches the cost comparison.`
+      : csMove ? `p is below τ, so the threshold leaves this VM. The cost-sensitive policy moves it anyway: it is <b>critical</b> and only <b>${gb} GB</b>, so the move is cheap next to what a failure would cost.`
+      : `p is above τ, so the threshold would move this VM. But moving <b>${gb} GB</b> costs more than the failure risk it removes: the threshold ignores what the move costs.`;
+    $('roomSteps').innerHTML = STEPS.map((st, i) => `<li class="${i < cur ? 'done' : i === cur ? 'cur' : 'todo'}"><button type="button" data-step="${i}" aria-current="${i === cur ? 'step' : 'false'}">
+      <span class="dot"></span><b>${st.name}</b><span class="n">${i + 1}/7</span><span class="r">${stepResult(i)}</span></button></li>`).join('');
+  }
+  function stepResult(i) {
+    const V = values();
+    return ['<code>' + V.smart + '</code> · ' + V.size, 'p = <code>' + V.p + '</code>', V.ttf, '<code>' + V.mv + '</code> to move', '<code>' + V.wait + '</code> to wait', '<code>' + V.dec + '</code>', 'threshold: <code>' + V.thr + '</code>'][i];
+  }
+  function go(i) { cur = Math.max(0, Math.min(STEPS.length - 1, i)); drawFlow(); explain(); }
+  function stop() { clearInterval(timer); timer = null; $('roomPlay').querySelector('span').textContent = cur === STEPS.length - 1 ? 'Replay' : 'Play'; }
+  function play() {
+    if (timer) return stop();
+    if (cur === STEPS.length - 1) go(0);
+    $('roomPlay').querySelector('span').textContent = 'Pause';
+    timer = setInterval(() => { if (cur >= STEPS.length - 1) return stop(); go(cur + 1); }, 1300);
+  }
+  async function load(id, autoplay) {
+    sc = SCEN.find(x => x.id === id); stop();
+    $('roomTitle').textContent = sc.title; $('roomSum').textContent = 'Running the model…';
+    try { d = await predict(sc); } catch (e) { $('roomSum').textContent = 'The model could not be reached: ' + e.message; return; }
+    go(autoplay && !still ? 0 : STEPS.length - 1);
+    if (autoplay && !still) play();
+  }
+  $('roomScen').innerHTML = SCEN.map(x => `<input type="radio" name="scen" id="sc-${x.id}" value="${x.id}" ${x === sc ? 'checked' : ''}><label for="sc-${x.id}">${x.label}</label>`).join('');
+  $('roomScen').addEventListener('change', (e) => load(e.target.value, true));
+  $('roomSteps').addEventListener('click', (e) => { const b = e.target.closest('[data-step]'); if (b) { stop(); go(+b.dataset.step); } });
+  $('flow').addEventListener('click', (e) => { const g = e.target.closest('.nd'); if (g) { stop(); go(stepOf[g.dataset.n]); } });
+  $('flow').addEventListener('keydown', (e) => { const g = e.target.closest('.nd'); if (g && (e.key === 'Enter' || e.key === ' ')) { e.preventDefault(); stop(); go(stepOf[g.dataset.n]); $('flow').querySelector(`[data-n="${g.dataset.n}"]`)?.focus(); } });
+  $('roomPlay').addEventListener('click', play);
+  // "Open in the live model": load this scenario into the live model's controls, then go there
+  $('roomOpen').addEventListener('click', () => {
+    $('m-v2').checked = true; $('v2_model').value = DM; $('age_days').value = AGE; $('temp').value = TEMP;
+    ['s5', 's187', 's188', 's197', 's198'].forEach(k => { $(k).value = sc.inp[k]; });
+    document.querySelectorAll('input[name=preset]').forEach(r => { r.checked = false; });
+    $(sc.inp.trend === 'rising' ? 't-rising' : 't-stable').checked = true;
+    const cr = document.querySelector(`input[name=criticality_tier][value="${sc.inp.crit}"]`); if (cr) cr.checked = true;
+    const sz = document.querySelector(`input[name=size_tier][value="${sc.inp.size}"]`); if (sz) sz.checked = true;
+    syncModelFields(); ageLabel(); tempLabel(); runPredict();
+  }, true);
+  // the first time the room comes into view it plays itself
+  let inView = false;
+  const auto = () => { if (inView && d && !played && !still) { played = true; go(0); play(); } };
+  load(sc.id, false).then(auto);
+  if ('IntersectionObserver' in window) new IntersectionObserver(([e]) => { inView = e.isIntersecting; auto(); }, { threshold: 0.35 }).observe(room);
+});
+
 // ---------------- the models page: pick a model on the left, read it on the right ----------------
-{
+safely(function () {
   const ROWS = {{ comparison | tojson }};
   const V2M = {{ ({'roc_auc': v2.test_roc_auc, 'pr_auc': v2.test_pr_auc, 'n': v2.n_members} if v2 else None) | tojson }};
   const row = (name) => ROWS.find(r => r.model === name);
@@ -1615,10 +2159,10 @@ document.querySelectorAll('.panel, .fcard, .xcard, .figc').forEach((el) => el.ad
     const a = e.target.closest('[data-try]'); if (!a) return;
     const r = $(a.dataset.try); if (r) { r.checked = true; r.dispatchEvent(new Event('change', { bubbles: true })); }
   }, true);
-}
+});
 
 // ---------------- home: "Where it sits" (ported from Faultline's SystemMap: isometric tiles, wires, packets) ----------------
-(function () {
+safely(function () {
   const svg = $('sysMap'); if (!svg) return;
   const GREY = 'rgba(255,255,255,0.28)', WHITE = 'rgba(255,255,255,0.88)', EMBER = 'var(--ember)', IRIS = 'var(--iris)', PROOF = 'var(--proof)';
   const TOP = '#111214', SIDE = '#0b0c0d';
@@ -1741,7 +2285,7 @@ document.querySelectorAll('.panel, .fcard, .xcard, .figc').forEach((el) => el.ad
   // packets ride the wires only while the map is on screen
   if ('IntersectionObserver' in window) new IntersectionObserver(([e]) => { if (e.isIntersecting !== onScreen) { onScreen = e.isIntersecting; packets(); } }, { threshold: 0.1 }).observe($('mapFrame'));
   draw();
-})();
+});
 
 document.querySelectorAll('[data-copy]').forEach((b) => b.addEventListener('click', async () => {
   const text = b.closest('.code').querySelector('pre').innerText.replace(/^\$ /gm, '');
