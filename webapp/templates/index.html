@@ -486,21 +486,72 @@
   @keyframes pageIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: none; } }
   @keyframes pageOut { to { opacity: 0; transform: translateY(-6px); } }
   .page > section.block:first-child { padding-top: 88px; }
-  /* home: the contents as Faultline's figure grid (hairline gaps, a light under the pointer) */
-  .explore { padding-top: 96px; }
-  .xgrid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 1px; overflow: hidden; border-radius: 16px; border: 1px solid var(--line); background: var(--line); }
-  @media (max-width: 900px) { .xgrid { grid-template-columns: 1fr 1fr; } }
-  @media (max-width: 600px) { .xgrid { grid-template-columns: 1fr; } }
-  .xcard { display: flex; flex-direction: column; gap: 14px; min-height: 220px; padding: 28px; text-decoration: none; color: inherit; background-color: var(--bg);
-    background-image: radial-gradient(420px circle at var(--mx, -999px) var(--my, -999px), rgba(255,255,255,.06), transparent 45%); transition: background-color .2s; }
-  .xcard:hover { background-color: #0d0e10; }
-  .xcard .t { font: 11px var(--mono); letter-spacing: .12em; text-transform: uppercase; color: var(--ink-3); }
-  .xcard b { font-size: 21px; font-weight: 590; letter-spacing: -0.015em; line-height: 1.25; color: #f4f4f5; }
-  .xcard .go { margin-top: auto; display: inline-flex; align-items: center; gap: 6px; font-size: 14px; color: #a1a1aa; transition: color .2s; }
-  .xcard .go svg { transition: transform .2s var(--ease); }
-  .xcard:hover .go { color: #fafafa; } .xcard:hover .go svg { transform: translateX(3px); }
-  .xcard:last-child { grid-column: span 1; }
-  @media (min-width: 901px) { .xgrid .xcard:last-child:nth-child(3n+1) { grid-column: 1 / -1; min-height: 160px; } }
+  /* home: the contents as an Apple-style gallery of glass cards: frosted over soft brand glows, a rail that
+     snaps as it scrolls, line art in each page's colour that glows when the pointer comes near */
+  :root { --a-iris: oklch(0.72 0.17 290); --a-sky: #7cc4ff; --a-ember: oklch(0.74 0.18 45); --a-violet: oklch(0.7 0.16 315); --a-mint: oklch(0.84 0.14 165); --a-amber: #f2c25a; }
+  .explore { padding-top: 96px; overflow: hidden; }
+  .gallery { position: relative; isolation: isolate; }
+  .glow-bed { position: absolute; inset: -60px -10% -40px; z-index: -1; pointer-events: none; filter: blur(70px); opacity: .55; }
+  .glow-bed i { position: absolute; width: 34%; height: 70%; border-radius: 50%; }
+  .glow-bed i:nth-child(1) { left: 2%; top: 12%; background: radial-gradient(closest-side, var(--a-iris), transparent); }
+  .glow-bed i:nth-child(2) { left: 30%; top: 30%; background: radial-gradient(closest-side, var(--a-sky), transparent); opacity: .7; }
+  .glow-bed i:nth-child(3) { left: 56%; top: 6%; background: radial-gradient(closest-side, var(--a-ember), transparent); opacity: .65; }
+  .glow-bed i:nth-child(4) { left: 76%; top: 34%; background: radial-gradient(closest-side, var(--a-mint), transparent); opacity: .6; }
+  .rail { display: flex; gap: 18px; overflow-x: auto; overscroll-behavior-x: contain; scroll-snap-type: x mandatory; scroll-behavior: smooth;
+    padding: 22px 32px 30px; margin: 0 -32px; scroll-padding-inline: 32px; scrollbar-width: none; -webkit-overflow-scrolling: touch;
+    -webkit-mask-image: linear-gradient(90deg, transparent, #000 32px, #000 calc(100% - 32px), transparent); mask-image: linear-gradient(90deg, transparent, #000 32px, #000 calc(100% - 32px), transparent); }
+  .rail::-webkit-scrollbar { display: none; }
+  @media (max-width: 640px) { .rail { padding: 18px 20px 26px; margin: 0 -20px; scroll-padding-inline: 20px; gap: 14px; } }
+  .gcard { --a: var(--a-iris); position: relative; flex: 0 0 clamp(270px, 30vw, 340px); scroll-snap-align: start; display: flex; flex-direction: column; min-height: 440px;
+    padding: 22px 22px 20px; border-radius: 26px; text-decoration: none; color: inherit; overflow: hidden; isolation: isolate;
+    background: linear-gradient(160deg, rgba(255,255,255,.10), rgba(255,255,255,.025) 42%, rgba(255,255,255,.04));
+    backdrop-filter: blur(26px) saturate(170%); -webkit-backdrop-filter: blur(26px) saturate(170%);
+    border: 1px solid rgba(255,255,255,.11);
+    box-shadow: inset 0 1px 0 rgba(255,255,255,.22), inset 0 -1px 0 rgba(255,255,255,.04), 0 1px 0 rgba(0,0,0,.4), 0 30px 60px -32px rgba(0,0,0,.85);
+    transition: transform .5s var(--ease), border-color .3s, box-shadow .5s var(--ease); }
+  @media (max-width: 640px) { .gcard { flex-basis: 82vw; min-height: 420px; } }
+  /* the glass's specular edge: a brighter rim at the top left, fading round the card */
+  .gcard::before { content: ""; position: absolute; inset: 0; border-radius: inherit; padding: 1px; pointer-events: none; z-index: 2;
+    background: linear-gradient(140deg, rgba(255,255,255,.55), rgba(255,255,255,.08) 28%, rgba(255,255,255,0) 55%, color-mix(in oklch, var(--a) 45%, transparent));
+    -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0); -webkit-mask-composite: xor; mask-composite: exclude; opacity: .7; transition: opacity .3s; }
+  /* light that follows the pointer across the glass, tinted with the card's colour */
+  .gcard::after { content: ""; position: absolute; inset: 0; z-index: -1; pointer-events: none; opacity: 0; transition: opacity .35s;
+    background: radial-gradient(340px circle at var(--mx, 50%) var(--my, 30%), color-mix(in oklch, var(--a) 22%, transparent), transparent 60%); }
+  .gcard:hover, .gcard:focus-visible { transform: translateY(-6px); border-color: color-mix(in oklch, var(--a) 40%, rgba(255,255,255,.12));
+    box-shadow: inset 0 1px 0 rgba(255,255,255,.28), 0 1px 0 rgba(0,0,0,.4), 0 40px 80px -30px color-mix(in oklch, var(--a) 35%, rgba(0,0,0,.9)); }
+  .gcard:hover::after, .gcard:focus-visible::after { opacity: 1; }
+  .gcard:hover::before { opacity: 1; }
+  .gcard .t { font: 500 11.5px var(--mono); letter-spacing: .14em; text-transform: uppercase; color: color-mix(in oklch, var(--a) 70%, #d4d4d8); }
+  .gcard .art { position: relative; display: block; height: 170px; margin: 18px -6px 18px; border-radius: 18px; overflow: hidden;
+    background: radial-gradient(70% 80% at 50% 60%, color-mix(in oklch, var(--a) 12%, transparent), transparent 75%), rgba(0,0,0,.18);
+    box-shadow: inset 0 0 0 1px rgba(255,255,255,.06); }
+  .gcard .art::after { content: ""; position: absolute; inset: 0; pointer-events: none; opacity: .4; transition: opacity .4s;
+    background: radial-gradient(60% 70% at 50% 55%, color-mix(in oklch, var(--a) 30%, transparent), transparent 70%); }
+  .gcard:hover .art::after { opacity: 1; }
+  .gcard .art svg { position: relative; z-index: 1; display: block; width: 100%; height: 100%; overflow: visible;
+    filter: drop-shadow(0 0 0 transparent); transition: filter .45s var(--ease), transform .6s var(--ease); }
+  .gcard:hover .art svg, .gcard:focus-visible .art svg { filter: drop-shadow(0 0 6px color-mix(in oklch, var(--a) 80%, transparent)) drop-shadow(0 0 18px color-mix(in oklch, var(--a) 45%, transparent)); transform: scale(1.03); }
+  .gcard .art .l { fill: none; stroke: var(--a); stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+  .gcard .art .g { fill: none; stroke: rgba(255,255,255,.28); stroke-width: 1.5; stroke-linecap: round; stroke-linejoin: round; }
+  .gcard .art .d { fill: none; stroke: rgba(255,255,255,.3); stroke-width: 1.2; stroke-dasharray: 4 5; }
+  .gcard .art .f { fill: var(--a); stroke: none; }
+  .gcard .art .h { fill: #0f1011; stroke: var(--a); stroke-width: 2; }
+  .gcard .art text { font: 600 16px var(--mono); fill: var(--a); }
+  .gcard b { font-size: 20px; font-weight: 600; letter-spacing: -0.02em; line-height: 1.25; color: #fafafa; }
+  .gcard .d { margin-top: 8px; font-size: 14.5px; line-height: 1.55; color: #a1a1aa; }
+  .gcard .go { margin-top: auto; padding-top: 18px; display: inline-flex; align-items: center; gap: 6px; font-size: 14px; font-weight: 500; color: #e4e4e7; }
+  .gcard .go svg { transition: transform .25s var(--ease); } .gcard:hover .go svg { transform: translateX(4px); }
+  .gal-ctl { display: flex; align-items: center; justify-content: space-between; gap: 16px; margin-top: 4px; }
+  .gal-dots { display: flex; gap: 6px; }
+  .gal-dots i { width: 6px; height: 6px; border-radius: 99px; background: rgba(255,255,255,.22); transition: width .35s var(--ease), background-color .3s; }
+  .gal-dots i.on { width: 22px; background: #fafafa; }
+  .gal-btns { display: flex; gap: 8px; }
+  .glass-btn { display: inline-grid; place-items: center; width: 42px; height: 42px; border-radius: 50%; cursor: pointer; color: #fafafa;
+    background: rgba(255,255,255,.07); border: 1px solid rgba(255,255,255,.14); backdrop-filter: blur(16px) saturate(160%); -webkit-backdrop-filter: blur(16px) saturate(160%);
+    box-shadow: inset 0 1px 0 rgba(255,255,255,.2); transition: background-color .2s, opacity .2s, transform .16s var(--ease-quick); }
+  .glass-btn:hover { background: rgba(255,255,255,.13); } .glass-btn:active { transform: scale(.94); }
+  .glass-btn:disabled { opacity: .3; cursor: default; }
+  @media (prefers-reduced-motion: reduce) { .rail { scroll-behavior: auto; } .gcard, .gcard .art svg { transition: none; } .gcard:hover, .gcard:focus-visible { transform: none; } .gcard:hover .art svg { transform: none; } }
   /* the end of each page: previous, and the next page as a large link */
   .pager { display: grid; grid-template-columns: auto 1fr; align-items: stretch; gap: 12px; padding-bottom: 96px; }
   .pg { display: flex; flex-direction: column; justify-content: center; gap: 6px; padding: 22px 26px; border: 1px solid var(--line); border-radius: 16px; text-decoration: none; color: inherit;
@@ -1098,14 +1149,68 @@
       <p class="sec-num">Contents</p>
       <h2 id="explore-title">Seven pages, one question. <span class="mute">Which VMs are worth moving off failing hardware, and when does it matter? Start with how the decision works, or go straight to what the research has found.</span></h2>
     </div>
-    <div class="xgrid">
-      <a class="xcard" href="/how"><span class="t">01 · How it works</span><b>Four signals, one decision.</b><span class="go">Open <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg></span></a>
-      <a class="xcard" href="/model"><span class="t">02 · Live model</span><b>Ask the model about one VM.</b><span class="go">Open <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg></span></a>
-      <a class="xcard" href="/v1"><span class="t">03 · v1 results</span><b>What the course project found.</b><span class="go">Open <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg></span></a>
-      <a class="xcard" href="/models"><span class="t">04 · Models</span><b>A deep attention model against a calibrated tree.</b><span class="go">Open <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg></span></a>
-      <a class="xcard" href="/research"><span class="t">05 · Research v2</span><b>Turning a course project into research.</b><span class="go">Open <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg></span></a>
-      <a class="xcard" href="/brain"><span class="t">06 · Brain</span><b>What the project claims, decided and why.</b><span class="go">Open <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg></span></a>
-      <a class="xcard" href="/explore"><span class="t">07 · Explore</span><b>Every part of the project, and how it connects.</b><span class="go">Open <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg></span></a>
+    <div class="gallery" id="gallery">
+      <div class="glow-bed" aria-hidden="true"><i></i><i></i><i></i><i></i></div>
+      <div class="rail" id="rail">
+        <a class="gcard" href="/how" style="--a: var(--a-iris)" aria-label="How it works: Four signals, one decision.">
+          <span class="t">01 · How it works</span>
+          <span class="art" aria-hidden="true"><svg viewBox="0 0 300 180"><rect class="g" x="16" y="30" width="62" height="24" rx="7"/><rect class="g" x="16" y="78" width="62" height="24" rx="7"/><rect class="g" x="16" y="126" width="62" height="24" rx="7"/>
+  <rect class="l" x="118" y="54" width="70" height="28" rx="8"/><rect class="l" x="118" y="110" width="70" height="28" rx="8"/>
+  <rect class="f" x="226" y="80" width="62" height="30" rx="9"/>
+  <path class="l" d="M78 42 C 100 42, 98 68, 118 68 M78 90 C 98 90, 100 68, 118 68 M78 138 C 100 138, 98 124, 118 124 M188 68 C 210 68, 206 95, 226 95 M188 124 C 210 124, 206 95, 226 95"/>
+  <circle class="f" cx="118" cy="68" r="3"/><circle class="f" cx="226" cy="95" r="3"/></svg></span>
+          <b>Four signals, one decision.</b><span class="d">Walk one decision through the real model, step by step.</span><span class="go">Open <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg></span>
+        </a>
+        <a class="gcard" href="/model" style="--a: var(--a-sky)" aria-label="Live model: Ask the model about one VM.">
+          <span class="t">02 · Live model</span>
+          <span class="art" aria-hidden="true"><svg viewBox="0 0 300 180"><path class="g" d="M40 140 A 110 110 0 0 1 260 140"/><path class="l" d="M40 140 A 110 110 0 0 1 196 41" stroke-width="5"/>
+  <line class="l" x1="150" y1="140" x2="205" y2="62" stroke-width="2.5"/><circle class="f" cx="150" cy="140" r="7"/>
+  <path class="d" d="M232 76 L 246 64"/><text x="214" y="56">τ</text>
+  <rect class="g" x="66" y="156" width="10" height="14" rx="2"/><rect class="g" x="84" y="150" width="10" height="20" rx="2"/><rect class="f" x="102" y="140" width="10" height="30" rx="2"/><rect class="g" x="120" y="152" width="10" height="18" rx="2"/></svg></span>
+          <b>Ask the model about one VM.</b><span class="d">Change a drive's health and a VM's size, and watch both policies decide.</span><span class="go">Open <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg></span>
+        </a>
+        <a class="gcard" href="/v1" style="--a: var(--a-ember)" aria-label="v1 results: What the course project found.">
+          <span class="t">03 · v1 results</span>
+          <span class="art" aria-hidden="true"><svg viewBox="0 0 300 180"><line class="d" x1="20" y1="104" x2="290" y2="104"/>
+  <rect class="g" x="34" y="58" width="16" height="96" rx="3"/><rect class="l" x="54" y="64" width="16" height="90" rx="3"/>
+  <rect class="g" x="96" y="78" width="16" height="76" rx="3"/><rect class="l" x="116" y="74" width="16" height="80" rx="3"/>
+  <path class="l" d="M150 128 C 190 120, 200 96, 230 82 S 270 56, 286 46" stroke-width="2.5"/>
+  <circle class="h" cx="150" cy="128" r="5"/><circle class="h" cx="206" cy="102" r="5"/><circle class="f" cx="286" cy="46" r="6"/></svg></span>
+          <b>What the course project found.</b><span class="d">The course project's replay, and why its loss was a counting artifact.</span><span class="go">Open <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg></span>
+        </a>
+        <a class="gcard" href="/models" style="--a: var(--a-violet)" aria-label="Models: A deep attention model against a calibrated tree.">
+          <span class="t">04 · Models</span>
+          <span class="art" aria-hidden="true"><svg viewBox="0 0 300 180"><path class="g" d="M30 160 H 280 M30 160 V 20"/><path class="d" d="M30 160 L 270 30"/>
+  <path class="l" d="M30 160 C 90 130, 140 100, 180 80 S 250 40, 270 32" stroke-width="2.5"/>
+  <path class="g" d="M30 160 C 60 100, 90 60, 140 52 S 230 60, 270 70" stroke-dasharray="6 5"/>
+  <circle class="f" cx="180" cy="80" r="5"/><circle class="h" cx="140" cy="52" r="5"/></svg></span>
+          <b>A deep attention model against a calibrated tree.</b><span class="d">Four models, score by score, and which one the policy can trust.</span><span class="go">Open <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg></span>
+        </a>
+        <a class="gcard" href="/research" style="--a: var(--a-mint)" aria-label="Research v2: Turning a course project into research.">
+          <span class="t">05 · Research v2</span>
+          <span class="art" aria-hidden="true"><svg viewBox="0 0 300 180"><rect class="f" x="26.0" y="34" width="15" height="15" rx="4"/><rect class="f" x="47.5" y="34" width="15" height="15" rx="4"/><rect class="f" x="69.0" y="34" width="15" height="15" rx="4"/><rect class="f" x="90.5" y="34" width="15" height="15" rx="4"/><rect class="f" x="112.0" y="34" width="15" height="15" rx="4"/><rect class="f" x="133.5" y="34" width="15" height="15" rx="4"/><rect class="f" x="155.0" y="34" width="15" height="15" rx="4"/><rect class="f" x="176.5" y="34" width="15" height="15" rx="4"/><rect class="f" x="198.0" y="34" width="15" height="15" rx="4"/><rect class="f" x="219.5" y="34" width="15" height="15" rx="4"/><rect class="f" x="241.0" y="34" width="15" height="15" rx="4"/><rect class="f" x="262.5" y="34" width="15" height="15" rx="4"/><rect class="f" x="26.0" y="58" width="15" height="15" rx="4"/><rect class="f" x="47.5" y="58" width="15" height="15" rx="4"/><rect class="f" x="69.0" y="58" width="15" height="15" rx="4"/><rect class="f" x="90.5" y="58" width="15" height="15" rx="4"/><rect class="f" x="112.0" y="58" width="15" height="15" rx="4"/><rect class="f" x="133.5" y="58" width="15" height="15" rx="4"/><rect class="l" x="155.0" y="58" width="15" height="15" rx="4" opacity=".55"/><rect class="l" x="176.5" y="58" width="15" height="15" rx="4" opacity=".55"/><rect class="l" x="198.0" y="58" width="15" height="15" rx="4" opacity=".55"/><rect class="l" x="219.5" y="58" width="15" height="15" rx="4" opacity=".55"/><rect class="l" x="241.0" y="58" width="15" height="15" rx="4" opacity=".55"/><rect class="l" x="262.5" y="58" width="15" height="15" rx="4" opacity=".55"/><rect class="l" x="26.0" y="82" width="15" height="15" rx="4" opacity=".55"/><rect class="l" x="47.5" y="82" width="15" height="15" rx="4" opacity=".55"/><rect class="l" x="69.0" y="82" width="15" height="15" rx="4" opacity=".55"/><rect class="l" x="90.5" y="82" width="15" height="15" rx="4" opacity=".55"/><rect class="g" x="112.0" y="82" width="15" height="15" rx="4"/><rect class="g" x="133.5" y="82" width="15" height="15" rx="4"/><rect class="g" x="155.0" y="82" width="15" height="15" rx="4"/><rect class="g" x="176.5" y="82" width="15" height="15" rx="4"/><rect class="g" x="198.0" y="82" width="15" height="15" rx="4"/><rect class="g" x="219.5" y="82" width="15" height="15" rx="4"/><rect class="g" x="241.0" y="82" width="15" height="15" rx="4"/><rect class="g" x="262.5" y="82" width="15" height="15" rx="4"/><rect class="g" x="26.0" y="106" width="15" height="15" rx="4"/><rect class="g" x="47.5" y="106" width="15" height="15" rx="4"/><rect class="g" x="69.0" y="106" width="15" height="15" rx="4"/><rect class="g" x="90.5" y="106" width="15" height="15" rx="4"/><rect class="g" x="112.0" y="106" width="15" height="15" rx="4"/><rect class="g" x="133.5" y="106" width="15" height="15" rx="4"/><rect class="g" x="155.0" y="106" width="15" height="15" rx="4"/><rect class="g" x="176.5" y="106" width="15" height="15" rx="4"/><rect class="g" x="198.0" y="106" width="15" height="15" rx="4"/><rect class="g" x="219.5" y="106" width="15" height="15" rx="4"/><rect class="g" x="241.0" y="106" width="15" height="15" rx="4"/><rect class="g" x="262.5" y="106" width="15" height="15" rx="4"/><rect class="g" x="26.0" y="130" width="15" height="15" rx="4"/><rect class="g" x="47.5" y="130" width="15" height="15" rx="4"/><rect class="g" x="69.0" y="130" width="15" height="15" rx="4"/><rect class="g" x="90.5" y="130" width="15" height="15" rx="4"/><rect class="g" x="112.0" y="130" width="15" height="15" rx="4"/><rect class="g" x="133.5" y="130" width="15" height="15" rx="4"/><rect class="g" x="155.0" y="130" width="15" height="15" rx="4"/><rect class="g" x="176.5" y="130" width="15" height="15" rx="4"/><rect class="g" x="198.0" y="130" width="15" height="15" rx="4"/><rect class="g" x="219.5" y="130" width="15" height="15" rx="4"/><rect class="g" x="241.0" y="130" width="15" height="15" rx="4"/><rect class="g" x="262.5" y="130" width="15" height="15" rx="4"/><path class="l" d="M26 168 H 108" stroke-width="3"/><path class="g" d="M108 168 H 284" stroke-width="3"/></svg></span>
+          <b>Turning a course project into research.</b><span class="d">Real traces, a validated simulator and pre-registered runs, week by week.</span><span class="go">Open <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg></span>
+        </a>
+        <a class="gcard" href="/brain" style="--a: var(--a-amber)" aria-label="Brain: What the project claims, decided and why.">
+          <span class="t">06 · Brain</span>
+          <span class="art" aria-hidden="true"><svg viewBox="0 0 300 180"><rect class="g" x="22" y="26" width="160" height="40" rx="14"/><path class="g" d="M48 66 L 40 80 L 62 66"/><line class="g" x1="38" y1="46" x2="150" y2="46"/>
+  <rect class="l" x="96" y="88" width="186" height="74" rx="14"/>
+  <rect class="f" x="112" y="104" width="34" height="16" rx="4"/><line class="l" x1="154" y1="112" x2="262" y2="112"/><line class="g" x1="112" y1="134" x2="246" y2="134"/><line class="g" x1="112" y1="148" x2="214" y2="148"/></svg></span>
+          <b>What the project claims, decided and why.</b><span class="d">Ask the project's own records, and get answers quoted with their ids.</span><span class="go">Open <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg></span>
+        </a>
+        <a class="gcard" href="/explore" style="--a: var(--a-sky)" aria-label="Explore: Every part of the project, and how it connects.">
+          <span class="t">07 · Explore</span>
+          <span class="art" aria-hidden="true"><svg viewBox="0 0 300 180"><path class="g" d="M58 52 L 128 92 L 70 136 M128 92 L 196 50 M128 92 L 212 128 L 270 96 M196 50 L 262 40 M212 128 L 176 162"/>
+  <path class="l" d="M58 52 L 128 92 L 212 128 L 270 96" stroke-width="2.5"/>
+  <circle class="h" cx="58" cy="52" r="8"/><circle class="h" cx="70" cy="136" r="7"/><circle class="h" cx="196" cy="50" r="7"/><circle class="h" cx="262" cy="40" r="6"/><circle class="h" cx="176" cy="162" r="6"/>
+  <circle class="f" cx="128" cy="92" r="11"/><circle class="f" cx="212" cy="128" r="9"/><circle class="f" cx="270" cy="96" r="8"/></svg></span>
+          <b>Every part of the project, and how it connects.</b><span class="d">Every dataset, model, policy and finding as one graph.</span><span class="go">Open <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg></span>
+        </a>
+      </div>
+      <div class="gal-ctl">
+        <div class="gal-dots" id="galDots" aria-hidden="true"></div>
+        <div class="gal-btns"><button type="button" class="glass-btn" id="galPrev" aria-label="Previous pages"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" aria-hidden="true"><polyline points="15 6 9 12 15 18"/></svg></button><button type="button" class="glass-btn" id="galNext" aria-label="More pages"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" aria-hidden="true"><polyline points="9 6 15 12 9 18"/></svg></button></div>
+      </div>
     </div>
   </div>
 </section>
@@ -1959,7 +2064,7 @@ function mountContours(canvas) {
   requestAnimationFrame(draw);
 }
 mountContours($('contours'));
-document.querySelectorAll('.panel, .fcard, .xcard, .figc').forEach((el) => el.addEventListener('pointermove', (e) => {
+document.querySelectorAll('.panel, .fcard, .gcard, .figc').forEach((el) => el.addEventListener('pointermove', (e) => {
   const r = el.getBoundingClientRect();
   el.style.setProperty('--mx', (e.clientX - r.left) + 'px'); el.style.setProperty('--my', (e.clientY - r.top) + 'px');
 }));
@@ -2116,6 +2221,32 @@ safely(function () {
   document.querySelectorAll('input[name=exl]').forEach(r => r.addEventListener('change', () => { layout = r.value; (layout === 'cols' ? layoutCols : layoutForce)(); draw(); fit(); }));
   ['exCard', 'exTable'].forEach(id => $(id).addEventListener('click', (e) => { const b = e.target.closest('[data-go]'); if (b) select(b.dataset.go); }));
   layoutForce(); draw(); card(); table(); fit();
+});
+
+// ---------------- home: the glass gallery (a snapping rail; arrows step one card; dots follow the scroll) ----------------
+safely(function () {
+  const rail = $('rail'); if (!rail) return;
+  const cards = [...rail.querySelectorAll('.gcard')], prev = $('galPrev'), next = $('galNext');
+  const step = () => (cards[1] ? cards[1].offsetLeft - cards[0].offsetLeft : rail.clientWidth);
+  // one dot per place the rail can rest: the last few cards share the final position
+  let dots = [];
+  function build() {
+    const n = Math.max(1, Math.ceil((rail.scrollWidth - rail.clientWidth - 2) / step()) + 1);
+    if (n !== dots.length) { $('galDots').innerHTML = '<i></i>'.repeat(n); dots = [...$('galDots').children]; }
+  }
+  function sync() {
+    build();
+    const max = rail.scrollWidth - rail.clientWidth, x = rail.scrollLeft;
+    const i = x >= max - 2 ? dots.length - 1 : Math.min(dots.length - 1, Math.round(x / step()));
+    dots.forEach((d, k) => d.classList.toggle('on', k === i));
+    prev.disabled = x <= 2; next.disabled = x >= max - 2;
+  }
+  prev.addEventListener('click', () => rail.scrollBy({ left: -step(), behavior: 'smooth' }));
+  next.addEventListener('click', () => rail.scrollBy({ left: step(), behavior: 'smooth' }));
+  rail.addEventListener('scroll', sync, { passive: true });   // cheap: a few class toggles
+  addEventListener('resize', sync); sync();
+  // a focused card scrolls fully into view, as a swipe would
+  rail.addEventListener('focusin', (e) => { const c = e.target.closest('.gcard'); if (c) c.scrollIntoView({ block: 'nearest', inline: 'nearest', behavior: 'smooth' }); });
 });
 
 // ---------------- v1 results: cards, bars and the correlation readout, all from the replay's own numbers ----------------
