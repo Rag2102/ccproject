@@ -1,0 +1,25 @@
+{
+  "_about": "The one place the site's progress is set. The server reads it on every request and fills the status pill and its menu, the home page figure, the research banner, its progress bar and the 60-week phase list. Phase states follow from the weeks: done when a phase ends by weeks_done, under way when it starts by code_ready_to, otherwise not started. Change the numbers and the notes here, set 'updated', and nothing else in the site needs editing. tests/test_site_status.py checks it.",
+  "updated": "2026-10-27",
+  "weeks_total": 60,
+  "weeks_done": 18,
+  "code_ready_to": 28,
+  "paper_week": 40,
+  "headline": "Week 18 benchmark done · Weeks 19–21 runs queued",
+  "summary": "Data, failure model, real-trace measurement, a validated simulator, policies, theory and a frozen protocol are done, and the first pre-registered benchmark runs (regimes A and E) are in. The code for Weeks 19–28 (the remaining runs, paper draft, artifact and console) is written and tested; the remaining runs take about ten hours of compute.",
+  "benchmark": "A and E · 30 seeds",
+  "next": "B, C, D regimes, queued",
+  "phases": [
+    {"name": "Foundation and claim", "from": 1, "to": 3, "note": "v1 frozen, protocol"},
+    {"name": "Real data", "from": 4, "to": 8, "note": "Backblaze, Google trace, G1"},
+    {"name": "Simulator", "from": 9, "to": 13, "note": "validated at G2"},
+    {"name": "Policies and theory", "from": 14, "to": 17, "note": "protocol frozen"},
+    {"name": "Benchmark runs", "from": 18, "to": 21, "note": "W18 done, rest queued"},
+    {"name": "Paper, artifact, console", "from": 22, "to": 26, "note": "drafted"},
+    {"name": "Polish and submit paper A", "from": 27, "to": 40, "note": "tools built, waiting on runs"},
+    {"name": "Ground the cost model", "from": 41, "to": 46, "note": ""},
+    {"name": "Failure physics", "from": 47, "to": 50, "note": ""},
+    {"name": "Open benchmark v1.0", "from": 51, "to": 54, "note": ""},
+    {"name": "Journal extension", "from": 55, "to": 60, "note": ""}
+  ]
+}

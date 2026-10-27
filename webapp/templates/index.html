@@ -852,15 +852,16 @@
     </nav>
     <div class="nav-right">
       <div class="status-wrap">
-        <button type="button" class="status-pill" id="statusBtn" aria-expanded="false" aria-controls="statusMenu" aria-label="Project status: v2 research, Week 18 of 60 done"><i></i><span>v2 · Week 18 of 60</span><svg class="chev" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" aria-hidden="true"><polyline points="6 9 12 15 18 9"/></svg></button>
+        <button type="button" class="status-pill" id="statusBtn" aria-expanded="false" aria-controls="statusMenu" aria-label="Project status: v2 research, Week {{ status.weeks_done }} of {{ status.weeks_total }} done"><i></i><span>v2 · Week {{ status.weeks_done }} of {{ status.weeks_total }}</span><svg class="chev" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" aria-hidden="true"><polyline points="6 9 12 15 18 9"/></svg></button>
         <div class="status-menu" id="statusMenu" hidden>
           <dl>
-            <dt>Plan</dt><dd>Week 18 of 60 done</dd>
-            <dt>Benchmark</dt><dd>A and E · 30 seeds</dd>
-            <dt>Next</dt><dd>B, C, D regimes, queued</dd>
+            <dt>Plan</dt><dd>Week {{ status.weeks_done }} of {{ status.weeks_total }} done</dd>
+            <dt>Benchmark</dt><dd>{{ status.benchmark }}</dd>
+            <dt>Next</dt><dd>{{ status.next }}</dd>
             <dt>Live model</dt><dd>{% if v2 %}v2 ensemble · {{ v2.n_members }} models{% else %}v1 HistGBM{% endif %}</dd>
             {% if v2 %}<dt>Test ROC-AUC</dt><dd>{{ '%.3f'|format(v2.test_roc_auc) }}</dd>{% endif %}
             <dt>Data</dt><dd>public only</dd>
+            <dt>Updated</dt><dd>{{ status.updated_text }}</dd>
           </dl>
           <a href="/research#plan">See the 60-week plan <span aria-hidden="true">→</span></a>
         </div>
@@ -911,7 +912,7 @@
     <div class="fig"><div class="t">Data</div><div class="n">2.0M+</div><div class="l">real VMs in the Azure public trace</div></div>
     <div class="fig"><div class="t">Data</div><div class="n">744M</div><div class="l">drive-days of Backblaze telemetry, 2013–2026</div></div>
     <div class="fig"><div class="t">Measured</div><div class="n">3</div><div class="l">Google 2019 cells: criticality and host risk essentially uncorrelated</div></div>
-    <div class="fig"><div class="t">Progress</div><div class="n">18<small>/60</small></div><div class="l">weeks of the v2 plan done; code ready well beyond</div></div>
+    <div class="fig"><div class="t">Progress</div><div class="n">{{ status.weeks_done }}<small>/{{ status.weeks_total }}</small></div><div class="l">weeks of the v2 plan done; code ready to Week {{ status.code_ready_to }}</div></div>
   </div>
 </section>
 
@@ -1366,12 +1367,12 @@
       <div class="status">
         <span class="b-ico" aria-hidden="true"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg></span>
         <div>
-          <h3>Week 18 benchmark done · Weeks 19–21 runs queued</h3>
-          <p>Data, failure model, real-trace measurement, a validated simulator, policies, theory and a frozen protocol are done, and the first pre-registered benchmark runs (regimes A and E) are in. The code for Weeks 19–28 (the remaining runs, paper draft, artifact and console) is written and tested; the remaining runs take about ten hours of compute.</p>
-          <div class="progress" aria-label="18 of 60 weeks done, code ready to week 28"><span style="width:30%;background:var(--cs)"></span><span style="width:16.7%;background:var(--amber);opacity:.55"></span></div>
-          <div class="progress-scale" style="position:relative;height:16px"><span style="position:absolute;left:0">Week 1</span><span style="position:absolute;left:66.7%;transform:translateX(-50%)">Paper A · W40</span><span style="position:absolute;right:0">Week 60</span></div>
+          <h3>{{ status.headline }}</h3>
+          <p>{{ status.summary }}</p>
+          <div class="progress" aria-label="{{ status.weeks_done }} of {{ status.weeks_total }} weeks done, code ready to week {{ status.code_ready_to }}"><span style="width:{{ status.done_pct }}%;background:var(--cs)"></span><span style="width:{{ status.ready_pct }}%;background:var(--amber);opacity:.55"></span></div>
+          <div class="progress-scale" style="position:relative;height:16px"><span style="position:absolute;left:0">Week 1</span><span style="position:absolute;left:{{ status.paper_pct }}%;transform:translateX(-50%)">Paper A · W{{ status.paper_week }}</span><span style="position:absolute;right:0">Week {{ status.weeks_total }}</span></div>
         </div>
-        <div class="status-num"><div class="n">18<small>/60</small></div><div class="l">weeks done · code to W28</div></div>
+        <div class="status-num"><div class="n">{{ status.weeks_done }}<small>/{{ status.weeks_total }}</small></div><div class="l">weeks done · code to W{{ status.code_ready_to }} · updated {{ status.updated_text }}</div></div>
       </div>
     </div>
 
@@ -1495,17 +1496,8 @@
           </div>
         </div>
         <div class="phases" id="phaseList">
-          <div class="phase done"><span class="dot"></span><div><b>Foundation and claim</b><span class="w">W1–3</span> <span>· v1 frozen, protocol</span></div></div>
-          <div class="phase done"><span class="dot"></span><div><b>Real data</b><span class="w">W4–8</span> <span>· Backblaze, Google trace, G1</span></div></div>
-          <div class="phase done"><span class="dot"></span><div><b>Simulator</b><span class="w">W9–13</span> <span>· validated at G2</span></div></div>
-          <div class="phase done"><span class="dot"></span><div><b>Policies and theory</b><span class="w">W14–17</span> <span>· protocol frozen</span></div></div>
-          <div class="phase now"><span class="dot"></span><div><b>Benchmark runs</b><span class="w">W18–21</span> <span>· W18 done, rest queued</span></div></div>
-          <div class="phase now"><span class="dot"></span><div><b>Paper, artifact, console</b><span class="w">W22–26</span> <span>· drafted</span></div></div>
-          <div class="phase now"><span class="dot"></span><div><b>Polish and submit paper A</b><span class="w">W27–40</span> <span>· tools built, waiting on runs</span></div></div>
-          <div class="phase"><span class="dot"></span><div><b>Ground the cost model</b><span class="w">W41–46</span></div></div>
-          <div class="phase"><span class="dot"></span><div><b>Failure physics</b><span class="w">W47–50</span></div></div>
-          <div class="phase"><span class="dot"></span><div><b>Open benchmark v1.0</b><span class="w">W51–54</span></div></div>
-          <div class="phase"><span class="dot"></span><div><b>Journal extension</b><span class="w">W55–60</span></div></div>
+          {% for ph in status.phases %}<div class="phase{% if ph.state != 'todo' %} {{ ph.state }}{% endif %}"><span class="dot"></span><div><b>{{ ph.name }}</b><span class="w">W{{ ph['from'] }}–{{ ph.to }}</span>{% if ph.note %} <span>· {{ ph.note }}</span>{% endif %}</div></div>
+          {% endfor %}
         </div>
       </div>
       <div class="links-row more-row">

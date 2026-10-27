@@ -27,6 +27,7 @@ import os
 from flask import Flask, render_template, request, jsonify, send_from_directory
 
 import core
+from site_status import load_status
 
 app = Flask(__name__)
 
@@ -37,14 +38,24 @@ PAGES = {"how": "How it works", "model": "Live model", "v1": "v1 results", "mode
          "explore": "Explore"}
 
 
+def render(page, title=None):
+    return render_template("index.html", page=page, page_title=title, status=load_status(), **core.get_meta())
+
+
 @app.route("/")
 def index():
-    return render_template("index.html", page="home", page_title=None, **core.get_meta())
+    return render("home")
 
 
 @app.route("/<any(how, model, v1, models, research, explore):name>")
 def section(name):
-    return render_template("index.html", page=name, page_title=PAGES[name], **core.get_meta())
+    return render(name, PAGES[name])
+
+
+@app.route("/api/status")
+def api_status():
+    """The same progress as JSON (for the static frontend and anything else that wants it)."""
+    return jsonify(load_status())
 
 
 @app.route("/figures/<path:fname>")
