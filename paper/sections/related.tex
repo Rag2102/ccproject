@@ -9,18 +9,28 @@ Field studies established that drive replacement rates far exceed datasheet valu
 SMART attributes carry real but incomplete signal~\cite{schroeder2007disk,pinheiro2007failure}.
 Later work predicts disk replacement from SMART data~\cite{botezatu2016predicting} and, in
 production, ranks disks by error-proneness from SMART and system signals with a cost-sensitive
-loss, acting on the top~$r$ under capacity constraints~\cite{xu2018cdef}. We use a predictor of
-this kind as a fixed input and do not claim a better one. These papers stop at the prediction or
+loss, acting on the top~$r$ under capacity constraints~\cite{xu2018cdef}. That cut-off minimises
+one fixed cost ratio between false alarms and misses for every disk; it does not weigh what each
+host runs, how critical or how large its VMs are, or how much a move costs. Deep models such as
+GQAT-Net~\cite{tripathi2025gqat} add calibrated attention architectures for job and instance
+failures in cluster traces. We use a predictor of this kind as a fixed input and do not claim a
+better one; instead we ask what a decision built on its probabilities needs from it, and find that
+noise in the probabilities does not reverse the advantage of budget-aware selection while
+flattening miscalibration can (Section~\ref{sec:approach}). These papers stop at the prediction or
 name VM migration as a downstream use; none asks which VMs to move under a migration budget, or
 how the answer depends on where critical work sits.
 
 \paragraph{Failure mitigation systems.}
 Narya~\cite{levy2020narya} chooses mitigation actions per flagged node with A/B tests and a
 Thompson-sampling bandit, NENYA~\cite{wang2022nenya} uses cascade reinforcement learning to trade
-mitigation cost against failures for databases, and Deoxys~\cite{zhang2024deoxys} recommends
-actions for unhealthy nodes with causal inference. All three are deployed at one operator and
-report large relative gains; none publishes data, code or absolute numbers, and none compares
-against a probability threshold tuned to the same budget. Protean~\cite{hadary2020protean} avoids
+mitigation cost against failures for databases, and Deoxys~\cite{zhang2024deoxys} chooses
+between rebooting and redeploying a node after it has become unhealthy, from causal estimates of
+each action's effect on downtime. All three are deployed at one operator and report large
+relative gains; none publishes data, code or absolute numbers, and none compares against a
+probability threshold tuned to the same budget. Deoxys also falls back to its legacy policy when
+the interval on an estimated effect is wide and the estimate is near zero; our guard (P6) applies
+the same idea at the level of the policy, with a sequential test whose false-switch rate is
+controlled across repeated looks and a calibration audit on realised outcomes. Protean~\cite{hadary2020protean} avoids
 risky hosts at allocation time; we take placement as given and measure it instead. Our P5 is a
 Narya-inspired baseline whose every departure from the paper is listed in the artifact. What this
 group does not do is isolate the ranking question, bound the gain from workload awareness, or let
