@@ -539,7 +539,7 @@ def run_predict_v2(body):
         },
         "threshold": {"migrate": bool(policy.threshold_decision(p, TAU_DEFAULT)), "tau": TAU_DEFAULT},
         "assumptions": "TTF from a constant hazard matching the 30-day probability; "
-                       "'stable' counters unchanged for 30 days, 'rising' ones new this week",
+                       "'stable' counters unchanged for 30 days, 'rising' ones new in the last 7 days",
     }
     _log_event(
         "predict_served", which_model="v2", drive_model=req.drive_model, age_days=req.age_days,

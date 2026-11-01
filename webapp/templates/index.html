@@ -333,6 +333,16 @@
   .dec { padding: 22px; }
   .dec + .dec { border-left: 1px solid var(--line); }
   @media (max-width: 760px) { .dec + .dec { border-left: none; border-top: 1px solid var(--line); } }
+  .examples { display: flex; flex-direction: column; gap: 8px; }
+  .example { display: block; flex: none; width: 100%; height: auto; min-height: 50px; white-space: normal; overflow: visible; text-align: left; padding: 9px 12px; border-radius: 9px; border: 1px solid var(--line); background: rgba(255,255,255,.03); color: #e4e4e7; font: 500 13px/1.35 var(--sans); cursor: pointer; }
+  .example small { display: block; font-weight: 400; font-size: 12px; color: var(--ink-3); }
+  .example:hover { background: rgba(255,255,255,.06); }
+  .example:focus-visible { outline: 2px solid #38bdf8; outline-offset: 1px; }
+  .example.active { border-color: var(--cs); background: var(--cs-soft); }
+  .summary { padding: 18px 22px; border-bottom: 1px solid var(--line); }
+  .summary .say { margin: 0; font-size: 17px; font-weight: 600; line-height: 1.4; color: var(--ink); }
+  .summary .differ { margin: 10px 0 0; padding: 10px 12px; border-radius: 8px; background: var(--th-soft); font-size: 13.5px; line-height: 1.5; color: #e4e4e7; }
+  .summary .differ b { color: var(--th); }
   .dec-top { display: flex; justify-content: space-between; align-items: center; gap: 10px; margin-bottom: 14px; }
   .dec-name { display: flex; align-items: center; gap: 8px; font-size: 13px; font-weight: 600; }
   .dec-name i { width: 9px; height: 9px; border-radius: 3px; }
@@ -1484,10 +1494,18 @@ migrate = expected_cost_of_inaction &gt; migration_cost</pre></div>
     <header class="page-head">
       <p class="eyebrow-mono">Live model</p>
       <h1 class="page-title">Ask the model about one VM.</h1>
-      <p class="page-lede">Every change runs a real forward pass on the server: the v1 course-project models, or the v2 ensemble trained on SMART telemetry (the model chosen in ADR-006). Both policies always see exactly the same inputs.</p>
+      <p class="page-lede">Pick a drive and a VM, and the model estimates the risk live on the server. Two policies then decide from the same inputs: one looks only at risk, the other also weighs what is at stake.</p>
     </header>
     <div class="demo">
       <div class="panel reveal" id="controls">
+        {% if v2 %}<div class="set-group">
+          <p class="set-head">Try an example</p>
+          <div class="examples">
+            <button type="button" class="example" data-ex="healthy">Healthy drive<small>Both policies should leave the VM alone</small></button>
+            <button type="button" class="example" data-ex="critical">Failing drive, critical VM<small>Both policies should move it</small></button>
+            <button type="button" class="example" data-ex="disagree">Failing drive, low-priority large VM<small>The policies disagree</small></button>
+          </div>
+        </div>{% endif %}
         <div class="set-group">
           <p class="set-head">Failure model</p>
           <div class="choices" role="radiogroup" aria-label="Failure model">
@@ -1521,8 +1539,9 @@ migrate = expected_cost_of_inaction &gt; migration_cost</pre></div>
               <input type="radio" name="preset" id="p-fail" value="failing"><label for="p-fail">Failing</label>
             </div>
             <div class="smart-grid">
+              {% set smart_help = {'s5': 'damaged areas already replaced', 's187': 'errors the drive could not fix', 's188': 'requests that timed out', 's197': 'unstable areas waiting to be replaced', 's198': 'areas unreadable in a self-check'} %}
               {% for k, name in v2.smart.items() %}
-              <label class="smart" for="{{ k }}"><span>{{ name }}<small>SMART {{ k[1:] }}</small></span>
+              <label class="smart" for="{{ k }}"><span>{{ name }}<small>{{ smart_help[k] }}</small></span>
                 <input type="number" id="{{ k }}" min="0" max="1000000" step="1" value="0" inputmode="numeric"></label>
               {% endfor %}
             </div>
@@ -1577,9 +1596,10 @@ migrate = expected_cost_of_inaction &gt; migration_cost</pre></div>
       <div class="panel reveal" id="resultPanel" aria-live="polite">
         <div class="result-empty" id="resultEmpty">Loading the model…</div>
         <div id="result" hidden>
+          <div class="summary"><p class="say" id="sum-say"></p><p class="differ" id="sum-differ" hidden></p></div>
           <div class="readouts">
             <div class="ro">
-              <div class="l">P(fail within {{ lookahead_days }} days)</div>
+              <div class="l">Chance of failing within {{ lookahead_days }} days</div>
               <div class="v" id="ro-p">–</div>
               <div class="meter" aria-hidden="true"><div class="band" id="pBand" hidden></div><div class="fill" id="pFill"></div><div class="tau" id="tauMark"></div></div>
               <div class="meter-scale"><span>0</span><span id="meterMax">–</span></div>
@@ -1598,19 +1618,19 @@ migrate = expected_cost_of_inaction &gt; migration_cost</pre></div>
               </div>
               <div class="dec-foot">
                 <div class="kv"><span>Urgency weight</span><b id="cs-urg">–</b></div>
-                <div class="kv"><span>Units</span><b>impact-minutes</b></div>
+                <div class="kv"><span>Units</span><b>minutes of customer impact</b></div>
               </div>
             </div>
             <div class="dec">
               <div class="dec-top"><span class="dec-name"><i style="background:var(--th)"></i>Threshold baseline</span><span class="verdict idle" id="th-verdict">–</span></div>
               <p class="why" id="th-why"></p>
               <div class="bars">
-                <div class="bar-row"><span>p (this VM's host)</span><div class="bar"><span id="bar-p" style="background:var(--ink-2)"></span></div><b id="v-p">–</b></div>
-                <div class="bar-row"><span>τ (fixed threshold)</span><div class="bar"><span id="bar-tau" style="background:var(--th)"></span></div><b>{{ tau_default }}</b></div>
+                <div class="bar-row"><span>Host's failure risk</span><div class="bar"><span id="bar-p" style="background:var(--ink-2)"></span></div><b id="v-p">–</b></div>
+                <div class="bar-row"><span>Risk cut-off</span><div class="bar"><span id="bar-tau" style="background:var(--th)"></span></div><b>{{ tau_default }}</b></div>
               </div>
               <div class="dec-foot">
-                <div class="kv"><span>Rule</span><b>migrate iff p &gt; τ</b></div>
-                <div class="kv"><span>Ignores</span><b>criticality, size, cost</b></div>
+                <div class="kv"><span>Rule</span><b>move if risk &gt; cut-off</b></div>
+                <div class="kv"><span>Ignores</span><b>importance, size, cost</b></div>
               </div>
             </div>
           </div>
@@ -3089,7 +3109,8 @@ function changed() {
 document.querySelectorAll('#controls input[type=radio]').forEach(r => r.addEventListener('change', changed));
 
 const fmtMin = (x) => (x >= 10 ? x.toFixed(1) : x >= 1 ? x.toFixed(2) : x.toFixed(3));
-const fmtDays = (d) => d == null ? null : d >= 730 ? (d / 365).toFixed(1) + '<small>years</small>' : Math.round(d) + '<small>days</small>';
+const LONG_TIME = '<span style="font-size:20px">Over 10 years</span>';
+const fmtDays = (d) => d == null || d > 3650 ? LONG_TIME : d >= 730 ? (d / 365).toFixed(1) + '<small>years</small>' : Math.round(d) + '<small>days</small>';
 
 async function runPredict() {
   const payload = inputs();
@@ -3116,8 +3137,8 @@ function render(d) {
   const r = $('result'); r.hidden = false; r.classList.remove('is-stale');
   const p = d.p_fail_within_window;
   $('ro-p').innerHTML = (p * 100).toFixed(p < 0.001 ? 3 : 2) + '<small>%</small>';
-  $('ro-ttf').innerHTML = fmtDays(d.expected_ttf_days) || '–';
-  $('ro-med').innerHTML = fmtDays(d.median_ttf_days) || '<span style="font-size:20px">beyond horizon</span>';
+  $('ro-ttf').innerHTML = fmtDays(d.expected_ttf_days);
+  $('ro-med').innerHTML = fmtDays(d.median_ttf_days);
   const scale = Math.min(1, Math.max(p, TAU) * 1.6);
   $('pFill').style.width = (100 * p / scale) + '%';
   $('pFill').style.background = p > TAU ? css('--th') : css('--ink-2');
@@ -3152,8 +3173,19 @@ function render(d) {
   $('v-p').textContent = p.toFixed(5);
   setVerdict('th-verdict', th.migrate);
   $('th-why').textContent = th.migrate
-    ? `p is above τ, so it migrates, whatever the workload or the cost.`
-    : `p is below τ, so it waits, whatever the workload or the cost.`;
+    ? `The risk is above the cut-off, so it migrates, whatever the workload or the cost.`
+    : `The risk is below the cut-off, so it waits, whatever the workload or the cost.`;
+
+  const pctText = (p * 100).toFixed(p < 0.001 ? 3 : p < 0.1 ? 2 : 0) + '%';
+  const crit = lastInputs.criticality_tier, gb = d.costs.size_tier_profile.memory_gb;
+  $('sum-say').textContent = cs.migrate
+    ? `Move this VM. The chance of failure is ${pctText}, and the expected loss from waiting is more than the cost of moving it.`
+    : `Leave this VM where it is. The chance of failure is ${pctText}, and moving it costs more than the expected loss from waiting.`;
+  const differ = $('sum-differ');
+  differ.hidden = cs.migrate === th.migrate;
+  if (!differ.hidden) differ.innerHTML = '<b>Why they disagree:</b> ' + (th.migrate
+    ? `the risk is above the cut-off, so the threshold moves the VM. The cost-sensitive policy also sees that this is a ${crit}-priority, ${gb} GB VM: moving costs ${fmtMin(mig)}, waiting is expected to cost ${fmtMin(wait)}.`
+    : `the risk is below the cut-off, so the threshold leaves the VM. The cost-sensitive policy also sees that this is a ${crit}-priority, ${gb} GB VM: waiting is expected to cost ${fmtMin(wait)}, moving costs ${fmtMin(mig)}.`);
 
   let note = d.model_used + ' · migration ' + (d.costs.precopy_converges ? 'pre-copy converges' : 'falls back to stop-and-copy') +
     ` in ${d.costs.migration_time_s}s, blackout ${d.costs.migration_blackout_s}s · VM ${d.costs.size_tier_profile.memory_gb} GB, ${d.costs.size_tier_profile.vcores} vCPU.`;
@@ -3165,7 +3197,27 @@ function render(d) {
 function setVerdict(id, migrate) {
   const el = $(id); el.className = 'verdict ' + (migrate ? 'migrate' : 'wait'); el.textContent = migrate ? 'MIGRATE' : 'WAIT';
 }
+const EXAMPLES = {
+  healthy: { preset: 'healthy', crit: 'high', size: 'medium' },
+  critical: { preset: 'failing', crit: 'high', size: 'large' },
+  disagree: { preset: 'failing', crit: 'low', size: 'large' },
+};
+function clearExample() { document.querySelectorAll('.example').forEach(b => b.classList.remove('active')); }
+function runExample(btn) {
+  const ex = EXAMPLES[btn.dataset.ex];
+  $('m-v2').checked = true; syncModelFields();
+  $('v2_model').value = '{{ v2.default_drive_model if v2 else '' }}';
+  $('temp').value = 30; tempLabel();
+  document.querySelector(`input[name=preset][value=${ex.preset}]`).checked = true; applyPreset(ex.preset);
+  $('c-' + ex.crit).checked = true; $('s-' + ex.size).checked = true;
+  age.value = 900; ageLabel();
+  clearTimeout(debounce); runPredict();
+  clearExample(); btn.classList.add('active');
+}
+document.querySelectorAll('.example').forEach(b => b.addEventListener('click', () => runExample(b)));
+document.querySelectorAll('#controls input, #controls select').forEach(el => el.addEventListener('input', clearExample));
 function resetForm() {
+  clearExample();
   $('m-hgb').checked = true;
   $('model_grp').value = [...$('model_grp').options].some(o => o.value === 'ST4000DM000') ? 'ST4000DM000' : $('model_grp').options[0].value;
   document.querySelector('input[name=criticality_tier]').checked = true;
