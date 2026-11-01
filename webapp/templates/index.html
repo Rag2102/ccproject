@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>{% if page_title %}{{ page_title }} · VM Mitigation{% else %}VM Mitigation: move the right VMs before hardware fails{% endif %}</title>
-<meta name="description" content="A workload-aware, cost-sensitive VM mitigation policy: live model demo, course-project results, and the v2 research programme in progress.">
+<meta name="description" content="A workload-aware, cost-sensitive VM mitigation policy: live model demo, course-project results, and the v2 research results.">
 <meta property="og:type" content="website">
 <meta property="og:title" content="VM Mitigation: move the right VMs before hardware fails">
 <meta property="og:description" content="Which VMs are worth moving off failing hardware? A live model demo, course-project results and the v2 research programme.">
@@ -418,26 +418,29 @@
   .sb-read div { font-size: 12px; color: var(--ink-3); }
   .sb-read b { display: block; font-family: var(--serif); font-size: 26px; font-weight: 600; color: var(--ink); line-height: 1.2; }
 
-  #w18 { margin-top: 20px; }
-  #w18 .panel-head { display: flex; justify-content: space-between; gap: 16px; flex-wrap: wrap; align-items: flex-start; }
-  .w18-seg { flex-shrink: 0; }
-  @media (max-width: 600px) { .w18-seg { width: 100%; } .w18-seg label { flex: 1; padding-left: 4px; padding-right: 4px; } .w18-seg label small { display: none; } }
-  .w18-bars { display: grid; gap: 12px; margin-top: 18px; }
-  .w18-row { display: grid; grid-template-columns: 190px 1fr 88px; gap: 12px; align-items: center; font-size: 12.5px; color: var(--ink-2); }
-  @media (max-width: 600px) { .w18-row { grid-template-columns: 1fr 72px; } .w18-row .trk { grid-column: 1 / -1; grid-row: 2; } }
-  .w18-row .nm b { display: block; color: var(--ink); font-weight: 600; font-size: 13px; }
-  .w18-row .nm span { font-size: 11.5px; color: var(--ink-3); }
-  .w18-row .trk { position: relative; height: 18px; border-radius: 6px; background: var(--bg-2); }
-  .w18-row .zero { position: absolute; top: -4px; bottom: -4px; width: 2px; background: var(--ink-3); opacity: .6; }
-  .w18-row .fill { position: absolute; top: 3px; bottom: 3px; border-radius: 4px; transition: left .45s cubic-bezier(.2,.7,.2,1), width .45s cubic-bezier(.2,.7,.2,1); }
-  .w18-row .fill.clip { border-top-left-radius: 0; border-bottom-left-radius: 0; background-image: repeating-linear-gradient(90deg, transparent 0 6px, rgba(0,0,0,.18) 6px 8px); }
-  .w18-row .ci { position: absolute; top: 7px; height: 4px; border-radius: 2px; background: var(--ink); opacity: .55; transition: left .45s, width .45s; }
-  .w18-row .val { font: 600 12.5px var(--mono); color: var(--ink); text-align: right; }
-  .w18-row .val small { display: block; font: 500 10.5px var(--sans); color: var(--ink-3); }
-  .w18-scale { display: grid; grid-template-columns: 190px 1fr 88px; gap: 12px; font: 500 10.5px var(--mono); color: var(--ink-3); }
-  .w18-scale .ax { position: relative; height: 14px; }
-  .w18-scale .ax span { position: absolute; transform: translateX(-50%); }
-  @media (max-width: 600px) { .w18-scale { grid-template-columns: 1fr; } .w18-scale > div:not(.ax) { display: none; } }
+  #bench { margin-top: 20px; }
+  #bench .panel-head { display: flex; justify-content: space-between; gap: 16px; flex-wrap: wrap; align-items: flex-start; }
+  .bench-seg { flex: 1 1 100%; flex-wrap: wrap; }
+  .bench-seg label { flex: 1 0 auto; white-space: nowrap; }
+  .bench-seg label small { margin-left: 5px; }
+  @media (max-width: 1100px) { .gh-label { display: none; } }
+  @media (max-width: 600px) { .bench-seg { width: 100%; } .bench-seg label { flex: 1; padding-left: 4px; padding-right: 4px; } .bench-seg label small { display: none; } }
+  .bench-bars { display: grid; gap: 12px; margin-top: 18px; }
+  .bench-row { display: grid; grid-template-columns: 190px 1fr 88px; gap: 12px; align-items: center; font-size: 12.5px; color: var(--ink-2); }
+  @media (max-width: 600px) { .bench-row { grid-template-columns: 1fr 72px; } .bench-row .trk { grid-column: 1 / -1; grid-row: 2; } }
+  .bench-row .nm b { display: block; color: var(--ink); font-weight: 600; font-size: 13px; }
+  .bench-row .nm span { font-size: 11.5px; color: var(--ink-3); }
+  .bench-row .trk { position: relative; height: 18px; border-radius: 6px; background: var(--bg-2); }
+  .bench-row .zero { position: absolute; top: -4px; bottom: -4px; width: 2px; background: var(--ink-3); opacity: .6; }
+  .bench-row .fill { position: absolute; top: 3px; bottom: 3px; border-radius: 4px; transition: left .45s cubic-bezier(.2,.7,.2,1), width .45s cubic-bezier(.2,.7,.2,1); }
+  .bench-row .fill.clip { border-top-left-radius: 0; border-bottom-left-radius: 0; background-image: repeating-linear-gradient(90deg, transparent 0 6px, rgba(0,0,0,.18) 6px 8px); }
+  .bench-row .ci { position: absolute; top: 7px; height: 4px; border-radius: 2px; background: var(--ink); opacity: .55; transition: left .45s, width .45s; }
+  .bench-row .val { font: 600 12.5px var(--mono); color: var(--ink); text-align: right; }
+  .bench-row .val small { display: block; font: 500 10.5px var(--sans); color: var(--ink-3); }
+  .bench-scale { display: grid; grid-template-columns: 190px 1fr 88px; gap: 12px; font: 500 10.5px var(--mono); color: var(--ink-3); }
+  .bench-scale .ax { position: relative; height: 14px; }
+  .bench-scale .ax span { position: absolute; transform: translateX(-50%); }
+  @media (max-width: 600px) { .bench-scale { grid-template-columns: 1fr; } .bench-scale > div:not(.ax) { display: none; } }
 
   .timeline { margin-top: 20px; }
   .phases { display: grid; grid-template-columns: repeat(auto-fill, minmax(210px, 1fr)); gap: 0; margin-top: 24px; border-top: 1px solid var(--line); }
@@ -1063,18 +1066,17 @@
     </nav>
     <div class="nav-right">
       <div class="status-wrap">
-        <button type="button" class="status-pill" id="statusBtn" aria-expanded="false" aria-controls="statusMenu" aria-label="Project status: v2 research, Week {{ status.weeks_done }} of {{ status.weeks_total }} done"><i></i><span>v2 · Week {{ status.weeks_done }} of {{ status.weeks_total }}</span><svg class="chev" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" aria-hidden="true"><polyline points="6 9 12 15 18 9"/></svg></button>
+        <button type="button" class="status-pill" id="statusBtn" aria-expanded="false" aria-controls="statusMenu" aria-label="Project status: all benchmark runs complete"><i></i><span>v2 · Runs complete</span><svg class="chev" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" aria-hidden="true"><polyline points="6 9 12 15 18 9"/></svg></button>
         <div class="status-menu" id="statusMenu" hidden>
           <dl>
-            <dt>Plan</dt><dd>Week {{ status.weeks_done }} of {{ status.weeks_total }} done</dd>
-            <dt>Benchmark</dt><dd>{{ status.benchmark }}</dd>
+                        <dt>Benchmark</dt><dd>{{ status.benchmark }}</dd>
             <dt>Next</dt><dd>{{ status.next }}</dd>
             <dt>Live model</dt><dd>{% if v2 %}v2 ensemble · {{ v2.n_members }} models{% else %}v1 HistGBM{% endif %}</dd>
             {% if v2 %}<dt>Test ROC-AUC</dt><dd>{{ '%.3f'|format(v2.test_roc_auc) }}</dd>{% endif %}
             <dt>Data</dt><dd>public only</dd>
             <dt>Updated</dt><dd>{{ status.updated_text }}</dd>
           </dl>
-          <a href="/research#plan">See the 60-week plan <span aria-hidden="true">→</span></a>
+          <a href="/research#plan">See the research plan <span aria-hidden="true">→</span></a>
         </div>
       </div>
       <a class="icon-btn" href="https://github.com/Rag2102/ccproject" target="_blank" rel="noopener" aria-label="Repository on GitHub"><svg width="15" height="15" viewBox="0 0 16 16" fill="currentColor" aria-hidden="true"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.01 8.01 0 0 0 16 8c0-4.42-3.58-8-8-8z"/></svg><span class="gh-label">GitHub</span></a>
@@ -1096,7 +1098,7 @@
   <div class="frame" aria-hidden="true"><span class="plus l"></span><span class="plus r"></span><div class="scroll-cue"><span>Scroll to explore</span><b></b></div></div>
   <div class="wrap">
     <div>
-      <a class="ring" href="/research"><span>New: avoiding risky hosts beat every migration rule · exploratory <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><polyline points="9 6 15 12 9 18"/></svg></span></a>
+      <a class="ring" href="/research"><span>New: keeping VMs off risky hosts beat every migration rule · confirmed on fresh seeds <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><polyline points="9 6 15 12 9 18"/></svg></span></a>
       <h1 id="hero-title"><span><span>Move the right VMs</span></span><span><span class="gradient-text">before they fail.</span></span></h1>
       <p class="lede">A cloud can live-migrate VMs off a server that is about to fail, but every move costs bandwidth and a pause, and the budget is finite.
         This project asks <b>which VMs are worth moving</b>: a policy that weighs failure probability, time to failure, criticality and migration cost,
@@ -1108,12 +1110,12 @@
     </div>
     <div class="hero-art">
       <div class="cube-box" id="cubeBox" role="button" tabindex="0" aria-pressed="false"
-           aria-label="Click the cube: a black cube of 27 blocks, the 60-week plan so far. Press to split it into the project's claims graph and watch which claims hold.">
+           aria-label="Click the cube: a black cube of 27 blocks, the research plan. Press to split it into the project's claims graph and watch which claims hold.">
         <div class="cube-mask"><canvas id="planCube"></canvas></div>
-        <div class="cube-label" data-k="rec" aria-hidden="true">W3 · a counting artifact</div>
+        <div class="cube-label" data-k="rec" aria-hidden="true">v1 · a counting artifact</div>
         <div class="cube-label" data-k="email" aria-hidden="true">option to wait · refuted</div>
         <div class="cube-label ember" data-k="pay" aria-hidden="true">G1 · ρ ≈ 0 measured</div>
-        <div class="cube-label check" data-k="check" aria-hidden="true">W18 benchmark</div>
+        <div class="cube-label check" data-k="check" aria-hidden="true">Main benchmark</div>
         <div class="cube-label hover" data-k="hover" aria-hidden="true"></div>
         <p class="cube-hint" id="cubeHint" aria-hidden="true"><i></i><span>Click the cube</span></p>
       </div>
@@ -1123,7 +1125,7 @@
     <div class="fig"><div class="t">Data</div><div class="n">2.0M+</div><div class="l">real VMs in the Azure public trace</div></div>
     <div class="fig"><div class="t">Data</div><div class="n">744M</div><div class="l">drive-days of Backblaze telemetry, 2013–2026</div></div>
     <div class="fig"><div class="t">Measured</div><div class="n">3</div><div class="l">Google 2019 cells: criticality and host risk essentially uncorrelated</div></div>
-    <div class="fig"><div class="t">Progress</div><div class="n">{{ status.weeks_done }}<small>/{{ status.weeks_total }}</small></div><div class="l">weeks of the v2 plan done; code ready to Week {{ status.code_ready_to }}</div></div>
+    <div class="fig"><div class="t">Benchmark</div><div class="n">19,140</div><div class="l">simulated runs in 528 cells, none missing; 30 of 30 pre-registered comparisons won</div></div>
   </div>
 </section>
 
@@ -1338,7 +1340,7 @@ migrate = expected_cost_of_inaction &gt; migration_cost</pre></div>
         <a class="gcard" href="/research" style="--a: var(--a-mint)" aria-label="Research v2: Turning a course project into research.">
           <span class="t">05 · Research v2</span>
           <span class="art" aria-hidden="true"><svg viewBox="0 0 300 180"><rect class="f" x="26.0" y="34" width="15" height="15" rx="4"/><rect class="f" x="47.5" y="34" width="15" height="15" rx="4"/><rect class="f" x="69.0" y="34" width="15" height="15" rx="4"/><rect class="f" x="90.5" y="34" width="15" height="15" rx="4"/><rect class="f" x="112.0" y="34" width="15" height="15" rx="4"/><rect class="f" x="133.5" y="34" width="15" height="15" rx="4"/><rect class="f" x="155.0" y="34" width="15" height="15" rx="4"/><rect class="f" x="176.5" y="34" width="15" height="15" rx="4"/><rect class="f" x="198.0" y="34" width="15" height="15" rx="4"/><rect class="f" x="219.5" y="34" width="15" height="15" rx="4"/><rect class="f" x="241.0" y="34" width="15" height="15" rx="4"/><rect class="f" x="262.5" y="34" width="15" height="15" rx="4"/><rect class="f" x="26.0" y="58" width="15" height="15" rx="4"/><rect class="f" x="47.5" y="58" width="15" height="15" rx="4"/><rect class="f" x="69.0" y="58" width="15" height="15" rx="4"/><rect class="f" x="90.5" y="58" width="15" height="15" rx="4"/><rect class="f" x="112.0" y="58" width="15" height="15" rx="4"/><rect class="f" x="133.5" y="58" width="15" height="15" rx="4"/><rect class="l" x="155.0" y="58" width="15" height="15" rx="4" opacity=".55"/><rect class="l" x="176.5" y="58" width="15" height="15" rx="4" opacity=".55"/><rect class="l" x="198.0" y="58" width="15" height="15" rx="4" opacity=".55"/><rect class="l" x="219.5" y="58" width="15" height="15" rx="4" opacity=".55"/><rect class="l" x="241.0" y="58" width="15" height="15" rx="4" opacity=".55"/><rect class="l" x="262.5" y="58" width="15" height="15" rx="4" opacity=".55"/><rect class="l" x="26.0" y="82" width="15" height="15" rx="4" opacity=".55"/><rect class="l" x="47.5" y="82" width="15" height="15" rx="4" opacity=".55"/><rect class="l" x="69.0" y="82" width="15" height="15" rx="4" opacity=".55"/><rect class="l" x="90.5" y="82" width="15" height="15" rx="4" opacity=".55"/><rect class="g" x="112.0" y="82" width="15" height="15" rx="4"/><rect class="g" x="133.5" y="82" width="15" height="15" rx="4"/><rect class="g" x="155.0" y="82" width="15" height="15" rx="4"/><rect class="g" x="176.5" y="82" width="15" height="15" rx="4"/><rect class="g" x="198.0" y="82" width="15" height="15" rx="4"/><rect class="g" x="219.5" y="82" width="15" height="15" rx="4"/><rect class="g" x="241.0" y="82" width="15" height="15" rx="4"/><rect class="g" x="262.5" y="82" width="15" height="15" rx="4"/><rect class="g" x="26.0" y="106" width="15" height="15" rx="4"/><rect class="g" x="47.5" y="106" width="15" height="15" rx="4"/><rect class="g" x="69.0" y="106" width="15" height="15" rx="4"/><rect class="g" x="90.5" y="106" width="15" height="15" rx="4"/><rect class="g" x="112.0" y="106" width="15" height="15" rx="4"/><rect class="g" x="133.5" y="106" width="15" height="15" rx="4"/><rect class="g" x="155.0" y="106" width="15" height="15" rx="4"/><rect class="g" x="176.5" y="106" width="15" height="15" rx="4"/><rect class="g" x="198.0" y="106" width="15" height="15" rx="4"/><rect class="g" x="219.5" y="106" width="15" height="15" rx="4"/><rect class="g" x="241.0" y="106" width="15" height="15" rx="4"/><rect class="g" x="262.5" y="106" width="15" height="15" rx="4"/><rect class="g" x="26.0" y="130" width="15" height="15" rx="4"/><rect class="g" x="47.5" y="130" width="15" height="15" rx="4"/><rect class="g" x="69.0" y="130" width="15" height="15" rx="4"/><rect class="g" x="90.5" y="130" width="15" height="15" rx="4"/><rect class="g" x="112.0" y="130" width="15" height="15" rx="4"/><rect class="g" x="133.5" y="130" width="15" height="15" rx="4"/><rect class="g" x="155.0" y="130" width="15" height="15" rx="4"/><rect class="g" x="176.5" y="130" width="15" height="15" rx="4"/><rect class="g" x="198.0" y="130" width="15" height="15" rx="4"/><rect class="g" x="219.5" y="130" width="15" height="15" rx="4"/><rect class="g" x="241.0" y="130" width="15" height="15" rx="4"/><rect class="g" x="262.5" y="130" width="15" height="15" rx="4"/><path class="l" d="M26 168 H 108" stroke-width="3"/><path class="g" d="M108 168 H 284" stroke-width="3"/></svg></span>
-          <b>Turning a course project into research.</b><span class="d">Real traces, a validated simulator and pre-registered runs, week by week.</span><span class="go">Open <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg></span>
+          <b>Turning a course project into research.</b><span class="d">Real traces, a validated simulator and pre-registered runs.</span><span class="go">Open <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg></span>
         </a>
         <a class="gcard" href="/brain" style="--a: var(--a-amber)" aria-label="Brain: What the project claims, decided and why.">
           <span class="t">06 · Brain</span>
@@ -1529,7 +1531,7 @@ migrate = expected_cost_of_inaction &gt; migration_cost</pre></div>
             <div class="field-label">Counters</div>
             <div class="seg" role="radiogroup" aria-label="Counter trend">
               <input type="radio" name="trend" id="t-stable" value="stable" checked><label for="t-stable">Stable for a month</label>
-              <input type="radio" name="trend" id="t-rising" value="rising"><label for="t-rising">New this week</label>
+              <input type="radio" name="trend" id="t-rising" value="rising"><label for="t-rising">New in the last 7 days</label>
             </div>
           </div>
           <div class="field">
@@ -1674,10 +1676,10 @@ migrate = expected_cost_of_inaction &gt; migration_cost</pre></div>
     </div>
 
     <div class="panel pad diag reveal" id="v1-diag">
-      <div class="panel-head"><div><h2>What v2 found</h2><p>The −3.1% was re-examined in Week 3, before any v2 runs.</p></div><span class="via"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><ellipse cx="12" cy="5" rx="8" ry="3"/><path d="M4 5v14c0 1.7 3.6 3 8 3s8-1.3 8-3V5M4 12c0 1.7 3.6 3 8 3s8-1.3 8-3"/></svg>via docs/v2/v1_anomaly.md</span></div>
+      <div class="panel-head"><div><h2>What v2 found</h2><p>The −3.1% was re-examined first, before any v2 runs.</p></div><span class="via"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><ellipse cx="12" cy="5" rx="8" ry="3"/><path d="M4 5v14c0 1.7 3.6 3 8 3s8-1.3 8-3V5M4 12c0 1.7 3.6 3 8 3s8-1.3 8-3"/></svg>via docs/v2/v1_anomaly.md</span></div>
       <ol class="tline">
         <li><span class="dot"></span><div><p class="k">v1 · the headline</p><p>At random placement the cost-sensitive policy cost <b>3.1% more</b> than a threshold with a matched budget.</p></div></li>
-        <li><span class="dot warn"></span><div><p class="k">Week 3 · the diagnosis</p><p>Mostly a counting effect: the threshold got <b>8% more migrations</b>, and every migration was credited with failures a <b>median 170 days later</b>, while the decision used a 30-day probability.</p></div></li>
+        <li><span class="dot warn"></span><div><p class="k">v2 · the diagnosis</p><p>Mostly a counting effect: the threshold got <b>8% more migrations</b>, and every migration was credited with failures a <b>median 170 days later</b>, while the decision used a 30-day probability.</p></div></li>
         <li><span class="dot ok"></span><div><p class="k">Corrected accounting</p><p>With the budget matched and credit limited to the decision's own window, the cost-sensitive rule is <b>ahead by about 0.2%</b>.</p></div></li>
         <li><span class="dot ok"></span><div><p class="k">Theory and gate G1</p><p>The v2 theory predicts no break-even near ρ ≈ 0.3: the advantage comes from the spread of costs and is largest near ρ = 0. Real placement in three Google cells sits at <b>ρ ≈ 0</b>, the regime that matters.</p></div></li>
       </ol>
@@ -1751,7 +1753,7 @@ migrate = expected_cost_of_inaction &gt; migration_cost</pre></div>
     <header class="page-head">
       <p class="eyebrow-mono">Research v2</p>
       <h1 class="page-title">Turning a course project into research.</h1>
-      <p class="page-lede">A 60-week plan (Oct 2026 to Nov 2027) asks whether the idea holds up under real data, a validated simulator, theory and pre-registered statistics. Everything below is work in progress; each number carries where it comes from.</p>
+      <p class="page-lede">The v2 research asks whether the idea holds up under real data, a validated simulator, theory and pre-registered statistics. Results are simulated and preliminary until the evidence gate is signed; each number carries where it comes from.</p>
     </header>
 
     <div class="panel pad reveal banner">
@@ -1760,10 +1762,8 @@ migrate = expected_cost_of_inaction &gt; migration_cost</pre></div>
         <div>
           <h2>{{ status.headline }}</h2>
           <p>{{ status.summary }}</p>
-          <div class="progress" aria-label="{{ status.weeks_done }} of {{ status.weeks_total }} weeks done, code ready to week {{ status.code_ready_to }}"><span style="width:{{ status.done_pct }}%;background:var(--cs)"></span><span style="width:{{ status.ready_pct }}%;background:var(--amber);opacity:.55"></span></div>
-          <div class="progress-scale" style="position:relative;height:16px"><span style="position:absolute;left:0">Week 1</span><span style="position:absolute;left:{{ status.paper_pct }}%;transform:translateX(-50%)">Paper A · W{{ status.paper_week }}</span><span style="position:absolute;right:0">Week {{ status.weeks_total }}</span></div>
         </div>
-        <div class="status-num"><div class="n">{{ status.weeks_done }}<small>/{{ status.weeks_total }}</small></div><div class="l">weeks done · code to W{{ status.code_ready_to }} · updated {{ status.updated_text }}</div></div>
+        <div class="status-num"><div class="n">30<small>/30</small></div><div class="l">pre-registered comparisons won · updated {{ status.updated_text }}</div></div>
       </div>
     </div>
 
@@ -1805,42 +1805,42 @@ migrate = expected_cost_of_inaction &gt; migration_cost</pre></div>
       </article>
       <article class="panel fcard reveal">
         <span class="tag simulated">Simulated · pre-registered</span>
-        <div class="big">+5% <small>to</small> +11%</div>
+        <div class="big">+4% <small>to</small> +11%</div>
         <h3>Budget-aware migration beats doing nothing</h3>
-        <p>Week 18, 30 seeds per cell: BAM saves 5–11% against never migrating in every A regime. The industry-style threshold (P2) costs 2–4× more than doing nothing, so "beating P2", the registered test, says little on its own.</p>
-        <div class="src"><a class="more" href="https://github.com/Rag2102/ccproject/blob/v2-research/docs/v2/RESULTS_W18.md" target="_blank" rel="noopener">RESULTS_W18.md</a> · ADR-005</div>
+        <p>At a 2% budget, BAM saves 4–11% against never migrating across the A, B, C and D regimes, and 4–5% in the trace-calibrated regimes B1 and B2. All 30 registered comparisons beat the threshold (P2), and the replication agrees, but P2 costs about 3–4× as much as doing nothing, so that test says little on its own.</p>
+        <div class="src"><a class="more" href="https://github.com/Rag2102/ccproject/blob/v2-research/docs/v2/G3_decision.md" target="_blank" rel="noopener">Evidence gate inputs</a> · ADR-005</div>
       </article>
       <article class="panel fcard reveal">
         <span class="tag simulated">Simulated</span>
         <div class="big">σ<sub style="font-size:18px">κ</sub> drives it</div>
         <h3>The theory's direction holds in simulation</h3>
         <p>At zero correlation, BAM goes from −2.4% to +1.6% to +5.3% against never migrating as the spread of VM costs rises (σ = 0.25, 0.5, 1.0): the first simulation evidence for the theory's claim.</p>
-        <div class="src"><a class="more" href="https://github.com/Rag2102/ccproject/blob/v2-research/docs/v2/RESULTS_W18.md" target="_blank" rel="noopener">RESULTS_W18.md</a> · regime E</div>
+        <div class="src"><a class="more" href="https://github.com/Rag2102/ccproject/blob/v2-research/docs/v2/RESULTS_W18.md" target="_blank" rel="noopener">Results, regimes A and E</a> · regime E</div>
       </article>
       <article class="panel fcard reveal">
-        <span class="tag illustrative">Exploratory · 30 seeds</span>
-        <div class="big">+11% <small>to</small> +20%</div>
+        <span class="tag simulated">Confirmed on fresh seeds · post-freeze</span>
+        <div class="big">+10% <small>to</small> +20%</div>
         <h3>Where new VMs go matters more than which to move</h3>
-        <p>Keeping new VMs off the riskiest 2% of hosts, with no migrations at all, beats every migration policy tested, in every regime and every seed. It is why the Narya-inspired policy (P5) beats BAM; adding migration on top gains at most about 2 points.</p>
-        <div class="src"><a class="more" href="https://github.com/Rag2102/ccproject/blob/v2-research/docs/v2/RESULTS_AVOID.md" target="_blank" rel="noopener">RESULTS_AVOID.md</a> · ADR-010</div>
+        <p>Keeping new VMs off the riskiest 2% of hosts, with no migrations at all, saves more than BAM and P5 on average in all 16 regimes. A rule committed first then confirmed it on 50 fresh seeds in B1 and B2 (+11.2% and +8.9%, 6 of 6 tests). Adding migration changes the result by at most about 2 points. This uses oracle predictions; with noisy ones (σ = 1) it falls to about 3–4%.</p>
+        <div class="src"><a class="more" href="https://github.com/Rag2102/ccproject/blob/v2-research/docs/v2/RESULTS_AVOID.md" target="_blank" rel="noopener">Avoidance results</a> · ADR-011</div>
       </article>
       <article class="panel fcard reveal">
         <span class="tag simulated">Simulated · pre-registered</span>
-        <div class="big">−30% <small>to</small> −51%</div>
+        <div class="big">−30% <small>to</small> −52%</div>
         <h3>The safety guard, as registered, does harm</h3>
-        <p>It ignored pure noise in the smoke test (0 of 5 switches), but its fallback is the threshold P2, so in Week 18 it costs more than never migrating. With a do-nothing fallback it saves 3–9% in regime A (exploratory).</p>
-        <div class="src"><a class="more" href="https://github.com/Rag2102/ccproject/blob/v2-research/docs/v2/RESULTS_W18.md" target="_blank" rel="noopener">RESULTS_W18.md</a> · P6</div>
+        <p>It ignored pure noise in the smoke test (0 of 5 switches), but its fallback is the threshold P2, so in the benchmark it costs more than never migrating. With a do-nothing fallback it saves 3–9% in regime A (exploratory).</p>
+        <div class="src"><a class="more" href="https://github.com/Rag2102/ccproject/blob/v2-research/docs/v2/RESULTS_W18.md" target="_blank" rel="noopener">Results, regimes A and E</a> · P6</div>
       </article>
     </div>
 
-    <div class="panel pad reveal" id="w18">
+    <div class="panel pad reveal" id="bench">
       <div class="panel-head">
-        <div><h3>First benchmark results: saving against never migrating</h3>
+        <div><h3>Benchmark results: saving against never migrating</h3>
         <p>2% budget, oracle failure probabilities, mean with 95% interval. Bars right of zero cost less than doing nothing.</p></div>
-        <div class="seg w18-seg" role="radiogroup" aria-label="Regime" id="w18Seg"></div>
+        <div class="seg bench-seg" role="radiogroup" aria-label="Regime" id="benchSeg"></div>
       </div>
-      <div class="w18-bars" id="w18Bars"></div>
-      <p class="fine" id="w18Note"></p>
+      <div class="bench-bars" id="benchBars"></div>
+      <p class="fine" id="benchNote"></p>
     </div>
 
     <div class="panel sandbox reveal">
@@ -1872,7 +1872,7 @@ migrate = expected_cost_of_inaction &gt; migration_cost</pre></div>
     </div>
 
     <div class="panel pad timeline reveal" id="plan">
-      <div class="panel-head"><div><h2>The 60-week plan</h2><p>Eleven phases from October 2026 to November 2027: done in blue, under way in amber. Beside them, the problem the plan is about: a fleet in which VMs move off risky hosts before they fail.</p></div></div>
+      <div class="panel-head"><div><h2>The research plan</h2><p>Eleven phases: done in blue, under way in amber. Beside them, the problem the plan is about: a fleet in which VMs move off risky hosts before they fail.</p></div></div>
       <div class="plan3d">
         <div>
           <div class="fleet-card" aria-label="Illustration: hosts coloured by failure risk; VMs move off risky hosts before they fail">
@@ -1887,7 +1887,7 @@ migrate = expected_cost_of_inaction &gt; migration_cost</pre></div>
           </div>
         </div>
         <div class="phases" id="phaseList">
-          {% for ph in status.phases %}<div class="phase{% if ph.state != 'todo' %} {{ ph.state }}{% endif %}"><span class="dot"></span><div><b>{{ ph.name }}</b><span class="w">W{{ ph['from'] }}–{{ ph.to }}</span>{% if ph.note %} <span>· {{ ph.note }}</span>{% endif %}</div></div>
+          {% for ph in status.phases %}<div class="phase{% if ph.state != 'todo' %} {{ ph.state }}{% endif %}"><span class="dot"></span><div><b>{{ ph.name }}</b>{% if ph.note %} <span>· {{ ph.note }}</span>{% endif %}</div></div>
           {% endfor %}
         </div>
       </div>
@@ -1938,7 +1938,7 @@ migrate = expected_cost_of_inaction &gt; migration_cost</pre></div>
         <div class="tracer"><div class="adr-list" id="adrList" role="listbox" aria-label="Decision records"></div><div class="adr-body" id="adrBody"></div></div>
       </div>
       <div class="panel pad widget">
-        <div class="panel-head"><div><h2>Claims board</h2><p>Every claim the paper may make, with its status. Open ones wait for runs.</p></div><span class="via"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><ellipse cx="12" cy="5" rx="8" ry="3"/><path d="M4 5v14c0 1.7 3.6 3 8 3s8-1.3 8-3V5M4 12c0 1.7 3.6 3 8 3s8-1.3 8-3"/></svg>via CLAIMS_LEDGER.md</span></div>
+        <div class="panel-head"><div><h2>Claims board</h2><p>Every claim the paper may make, with its status. The evidence gate is not signed yet.</p></div><span class="via"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><ellipse cx="12" cy="5" rx="8" ry="3"/><path d="M4 5v14c0 1.7 3.6 3 8 3s8-1.3 8-3V5M4 12c0 1.7 3.6 3 8 3s8-1.3 8-3"/></svg>via CLAIMS_LEDGER.md</span></div>
         <div class="health" id="claimHealth"></div>
         <ul class="claims" id="claimList"></ul>
       </div>
@@ -2040,7 +2040,7 @@ migrate = expected_cost_of_inaction &gt; migration_cost</pre></div>
       <defs><linearGradient id="wmFill" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#09090b"/><stop offset="1" stop-color="#71717a"/></linearGradient></defs>
       <text x="0" y="138" textLength="1000" lengthAdjust="spacingAndGlyphs" font-size="176" fill="url(#wmFill)">VM Mitigation</text>
     </svg>
-    <div class="bottom"><span>Started as a Cloud Computing course project; now a 60-week research programme.</span><span>Public data only · Python, scikit-learn, Flask, AWS Lambda</span></div>
+    <div class="bottom"><span>Started as a Cloud Computing course project; now a research programme.</span><span>Public data only · Python, scikit-learn, Flask, AWS Lambda</span></div>
   </div>
 </footer>
 
@@ -2260,23 +2260,23 @@ safely(function () {
     ['p3', 'policy', 'v1 rule (P3)', 'The v1 course project\'s rule, kept as a reference point.', '/research'],
     ['p4', 'policy', 'BAM (P4)', 'Budget-aware migration: ranks VMs by expected benefit per GB within the migration budget.', '/research'],
     ['p5', 'policy', 'Narya-inspired (P5)', 'A baseline inspired by Narya (OSDI 2020). Its gain comes from its avoid-allocation action, not from migrating.', '/research'],
-    ['p6', 'policy', 'Guard (P6)', 'The safe-adaptive variant: a guard against bad predictions, as registered in Week 16.', '/research'],
-    ['avoid', 'policy', 'Avoid risky hosts', 'Exploratory, added after the freeze (ADR-010): keep new VMs off the riskiest 2% of hosts, with no migrations at all.', '/research'],
+    ['p6', 'policy', 'Guard (P6)', 'The safe-adaptive variant: a guard against bad predictions, as registered.', '/research'],
+    ['avoid', 'policy', 'Avoid risky hosts', 'Added after the freeze (ADR-010) and confirmed on fresh seeds (ADR-011): keep new VMs off the riskiest 2% of hosts, with no migrations at all.', '/research'],
     ['sim', 'method', 'Simulator (gate G2)', 'A day-stepped fleet simulator with VM churn, migration queues and repairs. It reproduces v1\'s headline costs to a relative error of 6×10⁻⁷.', '/research'],
     ['theory', 'method', 'Closed-form theory', 'A closed form for the cost-aware rule\'s advantage over a threshold, checked by Monte Carlo at 3,024 points.', G + 'THEORY.md'],
     ['proto', 'method', 'Pre-registered protocol', 'Thirty comparisons, 30 evaluation seeds, Holm\'s correction and intervals on every number, fixed before any run.', G + 'PROTOCOL.md'],
-    ['w18', 'method', 'Week 18 benchmark', 'The first pre-registered runs: regimes A and E, all 30 evaluation seeds. Regimes B, C and D are queued.', '/research'],
+    ['bench', 'method', 'Main benchmark', 'The pre-registered runs: regimes A to E, 528 cells and 19,140 runs, with 50 seeds where the rules required it.', '/research'],
     ['f_rho', 'finding', 'ρ ≈ 0 (gate G1)', 'In three Google 2019 cells, criticality and host risk are essentially uncorrelated (|τb| ≤ 0.075).', '/research'],
     ['f_v1', 'finding', 'v1\'s loss was a counting artifact', 'Matching the budget and crediting migrations within the 30-day window turns v1\'s loss at ρ = 0 into a small gain.', '/v1'],
     ['f_spread', 'finding', 'Gains come from cost spread', 'The advantage over a threshold is driven by how much cost per GB varies between VMs, not by correlation.', '/research'],
-    ['f_avoid', 'finding', 'Where new VMs go matters more', 'Exploratory: in the first benchmark, keeping arrivals off risky hosts saved more than any migration rule.', '/research'],
+    ['f_avoid', 'finding', 'Where new VMs go matters more', 'Confirmed on fresh seeds in B1 and B2: keeping arrivals off risky hosts saved more than BAM and P5, with no migrations.', '/research'],
   ].map(([id, kind, name, desc, href]) => ({ id, kind, name, desc, href }));
   const EDGES = [
     ['bb', 'hgb', 'trains'], ['bb', 'gqat', 'trains'], ['bb', 'ens', 'trains'], ['az', 'pre', 'VM sizes'], ['az', 'sim', 'VMs'], ['gg', 'f_rho', 'measures'], ['gg', 'sim', 'placement'],
     ['gqat', 'hgb', 'compared'], ['hgb', 'cs', 'p'], ['ens', 'cs', 'p'], ['pre', 'cs', 'cost'], ['pre', 'sim', 'cost'], ['cs', 'f_v1', 'replayed'],
-    ['f_rho', 'sim', 'sets regimes'], ['sim', 'w18', 'runs'], ['proto', 'w18', 'rules'],
-    ['p0', 'w18', 'baseline'], ['p2', 'w18', 'compared'], ['p3', 'w18', 'compared'], ['p4', 'w18', 'compared'], ['p5', 'w18', 'compared'], ['p6', 'w18', 'compared'], ['avoid', 'w18', 'exploratory'],
-    ['theory', 'f_spread', 'shows'], ['theory', 'p4', 'motivates'], ['w18', 'f_avoid', 'shows'], ['avoid', 'f_avoid', 'is'],
+    ['f_rho', 'sim', 'sets regimes'], ['sim', 'bench', 'runs'], ['proto', 'bench', 'rules'],
+    ['p0', 'bench', 'baseline'], ['p2', 'bench', 'compared'], ['p3', 'bench', 'compared'], ['p4', 'bench', 'compared'], ['p5', 'bench', 'compared'], ['p6', 'bench', 'compared'], ['avoid', 'bench', 'post-freeze'],
+    ['theory', 'f_spread', 'shows'], ['theory', 'p4', 'motivates'], ['bench', 'f_avoid', 'shows'], ['avoid', 'f_avoid', 'is'],
   ].map(([a, b, rel]) => ({ a, b, rel }));
   const byId = Object.fromEntries(NODES.map(n => [n.id, n]));
   const nb = (id) => EDGES.filter(e => e.a === id || e.b === id).map(e => ({ id: e.a === id ? e.b : e.a, rel: e.rel, out: e.a === id }));
@@ -2332,7 +2332,7 @@ safely(function () {
   function card() {
     const n = byId[sel];
     if (!n) { $('exCard').innerHTML = `<span class="kind">Start here</span><h2>Pick a node</h2><p>Data on the left trains the models; the models feed the policies; the methods test them; the findings on the right are what came out. Click any node, or search above.</p>
-      <p class="k">Good first clicks</p><ul>${['ens', 'p2', 'w18', 'f_rho'].map(id => `<li><button type="button" data-go="${id}"><i style="background:${KINDS[byId[id].kind][1]}"></i>${byId[id].name}</button></li>`).join('')}</ul>`; return; }
+      <p class="k">Good first clicks</p><ul>${['ens', 'p2', 'bench', 'f_rho'].map(id => `<li><button type="button" data-go="${id}"><i style="background:${KINDS[byId[id].kind][1]}"></i>${byId[id].name}</button></li>`).join('')}</ul>`; return; }
     const ext = /^https?:/.test(n.href);
     $('exCard').innerHTML = `<span class="kind"><i style="background:${KINDS[n.kind][1]}"></i>${KINDS[n.kind][0].replace(/s$/, '')}</span><h2>${n.name}</h2><p>${n.desc}</p>
       <p class="k">Connects to</p><ul>${nb(n.id).map(x => `<li><button type="button" data-go="${x.id}"><i style="background:${KINDS[byId[x.id].kind][1]}"></i>${byId[x.id].name}<span>${x.out ? '' : '← '}${x.rel}${x.out ? ' →' : ''}</span></button></li>`).join('')}</ul>
@@ -2853,7 +2853,7 @@ safely(function () {
       cap: 'A 20-member ensemble trained on SMART telemetry gives each host a calibrated chance of failing within 30 days, and how unsure it is.' },
     { id: 'moves', name: 'Which VMs move', sub: 'ranked by benefit per GB', tone: PROOF, group: 'acts', tile: outT(OUT_Y[0]), glyph: 'toggle',
       cap: 'The decision itself: which VMs to migrate now, measured against a tuned probability threshold and against never migrating.' },
-    { id: 'place2', name: 'Where new VMs go', sub: 'avoid risky hosts · exploratory', tone: PROOF, group: 'acts', tile: outT(OUT_Y[1]), glyph: 'branch',
+    { id: 'place2', name: 'Where new VMs go', sub: 'avoid risky hosts · confirmed', tone: PROOF, group: 'acts', tile: outT(OUT_Y[1]), glyph: 'branch',
       cap: 'Keeping new arrivals off the riskiest hosts. An exploratory baseline that, in the first benchmark, saved more than any migration rule.' },
     { id: 'evidence', name: 'The evidence', sub: '30 seeds · Holm · intervals', tone: PROOF, group: 'acts', tile: outT(OUT_Y[2]), glyph: 'doc',
       cap: 'Every comparison was registered before the runs: 30 seeds, intervals on every number, Holm\'s correction across the family.' },
@@ -3383,50 +3383,54 @@ initCharts();
 // canvas text uses whatever font is loaded at draw time: redraw once the web fonts arrive
 if (document.fonts && document.fonts.ready) document.fonts.ready.then(() => redrawCharts());
 
-/* ---------------- Week 18 results ----------------
+/* ---------------- benchmark results ----------------
    Saving against never migrating (P0), % at a 2% budget: [mean, CI low, CI high, % of seeds beating P0].
-   P2-P6: results/summary/vs_p0.json (Week 18, eval seeds 1-30, 95% BCa).
+   P2-P6: results/summary/vs_p0.json (eval seeds, 95% BCa).
    AV (P0 + avoid): results/summary/explore_avoid.json (ADR-010, exploratory, eval seeds 1-30, 95% BCa). */
-const W18 = {"A1":{"P2":[-281.4,-286.8,-274.8,0],"P3":[1.7,1.2,2.1,87],"P4":[5.0,4.4,5.6,100],"P5":[8.6,7.8,9.3,100],"P6":[-49.7,-65.4,-37.5,0],"AV":[11.0,10.4,11.7,100]},"A3":{"P2":[-219.4,-224.1,-215.1,0],"P3":[6.7,5.6,7.8,100],"P4":[10.8,9.4,12.0,100],"P5":[15.5,14.2,16.6,100],"P6":[-33.1,-46.8,-22.7,13],"AV":[17.8,16.8,18.9,100]},"A7":{"P2":[-188.6,-193.4,-182.7,0],"P3":[3.1,2.0,4.3,83],"P4":[7.5,6.0,8.9,97],"P5":[16.9,15.4,18.3,100],"P6":[-29.9,-42.1,-20.9,3],"AV":[19.7,18.6,21.0,100]},"E1":{"P2":[-237.0,-241.4,-231.9,0],"P3":[-2.3,-2.8,-1.8,7],"P4":[-2.4,-3.1,-1.7,13],"P5":[8.4,7.5,9.3,100],"P6":[-46.8,-59.6,-36.9,0],"AV":[10.6,9.9,11.4,100]},"E3":{"P2":[-285.1,-290.5,-278.5,0],"P3":[1.7,1.3,2.1,83],"P4":[5.3,4.8,5.9,100],"P5":[8.6,7.8,9.4,100],"P6":[-50.6,-66.6,-38.2,0],"AV":[11.0,10.4,11.7,100]}};
-const W18_REG = { A1: 'A1 · ρ = 0', A3: 'A3 · ρ = 0.3', A7: 'A7 · ρ = 0.9', E1: 'E1 · low cost spread', E3: 'E3 · high cost spread' };
-const W18_NOTE = {
+const BENCH = {"B1":{"P2":[-272.8,-277.0,-268.4,0],"P3":[2.2,1.5,2.9,82],"P4":[4.0,3.3,4.8,92],"P5":[8.9,8.1,9.7,100],"P6":[-51.6,-63.6,-41.8,0],"AV":[11.6,10.8,12.3,100]},"B2":{"P2":[-276.3,-280.8,-271.7,0],"P3":[1.5,1.1,1.9,88],"P4":[5.1,4.6,5.6,100],"P5":[6.7,6.1,7.3,100],"P6":[-50.9,-63.5,-40.7,0],"AV":[9.6,9.2,10.1,100]},"C":{"P2":[-186.2,-191.2,-181.3,0],"P3":[-4.8,-5.7,-3.9,6],"P4":[4.6,3.5,5.6,88],"P5":[15.8,14.9,16.8,100],"P6":[-34.8,-43.9,-27.4,4],"AV":[19.3,18.4,20.4,100]},"D":{"P2":[-222.9,-228.6,-217.6,0],"P3":[5.6,4.4,6.8,93],"P4":[9.5,8.0,11.0,97],"P5":[15.0,13.7,16.2,100],"P6":[-46.3,-58.4,-35.2,0],"AV":[17.2,16.0,18.3,100]},"A1":{"P2":[-281.4,-286.8,-274.8,0],"P3":[1.7,1.2,2.1,87],"P4":[5.0,4.4,5.6,100],"P5":[8.6,7.8,9.3,100],"P6":[-49.7,-65.4,-37.5,0],"AV":[11.0,10.4,11.7,100]},"A3":{"P2":[-219.5,-223.5,-215.7,0],"P3":[6.5,5.6,7.4,94],"P4":[10.6,9.5,11.5,100],"P5":[15.1,14.2,16.0,100],"P6":[-36.0,-46.6,-27.4,12],"AV":[17.8,16.8,18.9,100]},"A7":{"P2":[-188.6,-193.4,-182.7,0],"P3":[3.1,2.0,4.3,83],"P4":[7.5,6.0,8.9,97],"P5":[16.9,15.4,18.3,100],"P6":[-29.9,-42.1,-20.9,3],"AV":[19.7,18.6,21.0,100]},"E1":{"P2":[-237.0,-241.4,-231.9,0],"P3":[-2.3,-2.8,-1.8,7],"P4":[-2.4,-3.1,-1.7,13],"P5":[8.4,7.5,9.3,100],"P6":[-46.8,-59.6,-36.9,0],"AV":[10.6,9.9,11.4,100]},"E3":{"P2":[-285.1,-290.5,-278.5,0],"P3":[1.7,1.3,2.1,83],"P4":[5.3,4.8,5.9,100],"P5":[8.6,7.8,9.4,100],"P6":[-50.6,-66.6,-38.2,0],"AV":[11.0,10.4,11.7,100]}};
+const BENCH_REG = { B1: 'B1 · trace', B2: 'B2 · trace', C: 'C · adversarial', D: 'D · drift', A1: 'A1 · ρ = 0', A3: 'A3 · ρ = 0.3', A7: 'A7 · ρ = 0.9', E1: 'E1 · low spread', E3: 'E3 · high spread' };
+const BENCH_NOTE = {
+  B1: 'Calibrated from the measured Google trace: the realistic case, still simulated.',
+  B2: 'Host classes and VM tiers follow the Google trace: the realistic case, still simulated.',
+  C: 'Adversarial: critical VMs on the riskiest hosts.',
+  D: 'Non-stationary: correlation shifts mid-run and the predictor drifts.',
   A1: 'No correlation between VM importance and host risk, as measured in the Google trace.',
   A3: 'Moderate correlation: BAM gains most here; the curve is hump-shaped in ρ.',
   A7: 'Strong correlation: important VMs sit on risky hosts.',
   E1: 'ρ = 0 and VM costs nearly equal: BAM is slightly worse than doing nothing, as the theory predicts.',
   E3: 'ρ = 0 and VM costs widely spread: BAM gains again.' };
-const W18_POL = [
-  ['AV', 'Avoid risky hosts', 'no migration · exploratory', '--good'],
+const BENCH_POL = [
+  ['AV', 'Avoid risky hosts', 'no migration · post-freeze', '--good'],
   ['P5', 'Narya-inspired (P5)', 'learns per host; uses avoidance', '--violet'],
   ['P4', 'Budget-aware, BAM (P4)', 'the paper’s method', '--cs'],
   ['P3', 'v1 rule (P3)', 'the course project’s policy', '--ink-3'],
   ['P6', 'Safety guard (P6)', 'falls back to P2, as registered', '--th'],
   ['P2', 'Threshold (P2)', 'industry habit, budget-tuned', '--bad'] ];
-const W18_LO = -40, W18_HI = 25;
-let w18Reg = 'A3';
-function w18x(v) { return (Math.max(W18_LO, Math.min(W18_HI, v)) - W18_LO) / (W18_HI - W18_LO) * 100; }
-function drawW18() {
-  const d = W18[w18Reg], z = w18x(0);
-  let h = '<div class="w18-scale"><div></div><div class="ax">' +
-    [-40, -20, 0, 10, 20].map(v => `<span style="left:${w18x(v)}%">${v > 0 ? '+' : ''}${v}%</span>`).join('') + '</div><div></div></div>';
-  W18_POL.forEach(([k, name, sub, col]) => {
+const BENCH_LO = -40, BENCH_HI = 25;
+let benchReg = 'B1';
+function benchx(v) { return (Math.max(BENCH_LO, Math.min(BENCH_HI, v)) - BENCH_LO) / (BENCH_HI - BENCH_LO) * 100; }
+function drawBENCH() {
+  const d = BENCH[benchReg], z = benchx(0);
+  let h = '<div class="bench-scale"><div></div><div class="ax">' +
+    [-40, -20, 0, 10, 20].map(v => `<span style="left:${benchx(v)}%">${v > 0 ? '+' : ''}${v}%</span>`).join('') + '</div><div></div></div>';
+  BENCH_POL.forEach(([k, name, sub, col]) => {
     const [m, lo, hi, share] = d[k];
-    const a = w18x(Math.min(0, m)), b = w18x(Math.max(0, m)), clip = m < W18_LO;
-    const ci = `<i class="ci" style="left:${w18x(lo)}%;width:${Math.max(0.6, w18x(hi) - w18x(lo))}%"></i>`;
-    const tip = `95% CI ${lo} to ${hi}%; ${share}% of 30 seeds beat never migrating${k === 'AV' ? ' (exploratory)' : ''}`;
-    h += `<div class="w18-row" title="${tip}"><div class="nm"><b>${name}</b><span>${sub}</span></div>
+    const a = benchx(Math.min(0, m)), b = benchx(Math.max(0, m)), clip = m < BENCH_LO;
+    const ci = `<i class="ci" style="left:${benchx(lo)}%;width:${Math.max(0.6, benchx(hi) - benchx(lo))}%"></i>`;
+    const tip = `95% CI ${lo} to ${hi}%; ${share}% of seeds beat never migrating${k === 'AV' ? ' (post-freeze)' : ''}`;
+    h += `<div class="bench-row" title="${tip}"><div class="nm"><b>${name}</b><span>${sub}</span></div>
       <div class="trk"><i class="zero" style="left:calc(${z}% - 1px)"></i>
       <i class="fill${clip ? ' clip' : ''}" style="left:${a}%;width:${b - a}%;background-color:${css(col)}"></i>${clip ? '' : ci}</div>
       <div class="val">${m > 0 ? '+' : ''}${m.toFixed(1)}%<small>${share}% of seeds win</small></div></div>`;
   });
-  $('w18Bars').innerHTML = h;
-  $('w18Note').textContent = W18_NOTE[w18Reg] + ' Bars past −40% are cut off (hatched). Avoidance was added after the protocol was frozen, so it is exploratory: same 30 evaluation seeds, outside the pre-registered tests.';
+  $('benchBars').innerHTML = h;
+  $('benchNote').textContent = BENCH_NOTE[benchReg] + ' Bars past −40% are cut off (hatched). Regimes A3, A5, B1, B2 and C use 50 seeds, others 30. Avoidance was added after the protocol was frozen, so it sits outside the pre-registered tests; these bars use 30 evaluation seeds, and B1 and B2 were then confirmed on 50 fresh seeds.';
 }
 (function () {
-  $('w18Seg').innerHTML = Object.keys(W18).map(r =>
-    `<input type="radio" name="w18r" id="w18_${r}" value="${r}"${r === w18Reg ? ' checked' : ''}><label for="w18_${r}">${r}<small>${W18_REG[r].split(' · ')[1]}</small></label>`).join('');
-  document.querySelectorAll('input[name=w18r]').forEach(el => el.addEventListener('change', () => { w18Reg = el.value; drawW18(); }));
-  drawW18();
+  $('benchSeg').innerHTML = Object.keys(BENCH).map(r =>
+    `<input type="radio" name="benchr" id="bench_${r}" value="${r}"${r === benchReg ? ' checked' : ''}><label for="bench_${r}">${r}<small>${BENCH_REG[r].split(' · ')[1]}</small></label>`).join('');
+  document.querySelectorAll('input[name=benchr]').forEach(el => el.addEventListener('change', () => { benchReg = el.value; drawBENCH(); }));
+  drawBENCH();
 })();
 
 /* ---------------- timeline ---------------- */
@@ -3437,7 +3441,7 @@ function drawW18() {
    Ported from Faultline's hero (reference/faultline-prashant/frontend/src/components/home/HeroGraph3D.tsx): a solid,
    glossy black cube of 27 blocks. Click it (or press Enter/Space) and it splits: nine blocks fly out into this
    project's claims graph and the decision plays (the v1 anomaly has no path to the paper; the "option to wait"
-   explanation is refuted; a light draws real data -> simulator -> the Week 18 benchmark; the source glows, the
+   explanation is refuted; a light draws real data -> simulator -> the main benchmark; the source glows, the
    benchmark turns mint); the other eighteen drift out as the rest of the plan. Click again and it closes. Leans
    toward the pointer; drag to turn it. Reduced motion: no tweening, a still frame. No WebGL: the flat track. */
 import * as THREE from 'three';
@@ -3452,19 +3456,19 @@ const NODES = {
 const ROLES = Object.keys(NODES);
 // what each of the nine blocks is in this project (left: where a claim came from; middle: what it rests on; right: where it lands)
 const INFO = {
-  rec: 'W3 · the v1 anomaly · a counting artifact', email: 'P5 · "option to wait" · refuted by the audit',
-  pay: 'W4–8 · real data · gate G1 passed', srec: 'v1 · the loss it reported', semail: 'P5 · why it wins',
-  spay: 'W9–13 · simulator · gate G2 passed', cart: 'W14–17 · theory and protocol · frozen',
-  front: 'W40 · paper A · not yet', check: 'W18 · main benchmark · done',
+  rec: 'v1 anomaly · a counting artifact', email: 'P5 · "option to wait" · refuted by the audit',
+  pay: 'real data · gate G1 passed', srec: 'v1 · the loss it reported', semail: 'P5 · why it wins',
+  spay: 'simulator · gate G2 passed', cart: 'theory and protocol · frozen',
+  front: 'paper A · in draft', check: 'main benchmark · done',
 };
 // the rest of the plan, in order; weight 1-3 sizes the block like betweenness sizes Faultline's
 const OTHERS = [
-  ['W1 · v1 frozen · done', 2], ['W2 · thesis locked · done', 1], ['W5 · Backblaze ingest · done', 2], ['W6 · placement trace chosen · done', 1],
-  ['W7 · hazard model v2 · done', 2], ['W10 · simulator spec · done', 1], ['W13 · v1 reproduced exactly · done', 2],
-  ['W15 · BAM and the Narya-inspired baseline · done', 2], ['W16 · safe-adaptive policy · done', 1], ['W17 · code freeze · done', 3],
-  ['W19–21 · B, C and D regimes · queued', 2], ['W21 · gate G3 · next', 3], ['W22–26 · paper, artifact, console · drafted', 2],
-  ['W29–39 · strengthen and polish · tools built', 2], ['W41–46 · ground the cost model · G4', 1], ['W47–50 · failure physics', 1],
-  ['W51–54 · open benchmark v1.0 · G5', 1], ['W55–60 · journal extension · G6', 1],
+  ['v1 frozen · done', 2], ['thesis locked · done', 1], ['Backblaze ingest · done', 2], ['placement trace chosen · done', 1],
+  ['hazard model v2 · done', 2], ['simulator spec · done', 1], ['v1 reproduced exactly · done', 2],
+  ['BAM and the Narya-inspired baseline · done', 2], ['safe-adaptive policy · done', 1], ['code freeze · done', 3],
+  ['B, C and D regimes · done', 2], ['evidence gate G3 · next', 3], ['paper, artifact, console · drafted', 2],
+  ['strengthen and polish · tools built', 2], ['ground the cost model · G4', 1], ['failure physics', 1],
+  ['open benchmark v1.0 · G5', 1], ['journal extension · G6', 1],
 ];
 const EDGES = [['rec', 'srec'], ['email', 'semail'], ['pay', 'spay'], ['srec', 'front'], ['semail', 'check'],
   ['spay', 'check'], ['check', 'front'], ['cart', 'spay'], ['cart', 'check']];
@@ -3488,7 +3492,7 @@ const place = (k, x, y, show, proved, text) => {
   const el = labels[k];
   el.style.transform = `translate(-50%, 0) translate(${x}px, ${y}px)`;
   el.style.opacity = show ? '1' : '0';
-  if (k === 'check') { el.dataset.state = proved ? 'proved' : 'alert'; el.textContent = proved ? 'W18 · done' : 'W18 benchmark'; }
+  if (k === 'check') { el.dataset.state = proved ? 'proved' : 'alert'; el.textContent = proved ? 'Benchmark · done' : 'Main benchmark'; }
   if (text !== undefined && el.textContent !== text) el.textContent = text;
 };
 
@@ -3537,7 +3541,7 @@ try {
     const p = { mesh, from, to, scaleTo, delay: rand() * 0.22, spin: new THREE.Vector3(rand() - 0.5, rand() - 0.5, rand() - 0.5).multiplyScalar(5), role, info };
     pieces.push(p); if (role) byRole[role] = p;
   });
-  // edges appear once the cube has split: the claims graph bright, the rest of the plan a faint chain in week order
+  // edges appear once the cube has split: the claims graph bright, the rest of the plan a faint chain in plan order
   const edgeMat = new THREE.MeshStandardMaterial({ color: '#2e3035', metalness: 0.85, roughness: 0.35, transparent: true, opacity: 0 });
   const faintMat = new THREE.MeshBasicMaterial({ color: '#ffffff', transparent: true, opacity: 0 });
   const tube = (a, b, r, m) => root.add(new THREE.Mesh(new THREE.TubeGeometry(new THREE.LineCurve3(a, b), 1, r, 6, false), m));
@@ -3559,8 +3563,8 @@ try {
     c.open = !c.open; c.openedAt = c.now + 0.9;   // the decision starts as the blocks land
     box.setAttribute('aria-pressed', c.open);
     box.setAttribute('aria-label', c.open
-      ? "Click to close. The plan as a claims graph: the v1 anomaly has no path to the paper, the option-to-wait explanation is refuted, and the path real data → simulator → Week 18 benchmark lights up. Hover a block for its name. Press to close it back into a cube."
-      : "Click the cube: a black cube of 27 blocks, the 60-week plan so far. Press to split it into the project's claims graph and watch which claims hold.");
+      ? "Click to close. The plan as a claims graph: the v1 anomaly has no path to the paper, the option-to-wait explanation is refuted, and the path real data → simulator → main benchmark lights up. Hover a block for its name. Press to close it back into a cube."
+      : "Click the cube: a black cube of 27 blocks, the research plan. Press to split it into the project's claims graph and watch which claims hold.");
     hint.classList.toggle('open', c.open);
     hint.querySelector('span').textContent = c.open ? 'Click to close' : 'Click the cube';
     dirty = true;
