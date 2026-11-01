@@ -1,0 +1,3170 @@
+{
+ "A1": {
+  "p0_cost": 32548.1,
+  "points": {
+   "P0": {
+    "0.0": {
+     "migrations": 0.0,
+     "missed_failures": 5856.933333333333,
+     "total_cost": 32548.1
+    }
+   },
+   "P1": {
+    "0.5": {
+     "migrations": 43753.76666666667,
+     "missed_failures": 4910.266666666666,
+     "total_cost": 52818.56023257716
+    },
+    "1.0": {
+     "migrations": 80852.86666666667,
+     "missed_failures": 4722.9,
+     "total_cost": 77231.80924302143
+    },
+    "2.0": {
+     "migrations": 156661.86666666667,
+     "missed_failures": 4556.633333333333,
+     "total_cost": 128052.13728189316
+    },
+    "5.0": {
+     "migrations": 345138.7,
+     "missed_failures": 4321.866666666667,
+     "total_cost": 289813.6322956708
+    }
+   },
+   "P2": {
+    "0.5": {
+     "migrations": 41068.433333333334,
+     "missed_failures": 4936.2,
+     "total_cost": 51676.419457580756
+    },
+    "1.0": {
+     "migrations": 75260.8,
+     "missed_failures": 4753.166666666667,
+     "total_cost": 74897.69420674592
+    },
+    "2.0": {
+     "migrations": 147494.16666666666,
+     "missed_failures": 4565.933333333333,
+     "total_cost": 123849.15952948801
+    },
+    "5.0": {
+     "migrations": 334353.13333333336,
+     "missed_failures": 4338.533333333334,
+     "total_cost": 279900.6917207578
+    }
+   },
+   "P3": {
+    "0.5": {
+     "migrations": 5257.833333333333,
+     "missed_failures": 5579.966666666666,
+     "total_cost": 32005.370461996692
+    },
+    "1.0": {
+     "migrations": 5257.833333333333,
+     "missed_failures": 5579.966666666666,
+     "total_cost": 32005.370461996692
+    },
+    "2.0": {
+     "migrations": 5257.833333333333,
+     "missed_failures": 5579.966666666666,
+     "total_cost": 32005.370461996692
+    },
+    "5.0": {
+     "migrations": 5257.833333333333,
+     "missed_failures": 5579.966666666666,
+     "total_cost": 32005.370461996692
+    }
+   },
+   "P4": {
+    "0.5": {
+     "migrations": 23826.666666666668,
+     "missed_failures": 5258.7,
+     "total_cost": 30918.249972504134
+    },
+    "1.0": {
+     "migrations": 23826.666666666668,
+     "missed_failures": 5258.7,
+     "total_cost": 30918.249972504134
+    },
+    "2.0": {
+     "migrations": 23826.666666666668,
+     "missed_failures": 5258.7,
+     "total_cost": 30918.249972504134
+    },
+    "5.0": {
+     "migrations": 23826.666666666668,
+     "missed_failures": 5258.7,
+     "total_cost": 30918.249972504134
+    }
+   },
+   "P5": {
+    "0.5": {
+     "migrations": 742.8,
+     "missed_failures": 5314.5,
+     "total_cost": 29756.431268930915
+    },
+    "1.0": {
+     "migrations": 698.5333333333333,
+     "missed_failures": 5314.933333333333,
+     "total_cost": 29758.059057735907
+    },
+    "2.0": {
+     "migrations": 698.5333333333333,
+     "missed_failures": 5314.933333333333,
+     "total_cost": 29758.059057735907
+    },
+    "5.0": {
+     "migrations": 698.5333333333333,
+     "missed_failures": 5314.933333333333,
+     "total_cost": 29758.059057735907
+    }
+   },
+   "P6": {
+    "0.5": {
+     "migrations": 27667.833333333332,
+     "missed_failures": 5177.3,
+     "total_cost": 34859.29089686716
+    },
+    "1.0": {
+     "migrations": 34434.13333333333,
+     "missed_failures": 5132.066666666667,
+     "total_cost": 39182.38146555536
+    },
+    "2.0": {
+     "migrations": 48961.066666666666,
+     "missed_failures": 5118.833333333333,
+     "total_cost": 48618.758383940556
+    },
+    "5.0": {
+     "migrations": 90383.83333333333,
+     "missed_failures": 5042.266666666666,
+     "total_cost": 78336.84057260967
+    }
+   },
+   "P7": {
+    "0.5": {
+     "migrations": 5022.9,
+     "missed_failures": 976.3666666666667,
+     "total_cost": 5839.031478009875
+    },
+    "1.0": {
+     "migrations": 5022.9,
+     "missed_failures": 976.3666666666667,
+     "total_cost": 5839.031478009875
+    },
+    "2.0": {
+     "migrations": 5022.9,
+     "missed_failures": 976.3666666666667,
+     "total_cost": 5839.031478009875
+    },
+    "5.0": {
+     "migrations": 5022.9,
+     "missed_failures": 976.3666666666667,
+     "total_cost": 5839.031478009875
+    }
+   },
+   "P8": {
+    "0.5": {
+     "migrations": 111738.4,
+     "missed_failures": 5694.766666666666,
+     "total_cost": 51229.80454177697
+    },
+    "1.0": {
+     "migrations": 221966.53333333333,
+     "missed_failures": 5552.966666666666,
+     "total_cost": 73687.82021280102
+    },
+    "2.0": {
+     "migrations": 441494.8333333333,
+     "missed_failures": 5336.433333333333,
+     "total_cost": 127013.65220869255
+    },
+    "5.0": {
+     "migrations": 1096940.2666666666,
+     "missed_failures": 4975.133333333333,
+     "total_cost": 319043.1298400405
+    }
+   }
+  },
+  "normalised_area": {
+   "P1": 4.105173507225646,
+   "P2": 3.9725757988000785,
+   "P3": 0.9833253081438454,
+   "P4": 0.9499248795629893,
+   "P5": 0.9142719252769733,
+   "P6": 1.5245168413537755,
+   "P7": 0.17939699945649287,
+   "P8": 4.232581243263298
+  }
+ },
+ "A2": {
+  "p0_cost": 36779.53333333333,
+  "points": {
+   "P0": {
+    "0.0": {
+     "migrations": 0.0,
+     "missed_failures": 5976.433333333333,
+     "total_cost": 36779.53333333333
+    }
+   },
+   "P1": {
+    "0.5": {
+     "migrations": 62425.4,
+     "missed_failures": 4997.233333333334,
+     "total_cost": 53520.229761915936
+    },
+    "1.0": {
+     "migrations": 115979.73333333334,
+     "missed_failures": 4885.5,
+     "total_cost": 78093.5145946442
+    },
+    "2.0": {
+     "migrations": 224922.03333333333,
+     "missed_failures": 4686.766666666666,
+     "total_cost": 128844.37668299284
+    },
+    "5.0": {
+     "migrations": 498060.9,
+     "missed_failures": 4459.166666666667,
+     "total_cost": 291734.81745192193
+    }
+   },
+   "P2": {
+    "0.5": {
+     "migrations": 58651.433333333334,
+     "missed_failures": 5027.233333333334,
+     "total_cost": 52267.39677192028
+    },
+    "1.0": {
+     "migrations": 108894.33333333333,
+     "missed_failures": 4877.9,
+     "total_cost": 75461.89847957269
+    },
+    "2.0": {
+     "migrations": 213019.8,
+     "missed_failures": 4718.2,
+     "total_cost": 124585.54653680506
+    },
+    "5.0": {
+     "migrations": 481657.26666666666,
+     "missed_failures": 4478.633333333333,
+     "total_cost": 281095.6320946789
+    }
+   },
+   "P3": {
+    "0.5": {
+     "migrations": 15125.333333333334,
+     "missed_failures": 5352.933333333333,
+     "total_cost": 34425.7884860894
+    },
+    "1.0": {
+     "migrations": 15066.466666666667,
+     "missed_failures": 5337.666666666667,
+     "total_cost": 34348.808945714
+    },
+    "2.0": {
+     "migrations": 15066.466666666667,
+     "missed_failures": 5337.666666666667,
+     "total_cost": 34348.808945714
+    },
+    "5.0": {
+     "migrations": 15066.466666666667,
+     "missed_failures": 5337.666666666667,
+     "total_cost": 34348.808945714
+    }
+   },
+   "P4": {
+    "0.5": {
+     "migrations": 32390.4,
+     "missed_failures": 5170.566666666667,
+     "total_cost": 33225.91910441561
+    },
+    "1.0": {
+     "migrations": 32381.966666666667,
+     "missed_failures": 5170.233333333334,
+     "total_cost": 33215.95437546229
+    },
+    "2.0": {
+     "migrations": 32381.966666666667,
+     "missed_failures": 5170.233333333334,
+     "total_cost": 33215.95437546229
+    },
+    "5.0": {
+     "migrations": 32381.966666666667,
+     "missed_failures": 5170.233333333334,
+     "total_cost": 33215.95437546229
+    }
+   },
+   "P5": {
+    "0.5": {
+     "migrations": 2789.3333333333335,
+     "missed_failures": 5314.466666666666,
+     "total_cost": 32060.089507662142
+    },
+    "1.0": {
+     "migrations": 2740.7,
+     "missed_failures": 5311.6,
+     "total_cost": 32051.263208304077
+    },
+    "2.0": {
+     "migrations": 2740.7,
+     "missed_failures": 5311.6,
+     "total_cost": 32051.263208304077
+    },
+    "5.0": {
+     "migrations": 2740.7,
+     "missed_failures": 5311.6,
+     "total_cost": 32051.263208304077
+    }
+   },
+   "P6": {
+    "0.5": {
+     "migrations": 37747.53333333333,
+     "missed_failures": 5148.2,
+     "total_cost": 36853.49095706234
+    },
+    "1.0": {
+     "migrations": 47634.96666666667,
+     "missed_failures": 5095.233333333334,
+     "total_cost": 41165.76817643226
+    },
+    "2.0": {
+     "migrations": 67953.2,
+     "missed_failures": 5126.033333333334,
+     "total_cost": 50795.266418397165
+    },
+    "5.0": {
+     "migrations": 123957.3,
+     "missed_failures": 5035.133333333333,
+     "total_cost": 80468.22681311252
+    }
+   },
+   "P7": {
+    "0.5": {
+     "migrations": 6464.7,
+     "missed_failures": 1172.5333333333333,
+     "total_cost": 7643.700671407108
+    },
+    "1.0": {
+     "migrations": 6464.7,
+     "missed_failures": 1172.5333333333333,
+     "total_cost": 7643.700671407108
+    },
+    "2.0": {
+     "migrations": 6464.7,
+     "missed_failures": 1172.5333333333333,
+     "total_cost": 7643.700671407108
+    },
+    "5.0": {
+     "migrations": 6464.7,
+     "missed_failures": 1172.5333333333333,
+     "total_cost": 7643.700671407108
+    }
+   },
+   "P8": {
+    "0.5": {
+     "migrations": 111849.83333333333,
+     "missed_failures": 5876.433333333333,
+     "total_cost": 55592.08251315947
+    },
+    "1.0": {
+     "migrations": 222608.63333333333,
+     "missed_failures": 5767.2,
+     "total_cost": 77807.65008008532
+    },
+    "2.0": {
+     "migrations": 442995.9,
+     "missed_failures": 5605.833333333333,
+     "total_cost": 130843.8610954671
+    },
+    "5.0": {
+     "migrations": 1105681.8333333333,
+     "missed_failures": 5255.033333333334,
+     "total_cost": 322981.50324469904
+    }
+   }
+  },
+  "normalised_area": {
+   "P1": 3.6607246090895127,
+   "P2": 3.5360345669278868,
+   "P3": 0.9342259786076689,
+   "P4": 0.9031505080711308,
+   "P5": 0.8714790209065411,
+   "P6": 1.4057296728280297,
+   "P7": 0.20782484111835137,
+   "P8": 3.85490146489574
+  }
+ },
+ "A3": {
+  "p0_cost": 39304.06,
+  "points": {
+   "P0": {
+    "0.0": {
+     "migrations": 0.0,
+     "missed_failures": 6101.8,
+     "total_cost": 39304.06
+    }
+   },
+   "P1": {
+    "0.5": {
+     "migrations": 64825.68,
+     "missed_failures": 5017.9,
+     "total_cost": 54261.38502319064
+    },
+    "1.0": {
+     "migrations": 118287.98,
+     "missed_failures": 4911.9,
+     "total_cost": 78865.4471152595
+    },
+    "2.0": {
+     "migrations": 227140.56,
+     "missed_failures": 4743.34,
+     "total_cost": 129807.41888903579
+    },
+    "5.0": {
+     "migrations": 500659.74,
+     "missed_failures": 4509.2,
+     "total_cost": 292767.13382373867
+    }
+   },
+   "P2": {
+    "0.5": {
+     "migrations": 61278.32,
+     "missed_failures": 5069.68,
+     "total_cost": 53393.784704379745
+    },
+    "1.0": {
+     "migrations": 111787.38,
+     "missed_failures": 4912.82,
+     "total_cost": 76390.08287952811
+    },
+    "2.0": {
+     "migrations": 214741.54,
+     "missed_failures": 4765.3,
+     "total_cost": 125286.6247899221
+    },
+    "5.0": {
+     "migrations": 483076.32,
+     "missed_failures": 4524.14,
+     "total_cost": 281017.86623312696
+    }
+   },
+   "P3": {
+    "0.5": {
+     "migrations": 20827.38,
+     "missed_failures": 5325.3,
+     "total_cost": 36594.43890344685
+    },
+    "1.0": {
+     "migrations": 20822.4,
+     "missed_failures": 5341.48,
+     "total_cost": 36722.63597319243
+    },
+    "2.0": {
+     "migrations": 20822.4,
+     "missed_failures": 5341.48,
+     "total_cost": 36722.63597319243
+    },
+    "5.0": {
+     "migrations": 20822.4,
+     "missed_failures": 5341.48,
+     "total_cost": 36722.63597319243
+    }
+   },
+   "P4": {
+    "0.5": {
+     "migrations": 39083.92,
+     "missed_failures": 5139.12,
+     "total_cost": 35052.097379110746
+    },
+    "1.0": {
+     "migrations": 39119.32,
+     "missed_failures": 5147.02,
+     "total_cost": 35106.24152843797
+    },
+    "2.0": {
+     "migrations": 39119.32,
+     "missed_failures": 5147.02,
+     "total_cost": 35106.24152843797
+    },
+    "5.0": {
+     "migrations": 39119.32,
+     "missed_failures": 5147.02,
+     "total_cost": 35106.24152843797
+    }
+   },
+   "P5": {
+    "0.5": {
+     "migrations": 3572.66,
+     "missed_failures": 5362.76,
+     "total_cost": 33415.343749828215
+    },
+    "1.0": {
+     "migrations": 3633.04,
+     "missed_failures": 5357.82,
+     "total_cost": 33374.64300216325
+    },
+    "2.0": {
+     "migrations": 3633.04,
+     "missed_failures": 5357.82,
+     "total_cost": 33374.64300216325
+    },
+    "5.0": {
+     "migrations": 3633.04,
+     "missed_failures": 5357.82,
+     "total_cost": 33374.64300216325
+    }
+   },
+   "P6": {
+    "0.5": {
+     "migrations": 43869.12,
+     "missed_failures": 5111.42,
+     "total_cost": 38701.85360731904
+    },
+    "1.0": {
+     "migrations": 54233.34,
+     "missed_failures": 5081.96,
+     "total_cost": 43419.36875572753
+    },
+    "2.0": {
+     "migrations": 75506.16,
+     "missed_failures": 5052.86,
+     "total_cost": 53279.79203466468
+    },
+    "5.0": {
+     "migrations": 134291.56,
+     "missed_failures": 5000.7,
+     "total_cost": 84648.35932040689
+    }
+   },
+   "P7": {
+    "0.5": {
+     "migrations": 6724.96,
+     "missed_failures": 1188.32,
+     "total_cost": 8081.915976126083
+    },
+    "1.0": {
+     "migrations": 6724.96,
+     "missed_failures": 1188.32,
+     "total_cost": 8081.915976126083
+    },
+    "2.0": {
+     "migrations": 6724.96,
+     "missed_failures": 1188.32,
+     "total_cost": 8081.915976126083
+    },
+    "5.0": {
+     "migrations": 6724.96,
+     "missed_failures": 1188.32,
+     "total_cost": 8081.915976126083
+    }
+   },
+   "P8": {
+    "0.5": {
+     "migrations": 111796.6,
+     "missed_failures": 5987.8,
+     "total_cost": 57783.527691625466
+    },
+    "1.0": {
+     "migrations": 222296.06,
+     "missed_failures": 5896.84,
+     "total_cost": 80105.86955851415
+    },
+    "2.0": {
+     "migrations": 443339.94,
+     "missed_failures": 5731.86,
+     "total_cost": 132933.74300864374
+    },
+    "5.0": {
+     "migrations": 1105186.76,
+     "missed_failures": 5330.4,
+     "total_cost": 324209.32348985435
+    }
+   }
+  },
+  "normalised_area": {
+   "P1": 3.448133383942583,
+   "P2": 3.3261753138543333,
+   "P3": 0.9338307643413328,
+   "P4": 0.8929889691273464,
+   "P5": 0.849295698080804,
+   "P6": 1.3830305178608324,
+   "P7": 0.20562547421630445,
+   "P8": 3.6580912270951207
+  }
+ },
+ "A4": {
+  "p0_cost": 40923.4,
+  "points": {
+   "P0": {
+    "0.0": {
+     "migrations": 0.0,
+     "missed_failures": 6156.066666666667,
+     "total_cost": 40923.4
+    }
+   },
+   "P1": {
+    "0.5": {
+     "migrations": 68053.63333333333,
+     "missed_failures": 5014.633333333333,
+     "total_cost": 55329.83348515179
+    },
+    "1.0": {
+     "migrations": 121359.6,
+     "missed_failures": 4888.633333333333,
+     "total_cost": 79632.12971594097
+    },
+    "2.0": {
+     "migrations": 229767.06666666668,
+     "missed_failures": 4722.366666666667,
+     "total_cost": 130525.56477850761
+    },
+    "5.0": {
+     "migrations": 504626.4666666667,
+     "missed_failures": 4498.3,
+     "total_cost": 293610.3603658793
+    }
+   },
+   "P2": {
+    "0.5": {
+     "migrations": 64279.833333333336,
+     "missed_failures": 5021.533333333334,
+     "total_cost": 54028.853114930964
+    },
+    "1.0": {
+     "migrations": 114642.23333333334,
+     "missed_failures": 4923.933333333333,
+     "total_cost": 77369.3256692024
+    },
+    "2.0": {
+     "migrations": 218198.83333333334,
+     "missed_failures": 4735.4,
+     "total_cost": 126275.34400134759
+    },
+    "5.0": {
+     "migrations": 487155.23333333334,
+     "missed_failures": 4482.766666666666,
+     "total_cost": 281976.8959060983
+    }
+   },
+   "P3": {
+    "0.5": {
+     "migrations": 25401.133333333335,
+     "missed_failures": 5316.466666666666,
+     "total_cost": 38622.09129180421
+    },
+    "1.0": {
+     "migrations": 25404.7,
+     "missed_failures": 5318.8,
+     "total_cost": 38580.038735081325
+    },
+    "2.0": {
+     "migrations": 25404.7,
+     "missed_failures": 5318.8,
+     "total_cost": 38580.038735081325
+    },
+    "5.0": {
+     "migrations": 25404.7,
+     "missed_failures": 5318.8,
+     "total_cost": 38580.038735081325
+    }
+   },
+   "P4": {
+    "0.5": {
+     "migrations": 46120.23333333333,
+     "missed_failures": 5093.5,
+     "total_cost": 36696.80013386957
+    },
+    "1.0": {
+     "migrations": 46018.26666666667,
+     "missed_failures": 5086.666666666667,
+     "total_cost": 36612.674458742986
+    },
+    "2.0": {
+     "migrations": 46018.26666666667,
+     "missed_failures": 5086.666666666667,
+     "total_cost": 36612.674458742986
+    },
+    "5.0": {
+     "migrations": 46018.26666666667,
+     "missed_failures": 5086.666666666667,
+     "total_cost": 36612.674458742986
+    }
+   },
+   "P5": {
+    "0.5": {
+     "migrations": 3827.9,
+     "missed_failures": 5400.933333333333,
+     "total_cost": 34528.52451888866
+    },
+    "1.0": {
+     "migrations": 3747.1666666666665,
+     "missed_failures": 5394.566666666667,
+     "total_cost": 34441.25756052586
+    },
+    "2.0": {
+     "migrations": 3747.1666666666665,
+     "missed_failures": 5394.566666666667,
+     "total_cost": 34441.25756052586
+    },
+    "5.0": {
+     "migrations": 3747.1666666666665,
+     "missed_failures": 5394.566666666667,
+     "total_cost": 34441.25756052586
+    }
+   },
+   "P6": {
+    "0.5": {
+     "migrations": 49782.46666666667,
+     "missed_failures": 5054.766666666666,
+     "total_cost": 39817.000472141655
+    },
+    "1.0": {
+     "migrations": 59398.3,
+     "missed_failures": 5038.8,
+     "total_cost": 44325.70091144883
+    },
+    "2.0": {
+     "migrations": 79747.46666666666,
+     "missed_failures": 4991.433333333333,
+     "total_cost": 53585.33552323391
+    },
+    "5.0": {
+     "migrations": 135515.86666666667,
+     "missed_failures": 4954.333333333333,
+     "total_cost": 83288.81976847947
+    }
+   },
+   "P7": {
+    "0.5": {
+     "migrations": 6887.566666666667,
+     "missed_failures": 1205.7,
+     "total_cost": 8417.847122355324
+    },
+    "1.0": {
+     "migrations": 6887.566666666667,
+     "missed_failures": 1205.7,
+     "total_cost": 8417.847122355324
+    },
+    "2.0": {
+     "migrations": 6887.566666666667,
+     "missed_failures": 1205.7,
+     "total_cost": 8417.847122355324
+    },
+    "5.0": {
+     "migrations": 6887.566666666667,
+     "missed_failures": 1205.7,
+     "total_cost": 8417.847122355324
+    }
+   },
+   "P8": {
+    "0.5": {
+     "migrations": 111930.73333333334,
+     "missed_failures": 6053.833333333333,
+     "total_cost": 59474.48105303813
+    },
+    "1.0": {
+     "migrations": 222315.86666666667,
+     "missed_failures": 5926.9,
+     "total_cost": 81515.16131943806
+    },
+    "2.0": {
+     "migrations": 442982.73333333334,
+     "missed_failures": 5744.8,
+     "total_cost": 134029.91329429773
+    },
+    "5.0": {
+     "migrations": 1105369.3333333333,
+     "missed_failures": 5372.233333333334,
+     "total_cost": 325431.8491153803
+    }
+   }
+  },
+  "normalised_area": {
+   "P1": 3.331492774179608,
+   "P2": 3.2172039359719506,
+   "P3": 0.942892532770134,
+   "P4": 0.8949729649675315,
+   "P5": 0.8419239981666881,
+   "P6": 1.3350716026748584,
+   "P7": 0.20569764785807934,
+   "P8": 3.5452316037547607
+  }
+ },
+ "A5": {
+  "p0_cost": 42439.38,
+  "points": {
+   "P0": {
+    "0.0": {
+     "migrations": 0.0,
+     "missed_failures": 6260.1,
+     "total_cost": 42439.38
+    }
+   },
+   "P1": {
+    "0.5": {
+     "migrations": 71459.34,
+     "missed_failures": 5012.62,
+     "total_cost": 56270.71424094092
+    },
+    "1.0": {
+     "migrations": 125046.7,
+     "missed_failures": 4898.96,
+     "total_cost": 80403.22181968334
+    },
+    "2.0": {
+     "migrations": 233070.0,
+     "missed_failures": 4759.6,
+     "total_cost": 131514.87419474556
+    },
+    "5.0": {
+     "migrations": 507843.9,
+     "missed_failures": 4538.26,
+     "total_cost": 294516.2684899355
+    }
+   },
+   "P2": {
+    "0.5": {
+     "migrations": 67711.88,
+     "missed_failures": 5049.62,
+     "total_cost": 55067.11726038959
+    },
+    "1.0": {
+     "migrations": 118005.74,
+     "missed_failures": 4921.96,
+     "total_cost": 77991.92116350512
+    },
+    "2.0": {
+     "migrations": 221062.38,
+     "missed_failures": 4774.7,
+     "total_cost": 126979.30116434027
+    },
+    "5.0": {
+     "migrations": 492057.64,
+     "missed_failures": 4538.28,
+     "total_cost": 283870.48320857494
+    }
+   },
+   "P3": {
+    "0.5": {
+     "migrations": 28194.72,
+     "missed_failures": 5354.76,
+     "total_cost": 40272.57641676195
+    },
+    "1.0": {
+     "migrations": 28158.68,
+     "missed_failures": 5354.16,
+     "total_cost": 40241.174127642866
+    },
+    "2.0": {
+     "migrations": 28158.68,
+     "missed_failures": 5354.16,
+     "total_cost": 40241.174127642866
+    },
+    "5.0": {
+     "migrations": 28158.68,
+     "missed_failures": 5354.16,
+     "total_cost": 40241.174127642866
+    }
+   },
+   "P4": {
+    "0.5": {
+     "migrations": 51465.52,
+     "missed_failures": 5095.4,
+     "total_cost": 38282.247039640184
+    },
+    "1.0": {
+     "migrations": 51413.28,
+     "missed_failures": 5093.98,
+     "total_cost": 38295.30290416274
+    },
+    "2.0": {
+     "migrations": 51413.28,
+     "missed_failures": 5093.98,
+     "total_cost": 38295.30290416274
+    },
+    "5.0": {
+     "migrations": 51413.28,
+     "missed_failures": 5093.98,
+     "total_cost": 38295.30290416274
+    }
+   },
+   "P5": {
+    "0.5": {
+     "migrations": 3738.46,
+     "missed_failures": 5464.26,
+     "total_cost": 35651.22653868665
+    },
+    "1.0": {
+     "migrations": 3843.78,
+     "missed_failures": 5464.88,
+     "total_cost": 35655.145860423065
+    },
+    "2.0": {
+     "migrations": 3843.78,
+     "missed_failures": 5464.88,
+     "total_cost": 35655.145860423065
+    },
+    "5.0": {
+     "migrations": 3843.78,
+     "missed_failures": 5464.88,
+     "total_cost": 35655.145860423065
+    }
+   },
+   "P6": {
+    "0.5": {
+     "migrations": 54971.48,
+     "missed_failures": 5087.36,
+     "total_cost": 41649.86184659752
+    },
+    "1.0": {
+     "migrations": 65251.9,
+     "missed_failures": 5069.5,
+     "total_cost": 46373.549093995
+    },
+    "2.0": {
+     "migrations": 86578.82,
+     "missed_failures": 5021.34,
+     "total_cost": 56098.759589498186
+    },
+    "5.0": {
+     "migrations": 146061.68,
+     "missed_failures": 4960.82,
+     "total_cost": 87950.28911190893
+    }
+   },
+   "P7": {
+    "0.5": {
+     "migrations": 7077.66,
+     "missed_failures": 1223.8,
+     "total_cost": 8730.88625605938
+    },
+    "1.0": {
+     "migrations": 7077.66,
+     "missed_failures": 1223.8,
+     "total_cost": 8730.88625605938
+    },
+    "2.0": {
+     "migrations": 7077.66,
+     "missed_failures": 1223.8,
+     "total_cost": 8730.88625605938
+    },
+    "5.0": {
+     "migrations": 7077.66,
+     "missed_failures": 1223.8,
+     "total_cost": 8730.88625605938
+    }
+   },
+   "P8": {
+    "0.5": {
+     "migrations": 112008.58,
+     "missed_failures": 6118.5,
+     "total_cost": 60572.725353703514
+    },
+    "1.0": {
+     "migrations": 222261.98,
+     "missed_failures": 6040.4,
+     "total_cost": 82875.09095127723
+    },
+    "2.0": {
+     "migrations": 443145.26,
+     "missed_failures": 5836.32,
+     "total_cost": 135304.47718216537
+    },
+    "5.0": {
+     "migrations": 1105089.28,
+     "missed_failures": 5457.86,
+     "total_cost": 326455.08482485183
+    }
+   }
+  },
+  "normalised_area": {
+   "P1": 3.2336887876136706,
+   "P2": 3.1250552515688668,
+   "P3": 0.9483149999628069,
+   "P4": 0.902306720803707,
+   "P5": 0.8401290486270159,
+   "P6": 1.3509599497198381,
+   "P7": 0.2057260557543343,
+   "P8": 3.447426589160164
+  }
+ },
+ "A6": {
+  "p0_cost": 43396.76666666667,
+  "points": {
+   "P0": {
+    "0.0": {
+     "migrations": 0.0,
+     "missed_failures": 6284.266666666666,
+     "total_cost": 43396.76666666667
+    }
+   },
+   "P1": {
+    "0.5": {
+     "migrations": 76062.53333333334,
+     "missed_failures": 4982.266666666666,
+     "total_cost": 57253.02966861578
+    },
+    "1.0": {
+     "migrations": 130086.86666666667,
+     "missed_failures": 4888.3,
+     "total_cost": 81503.98806769625
+    },
+    "2.0": {
+     "migrations": 237913.86666666667,
+     "missed_failures": 4725.7,
+     "total_cost": 132186.01704039483
+    },
+    "5.0": {
+     "migrations": 512888.5,
+     "missed_failures": 4482.633333333333,
+     "total_cost": 295046.9415268602
+    }
+   },
+   "P2": {
+    "0.5": {
+     "migrations": 72239.63333333333,
+     "missed_failures": 5027.133333333333,
+     "total_cost": 56281.09769592875
+    },
+    "1.0": {
+     "migrations": 123592.56666666667,
+     "missed_failures": 4884.833333333333,
+     "total_cost": 78946.89802937838
+    },
+    "2.0": {
+     "migrations": 225541.0,
+     "missed_failures": 4728.5,
+     "total_cost": 127577.5855731631
+    },
+    "5.0": {
+     "migrations": 496298.13333333336,
+     "missed_failures": 4490.2,
+     "total_cost": 284576.5001164667
+    }
+   },
+   "P3": {
+    "0.5": {
+     "migrations": 30856.866666666665,
+     "missed_failures": 5368.5,
+     "total_cost": 41830.72181713033
+    },
+    "1.0": {
+     "migrations": 30662.033333333333,
+     "missed_failures": 5352.566666666667,
+     "total_cost": 41642.34070668261
+    },
+    "2.0": {
+     "migrations": 30662.033333333333,
+     "missed_failures": 5352.566666666667,
+     "total_cost": 41642.34070668261
+    },
+    "5.0": {
+     "migrations": 30662.033333333333,
+     "missed_failures": 5352.566666666667,
+     "total_cost": 41642.34070668261
+    }
+   },
+   "P4": {
+    "0.5": {
+     "migrations": 57164.46666666667,
+     "missed_failures": 5065.333333333333,
+     "total_cost": 39533.0494000178
+    },
+    "1.0": {
+     "migrations": 57170.1,
+     "missed_failures": 5076.766666666666,
+     "total_cost": 39735.21990647386
+    },
+    "2.0": {
+     "migrations": 57170.1,
+     "missed_failures": 5076.766666666666,
+     "total_cost": 39735.21990647386
+    },
+    "5.0": {
+     "migrations": 57170.1,
+     "missed_failures": 5076.766666666666,
+     "total_cost": 39735.21990647386
+    }
+   },
+   "P5": {
+    "0.5": {
+     "migrations": 3744.6666666666665,
+     "missed_failures": 5483.866666666667,
+     "total_cost": 36429.995933886996
+    },
+    "1.0": {
+     "migrations": 3711.6666666666665,
+     "missed_failures": 5488.1,
+     "total_cost": 36448.828525048295
+    },
+    "2.0": {
+     "migrations": 3711.6666666666665,
+     "missed_failures": 5488.1,
+     "total_cost": 36448.828525048295
+    },
+    "5.0": {
+     "migrations": 3711.6666666666665,
+     "missed_failures": 5488.1,
+     "total_cost": 36448.828525048295
+    }
+   },
+   "P6": {
+    "0.5": {
+     "migrations": 60607.166666666664,
+     "missed_failures": 5043.5,
+     "total_cost": 42746.73429714555
+    },
+    "1.0": {
+     "migrations": 70321.3,
+     "missed_failures": 5011.766666666666,
+     "total_cost": 47041.77443426588
+    },
+    "2.0": {
+     "migrations": 90296.3,
+     "missed_failures": 5023.333333333333,
+     "total_cost": 56521.25202172274
+    },
+    "5.0": {
+     "migrations": 146747.36666666667,
+     "missed_failures": 4944.9,
+     "total_cost": 86371.97327814829
+    }
+   },
+   "P7": {
+    "0.5": {
+     "migrations": 7248.433333333333,
+     "missed_failures": 1234.6666666666667,
+     "total_cost": 9026.815522430472
+    },
+    "1.0": {
+     "migrations": 7248.433333333333,
+     "missed_failures": 1234.6666666666667,
+     "total_cost": 9026.815522430472
+    },
+    "2.0": {
+     "migrations": 7248.433333333333,
+     "missed_failures": 1234.6666666666667,
+     "total_cost": 9026.815522430472
+    },
+    "5.0": {
+     "migrations": 7248.433333333333,
+     "missed_failures": 1234.6666666666667,
+     "total_cost": 9026.815522430472
+    }
+   },
+   "P8": {
+    "0.5": {
+     "migrations": 112079.2,
+     "missed_failures": 6165.733333333334,
+     "total_cost": 61841.40243136518
+    },
+    "1.0": {
+     "migrations": 222223.13333333333,
+     "missed_failures": 6069.266666666666,
+     "total_cost": 83851.18587031978
+    },
+    "2.0": {
+     "migrations": 443099.36666666664,
+     "missed_failures": 5865.7,
+     "total_cost": 136256.99184696868
+    },
+    "5.0": {
+     "migrations": 1105343.7333333334,
+     "missed_failures": 5488.433333333333,
+     "total_cost": 327030.51056177577
+    }
+   }
+  },
+  "normalised_area": {
+   "P1": 3.181230241375903,
+   "P2": 3.0750026822708465,
+   "P3": 0.960225797677244,
+   "P4": 0.9149250799744589,
+   "P5": 0.8398320136975752,
+   "P6": 1.3257617093680547,
+   "P7": 0.2080066377240963,
+   "P8": 3.392852260130996
+  }
+ },
+ "A7": {
+  "p0_cost": 44882.566666666666,
+  "points": {
+   "P0": {
+    "0.0": {
+     "migrations": 0.0,
+     "missed_failures": 6369.666666666667,
+     "total_cost": 44882.566666666666
+    }
+   },
+   "P1": {
+    "0.5": {
+     "migrations": 82891.3,
+     "missed_failures": 4985.666666666667,
+     "total_cost": 58786.5414669897
+    },
+    "1.0": {
+     "migrations": 140720.73333333334,
+     "missed_failures": 4834.7,
+     "total_cost": 83037.75230444064
+    },
+    "2.0": {
+     "migrations": 249036.33333333334,
+     "missed_failures": 4672.5,
+     "total_cost": 133610.9341323233
+    },
+    "5.0": {
+     "migrations": 505525.6,
+     "missed_failures": 4494.4,
+     "total_cost": 294544.54541479313
+    }
+   },
+   "P2": {
+    "0.5": {
+     "migrations": 78929.8,
+     "missed_failures": 5002.033333333334,
+     "total_cost": 57664.98302527513
+    },
+    "1.0": {
+     "migrations": 133602.23333333334,
+     "missed_failures": 4857.366666666667,
+     "total_cost": 80594.20758633627
+    },
+    "2.0": {
+     "migrations": 236752.03333333333,
+     "missed_failures": 4712.2,
+     "total_cost": 129120.7362707793
+    },
+    "5.0": {
+     "migrations": 491079.26666666666,
+     "missed_failures": 4517.266666666666,
+     "total_cost": 284026.9980623245
+    }
+   },
+   "P3": {
+    "0.5": {
+     "migrations": 32638.533333333333,
+     "missed_failures": 5435.466666666666,
+     "total_cost": 43565.91695448472
+    },
+    "1.0": {
+     "migrations": 32664.333333333332,
+     "missed_failures": 5416.933333333333,
+     "total_cost": 43475.071428264004
+    },
+    "2.0": {
+     "migrations": 32664.333333333332,
+     "missed_failures": 5416.933333333333,
+     "total_cost": 43475.071428264004
+    },
+    "5.0": {
+     "migrations": 32664.333333333332,
+     "missed_failures": 5416.933333333333,
+     "total_cost": 43475.071428264004
+    }
+   },
+   "P4": {
+    "0.5": {
+     "migrations": 63801.36666666667,
+     "missed_failures": 5090.066666666667,
+     "total_cost": 41514.063754914525
+    },
+    "1.0": {
+     "migrations": 63748.933333333334,
+     "missed_failures": 5078.1,
+     "total_cost": 41461.19388757008
+    },
+    "2.0": {
+     "migrations": 63748.933333333334,
+     "missed_failures": 5078.1,
+     "total_cost": 41461.19388757008
+    },
+    "5.0": {
+     "migrations": 63748.933333333334,
+     "missed_failures": 5078.1,
+     "total_cost": 41461.19388757008
+    }
+   },
+   "P5": {
+    "0.5": {
+     "migrations": 4284.7,
+     "missed_failures": 5501.0,
+     "total_cost": 37389.38924359239
+    },
+    "1.0": {
+     "migrations": 4129.333333333333,
+     "missed_failures": 5499.4,
+     "total_cost": 37352.43094082785
+    },
+    "2.0": {
+     "migrations": 4129.333333333333,
+     "missed_failures": 5499.4,
+     "total_cost": 37352.43094082785
+    },
+    "5.0": {
+     "migrations": 4129.333333333333,
+     "missed_failures": 5499.4,
+     "total_cost": 37352.43094082785
+    }
+   },
+   "P6": {
+    "0.5": {
+     "migrations": 67284.66666666667,
+     "missed_failures": 5070.266666666666,
+     "total_cost": 44622.424065489424
+    },
+    "1.0": {
+     "migrations": 77889.66666666667,
+     "missed_failures": 5008.466666666666,
+     "total_cost": 48730.47793357044
+    },
+    "2.0": {
+     "migrations": 98168.4,
+     "missed_failures": 4987.466666666666,
+     "total_cost": 58002.16804167265
+    },
+    "5.0": {
+     "migrations": 151699.36666666667,
+     "missed_failures": 4957.2,
+     "total_cost": 87647.56237365957
+    }
+   },
+   "P7": {
+    "0.5": {
+     "migrations": 7483.1,
+     "missed_failures": 1245.5666666666666,
+     "total_cost": 9317.58509214072
+    },
+    "1.0": {
+     "migrations": 7483.1,
+     "missed_failures": 1245.5666666666666,
+     "total_cost": 9317.58509214072
+    },
+    "2.0": {
+     "migrations": 7483.1,
+     "missed_failures": 1245.5666666666666,
+     "total_cost": 9317.58509214072
+    },
+    "5.0": {
+     "migrations": 7483.1,
+     "missed_failures": 1245.5666666666666,
+     "total_cost": 9317.58509214072
+    }
+   },
+   "P8": {
+    "0.5": {
+     "migrations": 111916.5,
+     "missed_failures": 6259.133333333333,
+     "total_cost": 63260.288393252056
+    },
+    "1.0": {
+     "migrations": 222100.46666666667,
+     "missed_failures": 6142.2,
+     "total_cost": 85148.0155736014
+    },
+    "2.0": {
+     "migrations": 443008.23333333334,
+     "missed_failures": 5936.933333333333,
+     "total_cost": 137381.89021180206
+    },
+    "5.0": {
+     "migrations": 1105373.7666666666,
+     "missed_failures": 5528.966666666666,
+     "total_cost": 327919.25207671704
+    }
+   }
+  },
+  "normalised_area": {
+   "P1": 3.100216137242082,
+   "P2": 2.998476749030765,
+   "P3": 0.9689451444572649,
+   "P4": 0.9239478638448071,
+   "P5": 0.8323497628185629,
+   "P6": 1.3166761105873361,
+   "P7": 0.20759920352462138,
+   "P8": 3.306689994749956
+  }
+ },
+ "B1": {
+  "p0_cost": 33181.32,
+  "points": {
+   "P0": {
+    "0.0": {
+     "migrations": 0.0,
+     "missed_failures": 5906.9,
+     "total_cost": 33181.32
+    }
+   },
+   "P1": {
+    "0.5": {
+     "migrations": 60530.76,
+     "missed_failures": 5026.44,
+     "total_cost": 52929.73751714353
+    },
+    "1.0": {
+     "migrations": 114199.14,
+     "missed_failures": 4865.74,
+     "total_cost": 77211.53437086003
+    },
+    "2.0": {
+     "migrations": 222774.02,
+     "missed_failures": 4716.96,
+     "total_cost": 128186.84508005934
+    },
+    "5.0": {
+     "migrations": 495959.16,
+     "missed_failures": 4485.3,
+     "total_cost": 291133.5429419015
+    }
+   },
+   "P2": {
+    "0.5": {
+     "migrations": 57039.94,
+     "missed_failures": 5057.26,
+     "total_cost": 51831.40245637415
+    },
+    "1.0": {
+     "migrations": 107173.9,
+     "missed_failures": 4895.5,
+     "total_cost": 74859.11383759043
+    },
+    "2.0": {
+     "migrations": 210107.9,
+     "missed_failures": 4749.32,
+     "total_cost": 123433.84581341967
+    },
+    "5.0": {
+     "migrations": 478716.42,
+     "missed_failures": 4498.26,
+     "total_cost": 279835.3925457493
+    }
+   },
+   "P3": {
+    "0.5": {
+     "migrations": 7404.86,
+     "missed_failures": 5558.3,
+     "total_cost": 32445.39131779139
+    },
+    "1.0": {
+     "migrations": 7404.86,
+     "missed_failures": 5558.3,
+     "total_cost": 32445.39131779139
+    },
+    "2.0": {
+     "migrations": 7404.86,
+     "missed_failures": 5558.3,
+     "total_cost": 32445.39131779139
+    },
+    "5.0": {
+     "migrations": 7404.86,
+     "missed_failures": 5558.3,
+     "total_cost": 32445.39131779139
+    }
+   },
+   "P4": {
+    "0.5": {
+     "migrations": 26470.56,
+     "missed_failures": 5347.36,
+     "total_cost": 31832.276713751027
+    },
+    "1.0": {
+     "migrations": 26470.56,
+     "missed_failures": 5347.36,
+     "total_cost": 31832.276713751027
+    },
+    "2.0": {
+     "migrations": 26470.56,
+     "missed_failures": 5347.36,
+     "total_cost": 31832.276713751027
+    },
+    "5.0": {
+     "migrations": 26470.56,
+     "missed_failures": 5347.36,
+     "total_cost": 31832.276713751027
+    }
+   },
+   "P5": {
+    "0.5": {
+     "migrations": 1022.16,
+     "missed_failures": 5358.42,
+     "total_cost": 30261.30299780049
+    },
+    "1.0": {
+     "migrations": 941.28,
+     "missed_failures": 5356.16,
+     "total_cost": 30217.024684277443
+    },
+    "2.0": {
+     "migrations": 941.28,
+     "missed_failures": 5356.16,
+     "total_cost": 30217.024684277443
+    },
+    "5.0": {
+     "migrations": 941.28,
+     "missed_failures": 5356.16,
+     "total_cost": 30217.024684277443
+    }
+   },
+   "P6": {
+    "0.5": {
+     "migrations": 33006.98,
+     "missed_failures": 5250.12,
+     "total_cost": 35759.65240382532
+    },
+    "1.0": {
+     "migrations": 43548.34,
+     "missed_failures": 5222.22,
+     "total_cost": 40498.999644486306
+    },
+    "2.0": {
+     "migrations": 64802.34,
+     "missed_failures": 5203.82,
+     "total_cost": 50267.39431499557
+    },
+    "5.0": {
+     "migrations": 123923.18,
+     "missed_failures": 5115.76,
+     "total_cost": 81825.58522074846
+    }
+   },
+   "P7": {
+    "0.5": {
+     "migrations": 6255.78,
+     "missed_failures": 1146.72,
+     "total_cost": 7077.801321228637
+    },
+    "1.0": {
+     "migrations": 6255.78,
+     "missed_failures": 1146.72,
+     "total_cost": 7077.801321228637
+    },
+    "2.0": {
+     "migrations": 6255.78,
+     "missed_failures": 1146.72,
+     "total_cost": 7077.801321228637
+    },
+    "5.0": {
+     "migrations": 6255.78,
+     "missed_failures": 1146.72,
+     "total_cost": 7077.801321228637
+    }
+   },
+   "P8": {
+    "0.5": {
+     "migrations": 111941.04,
+     "missed_failures": 5804.74,
+     "total_cost": 52124.80153164561
+    },
+    "1.0": {
+     "migrations": 222211.74,
+     "missed_failures": 5728.94,
+     "total_cost": 74807.74165958747
+    },
+    "2.0": {
+     "migrations": 443209.84,
+     "missed_failures": 5564.48,
+     "total_cost": 128222.67799512725
+    },
+    "5.0": {
+     "migrations": 1105211.52,
+     "missed_failures": 5248.24,
+     "total_cost": 321264.78958342504
+    }
+   }
+  },
+  "normalised_area": {
+   "P1": 4.036485869662073,
+   "P2": 3.8923517594296277,
+   "P3": 0.977820994396588,
+   "P4": 0.9593432905547771,
+   "P5": 0.9108645838845885,
+   "P6": 1.5497368745045648,
+   "P7": 0.21330680398575577,
+   "P8": 4.192084522571305
+  }
+ },
+ "B1-high": {
+  "p0_cost": 34777.3,
+  "points": {
+   "P0": {
+    "0.0": {
+     "migrations": 0.0,
+     "missed_failures": 5918.966666666666,
+     "total_cost": 34777.3
+    }
+   },
+   "P1": {
+    "0.5": {
+     "migrations": 61157.9,
+     "missed_failures": 4983.1,
+     "total_cost": 52962.235079940765
+    },
+    "1.0": {
+     "migrations": 114755.23333333334,
+     "missed_failures": 4893.266666666666,
+     "total_cost": 77608.64467105317
+    },
+    "2.0": {
+     "migrations": 223196.96666666667,
+     "missed_failures": 4694.8,
+     "total_cost": 128425.09238105941
+    },
+    "5.0": {
+     "migrations": 496914.8333333333,
+     "missed_failures": 4477.266666666666,
+     "total_cost": 291463.3839971842
+    }
+   },
+   "P2": {
+    "0.5": {
+     "migrations": 57483.4,
+     "missed_failures": 5007.866666666667,
+     "total_cost": 51718.257770375916
+    },
+    "1.0": {
+     "migrations": 107815.46666666666,
+     "missed_failures": 4889.3,
+     "total_cost": 74951.86833718355
+    },
+    "2.0": {
+     "migrations": 211519.5,
+     "missed_failures": 4716.466666666666,
+     "total_cost": 124156.5105902466
+    },
+    "5.0": {
+     "migrations": 480584.4,
+     "missed_failures": 4469.133333333333,
+     "total_cost": 280655.2941120209
+    }
+   },
+   "P3": {
+    "0.5": {
+     "migrations": 10098.166666666666,
+     "missed_failures": 5453.133333333333,
+     "total_cost": 33079.09574224141
+    },
+    "1.0": {
+     "migrations": 10098.166666666666,
+     "missed_failures": 5453.133333333333,
+     "total_cost": 33079.09574224141
+    },
+    "2.0": {
+     "migrations": 10098.166666666666,
+     "missed_failures": 5453.133333333333,
+     "total_cost": 33079.09574224141
+    },
+    "5.0": {
+     "migrations": 10098.166666666666,
+     "missed_failures": 5453.133333333333,
+     "total_cost": 33079.09574224141
+    }
+   },
+   "P4": {
+    "0.5": {
+     "migrations": 28388.333333333332,
+     "missed_failures": 5258.5,
+     "total_cost": 32301.49632028753
+    },
+    "1.0": {
+     "migrations": 28388.333333333332,
+     "missed_failures": 5258.5,
+     "total_cost": 32301.49632028753
+    },
+    "2.0": {
+     "migrations": 28388.333333333332,
+     "missed_failures": 5258.5,
+     "total_cost": 32301.49632028753
+    },
+    "5.0": {
+     "migrations": 28388.333333333332,
+     "missed_failures": 5258.5,
+     "total_cost": 32301.49632028753
+    }
+   },
+   "P5": {
+    "0.5": {
+     "migrations": 1925.4666666666667,
+     "missed_failures": 5351.8,
+     "total_cost": 31207.037645238986
+    },
+    "1.0": {
+     "migrations": 1851.5333333333333,
+     "missed_failures": 5350.9,
+     "total_cost": 31180.750465975983
+    },
+    "2.0": {
+     "migrations": 1851.5333333333333,
+     "missed_failures": 5350.9,
+     "total_cost": 31180.750465975983
+    },
+    "5.0": {
+     "migrations": 1851.5333333333333,
+     "missed_failures": 5350.9,
+     "total_cost": 31180.750465975983
+    }
+   },
+   "P6": {
+    "0.5": {
+     "migrations": 34287.23333333333,
+     "missed_failures": 5176.166666666667,
+     "total_cost": 35875.71750523197
+    },
+    "1.0": {
+     "migrations": 44189.4,
+     "missed_failures": 5149.2,
+     "total_cost": 40239.095470518434
+    },
+    "2.0": {
+     "migrations": 64478.8,
+     "missed_failures": 5146.266666666666,
+     "total_cost": 49697.849637626685
+    },
+    "5.0": {
+     "migrations": 120611.36666666667,
+     "missed_failures": 5081.833333333333,
+     "total_cost": 79415.48575938115
+    }
+   },
+   "P7": {
+    "0.5": {
+     "migrations": 6308.933333333333,
+     "missed_failures": 1166.3666666666666,
+     "total_cost": 7395.862885698215
+    },
+    "1.0": {
+     "migrations": 6308.933333333333,
+     "missed_failures": 1166.3666666666666,
+     "total_cost": 7395.862885698215
+    },
+    "2.0": {
+     "migrations": 6308.933333333333,
+     "missed_failures": 1166.3666666666666,
+     "total_cost": 7395.862885698215
+    },
+    "5.0": {
+     "migrations": 6308.933333333333,
+     "missed_failures": 1166.3666666666666,
+     "total_cost": 7395.862885698215
+    }
+   },
+   "P8": {
+    "0.5": {
+     "migrations": 111903.86666666667,
+     "missed_failures": 5810.333333333333,
+     "total_cost": 53466.08242214356
+    },
+    "1.0": {
+     "migrations": 222204.0,
+     "missed_failures": 5709.566666666667,
+     "total_cost": 76082.7667771904
+    },
+    "2.0": {
+     "migrations": 442884.56666666665,
+     "missed_failures": 5557.866666666667,
+     "total_cost": 129223.34596303283
+    },
+    "5.0": {
+     "migrations": 1105793.7333333334,
+     "missed_failures": 5212.3,
+     "total_cost": 321869.7556803774
+    }
+   }
+  },
+  "normalised_area": {
+   "P1": 3.8591050810149463,
+   "P2": 3.725992458181986,
+   "P3": 0.9511691747847419,
+   "P4": 0.9288097788007559,
+   "P5": 0.8966971869784532,
+   "P6": 1.457357555410462,
+   "P7": 0.21266351573291242,
+   "P8": 4.030062433262537
+  }
+ },
+ "B1-low": {
+  "p0_cost": 32548.1,
+  "points": {
+   "P0": {
+    "0.0": {
+     "migrations": 0.0,
+     "missed_failures": 5856.933333333333,
+     "total_cost": 32548.1
+    }
+   },
+   "P1": {
+    "0.5": {
+     "migrations": 43753.76666666667,
+     "missed_failures": 4910.266666666666,
+     "total_cost": 52818.56023257716
+    },
+    "1.0": {
+     "migrations": 80852.86666666667,
+     "missed_failures": 4722.9,
+     "total_cost": 77231.80924302143
+    },
+    "2.0": {
+     "migrations": 156661.86666666667,
+     "missed_failures": 4556.633333333333,
+     "total_cost": 128052.13728189316
+    },
+    "5.0": {
+     "migrations": 345138.7,
+     "missed_failures": 4321.866666666667,
+     "total_cost": 289813.6322956708
+    }
+   },
+   "P2": {
+    "0.5": {
+     "migrations": 41068.433333333334,
+     "missed_failures": 4936.2,
+     "total_cost": 51676.419457580756
+    },
+    "1.0": {
+     "migrations": 75260.8,
+     "missed_failures": 4753.166666666667,
+     "total_cost": 74897.69420674592
+    },
+    "2.0": {
+     "migrations": 147494.16666666666,
+     "missed_failures": 4565.933333333333,
+     "total_cost": 123849.15952948801
+    },
+    "5.0": {
+     "migrations": 334353.13333333336,
+     "missed_failures": 4338.533333333334,
+     "total_cost": 279900.6917207578
+    }
+   },
+   "P3": {
+    "0.5": {
+     "migrations": 5257.833333333333,
+     "missed_failures": 5579.966666666666,
+     "total_cost": 32005.370461996692
+    },
+    "1.0": {
+     "migrations": 5257.833333333333,
+     "missed_failures": 5579.966666666666,
+     "total_cost": 32005.370461996692
+    },
+    "2.0": {
+     "migrations": 5257.833333333333,
+     "missed_failures": 5579.966666666666,
+     "total_cost": 32005.370461996692
+    },
+    "5.0": {
+     "migrations": 5257.833333333333,
+     "missed_failures": 5579.966666666666,
+     "total_cost": 32005.370461996692
+    }
+   },
+   "P4": {
+    "0.5": {
+     "migrations": 23826.666666666668,
+     "missed_failures": 5258.7,
+     "total_cost": 30918.249972504134
+    },
+    "1.0": {
+     "migrations": 23826.666666666668,
+     "missed_failures": 5258.7,
+     "total_cost": 30918.249972504134
+    },
+    "2.0": {
+     "migrations": 23826.666666666668,
+     "missed_failures": 5258.7,
+     "total_cost": 30918.249972504134
+    },
+    "5.0": {
+     "migrations": 23826.666666666668,
+     "missed_failures": 5258.7,
+     "total_cost": 30918.249972504134
+    }
+   },
+   "P5": {
+    "0.5": {
+     "migrations": 742.8,
+     "missed_failures": 5314.5,
+     "total_cost": 29756.431268930915
+    },
+    "1.0": {
+     "migrations": 698.5333333333333,
+     "missed_failures": 5314.933333333333,
+     "total_cost": 29758.059057735907
+    },
+    "2.0": {
+     "migrations": 698.5333333333333,
+     "missed_failures": 5314.933333333333,
+     "total_cost": 29758.059057735907
+    },
+    "5.0": {
+     "migrations": 698.5333333333333,
+     "missed_failures": 5314.933333333333,
+     "total_cost": 29758.059057735907
+    }
+   },
+   "P6": {
+    "0.5": {
+     "migrations": 27667.833333333332,
+     "missed_failures": 5177.3,
+     "total_cost": 34859.29089686716
+    },
+    "1.0": {
+     "migrations": 34434.13333333333,
+     "missed_failures": 5132.066666666667,
+     "total_cost": 39182.38146555536
+    },
+    "2.0": {
+     "migrations": 48961.066666666666,
+     "missed_failures": 5118.833333333333,
+     "total_cost": 48618.758383940556
+    },
+    "5.0": {
+     "migrations": 90383.83333333333,
+     "missed_failures": 5042.266666666666,
+     "total_cost": 78336.84057260967
+    }
+   },
+   "P7": {
+    "0.5": {
+     "migrations": 5022.9,
+     "missed_failures": 976.3666666666667,
+     "total_cost": 5839.031478009875
+    },
+    "1.0": {
+     "migrations": 5022.9,
+     "missed_failures": 976.3666666666667,
+     "total_cost": 5839.031478009875
+    },
+    "2.0": {
+     "migrations": 5022.9,
+     "missed_failures": 976.3666666666667,
+     "total_cost": 5839.031478009875
+    },
+    "5.0": {
+     "migrations": 5022.9,
+     "missed_failures": 976.3666666666667,
+     "total_cost": 5839.031478009875
+    }
+   },
+   "P8": {
+    "0.5": {
+     "migrations": 111738.4,
+     "missed_failures": 5694.766666666666,
+     "total_cost": 51229.80454177697
+    },
+    "1.0": {
+     "migrations": 221966.53333333333,
+     "missed_failures": 5552.966666666666,
+     "total_cost": 73687.82021280102
+    },
+    "2.0": {
+     "migrations": 441494.8333333333,
+     "missed_failures": 5336.433333333333,
+     "total_cost": 127013.65220869255
+    },
+    "5.0": {
+     "migrations": 1096940.2666666666,
+     "missed_failures": 4975.133333333333,
+     "total_cost": 319043.1298400405
+    }
+   }
+  },
+  "normalised_area": {
+   "P1": 4.105173507225646,
+   "P2": 3.9725757988000785,
+   "P3": 0.9833253081438454,
+   "P4": 0.9499248795629893,
+   "P5": 0.9142719252769733,
+   "P6": 1.5245168413537755,
+   "P7": 0.17939699945649287,
+   "P8": 4.232581243263298
+  }
+ },
+ "B2": {
+  "p0_cost": 32664.92,
+  "points": {
+   "P0": {
+    "0.0": {
+     "migrations": 0.0,
+     "missed_failures": 5889.34,
+     "total_cost": 32664.92
+    }
+   },
+   "P1": {
+    "0.5": {
+     "migrations": 49506.88,
+     "missed_failures": 4879.86,
+     "total_cost": 52442.40366887877
+    },
+    "1.0": {
+     "migrations": 85906.18,
+     "missed_failures": 4725.9,
+     "total_cost": 76729.04777099004
+    },
+    "2.0": {
+     "migrations": 162439.88,
+     "missed_failures": 4535.3,
+     "total_cost": 126659.88932377617
+    },
+    "5.0": {
+     "migrations": 328284.82,
+     "missed_failures": 4349.26,
+     "total_cost": 286285.3461774341
+    }
+   },
+   "P2": {
+    "0.5": {
+     "migrations": 47030.18,
+     "missed_failures": 4907.66,
+     "total_cost": 51356.8296256792
+    },
+    "1.0": {
+     "migrations": 79698.02,
+     "missed_failures": 4750.12,
+     "total_cost": 74502.62014777109
+    },
+    "2.0": {
+     "migrations": 152029.06,
+     "missed_failures": 4566.2,
+     "total_cost": 122630.30342840616
+    },
+    "5.0": {
+     "migrations": 319603.96,
+     "missed_failures": 4349.28,
+     "total_cost": 276754.20551691536
+    }
+   },
+   "P3": {
+    "0.5": {
+     "migrations": 6911.94,
+     "missed_failures": 5570.4,
+     "total_cost": 32168.583443856827
+    },
+    "1.0": {
+     "migrations": 6911.94,
+     "missed_failures": 5570.4,
+     "total_cost": 32168.583443856827
+    },
+    "2.0": {
+     "migrations": 6911.94,
+     "missed_failures": 5570.4,
+     "total_cost": 32168.583443856827
+    },
+    "5.0": {
+     "migrations": 6911.94,
+     "missed_failures": 5570.4,
+     "total_cost": 32168.583443856827
+    }
+   },
+   "P4": {
+    "0.5": {
+     "migrations": 24068.34,
+     "missed_failures": 5305.64,
+     "total_cost": 30999.561617299045
+    },
+    "1.0": {
+     "migrations": 24068.34,
+     "missed_failures": 5305.64,
+     "total_cost": 30999.561617299045
+    },
+    "2.0": {
+     "migrations": 24068.34,
+     "missed_failures": 5305.64,
+     "total_cost": 30999.561617299045
+    },
+    "5.0": {
+     "migrations": 24068.34,
+     "missed_failures": 5305.64,
+     "total_cost": 30999.561617299045
+    }
+   },
+   "P5": {
+    "0.5": {
+     "migrations": 1025.98,
+     "missed_failures": 5463.26,
+     "total_cost": 30495.89098337393
+    },
+    "1.0": {
+     "migrations": 1021.72,
+     "missed_failures": 5461.54,
+     "total_cost": 30472.543754368806
+    },
+    "2.0": {
+     "migrations": 1021.72,
+     "missed_failures": 5461.54,
+     "total_cost": 30472.543754368806
+    },
+    "5.0": {
+     "migrations": 1021.72,
+     "missed_failures": 5461.54,
+     "total_cost": 30472.543754368806
+    }
+   },
+   "P6": {
+    "0.5": {
+     "migrations": 29562.58,
+     "missed_failures": 5202.08,
+     "total_cost": 35086.11424548881
+    },
+    "1.0": {
+     "migrations": 36415.5,
+     "missed_failures": 5166.94,
+     "total_cost": 39742.22916119777
+    },
+    "2.0": {
+     "migrations": 51926.36,
+     "missed_failures": 5123.94,
+     "total_cost": 49231.42043394449
+    },
+    "5.0": {
+     "migrations": 91449.02,
+     "missed_failures": 5061.9,
+     "total_cost": 80404.83249178132
+    }
+   },
+   "P7": {
+    "0.5": {
+     "migrations": 5047.78,
+     "missed_failures": 976.44,
+     "total_cost": 5841.861398089718
+    },
+    "1.0": {
+     "migrations": 5047.78,
+     "missed_failures": 976.44,
+     "total_cost": 5841.861398089718
+    },
+    "2.0": {
+     "migrations": 5047.78,
+     "missed_failures": 976.44,
+     "total_cost": 5841.861398089718
+    },
+    "5.0": {
+     "migrations": 5047.78,
+     "missed_failures": 976.44,
+     "total_cost": 5841.861398089718
+    }
+   },
+   "P8": {
+    "0.5": {
+     "migrations": 111655.8,
+     "missed_failures": 5726.3,
+     "total_cost": 51383.01472665916
+    },
+    "1.0": {
+     "migrations": 221757.2,
+     "missed_failures": 5600.44,
+     "total_cost": 73936.71436944995
+    },
+    "2.0": {
+     "migrations": 441040.36,
+     "missed_failures": 5378.78,
+     "total_cost": 127236.73882436758
+    },
+    "5.0": {
+     "migrations": 1094439.24,
+     "missed_failures": 5039.48,
+     "total_cost": 319364.3240169146
+    }
+   }
+  },
+  "normalised_area": {
+   "P1": 4.047738107349127,
+   "P2": 3.921048447418762,
+   "P3": 0.9848052113354886,
+   "P4": 0.9490169153115651,
+   "P5": 0.932990433238223,
+   "P6": 1.5444208168360094,
+   "P7": 0.17884205435340783,
+   "P8": 4.224787203964637
+  }
+ },
+ "C": {
+  "p0_cost": 46626.28,
+  "points": {
+   "P0": {
+    "0.0": {
+     "migrations": 0.0,
+     "missed_failures": 6500.52,
+     "total_cost": 46626.28
+    }
+   },
+   "P1": {
+    "0.5": {
+     "migrations": 103685.94,
+     "missed_failures": 5184.98,
+     "total_cost": 63550.00413630596
+    },
+    "1.0": {
+     "migrations": 199557.7,
+     "missed_failures": 4701.68,
+     "total_cost": 88366.91696911525
+    },
+    "2.0": {
+     "migrations": 288910.08,
+     "missed_failures": 4654.1,
+     "total_cost": 136527.88106219418
+    },
+    "5.0": {
+     "migrations": 486486.98,
+     "missed_failures": 4569.8,
+     "total_cost": 291107.53276796377
+    }
+   },
+   "P2": {
+    "0.5": {
+     "migrations": 98408.34,
+     "missed_failures": 5219.18,
+     "total_cost": 62383.26412205218
+    },
+    "1.0": {
+     "migrations": 191089.8,
+     "missed_failures": 4716.56,
+     "total_cost": 85896.5275491599
+    },
+    "2.0": {
+     "migrations": 283294.78,
+     "missed_failures": 4633.26,
+     "total_cost": 132881.23130006844
+    },
+    "5.0": {
+     "migrations": 471323.76,
+     "missed_failures": 4574.64,
+     "total_cost": 280503.5779823712
+    }
+   },
+   "P3": {
+    "0.5": {
+     "migrations": 45642.62,
+     "missed_failures": 5565.52,
+     "total_cost": 48937.526871881615
+    },
+    "1.0": {
+     "migrations": 45553.6,
+     "missed_failures": 5550.82,
+     "total_cost": 48811.114355675476
+    },
+    "2.0": {
+     "migrations": 45553.6,
+     "missed_failures": 5550.82,
+     "total_cost": 48811.114355675476
+    },
+    "5.0": {
+     "migrations": 45553.6,
+     "missed_failures": 5550.82,
+     "total_cost": 48811.114355675476
+    }
+   },
+   "P4": {
+    "0.5": {
+     "migrations": 73498.82,
+     "missed_failures": 5195.32,
+     "total_cost": 44243.77420139193
+    },
+    "1.0": {
+     "migrations": 73462.34,
+     "missed_failures": 5227.84,
+     "total_cost": 44409.64468982337
+    },
+    "2.0": {
+     "migrations": 73462.34,
+     "missed_failures": 5227.84,
+     "total_cost": 44409.64468982337
+    },
+    "5.0": {
+     "migrations": 73462.34,
+     "missed_failures": 5227.84,
+     "total_cost": 44409.64468982337
+    }
+   },
+   "P5": {
+    "0.5": {
+     "migrations": 4193.08,
+     "missed_failures": 5649.92,
+     "total_cost": 39254.6404818014
+    },
+    "1.0": {
+     "migrations": 4233.36,
+     "missed_failures": 5647.84,
+     "total_cost": 39255.94891484313
+    },
+    "2.0": {
+     "migrations": 4233.36,
+     "missed_failures": 5647.84,
+     "total_cost": 39255.94891484313
+    },
+    "5.0": {
+     "migrations": 4233.36,
+     "missed_failures": 5647.84,
+     "total_cost": 39255.94891484313
+    }
+   },
+   "P6": {
+    "0.5": {
+     "migrations": 80217.08,
+     "missed_failures": 5201.18,
+     "total_cost": 48176.64485910528
+    },
+    "1.0": {
+     "migrations": 98560.82,
+     "missed_failures": 5085.64,
+     "total_cost": 52770.88004911108
+    },
+    "2.0": {
+     "migrations": 120764.76,
+     "missed_failures": 5069.94,
+     "total_cost": 62595.55203281261
+    },
+    "5.0": {
+     "migrations": 161553.88,
+     "missed_failures": 5065.32,
+     "total_cost": 92225.56052242377
+    }
+   },
+   "P7": {
+    "0.5": {
+     "migrations": 8431.28,
+     "missed_failures": 1405.54,
+     "total_cost": 11103.86744186975
+    },
+    "1.0": {
+     "migrations": 8431.28,
+     "missed_failures": 1405.54,
+     "total_cost": 11103.86744186975
+    },
+    "2.0": {
+     "migrations": 8431.28,
+     "missed_failures": 1405.54,
+     "total_cost": 11103.86744186975
+    },
+    "5.0": {
+     "migrations": 8431.28,
+     "missed_failures": 1405.54,
+     "total_cost": 11103.86744186975
+    }
+   },
+   "P8": {
+    "0.5": {
+     "migrations": 110866.82,
+     "missed_failures": 6376.9,
+     "total_cost": 64864.07540180646
+    },
+    "1.0": {
+     "migrations": 220347.32,
+     "missed_failures": 6272.84,
+     "total_cost": 87015.67037905054
+    },
+    "2.0": {
+     "migrations": 439779.48,
+     "missed_failures": 6080.4,
+     "total_cost": 139355.0167942303
+    },
+    "5.0": {
+     "migrations": 1099930.86,
+     "missed_failures": 5663.24,
+     "total_cost": 328527.04710516846
+    }
+   }
+  },
+  "normalised_area": {
+   "P1": 3.041255601625423,
+   "P2": 2.9489559046136895,
+   "P3": 1.0472665058262889,
+   "P4": 0.951924080017036,
+   "P5": 0.8419233096881564,
+   "P6": 1.3589600586583979,
+   "P7": 0.23814611506364547,
+   "P8": 3.217645915111614
+  }
+ },
+ "D": {
+  "p0_cost": 39053.26666666667,
+  "points": {
+   "P0": {
+    "0.0": {
+     "migrations": 0.0,
+     "missed_failures": 6075.166666666667,
+     "total_cost": 39053.26666666667
+    }
+   },
+   "P1": {
+    "0.5": {
+     "migrations": 66451.13333333333,
+     "missed_failures": 4992.033333333334,
+     "total_cost": 54696.23379115947
+    },
+    "1.0": {
+     "migrations": 120169.0,
+     "missed_failures": 4895.466666666666,
+     "total_cost": 79232.47349005756
+    },
+    "2.0": {
+     "migrations": 228846.43333333332,
+     "missed_failures": 4692.933333333333,
+     "total_cost": 129871.54052271256
+    },
+    "5.0": {
+     "migrations": 502845.3,
+     "missed_failures": 4470.066666666667,
+     "total_cost": 292934.6747700947
+    }
+   },
+   "P2": {
+    "0.5": {
+     "migrations": 61744.833333333336,
+     "missed_failures": 5003.666666666667,
+     "total_cost": 52976.03458839028
+    },
+    "1.0": {
+     "migrations": 112518.93333333333,
+     "missed_failures": 4866.5,
+     "total_cost": 76252.02471656392
+    },
+    "2.0": {
+     "migrations": 217000.86666666667,
+     "missed_failures": 4742.4,
+     "total_cost": 125800.10446710046
+    },
+    "5.0": {
+     "migrations": 487085.63333333336,
+     "missed_failures": 4492.9,
+     "total_cost": 282408.04491622053
+    }
+   },
+   "P3": {
+    "0.5": {
+     "migrations": 18321.4,
+     "missed_failures": 5401.066666666667,
+     "total_cost": 36828.65022346372
+    },
+    "1.0": {
+     "migrations": 18321.4,
+     "missed_failures": 5401.066666666667,
+     "total_cost": 36828.65022346372
+    },
+    "2.0": {
+     "migrations": 18321.4,
+     "missed_failures": 5401.066666666667,
+     "total_cost": 36828.65022346372
+    },
+    "5.0": {
+     "migrations": 18321.4,
+     "missed_failures": 5401.066666666667,
+     "total_cost": 36828.65022346372
+    }
+   },
+   "P4": {
+    "0.5": {
+     "migrations": 40335.46666666667,
+     "missed_failures": 5171.7,
+     "total_cost": 35292.620639686706
+    },
+    "1.0": {
+     "migrations": 40335.46666666667,
+     "missed_failures": 5171.7,
+     "total_cost": 35292.620639686706
+    },
+    "2.0": {
+     "migrations": 40335.46666666667,
+     "missed_failures": 5171.7,
+     "total_cost": 35292.620639686706
+    },
+    "5.0": {
+     "migrations": 40335.46666666667,
+     "missed_failures": 5171.7,
+     "total_cost": 35292.620639686706
+    }
+   },
+   "P5": {
+    "0.5": {
+     "migrations": 2668.0333333333333,
+     "missed_failures": 5353.2,
+     "total_cost": 33255.45561111716
+    },
+    "1.0": {
+     "migrations": 2598.0666666666666,
+     "missed_failures": 5344.433333333333,
+     "total_cost": 33176.31129158687
+    },
+    "2.0": {
+     "migrations": 2598.0666666666666,
+     "missed_failures": 5344.433333333333,
+     "total_cost": 33176.31129158687
+    },
+    "5.0": {
+     "migrations": 2598.0666666666666,
+     "missed_failures": 5344.433333333333,
+     "total_cost": 33176.31129158687
+    }
+   },
+   "P6": {
+    "0.5": {
+     "migrations": 46199.96666666667,
+     "missed_failures": 5107.2,
+     "total_cost": 39539.252965839914
+    },
+    "1.0": {
+     "migrations": 58774.7,
+     "missed_failures": 5072.933333333333,
+     "total_cost": 45107.65963672817
+    },
+    "2.0": {
+     "migrations": 84469.06666666667,
+     "missed_failures": 5060.666666666667,
+     "total_cost": 57060.228028923346
+    },
+    "5.0": {
+     "migrations": 154896.4,
+     "missed_failures": 5019.833333333333,
+     "total_cost": 94603.6074239358
+    }
+   },
+   "P7": {
+    "0.5": {
+     "migrations": 6723.966666666666,
+     "missed_failures": 1194.9333333333334,
+     "total_cost": 8165.620728916308
+    },
+    "1.0": {
+     "migrations": 6723.966666666666,
+     "missed_failures": 1194.9333333333334,
+     "total_cost": 8165.620728916308
+    },
+    "2.0": {
+     "migrations": 6723.966666666666,
+     "missed_failures": 1194.9333333333334,
+     "total_cost": 8165.620728916308
+    },
+    "5.0": {
+     "migrations": 6723.966666666666,
+     "missed_failures": 1194.9333333333334,
+     "total_cost": 8165.620728916308
+    }
+   },
+   "P8": {
+    "0.5": {
+     "migrations": 111899.23333333334,
+     "missed_failures": 5976.9,
+     "total_cost": 57734.283374089515
+    },
+    "1.0": {
+     "migrations": 222320.0,
+     "missed_failures": 5873.5,
+     "total_cost": 79964.31898087733
+    },
+    "2.0": {
+     "migrations": 443397.13333333336,
+     "missed_failures": 5723.233333333334,
+     "total_cost": 132957.54572560746
+    },
+    "5.0": {
+     "migrations": 1104979.2333333334,
+     "missed_failures": 5340.533333333334,
+     "total_cost": 324411.8855369603
+    }
+   }
+  },
+  "normalised_area": {
+   "P1": 3.476209172223882,
+   "P2": 3.3565390374072877,
+   "P3": 0.9430363543672076,
+   "P4": 0.9037047000682837,
+   "P5": 0.8498194013305601,
+   "P6": 1.49270440684503,
+   "P7": 0.20908931379832435,
+   "P8": 3.6815469954988354
+  }
+ },
+ "E1": {
+  "p0_cost": 38496.08415574986,
+  "points": {
+   "P0": {
+    "0.0": {
+     "migrations": 0.0,
+     "missed_failures": 5856.933333333333,
+     "total_cost": 38496.08415574986
+    }
+   },
+   "P1": {
+    "0.5": {
+     "migrations": 43753.76666666667,
+     "missed_failures": 4910.266666666666,
+     "total_cost": 58822.22021386997
+    },
+    "1.0": {
+     "migrations": 80852.86666666667,
+     "missed_failures": 4722.9,
+     "total_cost": 82808.91018409186
+    },
+    "2.0": {
+     "migrations": 156661.86666666667,
+     "missed_failures": 4556.633333333333,
+     "total_cost": 133447.23550472033
+    },
+    "5.0": {
+     "migrations": 345138.7,
+     "missed_failures": 4321.866666666667,
+     "total_cost": 295368.2422056804
+    }
+   },
+   "P2": {
+    "0.5": {
+     "migrations": 41068.433333333334,
+     "missed_failures": 4936.2,
+     "total_cost": 57632.00476163348
+    },
+    "1.0": {
+     "migrations": 75260.8,
+     "missed_failures": 4753.166666666667,
+     "total_cost": 80732.3853521911
+    },
+    "2.0": {
+     "migrations": 147494.16666666666,
+     "missed_failures": 4565.933333333333,
+     "total_cost": 129466.14688386318
+    },
+    "5.0": {
+     "migrations": 334353.13333333336,
+     "missed_failures": 4338.533333333334,
+     "total_cost": 285513.3031017238
+    }
+   },
+   "P3": {
+    "0.5": {
+     "migrations": 6880.666666666667,
+     "missed_failures": 5504.466666666666,
+     "total_cost": 39384.442445944966
+    },
+    "1.0": {
+     "migrations": 6880.666666666667,
+     "missed_failures": 5504.466666666666,
+     "total_cost": 39384.442445944966
+    },
+    "2.0": {
+     "migrations": 6880.666666666667,
+     "missed_failures": 5504.466666666666,
+     "total_cost": 39384.442445944966
+    },
+    "5.0": {
+     "migrations": 6880.666666666667,
+     "missed_failures": 5504.466666666666,
+     "total_cost": 39384.442445944966
+    }
+   },
+   "P4": {
+    "0.5": {
+     "migrations": 16434.766666666666,
+     "missed_failures": 5216.433333333333,
+     "total_cost": 39400.473166483265
+    },
+    "1.0": {
+     "migrations": 16434.766666666666,
+     "missed_failures": 5216.433333333333,
+     "total_cost": 39400.473166483265
+    },
+    "2.0": {
+     "migrations": 16434.766666666666,
+     "missed_failures": 5216.433333333333,
+     "total_cost": 39400.473166483265
+    },
+    "5.0": {
+     "migrations": 16434.766666666666,
+     "missed_failures": 5216.433333333333,
+     "total_cost": 39400.473166483265
+    }
+   },
+   "P5": {
+    "0.5": {
+     "migrations": 1053.3,
+     "missed_failures": 5280.366666666667,
+     "total_cost": 35309.6540951341
+    },
+    "1.0": {
+     "migrations": 1051.2333333333333,
+     "missed_failures": 5276.9,
+     "total_cost": 35256.52965022727
+    },
+    "2.0": {
+     "migrations": 1051.2333333333333,
+     "missed_failures": 5276.9,
+     "total_cost": 35256.52965022727
+    },
+    "5.0": {
+     "migrations": 1051.2333333333333,
+     "missed_failures": 5276.9,
+     "total_cost": 35256.52965022727
+    }
+   },
+   "P6": {
+    "0.5": {
+     "migrations": 21484.0,
+     "missed_failures": 5144.2,
+     "total_cost": 42871.04247251929
+    },
+    "1.0": {
+     "migrations": 28425.266666666666,
+     "missed_failures": 5103.4,
+     "total_cost": 47214.07777583807
+    },
+    "2.0": {
+     "migrations": 43015.666666666664,
+     "missed_failures": 5066.4,
+     "total_cost": 56444.89063449627
+    },
+    "5.0": {
+     "migrations": 84545.93333333333,
+     "missed_failures": 5004.4,
+     "total_cost": 86238.83214261406
+    }
+   },
+   "P7": {
+    "0.5": {
+     "migrations": 5189.166666666667,
+     "missed_failures": 895.4666666666667,
+     "total_cost": 14956.823541829935
+    },
+    "1.0": {
+     "migrations": 5189.166666666667,
+     "missed_failures": 895.4666666666667,
+     "total_cost": 14956.823541829935
+    },
+    "2.0": {
+     "migrations": 5189.166666666667,
+     "missed_failures": 895.4666666666667,
+     "total_cost": 14956.823541829935
+    },
+    "5.0": {
+     "migrations": 5189.166666666667,
+     "missed_failures": 895.4666666666667,
+     "total_cost": 14956.823541829935
+    }
+   },
+   "P8": {
+    "0.5": {
+     "migrations": 111738.4,
+     "missed_failures": 5694.766666666666,
+     "total_cost": 57388.76542671544
+    },
+    "1.0": {
+     "migrations": 221966.53333333333,
+     "missed_failures": 5552.966666666666,
+     "total_cost": 79830.98874765038
+    },
+    "2.0": {
+     "migrations": 441494.8333333333,
+     "missed_failures": 5336.433333333333,
+     "total_cost": 133256.16436741658
+    },
+    "5.0": {
+     "migrations": 1096940.2666666666,
+     "missed_failures": 4975.133333333333,
+     "total_cost": 325767.8275011105
+    }
+   }
+  },
+  "normalised_area": {
+   "P1": 3.615661776936829,
+   "P2": 3.5076921049546947,
+   "P3": 1.0230765884291226,
+   "P4": 1.0234930131354238,
+   "P5": 0.916054878030239,
+   "P6": 1.4949876925460992,
+   "P7": 0.3885284404854449,
+   "P8": 3.742158513078295
+  }
+ },
+ "E2": {
+  "p0_cost": 33467.92925958047,
+  "points": {
+   "P0": {
+    "0.0": {
+     "migrations": 0.0,
+     "missed_failures": 5856.933333333333,
+     "total_cost": 33467.92925958048
+    }
+   },
+   "P1": {
+    "0.5": {
+     "migrations": 43753.76666666667,
+     "missed_failures": 4910.266666666666,
+     "total_cost": 53976.00239472476
+    },
+    "1.0": {
+     "migrations": 80852.86666666667,
+     "missed_failures": 4722.9,
+     "total_cost": 78281.58244580454
+    },
+    "2.0": {
+     "migrations": 156661.86666666667,
+     "missed_failures": 4556.633333333333,
+     "total_cost": 129093.43001265163
+    },
+    "5.0": {
+     "migrations": 345138.7,
+     "missed_failures": 4321.866666666667,
+     "total_cost": 291008.15598322375
+    }
+   },
+   "P2": {
+    "0.5": {
+     "migrations": 41068.433333333334,
+     "missed_failures": 4936.2,
+     "total_cost": 52818.20295683428
+    },
+    "1.0": {
+     "migrations": 75260.8,
+     "missed_failures": 4753.166666666667,
+     "total_cost": 76044.4341394289
+    },
+    "2.0": {
+     "migrations": 147494.16666666666,
+     "missed_failures": 4565.933333333333,
+     "total_cost": 124984.06484678265
+    },
+    "5.0": {
+     "migrations": 334353.13333333336,
+     "missed_failures": 4338.533333333334,
+     "total_cost": 281140.4212630568
+    }
+   },
+   "P3": {
+    "0.5": {
+     "migrations": 4240.466666666666,
+     "missed_failures": 5609.666666666667,
+     "total_cost": 33329.740818679595
+    },
+    "1.0": {
+     "migrations": 4240.466666666666,
+     "missed_failures": 5609.666666666667,
+     "total_cost": 33329.740818679595
+    },
+    "2.0": {
+     "migrations": 4240.466666666666,
+     "missed_failures": 5609.666666666667,
+     "total_cost": 33329.740818679595
+    },
+    "5.0": {
+     "migrations": 4240.466666666666,
+     "missed_failures": 5609.666666666667,
+     "total_cost": 33329.740818679595
+    }
+   },
+   "P4": {
+    "0.5": {
+     "migrations": 15518.833333333334,
+     "missed_failures": 5250.3,
+     "total_cost": 32937.0603232913
+    },
+    "1.0": {
+     "migrations": 15518.833333333334,
+     "missed_failures": 5250.3,
+     "total_cost": 32937.0603232913
+    },
+    "2.0": {
+     "migrations": 15518.833333333334,
+     "missed_failures": 5250.3,
+     "total_cost": 32937.0603232913
+    },
+    "5.0": {
+     "migrations": 15518.833333333334,
+     "missed_failures": 5250.3,
+     "total_cost": 32937.0603232913
+    }
+   },
+   "P5": {
+    "0.5": {
+     "migrations": 832.8666666666667,
+     "missed_failures": 5322.733333333334,
+     "total_cost": 30798.111632639488
+    },
+    "1.0": {
+     "migrations": 796.3666666666667,
+     "missed_failures": 5320.366666666667,
+     "total_cost": 30778.388615691463
+    },
+    "2.0": {
+     "migrations": 796.3666666666667,
+     "missed_failures": 5320.366666666667,
+     "total_cost": 30778.388615691463
+    },
+    "5.0": {
+     "migrations": 796.3666666666667,
+     "missed_failures": 5320.366666666667,
+     "total_cost": 30778.388615691463
+    }
+   },
+   "P6": {
+    "0.5": {
+     "migrations": 20758.333333333332,
+     "missed_failures": 5181.2,
+     "total_cost": 36697.96070597183
+    },
+    "1.0": {
+     "migrations": 27807.933333333334,
+     "missed_failures": 5127.166666666667,
+     "total_cost": 41037.58275192082
+    },
+    "2.0": {
+     "migrations": 42523.26666666667,
+     "missed_failures": 5103.433333333333,
+     "total_cost": 50489.41092525887
+    },
+    "5.0": {
+     "migrations": 83820.36666666667,
+     "missed_failures": 5028.8,
+     "total_cost": 80243.05904285827
+    }
+   },
+   "P7": {
+    "0.5": {
+     "migrations": 5189.166666666667,
+     "missed_failures": 895.4666666666667,
+     "total_cost": 9191.885377471046
+    },
+    "1.0": {
+     "migrations": 5189.166666666667,
+     "missed_failures": 895.4666666666667,
+     "total_cost": 9191.885377471046
+    },
+    "2.0": {
+     "migrations": 5189.166666666667,
+     "missed_failures": 895.4666666666667,
+     "total_cost": 9191.885377471046
+    },
+    "5.0": {
+     "migrations": 5189.166666666667,
+     "missed_failures": 895.4666666666667,
+     "total_cost": 9191.885377471046
+    }
+   },
+   "P8": {
+    "0.5": {
+     "migrations": 111738.4,
+     "missed_failures": 5694.766666666666,
+     "total_cost": 52283.22648939208
+    },
+    "1.0": {
+     "migrations": 221966.53333333333,
+     "missed_failures": 5552.966666666666,
+     "total_cost": 74777.6890958822
+    },
+    "2.0": {
+     "migrations": 441494.8333333333,
+     "missed_failures": 5336.433333333333,
+     "total_cost": 128187.32366971167
+    },
+    "5.0": {
+     "migrations": 1096940.2666666666,
+     "missed_failures": 4975.133333333333,
+     "total_cost": 320539.36608577444
+    }
+   }
+  },
+  "normalised_area": {
+   "P1": 4.024970083702945,
+   "P2": 3.898064722876138,
+   "P3": 0.9958710190932616,
+   "P4": 0.9841379808062906,
+   "P5": 0.9197269716569996,
+   "P6": 1.5384396843613615,
+   "P7": 0.27464756800989687,
+   "P8": 4.151945052196214
+  }
+ },
+ "E3": {
+  "p0_cost": 32163.41653260684,
+  "points": {
+   "P0": {
+    "0.0": {
+     "migrations": 0.0,
+     "missed_failures": 5856.933333333333,
+     "total_cost": 32163.416532606836
+    }
+   },
+   "P1": {
+    "0.5": {
+     "migrations": 43753.76666666667,
+     "missed_failures": 4910.266666666666,
+     "total_cost": 52514.46436085892
+    },
+    "1.0": {
+     "migrations": 80852.86666666667,
+     "missed_failures": 4722.9,
+     "total_cost": 76938.58266069148
+    },
+    "2.0": {
+     "migrations": 156661.86666666667,
+     "missed_failures": 4556.633333333333,
+     "total_cost": 127773.03595150939
+    },
+    "5.0": {
+     "migrations": 345138.7,
+     "missed_failures": 4321.866666666667,
+     "total_cost": 289561.35663694853
+    }
+   },
+   "P2": {
+    "0.5": {
+     "migrations": 41068.433333333334,
+     "missed_failures": 4936.2,
+     "total_cost": 51371.83854731038
+    },
+    "1.0": {
+     "migrations": 75260.8,
+     "missed_failures": 4753.166666666667,
+     "total_cost": 74607.04242318583
+    },
+    "2.0": {
+     "migrations": 147494.16666666666,
+     "missed_failures": 4565.933333333333,
+     "total_cost": 123574.172241994
+    },
+    "5.0": {
+     "migrations": 334353.13333333336,
+     "missed_failures": 4338.533333333334,
+     "total_cost": 279653.70971745055
+    }
+   },
+   "P3": {
+    "0.5": {
+     "migrations": 4999.0,
+     "missed_failures": 5581.8,
+     "total_cost": 31613.742718273876
+    },
+    "1.0": {
+     "migrations": 4999.0,
+     "missed_failures": 5581.8,
+     "total_cost": 31613.742718273876
+    },
+    "2.0": {
+     "migrations": 4999.0,
+     "missed_failures": 5581.8,
+     "total_cost": 31613.742718273876
+    },
+    "5.0": {
+     "migrations": 4999.0,
+     "missed_failures": 5581.8,
+     "total_cost": 31613.742718273876
+    }
+   },
+   "P4": {
+    "0.5": {
+     "migrations": 20982.9,
+     "missed_failures": 5247.2,
+     "total_cost": 30457.047949024043
+    },
+    "1.0": {
+     "migrations": 20982.9,
+     "missed_failures": 5247.2,
+     "total_cost": 30457.047949024043
+    },
+    "2.0": {
+     "migrations": 20982.9,
+     "missed_failures": 5247.2,
+     "total_cost": 30457.047949024043
+    },
+    "5.0": {
+     "migrations": 20982.9,
+     "missed_failures": 5247.2,
+     "total_cost": 30457.047949024043
+    }
+   },
+   "P5": {
+    "0.5": {
+     "migrations": 707.2666666666667,
+     "missed_failures": 5307.5,
+     "total_cost": 29376.59586615313
+    },
+    "1.0": {
+     "migrations": 668.4666666666667,
+     "missed_failures": 5311.233333333334,
+     "total_cost": 29390.697199369217
+    },
+    "2.0": {
+     "migrations": 668.4666666666667,
+     "missed_failures": 5311.233333333334,
+     "total_cost": 29390.697199369217
+    },
+    "5.0": {
+     "migrations": 668.4666666666667,
+     "missed_failures": 5311.233333333334,
+     "total_cost": 29390.697199369217
+    }
+   },
+   "P6": {
+    "0.5": {
+     "migrations": 25328.633333333335,
+     "missed_failures": 5190.5,
+     "total_cost": 34545.04567414433
+    },
+    "1.0": {
+     "migrations": 32157.033333333333,
+     "missed_failures": 5132.633333333333,
+     "total_cost": 38874.53374698455
+    },
+    "2.0": {
+     "migrations": 46810.46666666667,
+     "missed_failures": 5121.8,
+     "total_cost": 48328.03879893873
+    },
+    "5.0": {
+     "migrations": 88030.93333333333,
+     "missed_failures": 5041.7,
+     "total_cost": 78035.38116329236
+    }
+   },
+   "P7": {
+    "0.5": {
+     "migrations": 5116.0,
+     "missed_failures": 919.9666666666667,
+     "total_cost": 5982.748982445428
+    },
+    "1.0": {
+     "migrations": 5116.0,
+     "missed_failures": 919.9666666666667,
+     "total_cost": 5982.748982445428
+    },
+    "2.0": {
+     "migrations": 5116.0,
+     "missed_failures": 919.9666666666667,
+     "total_cost": 5982.748982445428
+    },
+    "5.0": {
+     "migrations": 5116.0,
+     "missed_failures": 919.9666666666667,
+     "total_cost": 5982.748982445428
+    }
+   },
+   "P8": {
+    "0.5": {
+     "migrations": 111738.4,
+     "missed_failures": 5694.766666666666,
+     "total_cost": 50864.63414805546
+    },
+    "1.0": {
+     "migrations": 221966.53333333333,
+     "missed_failures": 5552.966666666666,
+     "total_cost": 73337.19930788409
+    },
+    "2.0": {
+     "migrations": 441494.8333333333,
+     "missed_failures": 5336.433333333333,
+     "total_cost": 126680.94460703948
+    },
+    "5.0": {
+     "migrations": 1096940.2666666666,
+     "missed_failures": 4975.133333333333,
+     "total_cost": 318757.08286283136
+    }
+   }
+  },
+  "normalised_area": {
+   "P1": 4.145511708655551,
+   "P2": 4.011427373795817,
+   "P3": 0.9829099681069109,
+   "P4": 0.9469469115057195,
+   "P5": 0.9137267711418976,
+   "P6": 1.5333748211385223,
+   "P7": 0.18601099097728618,
+   "P8": 4.272828892690797
+  }
+ }
+}

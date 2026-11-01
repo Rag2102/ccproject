@@ -307,7 +307,8 @@ def phase_failure(m, w, shard):
 
 def phase_collect():
     for phase in ("ablation", "robust"):
-        files = [f for f in (OUT / phase).rglob("s*.json")]
+        # robust/tuning/ holds P2 tuning files such as sigma_2_A3.json, not run records
+        files = [f for f in (OUT / phase).rglob("s*.json") if f.parent.name != "tuning"]
         if not files:
             continue
         rows = []
