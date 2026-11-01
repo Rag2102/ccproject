@@ -34,3 +34,26 @@ P0+avoid and P4+avoid beat never migrating in every seed of every cell (100%). P
 - One marking share (2%).
 - Marked hosts keep their resident VMs, so the effect builds up as VMs turn over; a shorter horizon would show less.
 - Exploratory and post-freeze: it informs G3's discussion and the paper's framing, not the confirmatory verdicts.
+
+## Confirmation on fresh seeds (ADR-011, 1 Nov 2026)
+
+Rule committed before the runs (`0e5517d`). Seeds 2001-2050, 2% budget, oracle predictor. **Verdict: confirmed, 6 of 6.** Paired difference in saving, points [95% BCa], all Holm p < 0.001:
+
+| Regime | P0+avoid against P0 | against P4 (BAM) | against P5 |
+| --- | --- | --- | --- |
+| B1 | +11.2 [10.3, 12.1] | +7.5 [7.0, 8.0] | +3.1 [2.4, 3.9] |
+| B2 | +8.9 [8.2, 9.6] | +3.9 [3.4, 4.3] | +2.5 [2.0, 3.1] |
+
+Secondary, not part of the verdict (saving against never migrating, %; P5 and the guard not tested here):
+
+| Predictor | B1 P0+avoid | B1 P4 | B2 P0+avoid | B2 P4 |
+| --- | --- | --- | --- | --- |
+| Oracle | +11.2 | +3.7 | +8.9 | +5.1 |
+| Noise σ = 0.5 | +7.4 | −55.2 | +6.4 | −52.5 |
+| Noise σ = 1 | +3.8 | −248.2 | +3.1 | −246.9 |
+| Noise σ = 2 | +2.3 | −419.2 | +1.0 | −427.9 |
+| Shuffled scores | +1.6 [0.7, 2.3] | −86.9 | +0.1 [−0.2, 0.4] | −90.0 |
+
+Rejected arrivals per run, P0 to P0+avoid: B1 169 to 175, B2 1.5 to 3.4. Adding BAM to avoidance: +0.3 points in B1, +0.9 in B2 (not tested for significance).
+
+Reading: avoidance's benefit depends on the predictor and shrinks quickly with noise, but it fails gently because it spends nothing. BAM uses p in its stopping rule, so noise makes it migrate far more (about 25,000 to 860,000 migrations in B1 at σ = 2); these are uncalibrated noisy scores with no recalibration, a harsh case. The shuffled control leaves +1.6 in B1, not zero as ADR-011 expected, so marking hosts at random has a small effect there; not explained yet.

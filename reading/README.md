@@ -16,4 +16,4 @@ Each note uses the v5 template: problem, data, baseline, metric, claim, limitati
 | [zhang2024deoxys.md](zhang2024deoxys.md) | Deoxys, SoCC 2024 (arXiv copy; 28 Oct) | sections 1-5 and 8-10; 6-7 skimmed |
 | [botezatu2016.md](botezatu2016.md) | Predicting Disk Replacement towards Reliable Data Centers, KDD 2016 (Week 5) | not read: closed access; template only |
 
-Not yet read: Botezatu et al., KDD 2016 (needs library access). NENYA is an abstract-only row in `docs/v2/T5_positioning.md`: the KDD paper is on the ACM Digital Library only, which blocks automated download (save the PDF by hand). GQAT-Net (Tripathi et al., J. Grid Computing 2025) is known here from its public code (`docs/task11_summary.md`), not its text: the article is not open access.
+Not yet read: Botezatu et al., KDD 2016 (needs library access). NENYA was read in full on 1 Nov 2026 (`wang2022nenya.md`).
