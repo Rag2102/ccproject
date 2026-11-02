@@ -1,0 +1,27 @@
+# Local viewing: docker compose up --build -d
+#   http://localhost:8040  results Console (v2)
+#   http://localhost:8050  project site; port 5000 is often taken by AirPlay on macOS
+# Refresh the Console's data first with: make console
+# The site lives on main, not this branch. It is served from a checkout of main:
+#   git worktree add --detach ../ccproject-site origin/main
+# Update it with: git -C ../ccproject-site checkout --detach origin/main (after git fetch)
+services:
+  console:
+    image: nginx:1.27-alpine
+    ports:
+      - "127.0.0.1:8040:80"
+    volumes:
+      - ./console:/usr/share/nginx/html:ro
+    restart: unless-stopped
+  demo:
+    build:
+      context: .
+      dockerfile: docker/web.Dockerfile
+    ports:
+      - "127.0.0.1:8050:5000"
+    volumes:
+      - ${SITE_ROOT:-../ccproject-site}/webapp:/repo/webapp:ro
+      - ${SITE_ROOT:-../ccproject-site}/models:/repo/models:ro
+      - ${SITE_ROOT:-../ccproject-site}/scripts:/repo/scripts:ro
+      - ${SITE_ROOT:-../ccproject-site}/data/processed:/repo/data/processed:ro
+    restart: unless-stopped

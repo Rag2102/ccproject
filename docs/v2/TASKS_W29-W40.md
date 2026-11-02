@@ -10,7 +10,7 @@ From the v5 week cards for W29-W40 (plan pages 23-26). Prepared on 26 Oct 2026, 
 ## W30: strengthen the weakest claim II, runs
 - [x] Scenario cards: `<regime>@G0-low/high` (`vmsim/scenarios.py`), cards marked migration DERIVED.
 - [x] Dev seeds first: `39_dev_precheck.py` (invariants, utilisation, failures per run; dev seeds 101-110 only).
-- [~] Run: `run_w30.sh` (derive, pre-check, tune, run B1/B2/C at both ends, P0 P2 P4 P6, 1% and 2%, seeds 1-30, stats, vs P0, Table 3). About 2 h. Tested end to end at small scale with placeholder settings. Waits for the cost range and for the device.
+- [x] Run (2 Nov 2026, `RESULTS_COSTRANGE.md`): `run_w30.sh` (derive, pre-check, tune, run B1/B2/C at both ends, P0 P2 P4 P6, 1% and 2%, seeds 1-30, stats, vs P0, Table 3). About 2 h. Tested end to end at small scale with placeholder settings. Waits for the cost range and for the device.
 - [x] Figures and tables: Table 3 gains exploratory rows (second source, cost range); `34_vs_p0.py --subdir`.
 
 ## W31: strengthen III, integrate; Console S5

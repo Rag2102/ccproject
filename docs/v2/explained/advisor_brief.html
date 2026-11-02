@@ -1,0 +1,97 @@
+<title>VM Mitigation Advisor Brief</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Source+Sans+3:wght@400;600;700&family=IBM+Plex+Mono:wght@400;600&display=swap">
+<style>
+/* Layout: one reading column, tables allowed to run wider than the prose. A working memo. */
+:root { --bg:#f7f8fa; --fg:#18202b; --mute:#566173; --line:#d5dbe3; --panel:#ffffff; --accent:#0d5ea8; --good:#0a7a4f; --warn:#b4530a;
+  --body:"Source Sans 3","Helvetica Neue",Arial,sans-serif; --mono:"IBM Plex Mono",Menlo,monospace; }
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) { --bg:#12161c; --fg:#e8ecf1; --mute:#a0aab8; --line:#2c3440; --panel:#1a2029; --accent:#7cbcf5; --good:#5fd6a4; --warn:#f0a45f; color-scheme:dark } }
+:root[data-theme="dark"] { --bg:#12161c; --fg:#e8ecf1; --mute:#a0aab8; --line:#2c3440; --panel:#1a2029; --accent:#7cbcf5; --good:#5fd6a4; --warn:#f0a45f; color-scheme:dark }
+* { box-sizing:border-box }
+body { background:var(--bg); color:var(--fg); font:17px/1.55 var(--body); padding-block:40px 64px; padding-left:max(16px,env(safe-area-inset-left,0px)); padding-right:max(16px,env(safe-area-inset-right,0px)) }
+main { max-width:800px; margin:0 auto; display:grid; gap:30px }
+main > * { min-width:0 }
+h1 { font-size:32px; line-height:1.2; margin:0 0 6px; text-wrap:balance }
+h2 { font-size:21px; margin:0 0 8px; color:var(--accent); text-wrap:balance }
+p { margin:0 0 10px; max-width:68ch } ul,ol { margin:0; padding-left:22px } li { margin:5px 0; max-width:66ch }
+.meta { color:var(--mute); margin:0 } .lede { font-size:19px; font-weight:600; margin:14px 0 0 }
+.scroll { overflow-x:auto; margin:6px 0 10px } table { border-collapse:collapse; width:100%; font-size:15.5px; font-variant-numeric:tabular-nums; background:var(--panel) }
+th,td { text-align:left; padding:7px 10px; border-bottom:1px solid var(--line); vertical-align:top } th { font-weight:700; color:var(--mute); font-size:14px }
+.good { color:var(--good); font-weight:700 } .bad { color:var(--warn); font-weight:700 }
+.adr { font-family:var(--mono); font-size:14px; color:var(--mute); white-space:nowrap }
+.note { color:var(--mute); font-size:15px }
+</style>
+<main>
+<header>
+<h1>VM failure mitigation: where the evidence stands</h1>
+<p class="meta">From Raghav Gupta, for the advisor, 2 November 2026, ahead of the CSE panel</p>
+<p class="lede">The 30 pre-registered wins stand, but BAM's saving against never migrating now depends on the assumed migration cost. Placement, not migration, has become the stronger result. G3 needs your view on what the paper should lead with.</p>
+</header>
+
+<section>
+<h2>Decisions needed from you</h2>
+<ol>
+<li><strong>G3 and the headline.</strong> I recommend leading with the condition and with placement, and reporting BAM's win over the threshold without using it as the main evidence that ranking pays.</li>
+<li><strong>Post-freeze work.</strong> I recommend a clearly separate exploratory section for the avoidance, law and new-policy results. None of it enters the 30-comparison family.</li>
+<li><strong>Cost range sources.</strong> Is 4 of 6 enough? Liu 2011 and the SoCC 2015 paper are unread because the ACM site showed a bot challenge. Library access would close this.</li>
+</ol>
+</section>
+
+<section>
+<h2>What was tested on 2 November</h2>
+<p>All results are simulated. The primary tests use an oracle predictor. Rules were fixed before the fresh seeds ran.</p>
+<div class="scroll"><table>
+<tr><th>Test</th><th>Rule</th><th>Verdict</th><th>Main numbers</th></tr>
+<tr><td>Avoidance law, S = φ R(q, σ)</td><td class="adr">ADR-012</td><td class="good">Supported</td><td>19 out-of-sample cells. Spearman 0.98 and 0.97. Mean error 1.2 and 0.9 points.</td></tr>
+<tr><td>BAM that charges destination risk (P4-net)</td><td class="adr">ADR-013 N</td><td class="good">Confirmed, 16 of 16</td><td>B1, cheap migration: −17.1 to +8.1%. High cost level: −77.8 to +9.6%. Default: +0.85 point.</td></tr>
+<tr><td>Per-tier host closing</td><td class="adr">ADR-013 S</td><td class="good">Confirmed, 8 of 8</td><td>B1 rejected VMs: 280 to 66. Saving: +16.9 to +17.5%. At σ = 1: +8.0 to +10.3%.</td></tr>
+<tr><td>Published migration-cost range</td><td class="adr">ADR-009</td><td>Descriptive</td><td>See the next table. 4 of 6 sources.</td></tr>
+</table></div>
+<p class="note">ADR-012 and ADR-013 were frozen by a stored SHA-256, not a prior commit, so they are weaker evidence of order than ADR-011. For ADR-013 only the seeds are blind: the policies and settings came from dev seeds.</p>
+</section>
+
+<section>
+<h2>The result that changes the story</h2>
+<p>BAM's saving against never migrating, 2% budget, seeds 1-30 at the two ends.</p>
+<div class="scroll"><table>
+<tr><th>Regime</th><th>Cheap end</th><th>Assumed cost</th><th>Expensive end</th><th>Threshold at the same ends</th></tr>
+<tr><td>B1</td><td class="bad">−17.4%</td><td>+4.0%</td><td>+1.0%</td><td>−156%, −1708%</td></tr>
+<tr><td>B2</td><td class="bad">−15.7%</td><td>+5.1%</td><td>+0.9%</td><td>−161%, −1676%</td></tr>
+<tr><td>C</td><td class="bad">−2.8%</td><td>+4.6%</td><td>+0.1%, interval includes 0</td><td>−91%, −1458%</td></tr>
+</table></div>
+<ul>
+<li>BAM still beats the threshold everywhere (+46% to +95%), so ADR-009's 1% condition is not crossed. That is mostly because the threshold does badly.</li>
+<li>Cheaper migration makes BAM worse. ADR-009 says this belongs in the Evaluation section, and I agree.</li>
+<li>Each end combines extremes from different papers, so no real system sits at either end. The range brackets the cost and does not estimate it.</li>
+</ul>
+</section>
+
+<section>
+<h2>Why BAM collapses</h2>
+<p>This came from a Week 20 robustness flag: "steep" tier weights made BAM collapse, which looked like it contradicted the claim that spread drives the gain. It does not. Those weights raised the cost level as well as the spread. With the same 1:10 ratio and the top weight kept at 1, BAM improves (A3 +17.2%, B1 +6.7%, dev seeds). With the same ratio as default but every weight multiplied by 3.33, it collapses.</p>
+<p>So the trigger is failure cost being large against migration cost. A dev-seed test (five seeds, descriptive only) allowed BAM to move each VM only once:</p>
+<div class="scroll"><table>
+<tr><th>B1</th><th>P4</th><th>P4, one move per VM</th><th>P4-net</th></tr>
+<tr><td>Cheap migration</td><td>−15.8%</td><td>+3.2%</td><td>+10.0%</td></tr>
+<tr><td>High cost level</td><td>−75.6%</td><td>−2.6%</td><td>+10.6%</td></tr>
+</table></div>
+<p>Moving the same VMs repeatedly explains most of the collapse. First moves that ignore destination risk explain the rest.</p>
+</section>
+
+<section>
+<h2>What still does not work</h2>
+<ul>
+<li><strong>P4-net does not fix noise.</strong> At σ = 1 it is −18.4% in B1 and −14.8% in B2. At the expensive end it adds nothing. Migration policies stay fragile under noise, while placement policies stay positive at every noise level run.</li>
+<li><strong>Per-tier closing is mainly a rejection result.</strong> The saving gain is under 2 points, and in B1 it cannot be told from zero against redirecting without tiers. Rejections are about 0.03% of arrivals at most. It rejects fewer than never migrating does (66 against 169), and I have not explained why.</li>
+<li><strong>Migration on top of per-tier closing adds nothing measurable</strong> (B1 +17.4 against +17.5%).</li>
+<li><strong>The law has one fitted constant,</strong> so it is a regularity, not a derivation. Its extension to tiers missed by 1.7 and 2.1 points in opposite directions. Shuffled scores still leave +2.13% in B1, not fully explained.</li>
+<li><strong>The guard P6 stays below never migrating</strong> in all 12 cost-range cells.</li>
+<li><strong>Novelty is claimed over the three base papers only.</strong> I ran three searches. A patent family (US 9277002, US 9584389) has a failure term for migrated VMs, which I have seen only in excerpts. Protean's preference rules also need checking.</li>
+</ul>
+</section>
+
+<section>
+<h2>Status of the work</h2>
+<p>Nothing from this round is committed yet. Results and limits are in <code>docs/v2/RESULTS_COSTRANGE.md</code>, <code>docs/v2/RESULTS_SELECTIVE_NET.md</code> and <code>docs/v2/NOVELTY.md</code>. The engine change is a hook used only by the new policies; earlier results reproduce exactly on the checked seeds.</p>
+</section>
+</main>

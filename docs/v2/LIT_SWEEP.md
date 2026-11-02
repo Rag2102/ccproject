@@ -32,3 +32,10 @@ Nothing found that isolates it on public data, but the search was thin. Narya an
 ## Proactive migration work seen
 
 [Proactive live migration for VNFs (CNSM 2021)](https://dl.ifip.org/db/conf/cnsm/cnsm2021/1570733268.pdf) and [proactive VM replication in OpenNebula (Computing 2025)](https://dl.acm.org/doi/10.1007/s00607-025-01476-1): neither shows a criticality-aware budget in what was seen.
+
+## N7 and N8 (2 Nov 2026, three searches, so thin)
+
+- **Destination risk in the migration decision.** [US 9277002](https://image-ppubs.uspto.gov/dirsearch-public/print/downloadPdf/9277002) and [US 9584389](https://image-ppubs.uspto.gov/dirsearch-public/print/downloadPdf/9584389), "Physical resource management": expected cost of migrating as cost times the probability of failure if the VM is migrated. Only excerpts seen; it may mean failure of the migration rather than of the destination host. Read before the paper. No research paper found that charges it, but this is absence from a thin search.
+- **Per-tier closure.** Nothing found. Nearby: [a node-error patent application](https://image-ppubs.uspto.gov/dirsearch-public/print/downloadPdf/12216552) allocates new VMs to healthier nodes (all VMs, no tiers); [Lin et al. node failure prediction](https://www.researchgate.net/publication/328592012_Predicting_Node_failure_in_cloud_service_systems) is the research form. Protean has priority and "likely to fail" preference rules, whose mechanism was not read, so that is the first thing to check. Spot and evictable VMs on risky nodes would be the closest idea, and these searches did not settle whether it exists.
+
+Status: state both over the three base papers only.

@@ -2,6 +2,13 @@
 
 Sunday ritual (15 minutes): update this log, tick the week's "done when", log any cut as an ADR, re-read the next gate's criteria, update `CAPACITY.md` for the coming month, write Monday's first task. Newest week first. Hours are yours to fill; nothing here is estimated.
 
+## Novelty runs (2 Nov 2026, ahead of the panel)
+- ADR-012 law: supported. ADR-009 cost range: done on 4 of 6 sources. ADR-013: N and S confirmed.
+- Found: BAM's saving against P0 reverses at cheap migration. Mostly re-migration, partly first moves (dev seeds).
+- Found: under selective placement, migration adds nothing measurable.
+- Results: `RESULTS_COSTRANGE.md`, `RESULTS_SELECTIVE_NET.md`. Claims: `NOVELTY.md` N6-N8, ledger C10-C13.
+- Open: G3 with the advisor; Liu 2011, SoCC 2015 unread; US 9277002 to read; nothing committed.
+
 ## Weeks 29-40 prepared (26 Oct 2026; W35 and W38 left out by the owner)
 - ADR-009 accepted. Cost-range rule fixed before any rerun; Clark 2005 extracted; five sources wait for their text. Runner, dev-seed pre-check and `run_w30.sh` built and tested at small scale.
 - Console S5 (paired seeds) and S6 (figures); light theme, reduced motion, 360 px.

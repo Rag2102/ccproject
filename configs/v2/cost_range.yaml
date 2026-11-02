@@ -68,21 +68,86 @@ sources:
       blackout_s: [0.060, 0.210]
   - key: voorsluys2009
     cite: Voorsluys, Broberg, Venugopal, Buyya, "Cost of Virtual Machine Live Migration in Clouds", CloudCom 2009, LNCS 5931, pp. 254-265, doi 10.1007/978-3-642-10665-1_23
-    status: pending  # arXiv 1109.4974: v2 is withdrawn (its PDF is 404); v1 is still served
+    status: extracted  # arXiv 1109.4974v1 (v2 is withdrawn); read 1 Nov 2026
     text: https://arxiv.org/pdf/1109.4974v1
+    setup: Citrix XenServer 5.0, Xeon E5410 hosts, Gigabit Ethernet, shared NFS (section 4.1)
+    measurements:
+      - what: Olio (Web 2.0) Apache/PHP VM, 1 vCPU, 2 GB, 600 concurrent users
+        where: section 5, Figure 2
+        total_time_s: 44
+        downtime_ms: 3000  # "up to 3 seconds"
+        derived:
+          usable_share: 0.37  # upper estimate: the whole 2,048 MB x 8 / 44 s = 372 Mbit/s of 1,000; bytes sent are not reported
+    summary:
+      usable_share: [0.37]
+      blackout_s: [3.0]
   - key: akoush2010
-    cite: Akoush, Sohan, Rice, Moore, Hopper, "Predicting the Performance of Virtual Machine Migration", MASCOTS 2010
-    status: pending
+    cite: Akoush, Sohan, Rice, Moore, Hopper, "Predicting the Performance of Virtual Machine Migration", MASCOTS 2010, pp. 37-46
+    status: extracted  # authors' PDF, read 1 Nov 2026
+    text: https://www.cl.cam.ac.uk/~acr31/pubs/akoush-migration.pdf
+    setup: Citrix XenServer 5.5 (Xen 3.3.1), Xeon E5506 hosts, 10 Gb/s back-to-back (section IV-C)
+    measurements:
+      - what: migration throughput on a 10 Gb/s link
+        where: section IV-D
+        derived:
+          usable_share_default_xen: 0.32  # 3.2 Gb/s
+          usable_share_modified_xen: 0.712  # 7.12 Gb/s, with their mapping change and jumbo frames
+      - what: industry-standard workloads, 10 Gb/s
+        where: Table III (actual columns)
+        downtime_ms: {spec_cpu: 317.3, specweb: 449.5, specsfs: 217.6, mapreduce: 348.9}
+        total_time_s: {spec_cpu: 5.8, specweb: 7.5, specsfs: 14.8, mapreduce: 14.9}
+      - what: page-dirty rates of those workloads
+        where: section IV-E (subsections 2-5)
+        notes: SPEC CPU about 50,000 pages/s and SPECweb about 12,000 (quoted from earlier work); SPECsfs under 10,000; MapReduce hardly over 50,000, which the paper states as about 200 MB/s
+        derived:
+          dirty_mbps_max: 200
+          dirty_mbps_min: 39  # 10,000 pages/s x 4 KB; an upper limit for SPECsfs, not a measured low
+      - what: MapReduce on a 100 Mb/s link, not a converged migration (excluded by the rule)
+        where: Table IV
+        notes: downtime 629 ms to 42,534 ms (actual)
+      - what: synthetic page-modification micro-benchmark (excluded by the rule)
+        where: sections III and IV-E1
+        notes: up to 300,000 pages/s
+    summary:
+      usable_share: [0.32, 0.712]
+      dirty_mbps: [39, 200]
+      blackout_s: [0.2176, 0.4495]
   - key: liu2011
     cite: Liu, Xu, Jin, Gong, Liao, "Performance and energy modeling for live migration of virtual machines", HPDC 2011 (doi 10.1145/1996130.1996154 seen in a search result, not yet checked against the paper)
-    status: pending
+    status: pending  # ACM Digital Library returned a bot challenge on 1 Nov 2026; not read
   - key: hu2013
-    cite: Hu et al., "A quantitative study of virtual machine live migration", CAC 2013
-    status: pending
+    cite: Hu, Hicks, Zhang, Dow, Soni, Jiang, Bull, Matthews, "A quantitative study of virtual machine live migration", CAC 2013, doi 10.1145/2494621.2494622
+    status: extracted  # authors' PDF, read 1 Nov 2026
+    text: https://lin-web.clarkson.edu/~jmatthew/publications/cac2013_livemigration.pdf
+    setup: KVM, VMware, Hyper-V, XenServer on HP DL165 G7 hosts, 1 Gb/s NICs and switch; VM 1 vCPU, 2 GB
+    measurements:
+      - what: memory migration baseline, no stress test running
+        where: section 4.2.1, Table 5 and the text after it
+        transfer_mb_s: {kvm: 20, vmware: 41, hyperv: 96, xenserver: 62}  # as stated in the paper
+        downtime_s: {kvm: 0.18, vmware: 0.59, hyperv: 0.72, xenserver: 4.64}
+        notes: the downtimes are of an idle VM, not a workload, so the rule excludes them from blackout_s; the throughputs enter the share
+        derived:
+          usable_share: [0.16, 0.33, 0.77, 0.50]  # transfer rate / 125 MB/s
+    summary:
+      usable_share: [0.16, 0.77]
   - key: socc2015
     cite: '"Towards a comprehensive performance model of virtual machine live migration", SoCC 2015'
-    status: pending
+    status: pending  # ACM Digital Library returned a bot challenge on 1 Nov 2026; not read
 
 # Filled by scripts/v2/38_cost_range.py from `sources` by the rule above; null until four sources
 # are extracted.
-settings: null
+settings:
+  G0-low:
+    usable_share: 0.77
+    usable_share_from: hu2013
+    dirty_mbps_at_100pct_cpu: 2.3
+    dirty_mbps_at_100pct_cpu_from: clark2005
+    blackout_converged_s: 0.06
+    blackout_converged_s_from: clark2005
+  G0-high:
+    usable_share: 0.1
+    usable_share_from: clark2005
+    dirty_mbps_at_100pct_cpu: 200.0
+    dirty_mbps_at_100pct_cpu_from: akoush2010
+    blackout_converged_s: 3.0
+    blackout_converged_s_from: voorsluys2009

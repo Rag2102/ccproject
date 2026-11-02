@@ -249,6 +249,7 @@ def run(
     blend = float(prep.world.place_blend) if ab is None else float(ab)
     switch, blend_after = cfg.placement.switch_day, cfg.placement.arrival_blend_after
 
+    tier_block = None
     state = np.full(n_hosts, UP, dtype=np.int8)
     used = np.zeros(n_hosts)
     epoch = np.zeros(n_hosts, dtype=np.int64)
@@ -370,6 +371,22 @@ def run(
                     rng_arr,
                     V["u_place"][ids],
                 )
+            if tier_block is not None:  # selective avoidance: move VMs off closed hosts
+                t_ = V["tier"][ids]
+                m_ = V["mem"][ids]
+                on = hs >= 0
+                bad_ = np.flatnonzero(on & tier_block[t_, np.maximum(hs, 0)])
+                if len(bad_):
+                    room_ = cap - used - np.bincount(hs[on], weights=m_[on], minlength=n_hosts)
+                    np.add.at(room_, hs[bad_], m_[bad_])
+                    for v_ in bad_:
+                        c_ = np.flatnonzero((state == UP) & ~tier_block[t_[v_]] & (room_ >= m_[v_]))
+                        if len(c_):
+                            j_ = rng_arr.choice(c_)
+                            hs[v_] = j_
+                            room_[j_] -= m_[v_]
+                        else:
+                            hs[v_] = -1
             ok = hs >= 0
             rejected = int((~ok).sum())
             vm_host[ids] = hs
@@ -410,6 +427,8 @@ def run(
         plan = np.asarray(policy.decide(obs, budget), dtype=np.int64) if budget > 0 else []
         # avoid-allocation marks (zero budget means no mitigation action of any kind)
         mark = policy.avoid(obs) if budget > 0 else None
+        if budget > 0 and hasattr(policy, "tier_block"):
+            tier_block = policy.tier_block(obs)
         if mark is not None:
             mark = np.asarray(mark, dtype=bool)
             state[(state == UP) & mark] = AVOID

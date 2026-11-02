@@ -43,3 +43,8 @@ Also recorded: testing the Week 19 scripts ran them on the Week 17 dry run (eval
 | 1 Nov 2026 | ADR-007 extension of B1, B2 and C to n = 50 (seeds 31-50, every policy), flagged by the SD rule once B and C were analysed; `49_manifest.py` expects these regimes at 50 seeds | ADR-007 | uncommitted | Pre-registered rule, bound 2.1%; all 30 comparisons still win |
 | 1 Nov 2026 | ADR-007 extension of the seed replication to n = 50 (seeds 1031-1050; A3, A5, B1, B2, C; P0, P2, P4, P5, P6; 1% and 2%) | ADR-007 | uncommitted | Pre-registered rule; replication only |
 | 1 Nov 2026 | ADR-011: avoidance confirmation on seeds 2001-2050 (`50_confirm_avoid.py`); verdict confirmed, 6 of 6 | ADR-011 | see git log | None for the confirmatory family or G3; post-freeze, reported separately |
+| 2 Nov 2026 | ADR-012: avoidance law on seeds 3001-3050 (`52_avoid_law.py`); verdict supported | Owner asked for more novelty | uncommitted | None for the family or G3 |
+| 2 Nov 2026 | ADR-009 run: `run_w30.sh`, 4 of 6 sources; settings derived by the rule | ADR-009 | uncommitted | Exploratory rows in Table 3; saving against P0 reverses at G0-low (`RESULTS_COSTRANGE.md`) |
+| 2 Nov 2026 | ADR-013: `vmsim/policies/selective.py`, `54_selective_net.py`, seeds 4001-4050; N and S confirmed | Owner asked for more novelty | uncommitted | None for the family or G3 |
+| 2 Nov 2026 | `vmsim/engine.py`: `tier_block` hook, used only by policies that define `tier_block` | ADR-013 | uncommitted | None: B1 seed 101 P0 33,289, P0+avoid 29,034, unchanged; rows reproduced exactly |
+| 2 Nov 2026 | `55_remigration_check.py`: dev seeds 101-105 | Test of ADR-013's proposed cause | uncommitted | Descriptive only |

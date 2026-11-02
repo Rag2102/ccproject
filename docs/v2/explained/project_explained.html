@@ -1,0 +1,316 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8">
+<title>VM Failure Mitigation: The Project Explained</title>
+<style>
+@page { size: A4; margin: 20mm 19mm 20mm; }
+:root { --ink:#17212c; --soft:#475463; --line:#c9d2db; --tint:#eef2f6; --accent:#0f5f6e; --warn:#a4481f; }
+* { box-sizing:border-box; }
+body { font-family: Charter, Georgia, serif; font-size:10.6pt; line-height:1.46; color:var(--ink); margin:0; }
+h1,h2,h3,th,.label,.cap,.side { font-family:"Helvetica Neue", Arial, sans-serif; }
+.cover { height:250mm; display:flex; flex-direction:column; justify-content:space-between; page-break-after:always; }
+.cover h1 { font-size:33pt; line-height:1.1; font-weight:600; margin:34mm 0 7mm; letter-spacing:-.4pt; }
+.cover p.sub { font-size:14.5pt; color:var(--soft); max-width:135mm; margin:0; }
+.cover .meta { font-family:"Helvetica Neue", Arial, sans-serif; font-size:9.5pt; color:var(--soft); border-top:1.5pt solid var(--ink); padding-top:3mm; }
+h2 { font-size:17pt; font-weight:600; margin:9mm 0 2.5mm; color:var(--accent); page-break-after:avoid; }
+h2.new { page-break-before:always; margin-top:0; }
+h3 { font-size:11.5pt; font-weight:600; margin:5mm 0 1.2mm; page-break-after:avoid; }
+p { margin:0 0 2.4mm; } ul,ol { margin:0 0 2.8mm; padding-left:5.5mm; } li { margin-bottom:1mm; }
+table { width:100%; border-collapse:collapse; margin:2mm 0 3.5mm; font-size:9.2pt; line-height:1.3; page-break-inside:avoid; }
+th { text-align:left; font-weight:600; font-size:8.5pt; border-bottom:1.1pt solid var(--ink); padding:1.2mm 1.6mm 1.2mm 0; vertical-align:bottom; }
+td { border-bottom:.5pt solid var(--line); padding:1.2mm 1.6mm 1.2mm 0; vertical-align:top; }
+td.n, th.n { text-align:right; font-variant-numeric:tabular-nums; white-space:nowrap; }
+.key { background:var(--tint); padding:3.5mm 4.5mm; margin:3mm 0 4mm; page-break-inside:avoid; }
+.key p:last-child { margin:0; } .key .label { font-size:8.5pt; font-weight:600; color:var(--accent); margin-bottom:1mm; }
+.warn .label { color:var(--warn); }
+.formula { font-family:Menlo, Consolas, monospace; font-size:9.4pt; margin:2mm 0 3mm; padding-left:4mm; }
+code { font-family:Menlo, Consolas, monospace; font-size:8.6pt; }
+.bar { display:flex; align-items:center; gap:2mm; font-family:"Helvetica Neue", Arial, sans-serif; font-size:9pt; margin-bottom:1.1mm; }
+.bar .n { width:50mm; } .bar .b { height:4.4mm; background:var(--accent); } .bar .b.g { background:#8a97a6; } .bar .b.o { background:var(--warn); }
+figure { margin:3mm 0 4mm; page-break-inside:avoid; } figure img { width:100%; display:block; } .cap { font-size:8.5pt; color:var(--soft); margin-top:1.5mm; }
+.steps { display:grid; grid-template-columns:repeat(5,1fr); gap:1.5mm; margin:2mm 0 4mm; page-break-inside:avoid; }
+.steps div { background:var(--tint); padding:2mm; font-family:"Helvetica Neue", Arial, sans-serif; font-size:8.3pt; line-height:1.28; }
+.steps b { display:block; color:var(--accent); margin-bottom:.7mm; }
+.q { page-break-inside:avoid; margin-bottom:2.6mm; } .q b { font-family:"Helvetica Neue", Arial, sans-serif; font-size:9.8pt; display:block; margin-bottom:.4mm; }
+.toc { columns:2; font-family:"Helvetica Neue", Arial, sans-serif; font-size:9.6pt; padding:0; list-style:none; } .toc li { margin-bottom:1.3mm; }
+</style></head><body>
+
+<section class="cover">
+<div></div>
+<div>
+<h1>When does workload-aware VM failure mitigation pay off?</h1>
+<p class="sub">The project explained end to end: the problem, the base papers, the method, the results, the novelty and the limits.</p>
+</div>
+<div class="meta">Raghav Gupta · State of the work on 1 November 2026 · Results are preliminary: Gate G3 is not signed and no paper has been submitted. Everything was simulated from public data; no claim is made about a live cloud.</div>
+</section>
+
+<h2 style="margin-top:0">The project in one page</h2>
+<p>Cloud servers fail. If a provider can see a failure coming, it can live-migrate the virtual machines (VMs) on that server to a healthy one. Moving a VM is not free, though: it uses network bandwidth, causes a brief pause, and capacity for it is limited. So the real decision is which VMs are worth moving.</p>
+<p>Microsoft's production systems Narya, NENYA and Deoxys learn which mitigation to take, on private data. This project asks the question they leave open: <b>when does taking the workload into account pay off at all?</b></p>
+<div class="key"><div class="label">The findings</div>
+<ul style="margin:0;padding-left:5mm">
+<li><b>Measured:</b> in public Google traces, critical work is essentially uncorrelated with machine risk (|τ-b| ≤ 0.075).</li>
+<li><b>Derived:</b> the gain from ranking comes from how widely costs vary. The break-even correlation the project first assumed is not what decides it.</li>
+<li><b>Built:</b> an open benchmark of 528 cells and 19,140 runs that anyone can rerun.</li>
+<li><b>Found:</b> a threshold tuned to spend its budget can be far worse than never migrating (−273% in B1).</li>
+<li><b>Confirmed on fresh seeds:</b> simply keeping new VMs off risky hosts saves more (+11.2%) than the cost-aware migration policy (+3.7%), using no migrations.</li>
+</ul></div>
+<p>The surprise is that the policy the project set out to champion is not the headline. BAM beats the threshold easily, but mostly because the threshold is so poor; against doing nothing it saves about 4–5% in the trace-calibrated regimes. The stronger contribution is the measurement, the theory, the benchmark and the avoidance result.</p>
+<h3>Contents</h3>
+<ul class="toc">
+<li>1. The problem</li><li>2. The three base papers</li><li>3. The gap and the novelty</li><li>4. Where it started: v1</li><li>5. The pipeline</li><li>6. Data and the failure model</li><li>7. Measuring real placement</li><li>8. The simulator</li><li>9. The policies</li><li>10. The theory</li><li>11. The rules of the experiment</li><li>12. Results</li><li>13. The avoidance confirmation</li><li>14. Robustness</li><li>15. Limits</li><li>16. Status and what comes next</li><li>17. Where everything is</li><li>18. Questions to expect</li><li>19. Glossary</li>
+</ul>
+
+<h2 class="new">1. The problem</h2>
+<p>A provider has a predictor that says, for each host, how likely it is to fail soon. For each VM on a risky host there are two options:</p>
+<ul><li><b>Leave it.</b> If the host fails, the VM is interrupted. The damage depends on how critical that VM is.</li>
+<li><b>Migrate it.</b> This costs bandwidth and disruption, and it may turn out to be needless, since most flagged hosts do not fail. In this project's model, only 5.6% of the top 1% of flagged drive-days fail within 30 days.</li></ul>
+<p>The common rule is a <b>probability threshold</b>: move anything whose failure probability is above a cut-off. It ignores what the VM runs and what the move costs. The alternative is to weigh expected benefit against cost, and to spend a limited migration budget where it does the most good. Whether that alternative actually helps, and when, is what the project tests.</p>
+
+<h2>2. The three base papers</h2>
+<table>
+<tr><th style="width:15%"></th><th style="width:28%">Narya (OSDI 2020)</th><th style="width:28%">NENYA (KDD 2022)</th><th>Deoxys (SoCC 2024)</th></tr>
+<tr><td><b>Where</b></td><td>Azure hosts</td><td>Microsoft 365 database copies</td><td>Microsoft nodes</td></tr>
+<tr><td><b>When it acts</b></td><td>Before failure</td><td>Before failure, hourly</td><td>After a node turns unhealthy</td></tr>
+<tr><td><b>How it decides</b></td><td>A predictor flags a node; A/B tests and a Thompson-sampling bandit choose an action</td><td>Cascade reinforcement learning: two layers filter out copies that need nothing, a third picks switch or replace</td><td>Causal estimates choose reboot or redeploy, falling back to the old policy when unsure</td></tr>
+<tr><td><b>Cost</b></td><td>Counts VM interruptions; VM size is not a decision input</td><td>Fixed per action type (switch 1, replace 100)</td><td>Downtime, with a withheld cost function</td></tr>
+<tr><td><b>Weakness for our question</b></td><td>Private data; its baseline was a fixed action plan, so it never tested against a threshold tuned to a budget</td><td>Cost does not depend on what the instance runs; private data</td><td>Reactive only; private data; thresholds not published</td></tr>
+</table>
+<p>All three are real deployed systems. This project does not claim to beat them: it asks a different question, in simulation.</p>
+
+<h2>3. The gap and the novelty</h2>
+<table>
+<tr><th style="width:30%"></th><th>Narya</th><th>NENYA</th><th>Deoxys</th><th>This work</th></tr>
+<tr><td>Per-instance criticality</td><td>No</td><td>No</td><td>Node-level only</td><td><b>Yes, per VM</b></td></tr>
+<tr><td>Migration budget in GB</td><td>No</td><td>No</td><td>No</td><td><b>Yes</b></td></tr>
+<tr><td>Decision unit</td><td>Node</td><td>Database copy</td><td>Node</td><td><b>VM</b></td></tr>
+<tr><td>Theory of when it pays</td><td>No</td><td>No</td><td>No</td><td><b>Closed form</b></td></tr>
+<tr><td>Data</td><td>Private</td><td>Private</td><td>Private</td><td><b>Public</b></td></tr>
+<tr><td>Rerunnable artifact</td><td>None found</td><td>None found</td><td>None</td><td><b>Yes</b></td></tr>
+</table>
+<div class="key"><div class="label">The novelty in one sentence</div><p>Production systems learn which mitigation to take, on private data; we ask when workload-aware ranking pays off at all, and on public data we measure the condition, derive it in closed form and release a benchmark anyone can rerun.</p></div>
+<table>
+<tr><th style="width:5%">#</th><th style="width:42%">Claim</th><th>Status</th></tr>
+<tr><td>N1</td><td>Criticality and machine risk are essentially uncorrelated in public traces</td><td>Holds; say “to our knowledge”, since the literature check was four web searches</td></tr>
+<tr><td>N2</td><td>Cost spread, not a break-even correlation, drives the gain</td><td>Holds for the theory; simulation gets the direction right and under-predicts the level</td></tr>
+<tr><td>N3</td><td>An open benchmark: public-data worlds, shared GB budget, paired seeds, frozen protocol</td><td>Built; release tag and DOI not done</td></tr>
+<tr><td>N4</td><td>Where new VMs go matters more than which VMs move</td><td>Confirmed on fresh seeds in B1 and B2; after the freeze; oracle predictor</td></tr>
+<tr><td>N5</td><td>A threshold tuned to its budget can be worse than never migrating</td><td>Seen in all regimes; preliminary until G3</td></tr>
+</table>
+<div class="key warn"><div class="label">What is not claimed</div><p>BAM is not a new algorithm: it is Dantzig's density rule with Elkan's cost-sensitive decision. Cost awareness alone is not new, since NENYA and Deoxys have it. Avoidance is not a new idea, since Narya and Protean use it; the new part is isolating and measuring it openly. Nothing here beats a production system.</p></div>
+
+<h2>4. Where it started: v1</h2>
+<p>The project began as a course project (tag <code>v1.0-course</code>), combining 122,618 Backblaze drives and 2,013,767 Azure VMs. It reported a cost-sensitive rule 3.1% behind a threshold under random placement, and 3.4% ahead when criticality tracked risk closely. That suggested a break-even correlation near ρ = 0.3.</p>
+<p>v2 re-ran this and traced the loss to how v1 counted, not to cost awareness. The threshold had been given about 8% more migrations (5,522 hosts against 5,116), the two sides were matched on hosts rather than GB, and the accounting windows did not match. With consistent accounting the gap became about +0.2% (<code>docs/v2/v1_anomaly.md</code>). That diagnosis is why v2 exists.</p>
+
+<h2 class="new">5. The pipeline</h2>
+<div class="steps">
+<div><b>Data</b>Backblaze drive history, Google 2019 placement</div>
+<div><b>Model</b>Calibrated failure probabilities</div>
+<div><b>Measure</b>Does critical work sit on risky machines?</div>
+<div><b>Simulate</b>Failure worlds, policies, migrations</div>
+<div><b>Compare</b>Frozen rules, paired statistics</div>
+</div>
+<p>Each stage ends at a written gate, and each gate's rule was set before its data was read. G1 asks where real placement sits. G2 asks whether the simulator can be trusted. The freeze fixes the rules. G3 asks how strong the evidence is.</p>
+
+<h2>6. Data and the failure model</h2>
+<ul><li><b>Backblaze:</b> 45 quarterly archives, 35.1 GB, converted to Parquet with row counts and checksums checked. A malformed day file that the first ingest silently dropped was found and fixed.</li>
+<li><b>Google ClusterData 2019:</b> cells a, b and h, chosen before any data was read to span workload mixes, plus cell f as a second source. Alibaba 2018 was tried and dropped because it has no machine-risk signal.</li></ul>
+<p>The failure model predicts per-drive failure from SMART telemetry, split by calendar time so the future never leaks into training.</p>
+<table>
+<tr><th>Result at a 30-day horizon</th><th class="n">Value</th></tr>
+<tr><td>PR-AUC with v1's features (model, capacity, age)</td><td class="n">0.0018</td></tr>
+<tr><td>PR-AUC with SMART features (gradient boosting)</td><td class="n">0.074</td></tr>
+<tr><td>ROC-AUC with SMART features</td><td class="n">0.88</td></tr>
+<tr><td>Calibration error (ECE) after isotonic calibration</td><td class="n">2.3 × 10⁻⁴</td></tr>
+</table>
+<p>The lesson is that the features carry the signal, more than the model class: plain logistic regression matched boosting on the same features. Calibration matters because the decision rule multiplies the probability by a cost. The main benchmark nevertheless uses an <b>oracle</b> predictor, the simulator's true hazard, so that differences between policies come from the policies. Its gains are therefore an upper bound.</p>
+
+<h2>7. Measuring real placement</h2>
+<p>For each cell, the project took every placement of a job on a machine and computed Kendall's τ-b between the job's criticality tier and the machine's risk, with bootstrap intervals over machines.</p>
+<table>
+<tr><th>Cell</th><th class="n">Machines</th><th class="n">τ-b</th><th class="n">95% interval</th><th>Class</th></tr>
+<tr><td>a</td><td class="n">9,949</td><td class="n">−0.009</td><td class="n">[−0.011, −0.007]</td><td>C0, negligible</td></tr>
+<tr><td>b</td><td class="n">10,023</td><td class="n">0.003</td><td class="n">[−0.004, 0.010]</td><td>C0, negligible</td></tr>
+<tr><td>h</td><td class="n">11,511</td><td class="n">0.015</td><td class="n">[0.007, 0.032]</td><td>C0, negligible</td></tr>
+</table>
+<p>Across every mapping and risk proxy tried, |τ-b| stays at or below 0.075. The sign changes with the choice, but the size stays small. Cell f, reported separately, came out at −0.004. G1 was signed off as class C0, and that class is final.</p>
+<p><b>Caveat:</b> risk here is a proxy, the machine platform's rate of long removals, not a measured failure rate, and it rests on few events (79–166 long removals per cell).</p>
+
+<h2>8. The simulator</h2>
+<p><code>vmsim</code> simulates 2,000 hosts with 4 drives each for 365 days plus 30 of warm-up, with VMs arriving and leaving, drives failing, hosts being repaired, and migrations costed with the pre-copy model of Clark et al. A policy may spend a daily migration budget of 0.5, 1, 2 or 5% of cluster memory.</p>
+<p>Every run in a seed sees the same failures (common random numbers), so policies can be compared seed by seed, and each world is hashed so it can be verified.</p>
+<table>
+<tr><th style="width:18%">Regime</th><th>What it is</th><th style="width:33%">Why</th></tr>
+<tr><td>A1–A7</td><td>Synthetic placement, correlation from 0 to 0.9</td><td>Sweep the correlation</td></tr>
+<tr><td>E1–E3</td><td>Zero correlation, growing cost spread</td><td>Isolate cost spread</td></tr>
+<tr><td>B1, B2</td><td>Calibrated from the measured Google traces</td><td>The realistic case; still simulated</td></tr>
+<tr><td>C</td><td>Critical VMs on the riskiest hosts</td><td>Adversarial upper range</td></tr>
+<tr><td>D</td><td>Correlation shifts mid-run, predictor drifts</td><td>Non-stationary case</td></tr>
+</table>
+<p><b>Gate G2</b> passed on five criteria: analytic special cases, self-calibration (109 failures seen against 111.9 expected), a v1 regression within 1%, invariants and determinism under property tests, and run time.</p>
+
+<h2 class="new">9. The policies</h2>
+<table>
+<tr><th style="width:9%">ID</th><th style="width:27%">Name</th><th>What it does</th></tr>
+<tr><td>P0</td><td>Never migrate</td><td>The floor, and the fairest comparison</td></tr>
+<tr><td>P1</td><td>Fixed threshold</td><td>v1's cut-off, for continuity</td></tr>
+<tr><td>P2</td><td>Tuned threshold</td><td>Cut-off tuned on dev seeds to use the budget; the pre-registered comparator</td></tr>
+<tr><td>P3</td><td>v1 rule</td><td>v1's cost-sensitive rule, for continuity</td></tr>
+<tr><td>P4</td><td><b>BAM-GB</b></td><td>Ranks VMs by benefit per GB and stops when benefit reaches zero</td></tr>
+<tr><td>P5</td><td>Narya-inspired</td><td>A bandit choosing among doing nothing, migrating and avoiding; not a re-implementation, and every difference is listed</td></tr>
+<tr><td>P6</td><td>Guard</td><td>Uses BAM only when evidence supports it, otherwise P2</td></tr>
+<tr><td>P7, P8</td><td>Oracle, random</td><td>Ceiling and sanity floor</td></tr>
+<tr><td>P0+avoid</td><td>Avoidance only</td><td>Marks the riskiest 2% of hosts each day so they take no new VMs; never migrates. Added after the freeze</td></tr>
+</table>
+<h3>How BAM decides</h3>
+<p class="formula">b = p · c · e − m &nbsp;&nbsp; w = GB &nbsp;&nbsp; rank by b / w, fill while b &gt; 0 and budget remains</p>
+<p>Here <i>p</i> is the probability the host fails, <i>c</i> the cost of interrupting this VM (its criticality), <i>e</i> the chance a move finishes in time, and <i>m</i> the cost of the move. So <i>b</i> is the expected net benefit of moving it. Ranking by benefit per GB is the textbook way to fill a knapsack.</p>
+
+<h2>10. The theory</h2>
+<ul><li><b>T1:</b> ranking by benefit per unit of budget is optimal for the stated budget (Dantzig; standard). BAM's measured gap to the exact solution is 0.05% on simulator snapshots.</li>
+<li><b>T2:</b> with calibrated probabilities and matched accounting, BAM cannot lose to a threshold in expectation, apart from one item at the budget's edge.</li>
+<li><b>T3:</b> a closed form for the advantage under a Gaussian copula. When the budget binds, BAM's advantage has a ranking term:</li></ul>
+<p class="formula">Φ(z_q + σ_z) − Φ(z_q + σ_x + ρσ_y), &nbsp; σ_z² = σ_x² + 2ρσ_xσ_y + σ_y²</p>
+<p>It is never negative, and it vanishes only if costs do not vary (σ_y = 0) or correlation is perfect (ρ = 1). So there is <b>no break-even correlation below which ranking loses</b>; the advantage comes from cost spread. A second term captures what a threshold loses by moving items with negative benefit.</p>
+<ul><li><b>T4:</b> noise in the probabilities alone does not reverse the advantage at ρ ≥ 0, in the theory's setting; miscalibration that flattens them can.</li></ul>
+<p>The closed form matched Monte Carlo at <b>3,024 of 3,024</b> grid points. The simulator breaks the theory's one-shot assumptions on purpose, so against the simulator only direction is claimed; the level is under-predicted by 7–24 points.</p>
+
+<h2>11. The rules of the experiment</h2>
+<p>The protocol (<code>docs/v2/PROTOCOL.md</code>) was frozen before the final runs, and every later change is logged in <code>CHANGES_AFTER_FREEZE.md</code>.</p>
+<ul><li><b>Confirmatory family:</b> 30 comparisons of P4, P5 and P6 against P2, in A3, A5, B1, B2 and C, at 1% and 2%.</li>
+<li><b>Win rule:</b> mean difference of at least 1% and Holm-adjusted p below 0.05 over all 30.</li>
+<li><b>Seeds:</b> dev 101–110 for tuning; eval 1–50; replication 1001–1050; avoidance confirmation 2001–2050.</li>
+<li><b>Extension rule:</b> if a comparison's spread is too large, its regime grows from 30 to 50 seeds, with a stricter bound. This triggered for all five confirmatory regimes, and all were extended.</li>
+<li><b>Intervals:</b> BCa bootstrap, simultaneous over the family.</li></ul>
+
+<h2 class="new">12. Results</h2>
+<h3>Against the pre-registered comparator</h3>
+<p>All 30 comparisons win at 50 seeds, and the fresh-seed replication also wins 30 of 30, with no sign flips and a largest gap of 1.2 points. The protocol check passed: 528 cells, 19,140 runs, none missing, no overspend.</p>
+<div class="key warn"><div class="label">Why that is a low bar</div><p>P2 is required to spend its budget, so it moves VMs whose expected benefit is negative. At a 2% budget in these regimes it beat never migrating in no seed. Almost any policy that can decline to move will beat it, so the comparison below is the one to read.</p></div>
+<h3>Against never migrating (2% budget, % saving, 95% interval)</h3>
+<table>
+<tr><th>Policy</th><th class="n">B1</th><th class="n">B2</th><th class="n">C</th><th class="n">D (30 seeds)</th></tr>
+<tr><td>P2 tuned threshold</td><td class="n">−272.8 [−277.0, −268.4]</td><td class="n">−276.3 [−280.8, −271.7]</td><td class="n">−186.2</td><td class="n">−222.9</td></tr>
+<tr><td>P6 guard</td><td class="n">−51.6 [−63.6, −41.8]</td><td class="n">−50.9 [−63.5, −40.7]</td><td class="n">−34.8</td><td class="n">−46.3</td></tr>
+<tr><td>P3 v1 rule</td><td class="n">+2.2 [1.5, 2.9]</td><td class="n">+1.5 [1.1, 1.9]</td><td class="n">−4.8</td><td class="n">+5.6</td></tr>
+<tr><td><b>P4 BAM</b></td><td class="n"><b>+4.0 [3.3, 4.8]</b></td><td class="n"><b>+5.1 [4.6, 5.6]</b></td><td class="n">+4.6</td><td class="n">+9.5</td></tr>
+<tr><td>P5 Narya-inspired</td><td class="n">+8.9 [8.1, 9.7]</td><td class="n">+6.7 [6.1, 7.3]</td><td class="n">+15.8</td><td class="n">+15.0</td></tr>
+</table>
+<h3>What this means</h3>
+<ul><li><b>BAM helps, modestly.</b> It saves 4–5% in the trace-calibrated regimes.</li>
+<li><b>The budget rarely binds.</b> BAM uses about 2.6% of its 2% budget in B1. Its gain comes from declining bad moves, more than from ranking. The ablations agree in part: removing criticality costs about 5 points in B1 and ranking by probability alone about 8, while removing urgency or changing the denominator changes nothing measurable.</li>
+<li><b>Cost spread drives it.</b> At zero correlation (E1–E3, A/E runs at 30 seeds), BAM goes from −2.4% to +1.6% to +5.3% as spread grows, as the theory predicts.</li>
+<li><b>The guard fails as specified.</b> P6 falls back to P2, and in regime D its median captured benefit is negative at every budget. The fallback was pre-registered and stays reported.</li>
+<li><b>P5 beats BAM</b> with far fewer migrations. A diagnosis on dev seeds traced its whole advantage to its avoid action, which led to the next section.</li></ul>
+<figure><img src="fig_f4b-1.png" alt="Each policy's saving against never migrating across regimes A and E"><div class="cap">F4b: each policy against never migrating across the synthetic regimes A and E. Generated from the committed results.</div></figure>
+
+<h2 class="new">13. The avoidance confirmation</h2>
+<p>Avoidance was found after the freeze, on seeds already read, so those seeds could not confirm it. A separate rule (ADR-011) was committed first (<code>0e5517d</code>), then run on seeds 2001–2050, which no result had used. It needed six comparisons to pass, each with a mean difference of at least 1 point, Holm p below 0.05 and an interval above zero.</p>
+<div class="key"><div class="label">Verdict: confirmed, 6 of 6</div>
+<table style="margin:1mm 0 0">
+<tr><th>Avoidance only, gain in points</th><th class="n">against P0</th><th class="n">against BAM</th><th class="n">against P5</th></tr>
+<tr><td>B1</td><td class="n">+11.2 [10.3, 12.1]</td><td class="n">+7.5 [7.0, 8.0]</td><td class="n">+3.1 [2.4, 3.9]</td></tr>
+<tr><td>B2</td><td class="n">+8.9 [8.2, 9.6]</td><td class="n">+3.9 [3.4, 4.3]</td><td class="n">+2.5 [2.0, 3.1]</td></tr>
+</table></div>
+<p style="font-family:'Helvetica Neue',Arial,sans-serif;font-size:9pt;font-weight:600;margin-bottom:1.5mm">Saving against never migrating, B1, fresh seeds, drawn to scale</p>
+<div class="bar"><div class="n">BAM (about 25,000 migrations)</div><div class="b g" style="width:18.5mm"></div>+3.7%</div>
+<div class="bar"><div class="n">P5 (about 1,200 migrations)</div><div class="b" style="width:40.5mm"></div>+8.1%</div>
+<div class="bar"><div class="n">Avoidance only (none)</div><div class="b o" style="width:56mm"></div>+11.2%</div>
+<div class="bar" style="margin-bottom:4mm"><div class="n">Avoidance plus BAM (about 15,000)</div><div class="b o" style="width:57.5mm"></div>+11.5%</div>
+<h3>With imperfect predictions (secondary, not part of the verdict)</h3>
+<table>
+<tr><th>Predictor</th><th class="n">B1 avoid</th><th class="n">B1 BAM</th><th class="n">B2 avoid</th><th class="n">B2 BAM</th></tr>
+<tr><td>Oracle</td><td class="n">+11.2</td><td class="n">+3.7</td><td class="n">+8.9</td><td class="n">+5.1</td></tr>
+<tr><td>Noise σ = 0.5</td><td class="n">+7.4</td><td class="n">−55.2</td><td class="n">+6.4</td><td class="n">−52.5</td></tr>
+<tr><td>Noise σ = 1</td><td class="n">+3.8</td><td class="n">−248.2</td><td class="n">+3.1</td><td class="n">−246.9</td></tr>
+<tr><td>Noise σ = 2</td><td class="n">+2.3</td><td class="n">−419.2</td><td class="n">+1.0</td><td class="n">−427.9</td></tr>
+<tr><td>Shuffled scores</td><td class="n">+1.6</td><td class="n">−86.9</td><td class="n">+0.1</td><td class="n">−90.0</td></tr>
+</table>
+<p>Avoidance weakens quickly with noise but fails gently, because it spends nothing. BAM uses the probability in its stopping rule, so noise makes it migrate far more. That is a harsh case, because the noisy scores are not recalibrated. Rejected arrivals, avoidance's cost, rise only slightly in B (169 to 175 a run in B1, 1.5 to 3.4 in B2), but by up to about a quarter in tight A regimes.</p>
+<p><b>Unexplained:</b> shuffled scores should remove the benefit. They do in B2, but B1 keeps +1.6% [0.7, 2.3].</p>
+
+<h2>14. Robustness</h2>
+<p>The Week 20 runs cover 1,440 ablation runs, 9,000 robustness runs over 16 settings plus a heatmap, and a 220-point Morris screening. Morris measured BAM against P2 on A3 only, ranking the factors that move that comparison most:</p>
+<table>
+<tr><th>Factor</th><th class="n">μ*</th><th>Reading</th></tr>
+<tr><td>Predictor noise σ</td><td class="n">0.53</td><td>Most influential</td></tr>
+<tr><td>Budget</td><td class="n">0.51</td><td>A larger budget hurts P2 more</td></tr>
+<tr><td>Non-disk failure multiplier</td><td class="n">0.39</td><td>An assumed term</td></tr>
+<tr><td>Concurrent migrations; failure-time minimum</td><td class="n">0.39, 0.37</td><td>Simulator settings</td></tr>
+<tr><td>Bandwidth and dirty-rate error</td><td class="n">0.08, 0.01</td><td>Low on this comparison</td></tr>
+</table>
+<p>The Week 30 run using published migration-cost ranges is built and tested at small scale, but waits on five papers.</p>
+
+<h2>15. Limits</h2>
+<ul><li><b>Simulation only.</b> B1 and B2 are calibrated from traces; they are not measurements of a real cloud.</li>
+<li><b>Oracle predictor</b> in the main matrix, so gains are upper bounds.</li>
+<li><b>Assumed migration costs,</b> until the testbed in Weeks 41–46.</li>
+<li><b>Drives stand in for hosts,</b> with an assumed non-disk term.</li>
+<li><b>A removal proxy</b> stands in for machine failure in the measurement, with few events.</li>
+<li><b>Seeds test chance,</b> not whether the simulator is right.</li>
+<li><b>The literature check was short:</b> four web searches, so “first” cannot be claimed.</li>
+<li><b>Avoidance came after the freeze</b> and is outside the confirmatory family, even though it is now confirmed under its own rule.</li></ul>
+
+<h2 class="new">16. Status and what comes next</h2>
+<p>By the calendar this is the end of Week 4 of a 60-week plan. Most work through Week 21 and a good part of the tooling to Week 39 already exist, ahead of the dates.</p>
+<table>
+<tr><th style="width:36%">Stage</th><th>State</th></tr>
+<tr><td>Measurement (G1)</td><td>Done, signed off</td></tr>
+<tr><td>Simulator (G2)</td><td>Done, tag <code>sim-v2.0</code></td></tr>
+<tr><td>Protocol freeze</td><td>Done, tag <code>protocol-v1.0</code></td></tr>
+<tr><td>All benchmark runs and replication</td><td>Done, 50 seeds where required</td></tr>
+<tr><td>Avoidance confirmation</td><td>Done, confirmed</td></tr>
+<tr><td>Evidence verdict (G3)</td><td><b>Open.</b> Inputs filled; the rule's wording likely gives Strong, but sign-off and framing belong to the owner and advisor; one input, theory against simulator on final files, still needs re-reading</td></tr>
+<tr><td>Paper</td><td>Sections drafted; Evaluation prose waits for G3; never yet compiled</td></tr>
+<tr><td>Outside review</td><td>None yet: only mock reviews; 8 feedback items open</td></tr>
+<tr><td>Release</td><td>No <code>results-frozen</code> tag, DOI or <code>vmmbench-v0.9</code> yet</td></tr>
+</table>
+<h3>Next, in order</h3>
+<ol><li>Sign G3 with the advisor and decide the framing; tag <code>results-frozen</code>.</li>
+<li>Run Week 30 (published cost range) after the five papers are fetched.</li>
+<li>Write the Evaluation, abstract and introduction from frozen numbers; install BasicTeX and compile.</li>
+<li>Send the draft to outside readers.</li>
+<li>Submit Paper A, targeting SoCC 2027 (around July; the date is inferred until the call is out).</li>
+<li>Weeks 41–60: KVM/QEMU testbed for measured costs, rack-correlated failures, two-resource budgets, VMMBench v1.0 with hidden seeds, and a journal extension.</li></ol>
+
+<h2>17. Where everything is</h2>
+<table>
+<tr><th style="width:38%">Path</th><th>What</th></tr>
+<tr><td><code>vmsim/</code>, <code>vmmbench/</code></td><td>Simulator, policies, theory; result schemas and validator</td></tr>
+<tr><td><code>scripts/v2/</code></td><td>Every step from raw data to the paper's numbers</td></tr>
+<tr><td><code>configs/v2/</code></td><td>Frozen matrix and scenario cards</td></tr>
+<tr><td><code>results/summary/</code></td><td>Statistics behind every number here</td></tr>
+<tr><td><code>docs/v2/</code></td><td>Protocol, theory, gates, ADRs, log, <code>NOVELTY.md</code></td></tr>
+<tr><td><code>reading/</code></td><td>Notes on the papers, including all three base papers</td></tr>
+<tr><td><code>paper/</code></td><td>Paper source; every number is a generated macro</td></tr>
+<tr><td><code>make reproduce-small</code></td><td>Small end-to-end reproduction, about 4 minutes</td></tr>
+<tr><td><code>docker compose up -d</code></td><td>Console on localhost:8040; project site on localhost:8050</td></tr>
+</table>
+
+<h2>18. Questions to expect</h2>
+<div class="q"><b>Isn't this just Dantzig plus Elkan?</b>The rule is, and that is stated. The contribution is showing when it helps, measuring the condition on public data, and testing it under a frozen protocol.</div>
+<div class="q"><b>Is P2 a straw man?</b>It is what the protocol fixed, and it is worse than doing nothing. That is why every result is also shown against never migrating, where BAM's gain is modest.</div>
+<div class="q"><b>Did you beat Narya?</b>No. Their system is live and uses private data. P5 is only inspired by it, so the numbers cannot be compared.</div>
+<div class="q"><b>NENYA already does cost-aware decisions. Why not reinforcement learning?</b>NENYA learns a policy for one operator, and its cost depends on the action type. This project asks when workload awareness pays. No RL policy is in the benchmark yet, though the policy API allows one.</div>
+<div class="q"><b>If avoidance is so good, why migrate at all?</b>In these simulated regimes migration added little on top: 0.3 points in B1 and 0.9 in B2. It uses an oracle predictor and does not cover failures already imminent for running VMs in any real system, so this is not a recommendation to stop migrating.</div>
+<div class="q"><b>Was avoidance data-dredged?</b>It was found after the freeze. So a rule was committed first and tested on 50 unused seeds, and it stays labelled post-freeze.</div>
+<div class="q"><b>Drives are not hosts. Removals are not failures. Are the findings valid?</b>Both are stated threats. The non-disk term is swept, and the measurement is repeated across proxies and mappings, with its size staying small. A real failure signal per machine would be stronger, and no public trace links it to placement.</div>
+<div class="q"><b>Why 2,000 hosts?</b>A pilot showed the variance is small enough at that scale, with seeds carrying the statistical power (ADR-007).</div>
+
+<h2>19. Glossary</h2>
+<table>
+<tr><th style="width:22%">Term</th><th>Meaning</th></tr>
+<tr><td>Live migration</td><td>Moving a running VM between hosts with a brief pause</td></tr>
+<tr><td>Criticality</td><td>How much an interruption of this VM matters</td></tr>
+<tr><td>Budget</td><td>GB of VM memory that may be migrated per day</td></tr>
+<tr><td>Avoidance</td><td>Marking a host so it takes no new VMs</td></tr>
+<tr><td>Oracle</td><td>A predictor given the simulator's true hazard; an upper bound</td></tr>
+<tr><td>τ-b</td><td>Kendall's rank correlation, adjusted for ties</td></tr>
+<tr><td>Holm</td><td>A correction that keeps false positives controlled across many tests</td></tr>
+<tr><td>BCa</td><td>Bias-corrected bootstrap confidence interval</td></tr>
+<tr><td>Seed</td><td>One random world; policies are compared within the same seed</td></tr>
+<tr><td>Morris screening</td><td>A method for ranking which inputs most affect an output</td></tr>
+<tr><td>ADR</td><td>Architecture decision record: a short written decision</td></tr>
+<tr><td>Freeze</td><td>The point after which the rules cannot change without being logged</td></tr>
+</table>
+</body></html>
