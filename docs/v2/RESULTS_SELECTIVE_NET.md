@@ -76,5 +76,6 @@ B2 follows the same shape: G0-low −14.3, +4.9, +9.9; `level` −78.2, 0.0, +11
 - Simulation only, oracle hazards in both primary families. Costs are assumed; G0-low and G0-high are joint extremes of published measurements.
 - Only the seeds are blind. All comparators were seen on dev seeds and q was picked from a dev-seed grid.
 - Rejected arrivals are a small absolute quantity: about 0.03% of arrivals at most in B1 (280 of about 878,000), and few in B2 at any setting. Selective rejects fewer than P0 itself (66 against 169), which closing hosts should not do by itself. The mechanism is not shown, and it may come from rank-based placement spreading load.
+- Noise here is ADR-012's: one draw per host per 30-day block (`54_selective_net.py`). ADR-011 redraws daily (`vmsim/predictor.py`), which is much harsher: B1 P4 at σ = 1 is −30.5 here and −248 in `avoid_confirm.json`. The two are not comparable, and P4-net and P0+selective were not run under daily noise.
 - P4-net does not make BAM robust. It removes one specific failure: collapse under cheap migration or high cost level, at a correct predictor.
 - `p_dst` here uses the mean over up hosts of the engine's destination rule; a real allocator's rule would differ.

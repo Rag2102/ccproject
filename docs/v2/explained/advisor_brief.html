@@ -44,7 +44,7 @@ th,td { text-align:left; padding:7px 10px; border-bottom:1px solid var(--line); 
 <tr><th>Test</th><th>Rule</th><th>Verdict</th><th>Main numbers</th></tr>
 <tr><td>Avoidance law, S = φ R(q, σ)</td><td class="adr">ADR-012</td><td class="good">Supported</td><td>19 out-of-sample cells. Spearman 0.98 and 0.97. Mean error 1.2 and 0.9 points.</td></tr>
 <tr><td>BAM that charges destination risk (P4-net)</td><td class="adr">ADR-013 N</td><td class="good">Confirmed, 16 of 16</td><td>B1, cheap migration: −17.1 to +8.1%. High cost level: −77.8 to +9.6%. Default: +0.85 point.</td></tr>
-<tr><td>Per-tier host closing</td><td class="adr">ADR-013 S</td><td class="good">Confirmed, 8 of 8</td><td>B1 rejected VMs: 280 to 66. Saving: +16.9 to +17.5%. At σ = 1: +8.0 to +10.3%.</td></tr>
+<tr><td>Per-tier host closing</td><td class="adr">ADR-013 S</td><td class="good">Confirmed, 8 of 8</td><td>B1 rejected VMs: 280 to 66. Saving: +16.9 to +17.5%. At σ = 1, noise redrawn every 30 days: +8.0 to +10.3%.</td></tr>
 <tr><td>Published migration-cost range</td><td class="adr">ADR-009</td><td>Descriptive</td><td>See the next table. 4 of 6 sources.</td></tr>
 </table></div>
 <p class="note">ADR-012 and ADR-013 were frozen by a stored SHA-256, not a prior commit, so they are weaker evidence of order than ADR-011. For ADR-013 only the seeds are blind: the policies and settings came from dev seeds.</p>
@@ -82,6 +82,7 @@ th,td { text-align:left; padding:7px 10px; border-bottom:1px solid var(--line); 
 <h2>What still does not work</h2>
 <ul>
 <li><strong>P4-net does not fix noise.</strong> At σ = 1 it is −18.4% in B1 and −14.8% in B2. At the expensive end it adds nothing. Migration policies stay fragile under noise, while placement policies stay positive at every noise level run.</li>
+<li><strong>The σ results use two noise definitions.</strong> The ADR-013 tests redraw noise every 30 days. The ADR-011 test redraws it daily, which is much harsher: BAM in B1 at σ = 1 is −30.5% under the first and −248% under the second, and avoidance on 2% of hosts falls to +3.8% under daily noise. P4-net and per-tier closing were not run under daily noise, so these numbers should not be compared across the two.</li>
 <li><strong>Per-tier closing is mainly a rejection result.</strong> The saving gain is under 2 points, and in B1 it cannot be told from zero against redirecting without tiers. Rejections are about 0.03% of arrivals at most. It rejects fewer than never migrating does (66 against 169), and I have not explained why.</li>
 <li><strong>Migration on top of per-tier closing adds nothing measurable</strong> (B1 +17.4 against +17.5%).</li>
 <li><strong>The law has one fitted constant,</strong> so it is a regularity, not a derivation. Its extension to tiers missed by 1.7 and 2.1 points in opposite directions. Shuffled scores still leave +2.13% in B1, not fully explained.</li>
