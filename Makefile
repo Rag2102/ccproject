@@ -2,7 +2,7 @@
 # v1 is run as documented in README.md; nothing here changes it.
 PY ?= .venv/bin/python
 
-.PHONY: test diag data train sim worlds bench stats numbers audit figures paper console reproduce-small reproduce docker-repro release
+.PHONY: test diag data train sim worlds bench stats numbers audit figures paper paper-springer console reproduce-small reproduce docker-repro release
 
 test:
 	$(PY) -m pytest tests -q
@@ -67,6 +67,13 @@ numbers:
 
 paper: numbers
 	cd paper && latexmk -pdf -interaction=nonstopmode main.tex
+
+# Research paper on the Springer Nature template: tables from results/summary, then the PDF
+# (Tectonic if installed, else latexmk)
+paper-springer: numbers
+	$(PY) scripts/v2/56_paper_tables_postfreeze.py
+	cd paper-springer && if command -v tectonic >/dev/null; then tectonic -X compile main.tex; \
+		else latexmk -pdf -interaction=nonstopmode main.tex; fi
 
 # Week 22: static results Console (console/), data from results/summary at this commit
 console:

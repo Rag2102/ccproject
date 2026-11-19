@@ -1,0 +1,327 @@
+% Research paper, Springer Nature LaTeX template (sn-jnl, December 2024 package: sn-jnl.cls and
+% bst/ from the link in the course notice; the other reference styles are in template/).
+%
+% Who writes what: every sentence of prose is the authors' own. This file holds only the template,
+% headings, generated tables and figures, definitions taken from the code, and \guide{} notes on
+% what each section should cover. The notes print in red; set \showguidefalse to hide them before
+% counting pages or submitting, and delete every \guide{} once its section is written.
+%
+% Numbers come only from ../paper/numbers.tex (make numbers) and generated tables; figures only from
+% ../results/figures. Build: make paper-springer (or tectonic main.tex from this folder).
+\documentclass[pdflatex,sn-mathphys-num]{sn-jnl}
+
+\usepackage{graphicx}%
+\usepackage{multirow}%
+\usepackage{amsmath,amssymb,amsfonts}%
+\usepackage{amsthm}%
+\usepackage{mathrsfs}%
+\usepackage[title]{appendix}%
+\usepackage{xcolor}%
+\usepackage{textcomp}%
+\usepackage{manyfoot}%
+\usepackage{booktabs}%
+\usepackage{algorithm}%
+\usepackage{algorithmicx}%
+\usepackage{algpseudocode}%
+\usepackage{listings}%
+\usepackage{rotating}% sidewaystable for the two widest tables
+\usepackage{tikz}%
+\usetikzlibrary{positioning,arrows.meta}
+
+\input{../paper/numbers}
+\graphicspath{{../results/figures/}}
+
+
+
+\newif\ifshowguide
+\showguidetrue
+\newcommand{\guide}[1]{\ifshowguide\par\noindent\textcolor{red}{\small[Write: #1]}\par\fi}
+\newcommand{\repourl}{\url{https://github.com/Rag2102/ccproject}}
+
+\theoremstyle{thmstyleone}%
+\newtheorem{proposition}{Proposition}%
+\theoremstyle{thmstylethree}%
+\newtheorem{definition}{Definition}%
+
+\raggedbottom
+
+\begin{document}
+
+\title[Place First, Migrate Carefully]{Place First, Migrate Carefully: Failure Mitigation for
+Cloud VMs}
+
+% Fill in every team member and the guide's details; one member submits.
+\author*[1]{\fnm{Raghav} \sur{Gupta}}\email{ragh.gupta22@gmail.com}
+\author[1]{\fnm{[First name]} \sur{[Surname]}}\email{[email]}
+\affil*[1]{\orgdiv{Department of Computer Science and Engineering}, \orgname{[Institution]},
+\orgaddress{\city{[City]}, \country{[Country]}}}
+
+\abstract{\guide{150--250 words in your own words: the problem (which VMs to move before a host
+fails, under a migration budget), what you built (simulator, policies, benchmark), the main
+results with numbers (30 of 30 pre-registered wins over the tuned threshold; BAM's saving against
+never migrating depends on migration cost; placement beats migration), and the code link. Use the
+macros in ../paper/numbers.tex for numbers.}}
+
+\keywords{virtual machine migration, failure mitigation, cost-sensitive decisions, cloud
+computing, VM placement, simulation}
+
+\maketitle
+
+% ======================================================================================
+\section{Introduction}\label{sec:intro}
+\guide{Motivation (VM interruptions from hardware failure; live migration costs bandwidth and a
+pause; flagged hosts often do not fail). The research question in one sentence. The contributions
+as a numbered list (measurement, closed-form theory, open benchmark, the cost-range finding,
+avoidance and the two new policies), each pointing to its section. End with the paper's
+organisation. Cite Narya, NENYA and Deoxys here.}
+
+% ======================================================================================
+\section{Literature Review}\label{sec:related}
+\guide{The guideline asks for a comprehensive review of relevant, recent papers from reputed
+journals and conferences. Only cite papers you have read. Suggested subsections below; each ends
+with how this work differs. Close with Table~\ref{tab:gap}.}
+
+\subsection{Failure prediction in cloud infrastructure}\label{sec:rel-pred}
+\guide{Disk and node failure prediction: Schroeder and Gibson, Pinheiro et al., Botezatu et al.,
+Xu et al. (CDEF), Tripathi et al. (GQAT-Net). Add recent journal work you have read.}
+
+\subsection{Proactive failure mitigation systems}\label{sec:rel-mitig}
+\guide{Narya (OSDI 2020), NENYA (KDD 2022), Deoxys (SoCC 2024): what each decides, with what
+data, against which baseline, and the headline result as each paper reports it. Your reading
+notes are in reading/ and docs/v2/narya\_differences.md.}
+
+\subsection{Live migration cost}\label{sec:rel-mig}
+\guide{Clark et al., Voorsluys et al., Akoush et al., Hu et al., and the two sources not yet read
+(Liu et al. 2011; Nathan et al., SoCC 2015). Cite only what you have read.}
+
+\subsection{VM placement and cluster traces}\label{sec:rel-place}
+\guide{Protean, Resource Central, Borg 2019 traces, VM rescheduling with RL (Ding et al.).}
+
+\subsection{Simulators and benchmarks}\label{sec:rel-bench}
+\guide{CloudSim Plus, OpenDC, Park, Gymnasium, Virt-LM, DCcluster-Opt, HELM as a benchmark
+model.}
+
+\begin{table}[t]\centering\small
+\caption{Scope of the three base papers and this work, as read from each paper.}
+\label{tab:gap}
+\setlength{\tabcolsep}{4pt}\footnotesize
+\begin{tabular}{lllll}\toprule
+ & Narya~\cite{levy2020narya} & NENYA~\cite{wang2022nenya} & Deoxys~\cite{zhang2024deoxys} & This work \\ \midrule
+Acts & Before failure & Before failure & After failure & Before failure \\
+Decision unit & Node & Database copy & Node & VM \\
+Per-instance criticality & No & No & Node-level only & Per VM \\
+Migration budget in GB & No & No & No & Yes \\
+Theory of when it pays & No & No & No & Closed form \\
+Data & Private & Private & Private & Public \\
+Open artifact & None found & None found & None & Rerunnable \\
+\bottomrule\end{tabular}
+\end{table}
+
+% ======================================================================================
+\section{Problem Formulation}\label{sec:problem}
+\guide{Explain the setting in your own words (hosts, VMs, tiers, daily GB budget, horizon $H$),
+then each symbol of the definitions below. Source: docs/v2/THEORY.md section 1.}
+
+\begin{definition}[Expected benefit of moving a VM]\label{def:benefit}
+For VM $i$ on host $j$, with $p_j$ the probability that host $j$ fails within $H$, $c_i$ the
+interruption cost, $e_i$ the probability that the migration finishes before the failure, $m_i$
+the migration cost and $w_i$ its memory in GB,
+\begin{equation}
+b_i = p_j\, c_i\, e_i - m_i, \qquad \text{subject to} \quad \sum_{i \in S} w_i \le B .
+\label{eq:benefit}
+\end{equation}
+\end{definition}
+
+\begin{equation}
+C(S) = C_0 - \sum_{i \in S} b_i, \qquad C_0 = \sum_i p_j\, c_i ,
+\label{eq:cost}
+\end{equation}
+\begin{equation}
+\Delta = \frac{C_{P2} - C_{\mathrm{BAM}}}{C_{P2}} .
+\label{eq:delta}
+\end{equation}
+\guide{State that choosing $S$ is a 0/1 knapsack and that its LP relaxation is solved by
+ranking on $b_i/w_i$ (Dantzig). Give the closed-form result for when ranking beats a threshold
+(THEORY.md sections 2--4) and how it was checked (Figure~\ref{fig:theory}).}
+
+% ======================================================================================
+\section{Proposed Methodology}\label{sec:method}
+\guide{Describe each policy you compare (Table~\ref{tab:policies}) and the two policies added
+after the freeze. Say which are confirmatory and which are exploratory.}
+
+\begin{table}[t]\centering\small
+\caption{Policies compared. Definitions from docs/v2/PROTOCOL.md section 2 and
+vmsim/policies.}
+\label{tab:policies}
+\begin{tabular}{lp{0.72\textwidth}}\toprule
+Policy & Rule \\ \midrule
+P0 & Never migrate \\
+P1 & Fixed probability threshold \\
+P2 & Threshold tuned on development seeds to use the budget \\
+P3 & Cost-sensitive rule from the first version of the project \\
+P4 (BAM) & Rank by $b_i/w_i$, move while $b_i>0$ and budget remains (Algorithm~\ref{alg:bam}) \\
+P5 & Narya-inspired: nothing, live-migrate or avoid allocation, chosen by Thompson sampling \\
+P6 & Guard: BAM only when evidence of benefit over P2 passes; otherwise P2 \\
+P7 & Oracle \\
+P8 & Random selection within the budget \\ \midrule
+P0+avoid & Close the riskiest hosts to new VMs; never migrate (ADR-010, ADR-011) \\
+P4-net & BAM charging destination risk, $b_i = (p_j e_i - p_{\mathrm{dst}})\,c_i - m_i$ (ADR-013) \\
+P0+selective & Close the riskiest $q_t$ of hosts to tier $t$ only, $q=(2,5,10)\%$ (ADR-013) \\
+\bottomrule\end{tabular}
+\end{table}
+
+\begin{algorithm}[t]
+\caption{Budget-aware migration (BAM, P4), one daily decision}\label{alg:bam}
+\begin{algorithmic}[1]
+\Require eligible VMs with $p_j, c_i, m_i, w_i$; daily budget $B$
+\State compute $e_i$ from the migration queue on each host and $b_i$ by Eq.~\eqref{eq:benefit}
+\State put every VM in a max-heap keyed by $b_i / w_i$; $S \gets \emptyset$; $U \gets 0$
+\While{the heap is not empty}
+  \State pop VM $i$; recompute $e_i$ and $b_i$ if its host's queue changed; reinsert if stale
+  \If{$b_i \le 0$} \textbf{break} \EndIf
+  \If{$U + w_i \le B$ and a destination has capacity}
+    \State $S \gets S \cup \{i\}$; $U \gets U + w_i$; reserve the destination
+  \EndIf
+\EndWhile
+\State \Return $S$
+\end{algorithmic}
+\end{algorithm}
+\guide{Check Algorithm~\ref{alg:bam} against vmsim/policies/bam.py and correct it if any step
+differs, then explain it in prose. Explain P4-net and per-tier closing in the same way
+(vmsim/policies/selective.py).}
+
+% ======================================================================================
+\section{System Architecture}\label{sec:arch}
+\guide{Walk through Figure~\ref{fig:arch}: public data, failure model, failure worlds, simulator,
+policies under one GB budget, paired statistics, benchmark and Console.}
+
+\begin{figure}[t]\centering
+\begin{tikzpicture}[node distance=4mm and 6mm, every node/.style={draw, rounded corners,
+  align=center, font=\small, minimum height=9mm, inner sep=3pt}, >={Stealth}]
+\node (data) {Public data\\Backblaze, Google 2019,\\Azure, Alibaba 2018};
+\node (model) [right=of data] {Failure model\\calibrated hazards};
+\node (worlds) [right=of model] {Failure worlds\\hashed, shared\\by every policy};
+\node (sim) [below=of worlds] {Simulator (vmsim)\\placement, migration,\\cost accounting};
+\node (pol) [left=of sim] {Policies P0--P8\\one daily GB budget};
+\node (stats) [left=of pol] {Statistics\\paired seeds, BCa,\\Holm correction};
+\node (out) [below=of pol] {Benchmark (VMMBench),\\tables, figures, Console};
+\draw[->] (data) -- (model);
+\draw[->] (model) -- (worlds);
+\draw[->] (worlds) -- (sim);
+\draw[->] (pol) -- (sim);
+\draw[->] (sim) |- (out);
+\draw[->] (stats) |- (out);
+\end{tikzpicture}
+\caption{Pipeline from public data to results.}\label{fig:arch}
+\end{figure}
+
+% ======================================================================================
+\section{Implementation}\label{sec:impl}
+\guide{Explain the main modules (vmsim/, vmmbench/, scripts/v2/, tests/v2) and how a run is
+reproduced (make reproduce-small). Point to Table~\ref{tab:stack} and the repository.}
+
+\begin{table}[t]\centering\small
+\caption{Software used. Exact versions are pinned in pyproject.toml and uv.lock.}
+\label{tab:stack}
+\setlength{\tabcolsep}{4pt}\footnotesize
+\begin{tabular}{ll}\toprule
+Purpose & Tools \\ \midrule
+Language and environment & Python 3.12, uv \\
+Data processing & pandas, NumPy, PyArrow (Parquet), DuckDB \\
+Failure model & scikit-learn (HistGradientBoosting, logistic regression, isotonic calibration) \\
+Statistics & SciPy \\
+Parallel runs & joblib \\
+Figures & Matplotlib \\
+Testing & pytest, Hypothesis, Ruff \\
+Demo site & Flask, Gunicorn \\
+\bottomrule\end{tabular}
+\end{table}
+
+% ======================================================================================
+\section{Experimental Setup}\label{sec:setup}
+\guide{Datasets and how each was checked (docs/v2/data\_quality\_report.md, data\_sources.md);
+the regimes (A--E, B1, B2, C, D) and what each represents; scale (\VHosts{} hosts,
+\VHorizonDays{} days after a \VWarmupDays-day warm-up, 4 budgets, seeds per family); the
+pre-registered win rule (mean adjusted $\Delta \ge 1\%$, Holm $p<0.05$ over \VFamilySize{}
+comparisons); simulator validation (docs/v2/G2\_simulator\_validation.md); the cost range
+(configs/v2/cost\_range.yaml). Say that the main runs use an oracle predictor and that the
+evaluation seeds were extended to 50 where ADR-007 required it.}
+
+% ======================================================================================
+\section{Results}\label{sec:results}
+\guide{Report what the tables and figures show, in the order of the research questions. Say
+which results are confirmatory and which are exploratory, and give intervals with every
+number.}
+
+\subsection{Budget-aware migration against the tuned threshold}\label{sec:res-main}
+\input{tables/table3}
+\input{tables/table3_p0}
+
+\begin{figure}[t]\centering
+\includegraphics[width=\linewidth]{v2_F4b_vs_p0.pdf}
+\caption{Saving against never migrating.\guide{Expand this caption: what is plotted, regime,
+budget, seeds, intervals.}}\label{fig:vsp0}
+\end{figure}
+
+\begin{figure}[t]\centering
+\includegraphics[width=\linewidth]{v2_F4_advantage.pdf}
+\caption{Advantage over the tuned threshold along $\rho_L$.\guide{Expand this caption.}}
+\label{fig:adv}
+\end{figure}
+
+\subsection{Theory against simulation}\label{sec:res-theory}
+\begin{figure}[t]\centering
+\includegraphics[width=\linewidth]{v2_theory_check.pdf}
+\caption{Theory check: closed form against Monte Carlo.\guide{Expand this caption.}}
+\label{fig:theory}
+\end{figure}
+
+\subsection{Sensitivity to migration cost}\label{sec:res-cost}
+\input{tables/costrange}
+
+\subsection{Placement without migration}\label{sec:res-avoid}
+\input{tables/avoid}
+
+\subsection{Destination-aware BAM and per-tier closing}\label{sec:res-new}
+\input{tables/selective_net}
+
+\subsection{Comparison with existing approaches}\label{sec:res-compare}
+\guide{Compare with Narya, NENYA and Deoxys honestly: their headline figures are from live
+systems against their own baselines, so they cannot be ranked against these simulated results.
+Inside each study the closest shared yardstick is a Narya policy (NENYA Table~1, Deoxys
+Figure~6, P5 here). Source: the comparison page and docs/v2/NOVELTY.md.}
+
+% ======================================================================================
+\section{Discussion}\label{sec:discussion}
+\guide{What the results mean; why BAM's saving reverses when migration is cheap (re-migration,
+destination risk); why placement matters more than migration; threats to validity (simulation
+only, oracle predictor, assumed costs from 4 of 6 sources, risk proxy, post-freeze tests frozen by
+hash rather than committed first, the two noise definitions).}
+
+% ======================================================================================
+\section{Conclusion}\label{sec:conclusion}
+\guide{Main findings in a few sentences and future work (KVM/QEMU testbed, benchmark release).}
+
+\backmatter
+
+\bmhead{Acknowledgements}
+\guide{Optional: your guide and anyone who helped.}
+
+\section*{Declarations}
+\begin{itemize}
+\item Funding: \guide{or `Not applicable'}
+\item Conflict of interest/Competing interests: \guide{or `Not applicable'}
+\item Ethics approval and consent to participate: \guide{`Not applicable' if no human data}
+\item Consent for publication: \guide{or `Not applicable'}
+\item Data availability: \guide{the public datasets and their citations \cite{backblaze2026drivestats,
+googleclusterdata2019,azurepublicdataset}}
+\item Materials availability: \guide{or `Not applicable'}
+\item Code availability: \repourl
+\item Author contribution: \guide{who did what}
+\item Use of AI tools: \guide{state how AI tools were used, as your guide and the course rules
+require.}
+\end{itemize}
+
+\bibliography{refs}
+
+\end{document}
