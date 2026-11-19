@@ -31,7 +31,9 @@ HEADER = (
 
 def fit(tex: str) -> str:
     """Narrow a table for the single-column template: smaller type and column gaps. sn-jnl sets
-    the caption from the tabular inside the table, so the tabular must not be wrapped in a box."""
+    the caption from the tabular inside the table, so the tabular must not be wrapped in a box.
+    Floats may go here, top, bottom or on a float page, which leaves fewer half-empty pages."""
+    tex = tex.replace(r"\begin{table}[t]", r"\begin{table}[htbp]")
     return tex.replace(r"\centering\small", r"\centering\footnotesize\setlength{\tabcolsep}{3pt}")
 
 

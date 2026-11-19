@@ -1,13 +1,9 @@
 % Research paper, Springer Nature LaTeX template (sn-jnl, December 2024 package: sn-jnl.cls and
 % bst/ from the link in the course notice; the other reference styles are in template/).
 %
-% Who writes what: every sentence of prose is the authors' own. This file holds only the template,
-% headings, generated tables and figures, definitions taken from the code, and \guide{} notes on
-% what each section should cover. The notes print in red; set \showguidefalse to hide them before
-% counting pages or submitting, and delete every \guide{} once its section is written.
-%
-% Numbers come only from ../paper/numbers.tex (make numbers) and generated tables; figures only from
-% ../results/figures. Build: make paper-springer (or tectonic main.tex from this folder).
+% Numbers come from ../paper/numbers.tex (make numbers), the generated tables in tables/ and the
+% summary files they are read from; figures only from ../results/figures. Build: make
+% paper-springer (or tectonic main.tex from this folder).
 \documentclass[pdflatex,sn-mathphys-num]{sn-jnl}
 
 \usepackage{graphicx}%
@@ -31,12 +27,7 @@
 \input{../paper/numbers}
 \graphicspath{{../results/figures/}}
 
-
-
-\newif\ifshowguide
-\showguidetrue
-\newcommand{\guide}[1]{\ifshowguide\par\noindent\textcolor{red}{\small[Write: #1]}\par\fi}
-\newcommand{\repourl}{\url{https://github.com/Rag2102/ccproject}}
+\newcommand{\repourl}{\url{https://github.com/Rag2102/ccproject/tree/v2-research}}
 
 \theoremstyle{thmstyleone}%
 \newtheorem{proposition}{Proposition}%
@@ -50,17 +41,28 @@
 \title[Place First, Migrate Carefully]{Place First, Migrate Carefully: Failure Mitigation for
 Cloud VMs}
 
-% Fill in every team member and the guide's details; one member submits.
+% Complete every team member and the affiliation; one member submits.
 \author*[1]{\fnm{Raghav} \sur{Gupta}}\email{ragh.gupta22@gmail.com}
 \author[1]{\fnm{[First name]} \sur{[Surname]}}\email{[email]}
 \affil*[1]{\orgdiv{Department of Computer Science and Engineering}, \orgname{[Institution]},
 \orgaddress{\city{[City]}, \country{[Country]}}}
 
-\abstract{\guide{150--250 words in your own words: the problem (which VMs to move before a host
-fails, under a migration budget), what you built (simulator, policies, benchmark), the main
-results with numbers (30 of 30 pre-registered wins over the tuned threshold; BAM's saving against
-never migrating depends on migration cost; placement beats migration), and the code link. Use the
-macros in ../paper/numbers.tex for numbers.}}
+\abstract{Cloud operators move virtual machines (VMs) off hosts that are predicted to fail, under
+a daily limit on how much they can migrate. Production systems learn which mitigation to take, on
+private data, and report their gains against their own baselines. We ask the question they leave
+open: when does it pay to rank VMs by what they run and what moving them costs? On public data
+(Backblaze drive telemetry, Google 2019 placements and Azure VM traces) we measure where real
+placement sits, derive the advantage of budget-aware ranking in closed form, and evaluate twelve
+policies in a validated simulator under a protocol fixed before any evaluation run. Critical work
+is essentially uncorrelated with machine risk: the rank correlation is at most \VGOneMaxAbsTauB{} in absolute value. Budget-aware
+migration (BAM) wins all \VFamilySize{} pre-registered comparisons against a threshold tuned to the
+same budget, and the result replicates on fresh seeds. That bar turns out to be low, because the
+tuned threshold costs more than never migrating. Against never migrating, BAM saves 4.0\% in the
+measured regime at the assumed migration cost, but its saving reverses to \textminus 17.4\% at the cheap
+end of the published cost range. Keeping new VMs off the riskiest hosts, with no migration at all,
+saves 11.2\% on fresh seeds. Two new policies follow: BAM that charges the destination's risk,
+which removes the reversal, and per-tier host closing, which keeps the saving while rejecting far
+fewer VMs. The simulator, protocol and benchmark are open.}
 
 \keywords{virtual machine migration, failure mitigation, cost-sensitive decisions, cloud
 computing, VM placement, simulation}
@@ -69,39 +71,153 @@ computing, VM placement, simulation}
 
 % ======================================================================================
 \section{Introduction}\label{sec:intro}
-\guide{Motivation (VM interruptions from hardware failure; live migration costs bandwidth and a
-pause; flagged hosts often do not fail). The research question in one sentence. The contributions
-as a numbered list (measurement, closed-form theory, open benchmark, the cost-range finding,
-avoidance and the two new policies), each pointing to its section. End with the paper's
-organisation. Cite Narya, NENYA and Deoxys here.}
+
+Hardware failures interrupt the virtual machines (VMs) they host, and large operators now predict
+those failures days ahead~\cite{levy2020narya,lin2018ming,xu2018cdef}. A prediction is only useful
+if something is done with it. The usual response is to live-migrate VMs off the host before it
+fails~\cite{clark2005live}, but migration is not free. Each move uses network and host capacity,
+pauses the VM briefly, and is wasted whenever the flagged host would not have failed, which is
+most of the time. Operators therefore limit how much they migrate per day, and the decision
+becomes a question of priority: which VMs should move first?
+
+The operational default ranks by failure probability alone and moves VMs on hosts above a
+threshold. The alternative weighs each VM's expected benefit against its cost: a small, critical
+VM on a moderately risky host can be worth more than a large batch VM on a riskier one. Rules of
+this form are classical~\cite{elkan2001foundations,dantzig1957discrete}, and production systems
+already use cost-aware and learned mitigation. Narya~\cite{levy2020narya} learns which action to
+take for a flagged node, NENYA~\cite{wang2022nenya} trades mitigation cost against failures with
+cascade reinforcement learning, and Deoxys~\cite{zhang2024deoxys} chooses between rebooting and
+redeploying an unhealthy node from causal estimates. All three run at one operator, on private
+data, and report their results relative to their own baselines. None of them asks when ranking
+VMs by workload pays off at all, or compares against a threshold tuned to the same budget.
+
+This paper answers that question on public data, with a simulator and a protocol that anyone can
+rerun. Our first version of this project gave a sharp but wrong answer: it found the cost-aware
+rule behind a matched threshold unless critical VMs sat on risky hosts, which suggested a
+break-even correlation. Diagnosing that result showed two accounting errors, not a weakness of the
+rule, and set the agenda for the work reported here.
+
+We make the following contributions.
+\begin{enumerate}
+\item \textbf{A measurement of real placement} (Section~\ref{sec:rho}). In three Google 2019
+cells, chosen before any data was read, the rank correlation between task criticality and machine
+risk is $|\tau_b| \le \VGOneMaxAbsTauB$ under every tier mapping and risk proxy tested.
+\item \textbf{A closed form for when ranking pays} (Section~\ref{sec:method}). Under calibrated
+probabilities, equal budgets and horizon-matched accounting, budget-aware ranking never loses in
+expectation to a probability threshold. Its advantage is driven by the spread of cost per GB and is
+largest near zero correlation; there is no break-even correlation. A Monte Carlo check agrees at
+all \VTheoryPoints{} grid points.
+\item \textbf{A pre-registered evaluation and an open benchmark} (Sections~\ref{sec:setup}
+and~\ref{sec:results}). Twelve policies are compared on paired seeds in a simulator validated
+against closed forms. BAM wins all \VFamilySize{} confirmatory comparisons against the tuned
+threshold, and we show why that bar is weak.
+\item \textbf{The migration-cost condition} (Section~\ref{sec:res-cost}). Across the published
+range of live-migration costs, BAM's saving against never migrating runs from $-17.4\%$ to
+$+4.0\%$, so the headline holds only under stated costs.
+\item \textbf{Placement before migration, and two new policies} (Sections~\ref{sec:res-avoid}
+and~\ref{sec:res-new}). Avoiding risky hosts for new VMs beats every migration policy, follows a
+simple concentration law, and motivates BAM with destination risk and per-tier host closing, both
+confirmed on fresh seeds under rules fixed before the runs.
+\end{enumerate}
+
+Section~\ref{sec:related} reviews related work and Section~\ref{sec:problem} states the decision
+problem. Section~\ref{sec:method} gives the policies and the theory, Sections~\ref{sec:arch}
+and~\ref{sec:impl} the system and its implementation, and Section~\ref{sec:setup} the data,
+simulator and protocol. Section~\ref{sec:results} reports the results and compares them with the
+base papers, Section~\ref{sec:discussion} discusses them and the threats to validity, and
+Section~\ref{sec:conclusion} concludes.
 
 % ======================================================================================
 \section{Literature Review}\label{sec:related}
-\guide{The guideline asks for a comprehensive review of relevant, recent papers from reputed
-journals and conferences. Only cite papers you have read. Suggested subsections below; each ends
-with how this work differs. Close with Table~\ref{tab:gap}.}
 
 \subsection{Failure prediction in cloud infrastructure}\label{sec:rel-pred}
-\guide{Disk and node failure prediction: Schroeder and Gibson, Pinheiro et al., Botezatu et al.,
-Xu et al. (CDEF), Tripathi et al. (GQAT-Net). Add recent journal work you have read.}
 
-\subsection{Proactive failure mitigation systems}\label{sec:rel-mitig}
-\guide{Narya (OSDI 2020), NENYA (KDD 2022), Deoxys (SoCC 2024): what each decides, with what
-data, against which baseline, and the headline result as each paper reports it. Your reading
-notes are in reading/ and docs/v2/narya\_differences.md.}
+Field studies of large drive populations established that replacement rates far exceed datasheet
+values and that SMART attributes carry real but incomplete signal~\cite{schroeder2007disk}. Later
+work predicts drive replacement from SMART data~\cite{botezatu2016predicting}, and production
+systems at Microsoft rank disks by error-proneness from SMART and system signals with a
+cost-sensitive loss, acting on the top few under capacity constraints~\cite{xu2018cdef}. MING
+predicts node failures by combining an LSTM over temporal signals, a random forest over spatial
+signals and a ranking model, with a cost-sensitive function to choose the cut-off; its authors
+note that predicting faulty nodes enables VMs to be allocated and migrated to healthy
+ones~\cite{lin2018ming}. NTAM extends disk failure prediction with the status of neighbouring
+disks and an attention-based temporal component, and is deployed on Azure and Microsoft
+365~\cite{luo2021ntam}. Memory is another major cause: HiMFP predicts uncorrectable memory errors
+from correctable-error patterns and reports about 45\% fewer VM interruptions from such
+errors~\cite{yu2023himfp}.
+
+Recent journal work broadens the toolset. Tengku Asmawi et al.\ compare five traditional and three
+deep learning models for job and task failure on Google cluster traces, finding gradient boosting
+best for jobs and tree models best for tasks~\cite{asmawi2022cloud}. On the Backblaze data used
+here, an explainable XGBoost model over SMART time-series features reaches a 74.7\% detection rate
+at a 0.73\% false-alarm rate~\cite{li2025explainable}, and a knowledge-graph approach adds context
+such as how failures relate to one another~\cite{chhetri2022kg}. GQAT-Net adds a calibrated
+attention architecture for failures in cluster traces~\cite{tripathi2025gqat}.
+
+All of these stop at the prediction, or name migration as a downstream use without deciding which
+VMs to move. We use a predictor of this kind as an input and do not claim a better one. Instead we
+ask what a decision built on its probabilities needs from it.
+
+\subsection{Proactive failure mitigation}\label{sec:rel-mitig}
+
+Narya~\cite{levy2020narya} flags nodes with rules and a gradient-boosted model, then chooses among
+composite actions (mark unallocatable, live-migrate, wait, send to repair) with A/B tests and a
+Thompson-sampling bandit, learning from interruptions observed over the following weeks. It
+reduced VM interruptions by about 26\% against the previous fixed action plan. NENYA~\cite{wang2022nenya}
+mitigates failures of Microsoft 365 database copies with cascade reinforcement learning, whose
+cost is fixed per action type. Deoxys~\cite{zhang2024deoxys} acts after a node turns unhealthy and
+chooses between Reboot and Redeploy from double machine learning with a causal forest, reporting
+53\% less VM downtime than the legacy policy in an A/B test. Protean~\cite{hadary2020protean}
+allocates VMs at scale and can avoid unhealthy hosts at allocation time.
+
+A second line of work treats proactive fault tolerance as an allocation problem. VMFT-LAD detects
+VM failures early from logs with a Matrix Profile and large language models, so that VMs can be
+migrated before the failure~\cite{senevirathne2024vmft}. Ramesh et al.\ formulate the allocation of
+VMs from deteriorating hosts as an integer linear program that minimises migration time, solved
+with hybrid genetic and simulated-annealing heuristics~\cite{ramesh2024ilp}. These methods decide
+where and how fast to move VMs once a host is suspect; none of them ranks VMs by their criticality
+and cost under a shared migration budget, or asks when doing so beats a probability threshold.
 
 \subsection{Live migration cost}\label{sec:rel-mig}
-\guide{Clark et al., Voorsluys et al., Akoush et al., Hu et al., and the two sources not yet read
-(Liu et al. 2011; Nathan et al., SoCC 2015). Cite only what you have read.}
+
+Pre-copy live migration sends memory in rounds while the VM runs, then pauses it for a final
+copy~\cite{clark2005live}. Its cost depends on the link, the VM's memory and how fast the workload
+dirties pages. Measurements span a wide range: from tens of milliseconds of downtime for
+interactive servers on Xen~\cite{clark2005live} to several seconds for a loaded web
+application~\cite{voorsluys2009cost}, with effective throughput from about a tenth of the link~\cite{clark2005live} to about three
+quarters, depending on the hypervisor~\cite{akoush2010predicting,hu2013quantitative}. Elsaid et al.\ survey
+the models that predict these costs~\cite{elsaid2021survey}, and Haris et al.\ use a learned model
+to stop pre-copy early when predicted downtime is low enough, cutting downtime on a KVM
+testbed~\cite{haris2024precopy}. Virt-LM benchmarks migration mechanisms
+themselves~\cite{huang2011virtlm}. We do not improve migration; we take its cost as an input and
+sweep it across this published range.
 
 \subsection{VM placement and cluster traces}\label{sec:rel-place}
-\guide{Protean, Resource Central, Borg 2019 traces, VM rescheduling with RL (Ding et al.).}
 
-\subsection{Simulators and benchmarks}\label{sec:rel-bench}
-\guide{CloudSim Plus, OpenDC, Park, Gymnasium, Virt-LM, DCcluster-Opt, HELM as a benchmark
-model.}
+Public traces make realistic inputs available. Resource Central characterises Azure VM workloads
+and shows that most VMs are short-lived while a long-lived minority holds most
+memory-time~\cite{cortez2017resource}. The 2019 Borg traces record placements, priorities and
+machine events for eight Google cells~\cite{tirmazi2020borg}. Recent work reschedules VMs with deep
+reinforcement learning on production traces~\cite{ding2025vm2rl}. Schedulers place work for
+packing, priority and spread, not for hardware risk, so there is no reason to expect critical work
+to sit on safer or riskier machines, but we found no published measurement of it.
 
-\begin{table}[t]\centering\small
+\subsection{Cost-sensitive decisions, simulators and benchmarks}\label{sec:rel-bench}
+
+Acting when expected cost exceeds a threshold is the classical cost-sensitive
+rule~\cite{elkan2001foundations}, and filling a budget by benefit density is the greedy solution
+of the knapsack relaxation~\cite{dantzig1957discrete}. We claim neither. General cloud simulators
+such as CloudSim Plus~\cite{cloudsimplus} and OpenDC~\cite{opendc} model faults and migration, and
+platforms such as Park~\cite{mao2019park}, Gymnasium~\cite{towers2024gymnasium} and
+DCcluster-Opt~\cite{guillenperez2025dccluster} standardise environments for learned policies. None
+combines calibrated failure worlds built from public data, a migration budget shared by every
+move, paired comparisons on common random numbers and a frozen protocol. Following
+holistic-evaluation practice~\cite{liang2023helm}, our benchmark documents every scenario with a
+card and traces every number to a file.
+
+Table~\ref{tab:gap} summarises the scope of the three base papers against this work.
+
+\begin{table}[htbp]\centering
 \caption{Scope of the three base papers and this work, as read from each paper.}
 \label{tab:gap}
 \setlength{\tabcolsep}{4pt}\footnotesize
@@ -119,40 +235,88 @@ Open artifact & None found & None found & None & Rerunnable \\
 
 % ======================================================================================
 \section{Problem Formulation}\label{sec:problem}
-\guide{Explain the setting in your own words (hosts, VMs, tiers, daily GB budget, horizon $H$),
-then each symbol of the definitions below. Source: docs/v2/THEORY.md section 1.}
+
+A cluster of hosts runs VMs. A host fails when any of its components fails, and every VM on it is
+interrupted. Once a day the operator may live-migrate some VMs to other hosts; each migration uses
+part of a daily budget $B$, measured in GB of memory moved. Table~\ref{tab:notation} lists the
+notation.
+
+\begin{table}[htbp]\centering
+\caption{Notation.}\label{tab:notation}
+\footnotesize
+\begin{tabular}{ll}\toprule
+Symbol & Meaning \\ \midrule
+$j$, $i$ & host; VM, on host $j(i)$ \\
+$H$ & risk horizon in days (30 unless stated) \\
+$p_j$ & probability that host $j$ fails within $H$, given that it is up now \\
+$c_i$ & cost if VM $i$ is interrupted: tier weight times recovery downtime, weighted by \\
+ & the probability that $i$ is still running at the failure \\
+$e_i$ & probability that $i$'s migration finishes before its host fails \\
+$m_i$ & cost of migrating $i$ (pause and resource time, in the units of $c_i$) \\
+$w_i$ & memory of $i$ in GB, the amount it uses from the budget \\
+$B$ & daily budget in GB \\
+$\kappa_i$ & averted cost per unit of budget, $c_i e_i / w_i$ \\
+$\rho$, $\rho_L$ & correlation of $\log\kappa$ and $\log p$; $\rho_L$ on the latent copula axis \\
+$\sigma_p$, $\sigma_\kappa$ & standard deviations of $\log p$ and $\log\kappa$ \\
+$q$ & share of VMs the budget allows \\
+$\Delta$ & advantage over the threshold, $(C_{P2}-C)/C_{P2}$ \\
+\bottomrule\end{tabular}
+\end{table}
 
 \begin{definition}[Expected benefit of moving a VM]\label{def:benefit}
-For VM $i$ on host $j$, with $p_j$ the probability that host $j$ fails within $H$, $c_i$ the
-interruption cost, $e_i$ the probability that the migration finishes before the failure, $m_i$
-the migration cost and $w_i$ its memory in GB,
+Migrating VM $i$ changes the expected cost by
 \begin{equation}
-b_i = p_j\, c_i\, e_i - m_i, \qquad \text{subject to} \quad \sum_{i \in S} w_i \le B .
+b_i = p_{j(i)}\, c_i\, e_i - m_i ,
 \label{eq:benefit}
 \end{equation}
+the expected interruption cost avoided minus the cost of moving.
 \end{definition}
 
+Each day the operator solves
 \begin{equation}
-C(S) = C_0 - \sum_{i \in S} b_i, \qquad C_0 = \sum_i p_j\, c_i ,
+\max_x \sum_i b_i x_i \quad \text{subject to} \quad \sum_i w_i x_i \le B, \quad x_i \in \{0,1\},
+\label{eq:knapsack}
+\end{equation}
+and the expected cost of moving a set $S$ is
+\begin{equation}
+C(S) = C_0 - \sum_{i \in S} b_i, \qquad C_0 = \sum_i p_{j(i)}\, c_i .
 \label{eq:cost}
 \end{equation}
+Problem~\eqref{eq:knapsack} is a 0--1 knapsack. Its fractional relaxation is solved exactly by
+ranking VMs by the density $b_i / w_i$ and filling the budget while $b_i > 0$, and the integer
+problem differs from it by at most one item~\cite{dantzig1957discrete}.
+
+The operational baseline migrates VMs on hosts with $p_j \ge \tau$. At an equal budget it is the
+special case of~\eqref{eq:knapsack} that ranks by $p_j$ and ignores $c$, $m$, $e$ and $w$. We
+compare policies by the advantage
 \begin{equation}
-\Delta = \frac{C_{P2} - C_{\mathrm{BAM}}}{C_{P2}} .
+\Delta = \frac{C_{P2} - C_{\mathrm{BAM}}}{C_{P2}},
 \label{eq:delta}
 \end{equation}
-\guide{State that choosing $S$ is a 0/1 knapsack and that its LP relaxation is solved by
-ranking on $b_i/w_i$ (Dantzig). Give the closed-form result for when ranking beats a threshold
-(THEORY.md sections 2--4) and how it was checked (Figure~\ref{fig:theory}).}
+and, because a tuned threshold can be worse than doing nothing, also by the saving against never
+migrating, $S = (C_{P0} - C)/C_{P0}$.
+
+Policies are compared by the cost that actually occurs in simulation: the interruption cost of
+every VM on a host when it fails, plus the cost of every migration. No migration is credited with
+a failure it averted, and the horizon $H$ of the probability a policy uses is the horizon over
+which its consequences are observed. Our earlier prototype broke this rule: it credited
+migrations with failures a median of \VVOneMedianLeadDays{} days after a 30-day decision, and gave
+the threshold \VVOneExtraGB\% more memory to move. Those two errors, not the decision rule,
+explained its apparent \VVOneAdvRandom\% loss; repaired, the same rule is \VVOneAdvAligned\% ahead
+at zero correlation.
 
 % ======================================================================================
 \section{Proposed Methodology}\label{sec:method}
-\guide{Describe each policy you compare (Table~\ref{tab:policies}) and the two policies added
-after the freeze. Say which are confirmatory and which are exploratory.}
 
-\begin{table}[t]\centering\small
-\caption{Policies compared. Definitions from docs/v2/PROTOCOL.md section 2 and
+We compare twelve policies (Table~\ref{tab:policies}). P0--P8 were fixed before the evaluation;
+P0+avoid, P4-net and P0+selective were added after it, each tested on fresh seeds under a rule
+written first.
+
+\begin{table}[htbp]\centering
+\caption{Policies compared. Definitions from the frozen protocol and the code in
 vmsim/policies.}
 \label{tab:policies}
+\footnotesize
 \begin{tabular}{lp{0.72\textwidth}}\toprule
 Policy & Rule \\ \midrule
 P0 & Never migrate \\
@@ -164,20 +328,30 @@ P5 & Narya-inspired: nothing, live-migrate or avoid allocation, chosen by Thomps
 P6 & Guard: BAM only when evidence of benefit over P2 passes; otherwise P2 \\
 P7 & Oracle \\
 P8 & Random selection within the budget \\ \midrule
-P0+avoid & Close the riskiest hosts to new VMs; never migrate (ADR-010, ADR-011) \\
-P4-net & BAM charging destination risk, $b_i = (p_j e_i - p_{\mathrm{dst}})\,c_i - m_i$ (ADR-013) \\
-P0+selective & Close the riskiest $q_t$ of hosts to tier $t$ only, $q=(2,5,10)\%$ (ADR-013) \\
+P0+avoid & Close the riskiest hosts to new VMs; never migrate \\
+P4-net & BAM charging destination risk, $b_i = (p_j e_i - p_{\mathrm{dst}})\,c_i - m_i$ \\
+P0+selective & Close the riskiest $q_t$ of hosts to tier $t$ only, $q=(2,5,10)\%$ \\
 \bottomrule\end{tabular}
 \end{table}
 
-\begin{algorithm}[t]
+\subsection{Budget-aware migration}\label{sec:bam}
+
+BAM (P4) ranks VMs by density $b_i/w_i$ and moves them while $b_i > 0$ and budget remains
+(Algorithm~\ref{alg:bam}). Two details matter in practice. The interruption cost $c_i$ is weighted
+by the probability that the VM is still running when its host would fail, since most VMs leave
+long before then. And $e_i$ depends on the VM's place in its host's migration queue,
+$e_i = \exp(-\lambda_j t)$ with $\lambda_j = -\ln(1-p_j)/H$ and $t$ the queue ahead of $i$ plus its
+own migration time, so it is recomputed after every pick with a lazy max-heap. On simulator
+snapshots the greedy is within \VBamExactGap\% of an exact solver on average.
+
+\begin{algorithm}[htbp]
 \caption{Budget-aware migration (BAM, P4), one daily decision}\label{alg:bam}
 \begin{algorithmic}[1]
 \Require eligible VMs with $p_j, c_i, m_i, w_i$; daily budget $B$
 \State compute $e_i$ from the migration queue on each host and $b_i$ by Eq.~\eqref{eq:benefit}
 \State put every VM in a max-heap keyed by $b_i / w_i$; $S \gets \emptyset$; $U \gets 0$
 \While{the heap is not empty}
-  \State pop VM $i$; recompute $e_i$ and $b_i$ if its host's queue changed; reinsert if stale
+  \State pop VM $i$; if its host's queue changed, recompute $e_i$ and $b_i$ and reinsert it
   \If{$b_i \le 0$} \textbf{break} \EndIf
   \If{$U + w_i \le B$ and a destination has capacity}
     \State $S \gets S \cup \{i\}$; $U \gets U + w_i$; reserve the destination
@@ -186,19 +360,76 @@ P0+selective & Close the riskiest $q_t$ of hosts to tier $t$ only, $q=(2,5,10)\%
 \State \Return $S$
 \end{algorithmic}
 \end{algorithm}
-\guide{Check Algorithm~\ref{alg:bam} against vmsim/policies/bam.py and correct it if any step
-differs, then explain it in prose. Explain P4-net and per-tier closing in the same way
-(vmsim/policies/selective.py).}
+
+\subsection{When ranking pays: a closed form}\label{sec:theory}
+
+Under four assumptions (calibrated $p$, failures independent given $p$, the same budget for every
+policy, additive costs) and accounting over the horizon the decision used, BAM is never worse in
+expectation than a threshold on $p$ with the same budget, because the threshold is one feasible
+solution of~\eqref{eq:knapsack}.
+
+\begin{proposition}[Ranking term]\label{prop:rank}
+Let $(\log p, \log \kappa)$ follow a Gaussian copula with correlation $\rho$, let the budget allow a
+share $q$ of VMs with $z_q = \Phi^{-1}(q)$, and let
+$\sigma_z^2 = \sigma_p^2 + 2\rho\sigma_p\sigma_\kappa + \sigma_\kappa^2$. When the budget binds for
+both rules, the advantage of density ranking over probability ranking has main term
+\begin{equation}
+\Phi(z_q + \sigma_z) - \Phi(z_q + \sigma_p + \rho\,\sigma_\kappa) \;\ge\; 0 .
+\label{eq:rankterm}
+\end{equation}
+\end{proposition}
+
+The term is non-negative because
+$\sigma_z^2 - (\sigma_p + \rho\sigma_\kappa)^2 = \sigma_\kappa^2 (1-\rho^2) \ge 0$, and it is zero
+only when costs do not vary ($\sigma_\kappa = 0$) or are perfectly aligned with risk
+($|\rho| = 1$). The advantage is therefore driven by the spread of cost per GB and is largest near
+$\rho = 0$, not above a break-even correlation. The same analysis gives two cautions. Noise in $p$
+alone does not make BAM lose unless costs are anti-aligned with risk, but flattening
+miscalibration ($p^\gamma$ with $\gamma < 1$) can, because the stopping rule $b_i > 0$ then compares a
+distorted $p\,c$ with $m$. A Monte Carlo check agrees with the closed form at all
+\VTheoryPoints{} grid points (Figure~\ref{fig:theory}).
+
+\subsection{Baselines and the guard}\label{sec:baselines}
+
+The threshold P2 is tuned on development seeds, separately for each regime and budget: the
+threshold and the order in which a host's VMs move are chosen so that it uses its budget, as an
+operator who has been given a budget usually does. P5 is a Narya-inspired policy with three
+actions (do nothing, live-migrate, avoid allocation), chosen per risk bucket by Thompson sampling;
+every difference from the paper is recorded in the artifact. The guard P6 runs BAM only when a
+bootstrap lower bound on BAM's model-based advantage over P2 is positive and a calibration audit
+passes at two consecutive looks, and otherwise falls back to P2, as registered.
+
+\subsection{Placement and two new policies}\label{sec:new}
+
+The evaluation showed that the Narya-inspired policy beat BAM, and diagnosing why pointed to its
+avoid-allocation action. P0+avoid isolates that action: it closes the riskiest $q$ of up hosts to
+new VMs and never migrates. A VM drawn onto a closed host is placed elsewhere. A second diagnosis,
+of why BAM collapses when migration is cheap, led to two further policies. BAM's benefit assumes
+that a moved VM is safe; P4-net charges the destination's risk,
+$b_i = (p_j e_i - p_{\mathrm{dst}})\,c_i - m_i$, where $p_{\mathrm{dst}}$ is the expected risk of
+the host the engine's destination rule delivers. Closing a host to every VM also rejects VMs when
+capacity is tight; P0+selective closes the riskiest $q_t$ of hosts only to tier $t$, with
+$q = (2\%, 5\%, 10\%)$ for low, medium and high criticality, so that a risky host stays open to
+less critical work. Neither policy migrates more than BAM; P0+selective does not migrate at all.
 
 % ======================================================================================
 \section{System Architecture}\label{sec:arch}
-\guide{Walk through Figure~\ref{fig:arch}: public data, failure model, failure worlds, simulator,
-policies under one GB budget, paired statistics, benchmark and Console.}
 
-\begin{figure}[t]\centering
+Figure~\ref{fig:arch} shows the pipeline. Public data feed a failure model whose calibrated
+hazards define \emph{failure worlds}: for each seed, every host's drives, failure and repair times,
+and every VM's arrival, size, tier and lifetime are drawn once and hashed, so every policy faces
+exactly the same world. The simulator advances one day at a time. Each day the policy under test
+proposes moves; the engine fills the shared GB budget in that order, places each VM on the less
+risky of two random hosts with room, and times the migrations. Results from every policy, regime,
+budget and seed are written as validated records and analysed with paired statistics. The same
+records feed the paper's tables, its figures and a read-only results viewer, and the benchmark
+packages the worlds, scenario cards and validator so that other policies can be scored on the
+same terms.
+
+\begin{figure}[htbp]\centering
 \begin{tikzpicture}[node distance=4mm and 6mm, every node/.style={draw, rounded corners,
   align=center, font=\small, minimum height=9mm, inner sep=3pt}, >={Stealth}]
-\node (data) {Public data\\Backblaze, Google 2019,\\Azure, Alibaba 2018};
+\node (data) {Public data\\Backblaze, Google 2019,\\Azure};
 \node (model) [right=of data] {Failure model\\calibrated hazards};
 \node (worlds) [right=of model] {Failure worlds\\hashed, shared\\by every policy};
 \node (sim) [below=of worlds] {Simulator (vmsim)\\placement, migration,\\cost accounting};
@@ -212,15 +443,27 @@ policies under one GB budget, paired statistics, benchmark and Console.}
 \draw[->] (sim) |- (out);
 \draw[->] (stats) |- (out);
 \end{tikzpicture}
-\caption{Pipeline from public data to results.}\label{fig:arch}
+\caption{Pipeline from public data to results. Every policy runs on the same hashed failure world
+for a given seed, so all comparisons are paired.}\label{fig:arch}
 \end{figure}
 
 % ======================================================================================
 \section{Implementation}\label{sec:impl}
-\guide{Explain the main modules (vmsim/, vmmbench/, scripts/v2/, tests/v2) and how a run is
-reproduced (make reproduce-small). Point to Table~\ref{tab:stack} and the repository.}
 
-\begin{table}[t]\centering\small
+The system is written in Python (Table~\ref{tab:stack}) and is available at \repourl. The
+simulator lives in \texttt{vmsim/}: failure model, placement, migration timing, cost accounting
+and one module per policy. \texttt{vmmbench/} holds the result and scenario-card schemas and a
+validator. \texttt{scripts/v2/} contains every step from raw data to the paper's numbers, in
+numbered order, and \texttt{configs/v2/} the frozen experiment matrix. Every number in this paper
+is generated from \texttt{results/summary/} by a script, never typed into a table by hand.
+
+Runs are sharded across local cores with joblib; one policy run of 5{,}000 hosts over a year takes
+2--5\,s on a laptop core. The test suite of 149 tests includes property-based tests with
+Hypothesis that check, on every simulated day, conservation of VMs, memory accounting, capacity,
+the budget and determinism. A one-command reduced reproduction (\texttt{make reproduce-small})
+runs the pipeline end to end in a few minutes.
+
+\begin{table}[htbp]\centering
 \caption{Software used. Exact versions are pinned in pyproject.toml and uv.lock.}
 \label{tab:stack}
 \setlength{\tabcolsep}{4pt}\footnotesize
@@ -239,87 +482,360 @@ Demo site & Flask, Gunicorn \\
 
 % ======================================================================================
 \section{Experimental Setup}\label{sec:setup}
-\guide{Datasets and how each was checked (docs/v2/data\_quality\_report.md, data\_sources.md);
-the regimes (A--E, B1, B2, C, D) and what each represents; scale (\VHosts{} hosts,
-\VHorizonDays{} days after a \VWarmupDays-day warm-up, 4 budgets, seeds per family); the
-pre-registered win rule (mean adjusted $\Delta \ge 1\%$, Holm $p<0.05$ over \VFamilySize{}
-comparisons); simulator validation (docs/v2/G2\_simulator\_validation.md); the cost range
-(configs/v2/cost\_range.yaml). Say that the main runs use an oracle predictor and that the
-evaluation seeds were extended to 50 where ADR-007 required it.}
+
+\subsection{Data}\label{sec:data}
+
+We use three public datasets (Table~\ref{tab:data}) under their published terms and no
+proprietary data.
+
+\begin{table}[htbp]\centering
+\caption{Datasets.}\label{tab:data}
+\setlength{\tabcolsep}{4pt}\footnotesize
+\begin{tabular}{p{0.3\textwidth}p{0.17\textwidth}p{0.27\textwidth}p{0.16\textwidth}}\toprule
+Dataset & Period & Size & Used for \\ \midrule
+Backblaze Drive Stats~\cite{backblaze2026drivestats} & Apr 2013--Jun 2026 & \VDriveDaysM{}M drive-days, \VDrives{} drives & failure model \\
+Google cluster trace~\cite{googleclusterdata2019,tirmazi2020borg} & May 2019 & 3 cells (+1), 10--12k machines each & placement correlation \\
+Azure Public Dataset V1~\cite{azurepublicdataset,cortez2017resource} & 2017 & 2{,}013{,}767 VMs & VM size, tier, lifetime \\
+\bottomrule\end{tabular}
+\end{table}
+
+\paragraph{Drive failures.} Backblaze publishes one record per drive per day with the drive's
+model, capacity, a failure flag and its SMART attributes. We converted all 45 published archives
+(35.1\,GB compressed) to columnar files, checked every archive's row count against its CSV files
+and recorded a checksum for every file. The data have no duplicate drive-days and no invalid
+failure flags; a drive fails at its first failure record, later records are dropped, and a drive
+absent on a given day is not counted as failed. A drive stands in for a host component; a host's
+failure probability is composed from its drives and an assumed non-disk term
+(Section~\ref{sec:sim}).
+
+\paragraph{Failure model.}\label{sec:model} We predict whether a drive fails within $H$ days from
+its SMART attributes, their trends, its model and its age, training only on the past: training
+ends in August 2025, validation (used to choose the model and fit its calibration) in January
+2026, and the test period runs to June 2026. At $H = 30$ a gradient-boosted model reaches a test
+PR-AUC of \VPrAucSMART{} and ROC-AUC of \VRocAucSMART; the first version's features (model,
+capacity, age) refitted on the same split reach only \VPrAucVOneFeatures, barely above the base
+rate. A logistic regression on the same features does as well (\VPrAucLogit), so the signal is in
+the SMART telemetry rather than the model class. A rule fixed in advance, the highest validation
+PR-AUC, selected a 20-member bootstrap ensemble (\VPrAucEnsembleVal{} against \VPrAucLogitVal{}
+for the next best), and isotonic calibration on the validation period makes its probabilities
+usable as $p$ in Eq.~\eqref{eq:benefit}.
+
+\paragraph{Where real placement sits.}\label{sec:rho} For three Google 2019 cells we compute
+Kendall's $\tau_b$ between the criticality tier of every placement and the risk proxy of its
+machine, over three weekly windows after a warm-up week, with bias-corrected bootstrap intervals
+over machines. The trace has no hardware-failure labels, so the risk proxy is a machine platform's
+rate of \emph{long} removals, those not followed by re-addition within 24 hours. The cells, the
+tier mapping, the proxies and the decision rule were fixed before any data was read. In every cell,
+under every combination of three mappings, three proxies and two weightings,
+$|\tau_b| \le \VGOneMaxAbsTauB$, and the upper end of every latent interval is at most
+\VGOneMaxLatentUpper{} (Figure~\ref{fig:rho}). The sign changes with the analysis choices; the
+magnitude does not. A fourth cell, chosen by a rule fixed before it was downloaded, gives
+$\tau_b = \VSecondTauB$. Critical work is essentially uncorrelated with machine risk, so the
+realistic regimes of the evaluation place VMs at these measured values.
+
+\begin{figure}[htbp]\centering
+\includegraphics[width=0.85\linewidth]{v2_trace_rho.pdf}
+\caption{Measured correlation between task criticality and machine risk in three Google 2019
+cells (a, b, h), on the latent copula axis with 95\% intervals, for each tier mapping, risk proxy
+and weighting. The risk proxy is long machine removals, not hardware failures. The dashed line is
+the first version's break-even (latent 0.38).}\label{fig:rho}
+\end{figure}
+
+\subsection{Simulator and validation}\label{sec:sim}
+
+A host has several drives drawn from the Backblaze population with their models and ages. Its
+daily hazard is $1 - \prod_k (1-h_k)(1-h_{\mathrm{other}})$, where $h_k$ is drive $k$'s hazard and
+$h_{\mathrm{other}}$ is an assumed Weibull term for non-disk causes. Failure times are drawn before
+any policy runs; a failed host is repaired after a log-normal time (median two days) and returns
+empty. VMs arrive as a Poisson process and keep the size, tier and lifetime of a resampled Azure
+VM. VMs that live at least a day are simulated individually (12\% of VMs, 92\% of memory-time);
+shorter ones are charged at each host failure as a Poisson draw, and no policy may migrate a VM
+younger than a day. Migration is pre-copy with a shared host link, and a source failure during a
+migration interrupts the VM. Every policy sees the same hosts, failures, arrivals and lifetimes
+for a given seed.
+
+Before any policy comparison, the simulator had to pass five checks (Table~\ref{tab:g2}): analytic
+cases under a constant hazard, self-calibration of 30-day failure counts across repairs, a
+regression against the first version's two headline costs, property-based invariants, and a run
+time target.
+
+\begin{table}[htbp]\centering
+\caption{Simulator validation, required before any policy comparison.}\label{tab:g2}
+\setlength{\tabcolsep}{4pt}\footnotesize
+\begin{tabular}{lll}\toprule
+Check & Result & Pass \\ \midrule
+Analytic, no migration ($N = \VGTwoHosts$ hosts, 5 seeds) & $|z| \le \VGTwoZNever$ & yes \\
+Analytic, migrate every VM once & $|z| \le \VGTwoZMoveAll$ & yes \\
+Self-calibration across repairs & $z = \VGTwoZSelf$; deciles $|z| \le \VGTwoZDecile$ & yes \\
+Regression against the first version & \VVOneCostCS{} and \VVOneCostMatched{}, to $<10^{-6}$ & yes \\
+Invariants and determinism & all property tests pass & yes \\
+Run time (5{,}000 hosts, one year) & $\le 4.8$\,s against a 10\,s target & yes \\
+\bottomrule\end{tabular}
+\end{table}
+
+\subsection{Regimes, protocol and statistics}\label{sec:protocol}
+
+Regimes differ in how VMs are placed. B1 calibrates placement to the measured correlation and
+dispersion, and B2 replays class-conditional placement from the Google machine platforms; these are
+the realistic regimes. A1--A7 sweep the latent correlation from 0 to 0.9, E1--E3 sweep the cost
+spread at zero correlation, C places critical VMs on the riskiest hosts, and D shifts placement
+and degrades the predictor mid-run. Each run has \VHosts{} hosts with four drives each, simulated for
+\VHorizonDays{} days after a \VWarmupDays-day warm-up, with $H = 30$ and daily budgets of 0.5, 1, 2
+and 5\% of cluster memory. Policies see the true host probabilities (an oracle predictor) in the
+main matrix, so gains are an upper bound; noisy predictors are tested separately.
+
+The protocol was frozen before any evaluation run. The confirmatory family is \VFamilySize{}
+comparisons of P4, P5 and P6 against P2 in regimes A3, A5, B1, B2 and C at 1\% and 2\%. A
+comparison wins if its mean regression-adjusted $\Delta$ is at least 1\% and its Holm-adjusted
+one-sided $p < 0.05$. Intervals are bias-corrected and accelerated (BCa) bootstrap intervals over
+paired seeds. Seed families never mix: development seeds 101--110 tune P2 and the guard,
+evaluation seeds 1--30 run the matrix and were extended to 50 where a pre-registered variance rule
+required it, and replication seeds 1001--1050 repeat the family. The full matrix is 528 cells and
+19{,}140 runs, with none missing. Every test added after the freeze has its own seed family
+(2001--2050, 3001--3050, 4001--4050) and a rule written before its run.
+
+\paragraph{Migration-cost range.} Migration cost is set by the usable share of the link, the rate
+at which the workload dirties memory, and the pause. A rule written before any rerun takes, from
+four published measurement studies~\cite{clark2005live,voorsluys2009cost,akoush2010predicting,hu2013quantitative},
+the extremes of each parameter: a cheap end (77\% usable share, 2.3\,MB/s dirty rate, 0.06\,s
+pause) and an expensive end (10\%, 200\,MB/s, 3\,s), against the assumed default (50\%,
+150\,MB/s, 1\,s). Each end combines extremes from different papers, so no measured system sits at
+either end; the range brackets the cost rather than estimating it.
 
 % ======================================================================================
 \section{Results}\label{sec:results}
-\guide{Report what the tables and figures show, in the order of the research questions. Say
-which results are confirmatory and which are exploratory, and give intervals with every
-number.}
 
 \subsection{Budget-aware migration against the tuned threshold}\label{sec:res-main}
+
+BAM wins all \VFamilySize{} confirmatory comparisons. In the measured regime B1 at a 2\% budget,
+its adjusted advantage over the tuned threshold is \VDeltaPFourBOneTwo\% (95\% interval
+[\VCILoPFourBOneTwo, \VCIHiPFourBOneTwo]\%), and every comparison clears the bar with
+Holm-adjusted $p \le 3\times10^{-14}$ (Table~\ref{tab:main}). The replication on seeds 1001--1050
+agrees: 30 of 30 win, no comparison changes sign, and the largest gap from the main result is 1.2
+points. The advantage falls slowly with the latent correlation and is present in every regime
+(Figure~\ref{fig:adv}).
+
 \input{tables/table3}
+
+That bar is weak. Table~\ref{tab:vsp0} compares the same cells with never migrating: the tuned
+threshold P2 costs more than doing nothing in every seed of every cell, $-272.8\%$ in B1 at 2\%,
+because spending its budget forces moves whose expected benefit is negative
+(Figure~\ref{fig:vsp0}). Against never
+migrating, BAM saves 4.0\% [3.3, 4.8] in B1, 5.1\% in B2 and 4.6\% in C at 2\%. Its saving is the
+same at every budget, because BAM rarely uses its budget: its gain comes from declining bad moves,
+the $b_i > 0$ stopping rule, not from ranking. The Narya-inspired P5 saves more than BAM in every
+regime (8.9\% in B1, 15.8\% in C), with far fewer migrations. The guard P6 falls back to P2 as
+registered and so ends below never migrating ($-51.6\%$ in B1); as specified, it cannot be
+recommended.
+
 \input{tables/table3_p0}
 
-\begin{figure}[t]\centering
-\includegraphics[width=\linewidth]{v2_F4b_vs_p0.pdf}
-\caption{Saving against never migrating.\guide{Expand this caption: what is plotted, regime,
-budget, seeds, intervals.}}\label{fig:vsp0}
+\begin{figure}[htbp]\centering
+\includegraphics[width=\linewidth]{v2_F4_advantage.pdf}
+\caption{Adjusted advantage $\Delta$ over the budget-tuned threshold P2 along the latent
+correlation $\rho_L$ (regimes A1--A7), at 1\% and 2\% budgets, with 95\% intervals. Grey markers
+are the cost-spread regimes E1--E3 at $\rho_L = 0$. The dotted line is the closed form with
+measured parameters, which gets the direction right and under-predicts the level.}\label{fig:adv}
 \end{figure}
 
-\begin{figure}[t]\centering
-\includegraphics[width=\linewidth]{v2_F4_advantage.pdf}
-\caption{Advantage over the tuned threshold along $\rho_L$.\guide{Expand this caption.}}
-\label{fig:adv}
+\begin{figure}[htbp]\centering
+\includegraphics[width=\linewidth]{v2_F4b_vs_p0.pdf}
+\caption{Saving against never migrating along $\rho_L$ (regimes A1--A7), at 1\% and 2\% budgets,
+with 95\% intervals. The tuned threshold P2 is off the scale ($-80\%$ to $-131\%$ at 1\%, $-189\%$
+to $-281\%$ at 2\%). Avoiding risky hosts, with no migration, is above every migration
+policy.}\label{fig:vsp0}
 \end{figure}
 
 \subsection{Theory against simulation}\label{sec:res-theory}
-\begin{figure}[t]\centering
+
+The closed form matches the Monte Carlo at every grid point (Figure~\ref{fig:theory}). In the
+simulator it gets the direction right. At zero correlation BAM's saving against never migrating
+rises from $-2.4\%$ to $+1.6\%$ to $+5.3\%$ as the cost spread $\sigma_\kappa$ grows from 0.25 to
+0.5 to 1.0 (regimes E1--E3), as Proposition~\ref{prop:rank} predicts, and with little spread BAM
+is slightly worse than doing nothing. The closed form under-predicts the level of $\Delta$ by 7 to 24
+points, as expected when the budget does not bind and the stopping rule, which the one-shot model
+leaves out, dominates.
+
+\begin{figure}[htbp]\centering
 \includegraphics[width=\linewidth]{v2_theory_check.pdf}
-\caption{Theory check: closed form against Monte Carlo.\guide{Expand this caption.}}
-\label{fig:theory}
+\caption{Theory check. Top left: the closed form (lines) against Monte Carlo (dots) for three cost
+spreads. Top right: the ranking term alone with free migration. Bottom left: effect of noise in
+$\log p$. Bottom right: where $\Delta$ crosses 1\% at $q = 0.02$.}\label{fig:theory}
 \end{figure}
 
 \subsection{Sensitivity to migration cost}\label{sec:res-cost}
+
+Table~\ref{tab:costrange} reruns BAM and the threshold at the two ends of the published cost range.
+BAM's win over P2 holds across the range (by 46\% to 95\%), mostly because P2 does so badly. Its
+saving against never migrating does not hold. At the expensive end BAM nearly stops migrating and
+saves about 1\% or less. At the cheap end it reverses in all three regimes, to $-17.4\%$ in B1,
+with 290{,}000 to 356{,}000 migrations per run. Cheaper migration makes BAM worse: when moving looks
+almost free, the benefit $b_i$ is positive for many VMs, and BAM moves the same VMs again and
+again. On five development seeds in B1, a version of BAM that may move each VM only once recovers
+most of the loss ($-15.8\%$ to $+3.2\%$), and charging destination risk recovers more
+($+10.0\%$). The headline saving therefore holds only at stated migration costs.
+
 \input{tables/costrange}
 
 \subsection{Placement without migration}\label{sec:res-avoid}
+
+Closing the riskiest 2\% of hosts to new VMs, with no migration at all, beats every migration
+policy. On fresh seeds 2001--2050, under a rule committed before the run, it saves 11.2\%
+[10.3, 12.1] in B1 and 8.9\% in B2 against never migrating, and beats BAM and the Narya-inspired
+policy in both regimes: all six comparisons pass (Table~\ref{tab:avoid}). Adding BAM's migrations
+on top gains only 0.3 points in B1 for about 15{,}000 migrations a run. The cost is rejected
+arrivals, which rise from 169 to 175 a run in B1. Avoidance weakens with noisy predictions, to
+3.8\% in B1 at noise $\sigma = 1$ redrawn daily, but stays positive where BAM loses heavily.
+
+The saving follows a simple concentration law, $S = \varphi\, R(q, \sigma)$, where $R$ is the share of
+failures that land on the closed hosts and $\varphi$ is the share of interruption cost that placement
+can reach. On 19 out-of-sample cells (seeds 3001--3050), the law's predictions rank the observed
+savings with Spearman correlation 0.98 in B1 and 0.97 in B2, with mean errors of 1.2 and 0.9
+points. Because $\varphi$ is fitted once per regime, this is a regularity, not a derivation.
+
 \input{tables/avoid}
 
 \subsection{Destination-aware BAM and per-tier closing}\label{sec:res-new}
+
+Both new policies pass every test of their pre-registered families on seeds 4001--4050
+(Tables~\ref{tab:net} and~\ref{tab:selective}). Charging destination risk removes BAM's collapse:
+in B1 the saving moves from $-17.1\%$ to $+8.1\%$ with cheap migration and from $-77.8\%$ to
+$+9.6\%$ at a higher cost level, with an order of magnitude fewer migrations, and it adds
+0.85 points at the default costs. It does not fix noise: at $\sigma = 1$, redrawn every 30 days, it
+still loses 18.4\% in B1.
+
+Per-tier closing keeps the saving of whole-host closing and rejects far fewer VMs: 66 instead of
+280 a run in B1, with a saving of 17.5\% against 16.9\%. The gain in saving is under two points, and
+in B1 it cannot be told from zero against a same-mechanism comparator without tiers; the clear gain
+is in rejections. With per-tier closing in place, adding destination-aware migration adds nothing
+measurable (17.4\% against 17.5\% in B1).
+
 \input{tables/selective_net}
 
 \subsection{Comparison with existing approaches}\label{sec:res-compare}
-\guide{Compare with Narya, NENYA and Deoxys honestly: their headline figures are from live
-systems against their own baselines, so they cannot be ranked against these simulated results.
-Inside each study the closest shared yardstick is a Narya policy (NENYA Table~1, Deoxys
-Figure~6, P5 here). Source: the comparison page and docs/v2/NOVELTY.md.}
+
+The base papers report larger numbers (Table~\ref{tab:compare}), but they come from live systems,
+on different metrics, against each paper's own baseline, so they cannot be ranked against these
+simulated savings. Narya reduced interruptions by 26\% against a fixed action plan, and Deoxys
+reduced downtime by 53\% against a legacy policy. The closest shared yardstick is a Narya policy
+measured inside each study. In NENYA's offline comparison, NENYA's failure rate is 0.65\% against
+Narya's 1.46\%, 55.5\% lower; in Deoxys's offline comparison its normalised downtime is 4.8
+against Narya's 6.4, 25\% lower. In our simulator, on the same fresh seeds, avoidance costs 3.4\%
+less than the Narya-inspired policy, while BAM costs 4.8\% more. Our Narya policy is only
+inspired by the paper, so even this is not a contest between systems. What the comparison does
+show is the difference in scope (Table~\ref{tab:gap}): this work decides per VM, under a GB budget,
+with a theory of when ranking pays, absolute costs with intervals, and public data.
+
+\begin{table}[htbp]\centering
+\caption{Headline results as each study reports them. The baselines, metrics and settings differ,
+so the rows cannot be ranked against each other.}\label{tab:compare}
+\setlength{\tabcolsep}{4pt}\footnotesize
+\begin{tabular}{p{0.2\textwidth}p{0.27\textwidth}p{0.21\textwidth}p{0.22\textwidth}}\toprule
+Study & Result & Against & Setting \\ \midrule
+Narya~\cite{levy2020narya} & $-26.2\%$ VM interruptions & previous static strategy & Azure production \\
+NENYA~\cite{wang2022nenya} & $-25.87\%$ cost, $-5.46\%$ failure rate & online comparison & Microsoft 365, online \\
+Deoxys~\cite{zhang2024deoxys} & $-53\%$ VM downtime & legacy policy & Azure A/B test \\ \midrule
+This work, BAM & $+4.0\%$ saving & never migrating & simulated, B1, 2\% \\
+This work, avoidance & $+11.2\%$ saving & never migrating & simulated, B1, fresh seeds \\
+This work, per-tier closing & $+17.5\%$ saving & never migrating & simulated, B1, fresh seeds \\
+\bottomrule\end{tabular}
+\end{table}
 
 % ======================================================================================
 \section{Discussion}\label{sec:discussion}
-\guide{What the results mean; why BAM's saving reverses when migration is cheap (re-migration,
-destination risk); why placement matters more than migration; threats to validity (simulation
-only, oracle predictor, assumed costs from 4 of 6 sources, risk proxy, post-freeze tests frozen by
-hash rather than committed first, the two noise definitions).}
+
+\paragraph{What the results mean.} Three findings do not depend on the simulator: real placement is
+essentially uncorrelated with machine risk, budget-aware ranking cannot lose in expectation under
+the theory's assumptions, and its advantage grows with the spread of cost per GB rather than with
+correlation. The size of the gain in a realistic cluster is a simulator result, and it is
+conditional. BAM beats a threshold tuned to its budget by a wide margin everywhere, but that
+threshold is worse than doing nothing, and BAM's own saving against never migrating depends on
+what migration costs. The practical lesson is the one in the title. Choosing where new VMs go
+captures more than choosing which VMs to move, does so without migrating, and degrades gently when
+predictions are noisy. Migration helps only when its benefit is weighed carefully, including the
+risk at the destination.
+
+\paragraph{The comparator.} We tuned the threshold to use its budget because the protocol says so
+and because operators given a budget tend to spend it. A threshold tuned on total cost would stop
+earlier and narrow the gap, since much of BAM's advantage is its stopping rule. That is why every
+results table shows never migrating beside the threshold.
+
+\paragraph{Threats to validity.} Table~\ref{tab:assumed} lists every assumed or synthetic element.
+Internally, the simulator is validated against closed forms and its own failure counts, but it is
+still a model: failures come from drive hazards and an assumed non-disk term, the simulated time
+between a node's failures is less bursty than node logs suggest, and correlated failures across
+racks are not modelled. The main matrix uses an oracle predictor, so its gains are upper bounds.
+Two noise definitions appear: the avoidance test redraws noise daily and the ADR-013 tests every 30
+days, so their noise results are not comparable. Externally, the failure data come from one
+operator's drives, the placement measurement from one provider's 2019 trace, and migration costs
+from four of six planned published sources. For construct validity, a drive failure stands for a
+host failure and a long machine removal for elevated risk. Finally, the tests added after the
+freeze have blind seeds, but their policies and settings came from development seeds; the
+avoidance rule was committed before its run, while the later rules were frozen by a stored hash.
+
+\begin{table}[htbp]\centering
+\caption{Every synthetic or assumed element, in one place.}\label{tab:assumed}
+\setlength{\tabcolsep}{4pt}\footnotesize
+\begin{tabular}{lll}\toprule
+Element & Status & Varied in \\ \midrule
+Host risk composed from its drives & assumed & -- \\
+Non-disk hazard (Weibull) & assumed & $0\times$--$3\times$ disk \\
+Repair time (log-normal, median 2 days) & assumed & 1--4 days \\
+Tier weights 1.0 / 0.6 / 0.3 & assumed & flat; 1 / 3 / 10 \\
+Link 10\,Gb/s, 50\% usable & assumed & published range (Sec.~\ref{sec:res-cost}) \\
+Dirty rate 150\,MB/s at full CPU & assumed & published range \\
+Risk horizon 30 days & assumed & 7, 14 days \\
+Placement at a target correlation & synthetic (A, D) & $\rho_L$ 0--0.9 \\
+Cost spread at zero correlation & synthetic (E) & $\sigma_\kappa$ 0.25--1.0 \\
+Adversarial placement & synthetic (C) & -- \\
+Predictor noise and miscalibration & synthetic & logit noise 0--2; $\gamma$ 0.5--2 \\
+Risk proxy: long removals & proxy, not failures & 3 proxies, 2 weightings, 3 mappings \\
+\bottomrule\end{tabular}
+\end{table}
+
+\paragraph{When to use which policy.} If cost per GB varies little across VMs, ranking by
+probability is enough. If it varies widely and probabilities are well calibrated, budget-aware
+ranking is never worse, provided migration is not so cheap that it invites repeated moves; charging
+destination risk guards against that. Where placement can be controlled, closing risky hosts to new
+VMs, per tier where capacity is tight, should come first.
 
 % ======================================================================================
 \section{Conclusion}\label{sec:conclusion}
-\guide{Main findings in a few sentences and future work (KVM/QEMU testbed, benchmark release).}
+
+We asked when ranking VMs by expected benefit per GB beats a tuned probability threshold under a
+daily migration budget. In real placement, as far as public traces show, critical work is
+uncorrelated with machine risk. That does not doom workload awareness: under calibrated
+probabilities and horizon-matched accounting, budget-aware ranking cannot lose in expectation, and
+its advantage is driven by the spread of cost per GB. In a validated simulator it wins all
+\VFamilySize{} pre-registered comparisons, but its saving against never migrating holds only at
+stated migration costs, and placement captures more than migration. BAM with destination risk and
+per-tier host closing address the two weaknesses we found. Nothing here is a claim about
+production performance. The next steps are measured migration costs on a KVM/QEMU testbed,
+rack-correlated failures, and opening the benchmark's hidden seeds to outside policies.
 
 \backmatter
 
 \bmhead{Acknowledgements}
-\guide{Optional: your guide and anyone who helped.}
+We thank our project guide, [name], for guidance throughout this work.
 
 \section*{Declarations}
 \begin{itemize}
-\item Funding: \guide{or `Not applicable'}
-\item Conflict of interest/Competing interests: \guide{or `Not applicable'}
-\item Ethics approval and consent to participate: \guide{`Not applicable' if no human data}
-\item Consent for publication: \guide{or `Not applicable'}
-\item Data availability: \guide{the public datasets and their citations \cite{backblaze2026drivestats,
-googleclusterdata2019,azurepublicdataset}}
-\item Materials availability: \guide{or `Not applicable'}
-\item Code availability: \repourl
-\item Author contribution: \guide{who did what}
-\item Use of AI tools: \guide{state how AI tools were used, as your guide and the course rules
-require.}
+\item Funding: Not applicable.
+\item Conflict of interest/Competing interests: The authors declare no competing interests.
+\item Ethics approval and consent to participate: Not applicable; no human participants or
+personal data were involved.
+\item Consent for publication: Not applicable.
+\item Data availability: All datasets are public: Backblaze Drive
+Stats~\cite{backblaze2026drivestats}, the Google 2019 cluster trace~\cite{googleclusterdata2019}
+and the Azure Public Dataset~\cite{azurepublicdataset}.
+\item Materials availability: Not applicable.
+\item Code availability: The simulator, benchmark, scripts and results are at
+\repourl~\cite{ccproject2026repo}.
+\item Author contribution: [Describe each author's contribution.]
+\item Use of AI tools: An AI assistant (Claude, Anthropic) was used to help write the code, analysis
+scripts and documentation, and to draft the text of this manuscript, as permitted by the project
+guide. The authors directed the research, checked every result against the generated files and take
+full responsibility for the content.
 \end{itemize}
 
 \bibliography{refs}
