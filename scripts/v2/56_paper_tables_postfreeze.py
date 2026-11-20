@@ -9,8 +9,9 @@ caption says so. Every number is read from results/summary; nothing is recompute
 - selective_net.tex: P4-net against P0 and P4 (family N) and P0+selective against the two
   whole-host comparators (family S), seeds 4001-4050 (ADR-013).
 
-The Springer template is single-column, so tables use smaller type and column gaps, and Table 3
-and its P0 companion are copied from paper/tables as sideways (rotated) tables.
+The paper uses the template's two-column layout, so tables span both columns with smaller type and
+column gaps, and Table 3 and its P0 companion are copied from paper/tables as sideways (rotated)
+tables.
 
 Writes paper-springer/tables/{costrange,avoid,selective_net,table3,table3_p0}.tex.
 """
@@ -30,10 +31,12 @@ HEADER = (
 
 
 def fit(tex: str) -> str:
-    """Narrow a table for the single-column template: smaller type and column gaps. sn-jnl sets
-    the caption from the tabular inside the table, so the tabular must not be wrapped in a box.
-    Floats may go here, top, bottom or on a float page, which leaves fewer half-empty pages."""
-    tex = tex.replace(r"\begin{table}[t]", r"\begin{table}[htbp]")
+    """Fit a table to the two-column layout (iicol): it spans both columns at the top of a page,
+    with smaller type and column gaps. sn-jnl sets the caption from the tabular inside the
+    table, so the tabular must not be wrapped in a box."""
+    tex = tex.replace(r"\begin{table}[t]", r"\begin{table*}[!t]").replace(
+        r"\end{table}", r"\end{table*}"
+    )
     return tex.replace(r"\centering\small", r"\centering\footnotesize\setlength{\tabcolsep}{3pt}")
 
 
@@ -43,7 +46,7 @@ def sideways(tex: str) -> str:
     values still do not fit, so they move into one caption sentence read from
     confirmatory.json."""
     tex = tex.replace(
-        r"\begin{table*}[t]\centering\small", r"\begin{sidewaystable}\centering\scriptsize"
+        r"\begin{table*}[t]\centering\small", r"\begin{sidewaystable*}\centering\scriptsize"
     )
     if r"$p_H$=" in tex:
         conf = load("confirmatory.json")
@@ -56,7 +59,7 @@ def sideways(tex: str) -> str:
             " confirmatory cells.}\n" + r"\label{tab:main}",
             1,
         )
-    return tex.replace(r"\end{table*}", r"\end{sidewaystable}")
+    return tex.replace(r"\end{table*}", r"\end{sidewaystable*}")
 
 
 def load(name: str) -> dict:

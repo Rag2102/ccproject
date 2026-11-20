@@ -4,7 +4,7 @@
 % Numbers come from ../paper/numbers.tex (make numbers), the generated tables in tables/ and the
 % summary files they are read from; figures only from ../results/figures. Build: make
 % paper-springer (or tectonic main.tex from this folder).
-\documentclass[pdflatex,sn-mathphys-num]{sn-jnl}
+\documentclass[pdflatex,sn-mathphys-num,iicol]{sn-jnl}
 
 \usepackage{graphicx}%
 \usepackage{multirow}%
@@ -23,6 +23,9 @@
 \usepackage{rotating}% sidewaystable for the two widest tables
 \usepackage{tikz}%
 \usetikzlibrary{positioning,arrows.meta}
+\usepackage{xurl}% long URLs break across the narrow columns
+\AtBeginDocument{\let\burl\url}% reference URLs (sn-mathphys-num prints them unbroken otherwise)
+\usepackage{newtxtext,newtxmath}% Times text and maths, as in the base papers
 
 \input{../paper/numbers}
 \graphicspath{{../results/figures/}}
@@ -36,16 +39,20 @@
 
 \raggedbottom
 
+% Bold, centred title, as in the base papers
+\makeatletter\def\Titlefont{\reset@font\fontsize{17bp}{22.5bp}\selectfont\bfseries\centering}\makeatother
+
 \begin{document}
 
-\title[Place First, Migrate Carefully]{Place First, Migrate Carefully: Failure Mitigation for
+\title[Place First, Migrate Carefully]{Place First, Migrate Carefully:\\ Failure Mitigation for
 Cloud VMs}
 
-% Complete every team member and the affiliation; one member submits.
 \author*[1]{\fnm{Raghav} \sur{Gupta}}\email{ragh.gupta22@gmail.com}
-\author[1]{\fnm{[First name]} \sur{[Surname]}}\email{[email]}
-\affil*[1]{\orgdiv{Department of Computer Science and Engineering}, \orgname{[Institution]},
-\orgaddress{\city{[City]}, \country{[Country]}}}
+\author[1]{\fnm{Lakshay} \sur{Gupta}}
+\author[1]{\fnm{Deepak} \sur{Gupta}}
+\affil[1]{\orgdiv{Department of Information Technology}, \orgname{Netaji Subhas University of
+Technology}, \orgaddress{\street{Sector 3, Dwarka}, \city{New Delhi}, \postcode{110078},
+\country{India}}}
 
 \abstract{Cloud operators move virtual machines (VMs) off hosts that are predicted to fail, under
 a daily limit on how much they can migrate. Production systems learn which mitigation to take, on
@@ -217,7 +224,7 @@ card and traces every number to a file.
 
 Table~\ref{tab:gap} summarises the scope of the three base papers against this work.
 
-\begin{table}[htbp]\centering
+\begin{table*}[!t]\centering
 \caption{Scope of the three base papers and this work, as read from each paper.}
 \label{tab:gap}
 \setlength{\tabcolsep}{4pt}\footnotesize
@@ -231,7 +238,7 @@ Theory of when it pays & No & No & No & Closed form \\
 Data & Private & Private & Private & Public \\
 Open artifact & None found & None found & None & Rerunnable \\
 \bottomrule\end{tabular}
-\end{table}
+\end{table*}
 
 % ======================================================================================
 \section{Problem Formulation}\label{sec:problem}
@@ -241,7 +248,7 @@ interrupted. Once a day the operator may live-migrate some VMs to other hosts; e
 part of a daily budget $B$, measured in GB of memory moved. Table~\ref{tab:notation} lists the
 notation.
 
-\begin{table}[htbp]\centering
+\begin{table*}[!t]\centering
 \caption{Notation.}\label{tab:notation}
 \footnotesize
 \begin{tabular}{ll}\toprule
@@ -261,7 +268,7 @@ $\sigma_p$, $\sigma_\kappa$ & standard deviations of $\log p$ and $\log\kappa$ \
 $q$ & share of VMs the budget allows \\
 $\Delta$ & advantage over the threshold, $(C_{P2}-C)/C_{P2}$ \\
 \bottomrule\end{tabular}
-\end{table}
+\end{table*}
 
 \begin{definition}[Expected benefit of moving a VM]\label{def:benefit}
 Migrating VM $i$ changes the expected cost by
@@ -274,7 +281,10 @@ the expected interruption cost avoided minus the cost of moving.
 
 Each day the operator solves
 \begin{equation}
-\max_x \sum_i b_i x_i \quad \text{subject to} \quad \sum_i w_i x_i \le B, \quad x_i \in \{0,1\},
+\begin{aligned}
+\max_x \; & \sum_i b_i x_i \\
+\text{subject to} \; & \sum_i w_i x_i \le B, \quad x_i \in \{0,1\},
+\end{aligned}
 \label{eq:knapsack}
 \end{equation}
 and the expected cost of moving a set $S$ is
@@ -312,7 +322,7 @@ We compare twelve policies (Table~\ref{tab:policies}). P0--P8 were fixed before 
 P0+avoid, P4-net and P0+selective were added after it, each tested on fresh seeds under a rule
 written first.
 
-\begin{table}[htbp]\centering
+\begin{table*}[!t]\centering
 \caption{Policies compared. Definitions from the frozen protocol and the code in
 vmsim/policies.}
 \label{tab:policies}
@@ -332,7 +342,7 @@ P0+avoid & Close the riskiest hosts to new VMs; never migrate \\
 P4-net & BAM charging destination risk, $b_i = (p_j e_i - p_{\mathrm{dst}})\,c_i - m_i$ \\
 P0+selective & Close the riskiest $q_t$ of hosts to tier $t$ only, $q=(2,5,10)\%$ \\
 \bottomrule\end{tabular}
-\end{table}
+\end{table*}
 
 \subsection{Budget-aware migration}\label{sec:bam}
 
@@ -426,7 +436,7 @@ records feed the paper's tables, its figures and a read-only results viewer, and
 packages the worlds, scenario cards and validator so that other policies can be scored on the
 same terms.
 
-\begin{figure}[htbp]\centering
+\begin{figure*}[!t]\centering
 \begin{tikzpicture}[node distance=4mm and 6mm, every node/.style={draw, rounded corners,
   align=center, font=\small, minimum height=9mm, inner sep=3pt}, >={Stealth}]
 \node (data) {Public data\\Backblaze, Google 2019,\\Azure};
@@ -445,7 +455,7 @@ same terms.
 \end{tikzpicture}
 \caption{Pipeline from public data to results. Every policy runs on the same hashed failure world
 for a given seed, so all comparisons are paired.}\label{fig:arch}
-\end{figure}
+\end{figure*}
 
 % ======================================================================================
 \section{Implementation}\label{sec:impl}
@@ -463,7 +473,7 @@ Hypothesis that check, on every simulated day, conservation of VMs, memory accou
 the budget and determinism. A one-command reduced reproduction (\texttt{make reproduce-small})
 runs the pipeline end to end in a few minutes.
 
-\begin{table}[htbp]\centering
+\begin{table*}[!t]\centering
 \caption{Software used. Exact versions are pinned in pyproject.toml and uv.lock.}
 \label{tab:stack}
 \setlength{\tabcolsep}{4pt}\footnotesize
@@ -478,7 +488,7 @@ Figures & Matplotlib \\
 Testing & pytest, Hypothesis, Ruff \\
 Demo site & Flask, Gunicorn \\
 \bottomrule\end{tabular}
-\end{table}
+\end{table*}
 
 % ======================================================================================
 \section{Experimental Setup}\label{sec:setup}
@@ -488,7 +498,7 @@ Demo site & Flask, Gunicorn \\
 We use three public datasets (Table~\ref{tab:data}) under their published terms and no
 proprietary data.
 
-\begin{table}[htbp]\centering
+\begin{table*}[!t]\centering
 \caption{Datasets.}\label{tab:data}
 \setlength{\tabcolsep}{4pt}\footnotesize
 \begin{tabular}{p{0.3\textwidth}p{0.17\textwidth}p{0.27\textwidth}p{0.16\textwidth}}\toprule
@@ -497,7 +507,7 @@ Backblaze Drive Stats~\cite{backblaze2026drivestats} & Apr 2013--Jun 2026 & \VDr
 Google cluster trace~\cite{googleclusterdata2019,tirmazi2020borg} & May 2019 & 3 cells (+1), 10--12k machines each & placement correlation \\
 Azure Public Dataset V1~\cite{azurepublicdataset,cortez2017resource} & 2017 & 2{,}013{,}767 VMs & VM size, tier, lifetime \\
 \bottomrule\end{tabular}
-\end{table}
+\end{table*}
 
 \paragraph{Drive failures.} Backblaze publishes one record per drive per day with the drive's
 model, capacity, a failure flag and its SMART attributes. We converted all 45 published archives
@@ -534,7 +544,7 @@ $\tau_b = \VSecondTauB$. Critical work is essentially uncorrelated with machine 
 realistic regimes of the evaluation place VMs at these measured values.
 
 \begin{figure}[htbp]\centering
-\includegraphics[width=0.85\linewidth]{v2_trace_rho.pdf}
+\includegraphics[width=\linewidth]{v2_trace_rho.pdf}
 \caption{Measured correlation between task criticality and machine risk in three Google 2019
 cells (a, b, h), on the latent copula axis with 95\% intervals, for each tier mapping, risk proxy
 and weighting. The risk proxy is long machine removals, not hardware failures. The dashed line is
@@ -559,7 +569,7 @@ cases under a constant hazard, self-calibration of 30-day failure counts across 
 regression against the first version's two headline costs, property-based invariants, and a run
 time target.
 
-\begin{table}[htbp]\centering
+\begin{table*}[!t]\centering
 \caption{Simulator validation, required before any policy comparison.}\label{tab:g2}
 \setlength{\tabcolsep}{4pt}\footnotesize
 \begin{tabular}{lll}\toprule
@@ -571,7 +581,7 @@ Regression against the first version & \VVOneCostCS{} and \VVOneCostMatched{}, t
 Invariants and determinism & all property tests pass & yes \\
 Run time (5{,}000 hosts, one year) & $\le 4.8$\,s against a 10\,s target & yes \\
 \bottomrule\end{tabular}
-\end{table}
+\end{table*}
 
 \subsection{Regimes, protocol and statistics}\label{sec:protocol}
 
@@ -630,21 +640,21 @@ recommended.
 
 \input{tables/table3_p0}
 
-\begin{figure}[htbp]\centering
+\begin{figure*}[!t]\centering
 \includegraphics[width=\linewidth]{v2_F4_advantage.pdf}
 \caption{Adjusted advantage $\Delta$ over the budget-tuned threshold P2 along the latent
 correlation $\rho_L$ (regimes A1--A7), at 1\% and 2\% budgets, with 95\% intervals. Grey markers
 are the cost-spread regimes E1--E3 at $\rho_L = 0$. The dotted line is the closed form with
 measured parameters, which gets the direction right and under-predicts the level.}\label{fig:adv}
-\end{figure}
+\end{figure*}
 
-\begin{figure}[htbp]\centering
+\begin{figure*}[!t]\centering
 \includegraphics[width=\linewidth]{v2_F4b_vs_p0.pdf}
 \caption{Saving against never migrating along $\rho_L$ (regimes A1--A7), at 1\% and 2\% budgets,
 with 95\% intervals. The tuned threshold P2 is off the scale ($-80\%$ to $-131\%$ at 1\%, $-189\%$
 to $-281\%$ at 2\%). Avoiding risky hosts, with no migration, is above every migration
 policy.}\label{fig:vsp0}
-\end{figure}
+\end{figure*}
 
 \subsection{Theory against simulation}\label{sec:res-theory}
 
@@ -656,12 +666,12 @@ is slightly worse than doing nothing. The closed form under-predicts the level o
 points, as expected when the budget does not bind and the stopping rule, which the one-shot model
 leaves out, dominates.
 
-\begin{figure}[htbp]\centering
+\begin{figure*}[!t]\centering
 \includegraphics[width=\linewidth]{v2_theory_check.pdf}
 \caption{Theory check. Top left: the closed form (lines) against Monte Carlo (dots) for three cost
 spreads. Top right: the ranking term alone with free migration. Bottom left: effect of noise in
 $\log p$. Bottom right: where $\Delta$ crosses 1\% at $q = 0.02$.}\label{fig:theory}
-\end{figure}
+\end{figure*}
 
 \subsection{Sensitivity to migration cost}\label{sec:res-cost}
 
@@ -712,6 +722,26 @@ measurable (17.4\% against 17.5\% in B1).
 
 \input{tables/selective_net}
 
+\begin{table*}[!t]\centering
+\caption{Every synthetic or assumed element, in one place.}\label{tab:assumed}
+\setlength{\tabcolsep}{4pt}\footnotesize
+\begin{tabular}{lll}\toprule
+Element & Status & Varied in \\ \midrule
+Host risk composed from its drives & assumed & -- \\
+Non-disk hazard (Weibull) & assumed & $0\times$--$3\times$ disk \\
+Repair time (log-normal, median 2 days) & assumed & 1--4 days \\
+Tier weights 1.0 / 0.6 / 0.3 & assumed & flat; 1 / 3 / 10 \\
+Link 10\,Gb/s, 50\% usable & assumed & published range (Sec.~\ref{sec:res-cost}) \\
+Dirty rate 150\,MB/s at full CPU & assumed & published range \\
+Risk horizon 30 days & assumed & 7, 14 days \\
+Placement at a target correlation & synthetic (A, D) & $\rho_L$ 0--0.9 \\
+Cost spread at zero correlation & synthetic (E) & $\sigma_\kappa$ 0.25--1.0 \\
+Adversarial placement & synthetic (C) & -- \\
+Predictor noise and miscalibration & synthetic & logit noise 0--2; $\gamma$ 0.5--2 \\
+Risk proxy: long removals & proxy, not failures & 3 proxies, 2 weightings, 3 mappings \\
+\bottomrule\end{tabular}
+\end{table*}
+
 \subsection{Comparison with existing approaches}\label{sec:res-compare}
 
 The base papers report larger numbers (Table~\ref{tab:compare}), but they come from live systems,
@@ -726,7 +756,7 @@ inspired by the paper, so even this is not a contest between systems. What the c
 show is the difference in scope (Table~\ref{tab:gap}): this work decides per VM, under a GB budget,
 with a theory of when ranking pays, absolute costs with intervals, and public data.
 
-\begin{table}[htbp]\centering
+\begin{table*}[!t]\centering
 \caption{Headline results as each study reports them. The baselines, metrics and settings differ,
 so the rows cannot be ranked against each other.}\label{tab:compare}
 \setlength{\tabcolsep}{4pt}\footnotesize
@@ -739,7 +769,7 @@ This work, BAM & $+4.0\%$ saving & never migrating & simulated, B1, 2\% \\
 This work, avoidance & $+11.2\%$ saving & never migrating & simulated, B1, fresh seeds \\
 This work, per-tier closing & $+17.5\%$ saving & never migrating & simulated, B1, fresh seeds \\
 \bottomrule\end{tabular}
-\end{table}
+\end{table*}
 
 % ======================================================================================
 \section{Discussion}\label{sec:discussion}
@@ -773,25 +803,7 @@ host failure and a long machine removal for elevated risk. Finally, the tests ad
 freeze have blind seeds, but their policies and settings came from development seeds; the
 avoidance rule was committed before its run, while the later rules were frozen by a stored hash.
 
-\begin{table}[htbp]\centering
-\caption{Every synthetic or assumed element, in one place.}\label{tab:assumed}
-\setlength{\tabcolsep}{4pt}\footnotesize
-\begin{tabular}{lll}\toprule
-Element & Status & Varied in \\ \midrule
-Host risk composed from its drives & assumed & -- \\
-Non-disk hazard (Weibull) & assumed & $0\times$--$3\times$ disk \\
-Repair time (log-normal, median 2 days) & assumed & 1--4 days \\
-Tier weights 1.0 / 0.6 / 0.3 & assumed & flat; 1 / 3 / 10 \\
-Link 10\,Gb/s, 50\% usable & assumed & published range (Sec.~\ref{sec:res-cost}) \\
-Dirty rate 150\,MB/s at full CPU & assumed & published range \\
-Risk horizon 30 days & assumed & 7, 14 days \\
-Placement at a target correlation & synthetic (A, D) & $\rho_L$ 0--0.9 \\
-Cost spread at zero correlation & synthetic (E) & $\sigma_\kappa$ 0.25--1.0 \\
-Adversarial placement & synthetic (C) & -- \\
-Predictor noise and miscalibration & synthetic & logit noise 0--2; $\gamma$ 0.5--2 \\
-Risk proxy: long removals & proxy, not failures & 3 proxies, 2 weightings, 3 mappings \\
-\bottomrule\end{tabular}
-\end{table}
+
 
 \paragraph{When to use which policy.} If cost per GB varies little across VMs, ranking by
 probability is enough. If it varies widely and probabilities are well calibrated, budget-aware
@@ -816,7 +828,8 @@ rack-correlated failures, and opening the benchmark's hidden seeds to outside po
 \backmatter
 
 \bmhead{Acknowledgements}
-We thank our project guide, [name], for guidance throughout this work.
+We thank our project guide at the Department of Information Technology, Netaji Subhas University
+of Technology, for guidance throughout this work.
 
 \section*{Declarations}
 \begin{itemize}
@@ -831,7 +844,9 @@ and the Azure Public Dataset~\cite{azurepublicdataset}.
 \item Materials availability: Not applicable.
 \item Code availability: The simulator, benchmark, scripts and results are at
 \repourl~\cite{ccproject2026repo}.
-\item Author contribution: [Describe each author's contribution.]
+\item Author contribution: All authors contributed to the study design, the implementation of
+the simulator and policies, and the analysis of the results. Raghav Gupta prepared the first
+draft of the manuscript, and all authors reviewed and approved the final manuscript.
 \item Use of AI tools: An AI assistant (Claude, Anthropic) was used to help write the code, analysis
 scripts and documentation, and to draft the text of this manuscript, as permitted by the project
 guide. The authors directed the research, checked every result against the generated files and take
