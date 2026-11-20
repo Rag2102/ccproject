@@ -1,0 +1,8 @@
+ccproject / VMMBench
+Copyright 2026 Raghav Gupta
+
+Licensed under the Apache License, Version 2.0 (LICENSE). The licence covers the code and the
+processed results in this repository. Third-party data is not redistributed except where its
+licence allows it (Azure Public Dataset, CC-BY-4.0/MIT, extract in data/processed); Backblaze Drive
+Stats and Google ClusterData 2019 are fetched by scripts/v2/fetch_data.sh under their own terms
+(see docs/v2/data_sources.md and paper/refs.bib).

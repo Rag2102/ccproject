@@ -30,9 +30,7 @@ cloud/infra/bootstrap/crash.log
 # or commit a real one (see cloud/frontend/config.js.tpl).
 cloud/frontend/config.js
 
-# v2
-results/raw/*
-!results/raw/README.md
+# v2 (results/raw: see the matrix-runs rule below; only the per-run records stay out)
 worlds/*.parquet
 worlds/*/
 .dvc/cache
@@ -47,3 +45,14 @@ results/raw/*/*/
 results/dryrun/*/*/
 results/raw/tuning/*.tmp
 results/dryrun_summary/
+results/small/
+console/data/
+results/figures/gray/
+results/final/
+
+# paper-springer build output (the PDF is covered by *.pdf above)
+paper-springer/*.aux
+paper-springer/*.bbl
+paper-springer/*.blg
+paper-springer/*.log
+paper-springer/*.out

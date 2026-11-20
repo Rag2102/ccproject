@@ -35,9 +35,51 @@ CALIBRATION = Path(__file__).resolve().parents[1] / "results" / "v2" / "regime_c
 B2_CLASSES = CALIBRATION.with_name("b2_classes.json")
 
 
+def second_source_latent() -> float | None:
+    """Week 21 second placement source (Google 2019 cell f): its latent rho_L point estimate
+    under the primary choices (M1, platform proxy, placement weights, tau-b), from
+    scripts/v2/13_trace_rho.py --analyse-second. None until that has run."""
+    f = CALIBRATION.with_name("trace_rho_second_table.csv")
+    if not f.exists():
+        return None
+    import pandas as pd
+
+    d = pd.read_csv(f)
+    d = d[
+        (d.mapping == "M1") & (d.proxy == "risk_platform") & (d.weight == "n") & (d.stat == "tau_b")
+    ]
+    return float(d["latent"].iloc[0]) if len(d) else None
+
+
+COST_RANGE = Path(__file__).resolve().parents[1] / "configs" / "v2" / "cost_range.yaml"
+COST_FIELDS = ("usable_share", "dirty_mbps_at_100pct_cpu", "blackout_converged_s")
+
+
+def split_cost(cell: str) -> tuple[str, str | None]:
+    """ADR-009 (Weeks 29-30): "B1@G0-low" is regime B1 with the published migration-cost setting
+    G0-low from configs/v2/cost_range.yaml. Returns (base regime, setting or None)."""
+    base, _, setting = cell.partition("@")
+    return base, setting or None
+
+
+def cost_setting(setting: str) -> dict:
+    """The migration overrides of one cost-range setting. Fails until the range is derived (the
+    rule in cost_range.yaml is fixed before any rerun; ADR-009 step 2)."""
+    import yaml
+
+    d = yaml.safe_load(COST_RANGE.read_text()) if COST_RANGE.exists() else {}
+    s = (d.get("settings") or {}).get(setting)
+    if not s or any(s.get(k) is None for k in COST_FIELDS):
+        raise ValueError(f"cost-range setting {setting!r} is not derived yet ({COST_RANGE.name})")
+    return {k: float(s[k]) for k in COST_FIELDS}
+
+
 def latent_of(cell: str) -> float | None:
+    cell = split_cost(cell)[0]
     if cell == "D0":  # calibration entry for regime D's first half
         return D_LATENT[0]
+    if cell == "B1-f":  # Week 21 second source, B-style placement at cell f's measured rho_L
+        return second_source_latent()
     return A_LATENT.get(cell, B1_LATENT.get(cell))
 
 
@@ -50,6 +92,11 @@ def _calibrated(cell: str, n_hosts: int) -> float | None:
 
 
 def regime(base: SimConfig, cell: str, calibrated: bool = True) -> SimConfig:
+    cell, setting = split_cost(cell)
+    if setting is not None:
+        cfg = regime(base, cell, calibrated)
+        mc = replace(cfg.migration, **cost_setting(setting))
+        return replace(cfg, migration=mc, name=f"{cfg.name}@{setting}")
     pc = base.placement
     lat = latent_of(cell)
     if cell == "A1":
@@ -121,7 +168,16 @@ def calibrate_arrival_blend(cfg: SimConfig, seed: int = 101, steps: int = 8, tol
     return best[0], best[1], tries
 
 
-__all__ = ["A_LATENT", "B1_LATENT", "regime", "calibrate_arrival_blend", "latent_of", "np"]
+__all__ = [
+    "A_LATENT",
+    "B1_LATENT",
+    "regime",
+    "split_cost",
+    "cost_setting",
+    "calibrate_arrival_blend",
+    "latent_of",
+    "np",
+]
 
 
 def ipf(seed: np.ndarray, rows: np.ndarray, cols: np.ndarray, iters: int = 200) -> np.ndarray:

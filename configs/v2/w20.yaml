@@ -1,0 +1,66 @@
+# Week 20: ablations, robustness grid, global sensitivity, failure analysis (PROTOCOL.md v1.0
+# section 9; exploratory). Read by scripts/v2/26_run_w20.py. Scale, seeds and policies as in
+# configs/v2/matrix.yaml. Decisions (owner, 5 Oct 2026): P2 retuned per robustness setting; Morris
+# implemented in the repo (vmsim/morris.py); model-based worlds deferred past Week 21.
+seeds: [1, 30]
+ablation:
+  regimes: [A1, A3, A5, B1]
+  budgets_pct: [1, 2]
+  # BAM with one term removed; each compared with full BAM (P4) and with P2 from the main matrix
+  variants:
+    P4-nourg:  {urgency: false}          # e = 1
+    P4-nocrit: {c_uniform: mean}         # one interruption cost for every VM
+    P4-unim:   {m_uniform: mean}         # one migration cost for every VM
+    P4-ponly:  {p_only: true, c_uniform: mean, m_uniform: mean, urgency: false}
+    P4-time:   {weight: time}            # budgeted resource NIC-seconds
+    P4-cost:   {weight: cost}            # density over migration cost (the v2 rule)
+robustness:
+  regimes: [A3, B1]
+  budget_pct: 2
+  policies: [P0, P1, P2, P3, P4, P5, P6, P7, P8]
+  settings:                              # each changes one thing; P2 is retuned for each
+    bw_0.5:       {migration.true_bw_factor: 0.5}       # cost-model error: real bandwidth
+    bw_1.5:       {migration.true_bw_factor: 1.5}
+    dirty_0.5:    {migration.true_dirty_factor: 0.5}    # cost-model error: real dirty rate
+    dirty_1.5:    {migration.true_dirty_factor: 1.5}
+    gamma_0.5:    {predictor: {gamma: 0.5}}             # miscalibration p' = p^gamma
+    gamma_2:      {predictor: {gamma: 2.0}}
+    sigma_0.25:   {predictor: {sigma: 0.25}}            # noisy predictor (logit noise)
+    sigma_0.5:    {predictor: {sigma: 0.5}}
+    sigma_1:      {predictor: {sigma: 1.0}}
+    sigma_2:      {predictor: {sigma: 2.0}}
+    H_7:          {risk_h_days: 7}
+    H_14:         {risk_h_days: 14}
+    nondisk_0:    {failure.non_disk_multiplier: 0.0}
+    nondisk_3:    {failure.non_disk_multiplier: 3.0}
+    tiers_flat:   {cost.tier_weights: [1.0, 1.0, 1.0]}  # low, medium, high
+    tiers_steep:  {cost.tier_weights: [1.0, 3.0, 10.0]}
+  # F7: cost-model error x miscalibration on A3 (P0, P2, P4 only); singletons come from above
+  f7:
+    regime: A3
+    policies: [P0, P2, P4]
+    bw: [0.5, 1.5]
+    gamma: [0.5, 2.0]
+morris:
+  regime: A3
+  seeds: [1, 3]
+  r: 20
+  levels: 4
+  seed: 2026
+  p2_tuning: {dev_seeds: [101, 102], steps: 8, order: from_main}   # fast tuner, per point
+  factors:                               # name: [low, high, scale]
+    true_bw_factor:      [0.5, 1.5, lin]
+    true_dirty_factor:   [0.5, 1.5, lin]
+    d_fail_min:          [5.0, 20.0, lin]
+    repair_median_days:  [1.0, 4.0, log]
+    non_disk_multiplier: [0.0, 3.0, lin]
+    max_concurrent:      [1, 4, int]
+    init_fill:           [0.6, 0.8, lin]
+    budget_pct:          [0.5, 5.0, log]
+    gamma:               [0.5, 2.0, log]
+    sigma:               [0.0, 2.0, lin]
+failure_analysis:
+  regimes: [A3, B1]
+  budgets_pct: [0.5, 2, 5]
+  seeds: [1, 5]
+  policies: [P2, P4]

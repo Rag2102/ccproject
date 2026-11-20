@@ -1,0 +1,10 @@
+group,regime,budget_pct,policy,done,missing
+S,B1-f,0,P0,30,0
+S,B1-f,1,P2,30,0
+S,B1-f,2,P2,30,0
+S,B1-f,1,P4,30,0
+S,B1-f,2,P4,30,0
+S,B1-f,1,P5,30,0
+S,B1-f,2,P5,30,0
+S,B1-f,1,P6,30,0
+S,B1-f,2,P6,30,0

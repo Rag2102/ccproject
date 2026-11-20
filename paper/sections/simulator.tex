@@ -60,10 +60,10 @@ near~1, whereas node logs show a more strongly decreasing hazard. We report this
     \toprule
     Check & Result & Pass \\
     \midrule
-    Analytic, no migration ($N = 20{,}000$, 5 seeds) & $|z| \le 2.6$ & yes \\
-    Analytic, migrate all once & $|z| \le 2.3$ & yes \\
-    Self-calibration across repairs & $z = -0.28$; deciles $|z| \le 0.93$ & yes \\
-    Prototype regression & $456{,}533$ and $442{,}701$ to $<10^{-6}$ & yes \\
+    Analytic, no migration ($N = \VGTwoHosts$, 5 seeds) & $|z| \le \VGTwoZNever$ & yes \\
+    Analytic, migrate all once & $|z| \le \VGTwoZMoveAll$ & yes \\
+    Self-calibration across repairs & $z = \VGTwoZSelf$; deciles $|z| \le \VGTwoZDecile$ & yes \\
+    Prototype regression & \VVOneCostCS{} and \VVOneCostMatched{} to $<10^{-6}$ & yes \\
     Invariants and determinism & all property tests pass & yes \\
     Run time (5{,}000 hosts, 1 year) & $\le 4.8$\,s (target 10\,s) & yes \\
     \bottomrule

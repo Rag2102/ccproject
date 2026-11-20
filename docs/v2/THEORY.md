@@ -119,7 +119,7 @@ With both repaired, v1 measured +0.19% (same GB) and +0.22% (exact count). T3 ac
 
 - **Repeated decisions.** Decisions are made daily with a 30-day p. Moving today forgoes the option to wait, which b ignores (Week 15 finding).
 - **VMs leave.** c is survival-weighted, but a migration still protects only the VMs present.
-- **Destination risk.** A moved VM can fail on its destination. b assumes the destination is safe.
+- **Destination risk.** A moved VM can fail on its destination. b assumes the destination is safe. Measured on 2 Nov 2026: this and repeated moves together collapse BAM once m is small against c, and charging it restores a positive saving (`RESULTS_SELECTIVE_NET.md`).
 - **Queue-aware e.** Selection is no longer separable (T1 holds approximately; MILP gap 0.05%).
 - **Budget per day, not per decision.** At a 2% daily budget BAM rarely binds (it used 4.6% of its budget in the Week 15 smoke). Its advantage over budget-tuned P2 then comes mostly from the stopping term (λ), not the ranking term.
 - **Host-level failures.** All VMs on a host fail together. Expectations are unaffected; seed variance is not.

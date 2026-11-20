@@ -1,0 +1,117 @@
+{
+ "scenario": "B2",
+ "seeds": "101-110",
+ "budget_pct": 2.0,
+ "pass": true,
+ "problems": [],
+ "mean": {
+  "host_failures": 307.0,
+  "interrupted_vms_p0": 5659.0,
+  "migrations_p4": 23993.6,
+  "utilisation_p4": 0.022758858923135467,
+  "saving_p4_vs_p0": 0.048919281180090514,
+  "rejected_arrivals_p0": 1.0
+ },
+ "runs": [
+  {
+   "scenario": "B2",
+   "seed": 101,
+   "host_failures": 307,
+   "interrupted_vms_p0": 5708,
+   "migrations_p4": 24161,
+   "utilisation_p4": 0.022973149733637746,
+   "saving_p4_vs_p0": 0.07312082637641443,
+   "rejected_arrivals_p0": 3
+  },
+  {
+   "scenario": "B2",
+   "seed": 102,
+   "host_failures": 309,
+   "interrupted_vms_p0": 5690,
+   "migrations_p4": 24593,
+   "utilisation_p4": 0.023477216514459665,
+   "saving_p4_vs_p0": 0.07527892820237575,
+   "rejected_arrivals_p0": 1
+  },
+  {
+   "scenario": "B2",
+   "seed": 103,
+   "host_failures": 309,
+   "interrupted_vms_p0": 5665,
+   "migrations_p4": 24465,
+   "utilisation_p4": 0.02320050894216134,
+   "saving_p4_vs_p0": 0.06075482155062434,
+   "rejected_arrivals_p0": 0
+  },
+  {
+   "scenario": "B2",
+   "seed": 104,
+   "host_failures": 307,
+   "interrupted_vms_p0": 5561,
+   "migrations_p4": 21709,
+   "utilisation_p4": 0.020510131278538814,
+   "saving_p4_vs_p0": 0.024810691431740025,
+   "rejected_arrivals_p0": 1
+  },
+  {
+   "scenario": "B2",
+   "seed": 105,
+   "host_failures": 306,
+   "interrupted_vms_p0": 5673,
+   "migrations_p4": 25195,
+   "utilisation_p4": 0.023774614726027397,
+   "saving_p4_vs_p0": 0.04194291187032458,
+   "rejected_arrivals_p0": 4
+  },
+  {
+   "scenario": "B2",
+   "seed": 106,
+   "host_failures": 323,
+   "interrupted_vms_p0": 5967,
+   "migrations_p4": 23444,
+   "utilisation_p4": 0.022001522070015222,
+   "saving_p4_vs_p0": 0.07596452647957405,
+   "rejected_arrivals_p0": 0
+  },
+  {
+   "scenario": "B2",
+   "seed": 107,
+   "host_failures": 304,
+   "interrupted_vms_p0": 5602,
+   "migrations_p4": 23441,
+   "utilisation_p4": 0.022398568302891934,
+   "saving_p4_vs_p0": 0.039172070435771415,
+   "rejected_arrivals_p0": 0
+  },
+  {
+   "scenario": "B2",
+   "seed": 108,
+   "host_failures": 319,
+   "interrupted_vms_p0": 5855,
+   "migrations_p4": 25715,
+   "utilisation_p4": 0.024112086187214613,
+   "saving_p4_vs_p0": 0.025207279057660213,
+   "rejected_arrivals_p0": 0
+  },
+  {
+   "scenario": "B2",
+   "seed": 109,
+   "host_failures": 278,
+   "interrupted_vms_p0": 5217,
+   "migrations_p4": 22701,
+   "utilisation_p4": 0.021520048515981736,
+   "saving_p4_vs_p0": 0.023033555403104727,
+   "rejected_arrivals_p0": 1
+  },
+  {
+   "scenario": "B2",
+   "seed": 110,
+   "host_failures": 308,
+   "interrupted_vms_p0": 5652,
+   "migrations_p4": 24512,
+   "utilisation_p4": 0.02362074296042618,
+   "saving_p4_vs_p0": 0.04990720099331557,
+   "rejected_arrivals_p0": 0
+  }
+ ]
+}

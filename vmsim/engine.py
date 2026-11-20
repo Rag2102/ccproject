@@ -26,7 +26,7 @@ from __future__ import annotations
 import functools
 import hashlib
 import time
-from dataclasses import dataclass
+from dataclasses import dataclass, replace
 from pathlib import Path
 
 import numpy as np
@@ -239,11 +239,17 @@ def run(
     cap = np.full(n_hosts, float(cfg.host_mem_gb))
     budget = bfrac * cap.sum()
     mc = cfg.migration
+    # realised migrations (Week 20 cost-model error); identical to mc when both factors are 1
+    mc_true = (
+        mc if mc.true_bw_factor == 1.0 else replace(mc, nic_gbps=mc.nic_gbps * mc.true_bw_factor)
+    )
+    dirty_true = mc.true_dirty_factor
     policy.reset()
     ab = cfg.placement.arrival_blend
     blend = float(prep.world.place_blend) if ab is None else float(ab)
     switch, blend_after = cfg.placement.switch_day, cfg.placement.arrival_blend_after
 
+    tier_block = None
     state = np.full(n_hosts, UP, dtype=np.int8)
     used = np.zeros(n_hosts)
     epoch = np.zeros(n_hosts, dtype=np.int64)
@@ -365,6 +371,22 @@ def run(
                     rng_arr,
                     V["u_place"][ids],
                 )
+            if tier_block is not None:  # selective avoidance: move VMs off closed hosts
+                t_ = V["tier"][ids]
+                m_ = V["mem"][ids]
+                on = hs >= 0
+                bad_ = np.flatnonzero(on & tier_block[t_, np.maximum(hs, 0)])
+                if len(bad_):
+                    room_ = cap - used - np.bincount(hs[on], weights=m_[on], minlength=n_hosts)
+                    np.add.at(room_, hs[bad_], m_[bad_])
+                    for v_ in bad_:
+                        c_ = np.flatnonzero((state == UP) & ~tier_block[t_[v_]] & (room_ >= m_[v_]))
+                        if len(c_):
+                            j_ = rng_arr.choice(c_)
+                            hs[v_] = j_
+                            room_[j_] -= m_[v_]
+                        else:
+                            hs[v_] = -1
             ok = hs >= 0
             rejected = int((~ok).sum())
             vm_host[ids] = hs
@@ -405,6 +427,8 @@ def run(
         plan = np.asarray(policy.decide(obs, budget), dtype=np.int64) if budget > 0 else []
         # avoid-allocation marks (zero budget means no mitigation action of any kind)
         mark = policy.avoid(obs) if budget > 0 else None
+        if budget > 0 and hasattr(policy, "tier_block"):
+            tier_block = policy.tier_block(obs)
         if mark is not None:
             mark = np.asarray(mark, dtype=bool)
             state[(state == UP) & mark] = AVOID
@@ -448,9 +472,8 @@ def run(
             src = vm_host[sel]
             if check and (state[dsts] != UP).any():
                 raise InvariantError(f"day {d}: migration to a host that is not up")
-            ts, te, dur, blk, _ = migration.schedule(
-                src, V["mem"][sel], V["dirty"][sel], float(d), mc
-            )
+            dirty = V["dirty"][sel] if dirty_true == 1.0 else V["dirty"][sel] * dirty_true
+            ts, te, dur, blk, _ = migration.schedule(src, V["mem"][sel], dirty, float(d), mc_true)
             cost = migration.migration_cost_min(V["w"][sel], dur, blk, cfg.cost)
             np.add.at(fb_mcost, src, cost)
             np.add.at(fb_gb, src, V["mem"][sel])

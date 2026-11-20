@@ -1,0 +1,19 @@
+id,source,section,claim_affected,comment,severity,effort_h,decision,owner_week,status,commit
+R1.1,mock R1 (systems),Simulator; Discussion,C3a,No testbed; migration cost model assumed,should,0.5,accept-partly: Week 20 sweeps + Morris; testbed is RQ6 (W41-46); strengthening ADR-009 adds a published range,W29,open,
+R1.2,mock R1 (systems),Discussion,C3a,Drives stand in for hosts,should,0.2,accept: construct threat stated; non-disk multiplier swept,W23,closed,1c8fdf5
+R1.3,mock R1 (systems),Evaluation,C3a,2000 hosts is small,could,0.3,accept-partly: one sentence on why seeds not hosts carry power (ADR-007),W30,open,
+R1.4,mock R1 (systems),Discussion,C3a,Daily cadence and GB budget are one design among many,could,0.2,accept-partly: P4-time ablation; rack caps are RQ7,W23,closed,1c8fdf5
+R1.5,mock R1 (systems),Related work,C3a,P5 is not Narya,should,0.1,accept: called Narya-inspired; differences listed in artifact,W23,closed,1c8fdf5
+R1.6,mock R1 (systems),Data,C1,Long removals are not failures,should,0.1,accept: proxy stated; three proxies two weightings three mappings,W23,closed,1c8fdf5
+R2.1,mock R2 (ML/stats),Evaluation; Discussion,C3a,Main matrix uses an oracle predictor so the headline is an upper bound,must,0.5,accept: stated in Evaluation setup; Discussion internal validity sentence after results,W28,open,a055c47
+R2.2,mock R2 (ML/stats),Evaluation,C3a,Regression adjustment may be post-treatment,should,0.1,reject with reason: failures drawn before any policy (CRN); clause added,W24,closed,a055c47
+R2.3,mock R2 (ML/stats),All figures,C6,Exploratory cells read as findings,should,1,accept: label every exploratory caption at the language pass,W28,open,
+R2.4,mock R2 (ML/stats),Evaluation,C7,Seeds test luck not misspecification,should,0.1,accept: replication reported as seed replication,W28,open,
+R2.5,mock R2 (ML/stats),Data,C3d,Last rolling fold much weaker,could,0.1,accept: fold range reported as macros,W24,closed,a055c47
+R2.6,mock R2 (ML/stats),Data,C1,Latent-axis conversion decides the class,could,0.1,reject with reason: C0 on the direct reading too; sentence added,W24,closed,a055c47
+R2.7,mock R2 (ML/stats),Table 3,C3a,No effect sizes against never migrating,must,1,accept: P0 and P3 columns plus companion table (ADR-005 required them),W24,closed,e5560ed
+R3.1,mock R3 (skeptic),Intro; Related,C2a,Novelty: this is Dantzig plus Elkan,should,0.2,accept-partly: contributions say what is not claimed,W23,closed,1c8fdf5
+R3.2,mock R3 (skeptic),Abstract; Intro; Table 3,C3a,Straw-man comparator (P2 can cost more than doing nothing),must,1,accept-partly: P0 beside every number (done); abstract and intro state the result against P0 after results,W28,open,e5560ed
+R3.3,mock R3 (skeptic),Discussion,C2b,Practical significance,should,0.2,accept-partly: reduction to cost spread per GB stated in Discussion,W23,closed,1c8fdf5
+R3.4,mock R3 (skeptic),Abstract; Intro; Conclusion,C3a,If no 1% win is there a paper,must,1,accept: pre-registered paper shapes; write the G3-shape sentences after results-frozen,W28,open,
+R3.5,mock R3 (skeptic),Approach; F4,C2b,Theory scope (one-shot; copula; equal weights),should,0.3,accept-partly: F4 caption says direction and order of magnitude only,W28,open,

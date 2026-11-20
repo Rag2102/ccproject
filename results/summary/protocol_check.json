@@ -1,0 +1,213 @@
+{
+ "groups": [
+  "A",
+  "E",
+  "B",
+  "C",
+  "D"
+ ],
+ "cells": 528,
+ "cells_incomplete": [],
+ "runs": 19140,
+ "overspend_runs": 0,
+ "git_shas": [
+  "29c4749a4f7ed898846bd0d41684645b00200eb3+dirty",
+  "3153b94f31272e34d6db90b3b2f4e3271e48abc8",
+  "9bcabd49fb10e7ac6c753ebcae2cdb713995a000"
+ ],
+ "invariant_reruns": [
+  {
+   "regime": "A1",
+   "policy": "P2",
+   "ok": true,
+   "error": null
+  },
+  {
+   "regime": "A1",
+   "policy": "P4",
+   "ok": true,
+   "error": null
+  },
+  {
+   "regime": "A2",
+   "policy": "P2",
+   "ok": true,
+   "error": null
+  },
+  {
+   "regime": "A2",
+   "policy": "P4",
+   "ok": true,
+   "error": null
+  },
+  {
+   "regime": "A3",
+   "policy": "P2",
+   "ok": true,
+   "error": null
+  },
+  {
+   "regime": "A3",
+   "policy": "P4",
+   "ok": true,
+   "error": null
+  },
+  {
+   "regime": "A4",
+   "policy": "P2",
+   "ok": true,
+   "error": null
+  },
+  {
+   "regime": "A4",
+   "policy": "P4",
+   "ok": true,
+   "error": null
+  },
+  {
+   "regime": "A5",
+   "policy": "P2",
+   "ok": true,
+   "error": null
+  },
+  {
+   "regime": "A5",
+   "policy": "P4",
+   "ok": true,
+   "error": null
+  },
+  {
+   "regime": "A6",
+   "policy": "P2",
+   "ok": true,
+   "error": null
+  },
+  {
+   "regime": "A6",
+   "policy": "P4",
+   "ok": true,
+   "error": null
+  },
+  {
+   "regime": "A7",
+   "policy": "P2",
+   "ok": true,
+   "error": null
+  },
+  {
+   "regime": "A7",
+   "policy": "P4",
+   "ok": true,
+   "error": null
+  },
+  {
+   "regime": "E1",
+   "policy": "P2",
+   "ok": true,
+   "error": null
+  },
+  {
+   "regime": "E1",
+   "policy": "P4",
+   "ok": true,
+   "error": null
+  },
+  {
+   "regime": "E2",
+   "policy": "P2",
+   "ok": true,
+   "error": null
+  },
+  {
+   "regime": "E2",
+   "policy": "P4",
+   "ok": true,
+   "error": null
+  },
+  {
+   "regime": "E3",
+   "policy": "P2",
+   "ok": true,
+   "error": null
+  },
+  {
+   "regime": "E3",
+   "policy": "P4",
+   "ok": true,
+   "error": null
+  },
+  {
+   "regime": "B1-low",
+   "policy": "P2",
+   "ok": true,
+   "error": null
+  },
+  {
+   "regime": "B1-low",
+   "policy": "P4",
+   "ok": true,
+   "error": null
+  },
+  {
+   "regime": "B1",
+   "policy": "P2",
+   "ok": true,
+   "error": null
+  },
+  {
+   "regime": "B1",
+   "policy": "P4",
+   "ok": true,
+   "error": null
+  },
+  {
+   "regime": "B1-high",
+   "policy": "P2",
+   "ok": true,
+   "error": null
+  },
+  {
+   "regime": "B1-high",
+   "policy": "P4",
+   "ok": true,
+   "error": null
+  },
+  {
+   "regime": "B2",
+   "policy": "P2",
+   "ok": true,
+   "error": null
+  },
+  {
+   "regime": "B2",
+   "policy": "P4",
+   "ok": true,
+   "error": null
+  },
+  {
+   "regime": "C",
+   "policy": "P2",
+   "ok": true,
+   "error": null
+  },
+  {
+   "regime": "C",
+   "policy": "P4",
+   "ok": true,
+   "error": null
+  },
+  {
+   "regime": "D",
+   "policy": "P2",
+   "ok": true,
+   "error": null
+  },
+  {
+   "regime": "D",
+   "policy": "P4",
+   "ok": true,
+   "error": null
+  }
+ ],
+ "passed": true
+}

@@ -1,0 +1,19 @@
+% Conclusion (Week 23). The result sentence uses only macros; the G3-shape sentence is added after
+% results-frozen.
+\section{Conclusion}
+\label{sec:conclusion}
+
+We asked when ranking VMs by expected benefit per GB beats a tuned probability threshold under a
+daily migration budget. The answer has three parts. In real placement, as far as public traces
+show, critical work is uncorrelated with machine risk ($|\tau_b| \le \VGOneMaxAbsTauB$). That does
+not doom workload awareness: under calibrated probabilities and horizon-matched accounting the
+budget-aware rule cannot lose in expectation, and its advantage is driven by the spread of cost per
+GB rather than by correlation. In a validated simulator at the measured correlation, its adjusted
+advantage over a threshold tuned to the same budget is \VDeltaPFourBOneTwo\% at a 2\% budget, and
+\VWins{} of \VFamilySize{} pre-registered comparisons clear the 1\% bar.
+% After results-frozen: one sentence on what this means for an operator (G3 shape).
+
+What we did not show: anything about production performance, about failures other than drives,
+or about schedulers other than Borg. The next steps are measured migration costs on a testbed,
+rack-correlated failures and two budgeted resources, and opening VMMBench's hidden seeds to
+outside policies.

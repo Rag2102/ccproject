@@ -34,7 +34,7 @@ From the v5 week cards for W17 and W18 (plan page 19-20). Built on 4 Oct 2026, a
 
 ## Week 18 (1-7 Feb): benchmark runs I, regimes A1-A7 and E
 
-- [ ] Launch A1-A7 and E1-E3: all policies, 4 budgets, eval seeds 1-30, 8 shards → `results/raw/A/`, `results/raw/E/`
+- [~] Launch A1-A7 and E1-E3: all policies, 4 budgets, eval seeds 1-30, 8 shards → `results/raw/A/`, `results/raw/E/` (launcher `scripts/v2/run_w18.sh`, or all of Weeks 18-20 with `run_overnight.sh`; first launch stopped on 4 Oct after the pre-filter bug was found and fixed; not yet rerun)
 - [ ] Monitor completeness only (`results/raw/completeness.csv`)
 - [ ] Statistics: `scripts/v2/30_stats.py --groups A E` → `results/summary/A.json`, `E.json`, `confirmatory.json` (partial family, provisional), `vmconsole.json`
 - [ ] F4: `scripts/v2/31_fig_f4.py` → `results/figures/v2_F4_advantage.pdf` (simultaneous CIs, per-seed dots, T3 overlay at the simulator's measured parameters)

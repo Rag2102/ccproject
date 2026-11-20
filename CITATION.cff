@@ -1,0 +1,17 @@
+cff-version: 1.2.0
+message: "If you use this software or VMMBench, please cite it as below."
+title: "VMMBench: budget-aware VM failure mitigation, simulator and benchmark"
+type: software
+authors:
+  - family-names: Gupta
+    given-names: Raghav
+version: 2.0.0
+license: Apache-2.0
+repository-code: "https://github.com/Rag2102/ccproject"
+keywords:
+  - cloud computing
+  - failure mitigation
+  - live migration
+  - benchmark
+  - simulation
+# doi: filled in from the Zenodo release (Week 25, owner)

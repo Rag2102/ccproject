@@ -1,0 +1,975 @@
+{
+ "note": "diff = BAM cost - P2 cost per host over the horizon (interruptions on the host plus migrations out of it); positive means BAM is worse there",
+ "by_age_decile": [
+  {
+   "regime": "A3",
+   "budget_pct": 0.5,
+   "age_decile": "0",
+   "mean_cost_diff_per_host": -1.2761876606167226,
+   "bam_worse": false
+  },
+  {
+   "regime": "A3",
+   "budget_pct": 0.5,
+   "age_decile": "1",
+   "mean_cost_diff_per_host": -6.758230767064527,
+   "bam_worse": false
+  },
+  {
+   "regime": "A3",
+   "budget_pct": 0.5,
+   "age_decile": "2",
+   "mean_cost_diff_per_host": -9.20215528441098,
+   "bam_worse": false
+  },
+  {
+   "regime": "A3",
+   "budget_pct": 0.5,
+   "age_decile": "3",
+   "mean_cost_diff_per_host": -9.73642273865348,
+   "bam_worse": false
+  },
+  {
+   "regime": "A3",
+   "budget_pct": 0.5,
+   "age_decile": "4",
+   "mean_cost_diff_per_host": -11.871559170551574,
+   "bam_worse": false
+  },
+  {
+   "regime": "A3",
+   "budget_pct": 0.5,
+   "age_decile": "5",
+   "mean_cost_diff_per_host": -9.48398842612928,
+   "bam_worse": false
+  },
+  {
+   "regime": "A3",
+   "budget_pct": 0.5,
+   "age_decile": "6",
+   "mean_cost_diff_per_host": -11.735169923536773,
+   "bam_worse": false
+  },
+  {
+   "regime": "A3",
+   "budget_pct": 0.5,
+   "age_decile": "7",
+   "mean_cost_diff_per_host": -12.82948436730618,
+   "bam_worse": false
+  },
+  {
+   "regime": "A3",
+   "budget_pct": 0.5,
+   "age_decile": "8",
+   "mean_cost_diff_per_host": -8.466708307636285,
+   "bam_worse": false
+  },
+  {
+   "regime": "A3",
+   "budget_pct": 0.5,
+   "age_decile": "9",
+   "mean_cost_diff_per_host": -8.623976231799285,
+   "bam_worse": false
+  },
+  {
+   "regime": "A3",
+   "budget_pct": 2.0,
+   "age_decile": "0",
+   "mean_cost_diff_per_host": -18.928361188270436,
+   "bam_worse": false
+  },
+  {
+   "regime": "A3",
+   "budget_pct": 2.0,
+   "age_decile": "1",
+   "mean_cost_diff_per_host": -31.82007447095663,
+   "bam_worse": false
+  },
+  {
+   "regime": "A3",
+   "budget_pct": 2.0,
+   "age_decile": "2",
+   "mean_cost_diff_per_host": -35.906439419607366,
+   "bam_worse": false
+  },
+  {
+   "regime": "A3",
+   "budget_pct": 2.0,
+   "age_decile": "3",
+   "mean_cost_diff_per_host": -35.97735415174708,
+   "bam_worse": false
+  },
+  {
+   "regime": "A3",
+   "budget_pct": 2.0,
+   "age_decile": "4",
+   "mean_cost_diff_per_host": -43.55520058372144,
+   "bam_worse": false
+  },
+  {
+   "regime": "A3",
+   "budget_pct": 2.0,
+   "age_decile": "5",
+   "mean_cost_diff_per_host": -39.07745362818894,
+   "bam_worse": false
+  },
+  {
+   "regime": "A3",
+   "budget_pct": 2.0,
+   "age_decile": "6",
+   "mean_cost_diff_per_host": -51.709816127591054,
+   "bam_worse": false
+  },
+  {
+   "regime": "A3",
+   "budget_pct": 2.0,
+   "age_decile": "7",
+   "mean_cost_diff_per_host": -60.407626917529086,
+   "bam_worse": false
+  },
+  {
+   "regime": "A3",
+   "budget_pct": 2.0,
+   "age_decile": "8",
+   "mean_cost_diff_per_host": -63.93792048476229,
+   "bam_worse": false
+  },
+  {
+   "regime": "A3",
+   "budget_pct": 2.0,
+   "age_decile": "9",
+   "mean_cost_diff_per_host": -70.27841591703121,
+   "bam_worse": false
+  },
+  {
+   "regime": "A3",
+   "budget_pct": 5.0,
+   "age_decile": "0",
+   "mean_cost_diff_per_host": -68.5708055654325,
+   "bam_worse": false
+  },
+  {
+   "regime": "A3",
+   "budget_pct": 5.0,
+   "age_decile": "1",
+   "mean_cost_diff_per_host": -81.82261527819588,
+   "bam_worse": false
+  },
+  {
+   "regime": "A3",
+   "budget_pct": 5.0,
+   "age_decile": "2",
+   "mean_cost_diff_per_host": -91.15386512910469,
+   "bam_worse": false
+  },
+  {
+   "regime": "A3",
+   "budget_pct": 5.0,
+   "age_decile": "3",
+   "mean_cost_diff_per_host": -105.51008082538964,
+   "bam_worse": false
+  },
+  {
+   "regime": "A3",
+   "budget_pct": 5.0,
+   "age_decile": "4",
+   "mean_cost_diff_per_host": -121.04054922321598,
+   "bam_worse": false
+  },
+  {
+   "regime": "A3",
+   "budget_pct": 5.0,
+   "age_decile": "5",
+   "mean_cost_diff_per_host": -133.23688776229406,
+   "bam_worse": false
+  },
+  {
+   "regime": "A3",
+   "budget_pct": 5.0,
+   "age_decile": "6",
+   "mean_cost_diff_per_host": -152.33323503644849,
+   "bam_worse": false
+  },
+  {
+   "regime": "A3",
+   "budget_pct": 5.0,
+   "age_decile": "7",
+   "mean_cost_diff_per_host": -156.17735595322267,
+   "bam_worse": false
+  },
+  {
+   "regime": "A3",
+   "budget_pct": 5.0,
+   "age_decile": "8",
+   "mean_cost_diff_per_host": -157.25428634640036,
+   "bam_worse": false
+  },
+  {
+   "regime": "A3",
+   "budget_pct": 5.0,
+   "age_decile": "9",
+   "mean_cost_diff_per_host": -168.18375934181793,
+   "bam_worse": false
+  },
+  {
+   "regime": "B1",
+   "budget_pct": 0.5,
+   "age_decile": "0",
+   "mean_cost_diff_per_host": -1.6589897363927024,
+   "bam_worse": false
+  },
+  {
+   "regime": "B1",
+   "budget_pct": 0.5,
+   "age_decile": "1",
+   "mean_cost_diff_per_host": -7.72144965050241,
+   "bam_worse": false
+  },
+  {
+   "regime": "B1",
+   "budget_pct": 0.5,
+   "age_decile": "2",
+   "mean_cost_diff_per_host": -10.236445687872683,
+   "bam_worse": false
+  },
+  {
+   "regime": "B1",
+   "budget_pct": 0.5,
+   "age_decile": "3",
+   "mean_cost_diff_per_host": -9.650372204120671,
+   "bam_worse": false
+  },
+  {
+   "regime": "B1",
+   "budget_pct": 0.5,
+   "age_decile": "4",
+   "mean_cost_diff_per_host": -12.729589179838218,
+   "bam_worse": false
+  },
+  {
+   "regime": "B1",
+   "budget_pct": 0.5,
+   "age_decile": "5",
+   "mean_cost_diff_per_host": -9.608679182834104,
+   "bam_worse": false
+  },
+  {
+   "regime": "B1",
+   "budget_pct": 0.5,
+   "age_decile": "6",
+   "mean_cost_diff_per_host": -13.10075010831808,
+   "bam_worse": false
+  },
+  {
+   "regime": "B1",
+   "budget_pct": 0.5,
+   "age_decile": "7",
+   "mean_cost_diff_per_host": -13.814780335846907,
+   "bam_worse": false
+  },
+  {
+   "regime": "B1",
+   "budget_pct": 0.5,
+   "age_decile": "8",
+   "mean_cost_diff_per_host": -9.698384138091647,
+   "bam_worse": false
+  },
+  {
+   "regime": "B1",
+   "budget_pct": 0.5,
+   "age_decile": "9",
+   "mean_cost_diff_per_host": -8.899010091608657,
+   "bam_worse": false
+  },
+  {
+   "regime": "B1",
+   "budget_pct": 2.0,
+   "age_decile": "0",
+   "mean_cost_diff_per_host": -19.184320295182747,
+   "bam_worse": false
+  },
+  {
+   "regime": "B1",
+   "budget_pct": 2.0,
+   "age_decile": "1",
+   "mean_cost_diff_per_host": -33.48734965161787,
+   "bam_worse": false
+  },
+  {
+   "regime": "B1",
+   "budget_pct": 2.0,
+   "age_decile": "2",
+   "mean_cost_diff_per_host": -37.23211237464081,
+   "bam_worse": false
+  },
+  {
+   "regime": "B1",
+   "budget_pct": 2.0,
+   "age_decile": "3",
+   "mean_cost_diff_per_host": -36.5445488346096,
+   "bam_worse": false
+  },
+  {
+   "regime": "B1",
+   "budget_pct": 2.0,
+   "age_decile": "4",
+   "mean_cost_diff_per_host": -45.30927643485703,
+   "bam_worse": false
+  },
+  {
+   "regime": "B1",
+   "budget_pct": 2.0,
+   "age_decile": "5",
+   "mean_cost_diff_per_host": -39.52680432436083,
+   "bam_worse": false
+  },
+  {
+   "regime": "B1",
+   "budget_pct": 2.0,
+   "age_decile": "6",
+   "mean_cost_diff_per_host": -52.407412368006824,
+   "bam_worse": false
+  },
+  {
+   "regime": "B1",
+   "budget_pct": 2.0,
+   "age_decile": "7",
+   "mean_cost_diff_per_host": -61.893321325696895,
+   "bam_worse": false
+  },
+  {
+   "regime": "B1",
+   "budget_pct": 2.0,
+   "age_decile": "8",
+   "mean_cost_diff_per_host": -62.52179072993634,
+   "bam_worse": false
+  },
+  {
+   "regime": "B1",
+   "budget_pct": 2.0,
+   "age_decile": "9",
+   "mean_cost_diff_per_host": -70.83364368048365,
+   "bam_worse": false
+  },
+  {
+   "regime": "B1",
+   "budget_pct": 5.0,
+   "age_decile": "0",
+   "mean_cost_diff_per_host": -68.6947173480658,
+   "bam_worse": false
+  },
+  {
+   "regime": "B1",
+   "budget_pct": 5.0,
+   "age_decile": "1",
+   "mean_cost_diff_per_host": -82.77066495053256,
+   "bam_worse": false
+  },
+  {
+   "regime": "B1",
+   "budget_pct": 5.0,
+   "age_decile": "2",
+   "mean_cost_diff_per_host": -92.32239983841377,
+   "bam_worse": false
+  },
+  {
+   "regime": "B1",
+   "budget_pct": 5.0,
+   "age_decile": "3",
+   "mean_cost_diff_per_host": -107.26900914200701,
+   "bam_worse": false
+  },
+  {
+   "regime": "B1",
+   "budget_pct": 5.0,
+   "age_decile": "4",
+   "mean_cost_diff_per_host": -122.69197906207378,
+   "bam_worse": false
+  },
+  {
+   "regime": "B1",
+   "budget_pct": 5.0,
+   "age_decile": "5",
+   "mean_cost_diff_per_host": -134.33204144574995,
+   "bam_worse": false
+  },
+  {
+   "regime": "B1",
+   "budget_pct": 5.0,
+   "age_decile": "6",
+   "mean_cost_diff_per_host": -154.35396010955853,
+   "bam_worse": false
+  },
+  {
+   "regime": "B1",
+   "budget_pct": 5.0,
+   "age_decile": "7",
+   "mean_cost_diff_per_host": -158.49274108251404,
+   "bam_worse": false
+  },
+  {
+   "regime": "B1",
+   "budget_pct": 5.0,
+   "age_decile": "8",
+   "mean_cost_diff_per_host": -155.09834148654735,
+   "bam_worse": false
+  },
+  {
+   "regime": "B1",
+   "budget_pct": 5.0,
+   "age_decile": "9",
+   "mean_cost_diff_per_host": -168.00151133249557,
+   "bam_worse": false
+  }
+ ],
+ "by_risk_decile": [
+  {
+   "regime": "A3",
+   "budget_pct": 0.5,
+   "risk_decile": "0",
+   "mean_cost_diff_per_host": -0.020105918252110843,
+   "bam_worse": false
+  },
+  {
+   "regime": "A3",
+   "budget_pct": 0.5,
+   "risk_decile": "1",
+   "mean_cost_diff_per_host": 0.08505021955565642,
+   "bam_worse": true
+  },
+  {
+   "regime": "A3",
+   "budget_pct": 0.5,
+   "risk_decile": "2",
+   "mean_cost_diff_per_host": 0.3018198157552124,
+   "bam_worse": true
+  },
+  {
+   "regime": "A3",
+   "budget_pct": 0.5,
+   "risk_decile": "3",
+   "mean_cost_diff_per_host": -1.1687627340989113,
+   "bam_worse": false
+  },
+  {
+   "regime": "A3",
+   "budget_pct": 0.5,
+   "risk_decile": "4",
+   "mean_cost_diff_per_host": -0.8091239876110566,
+   "bam_worse": false
+  },
+  {
+   "regime": "A3",
+   "budget_pct": 0.5,
+   "risk_decile": "5",
+   "mean_cost_diff_per_host": -1.8665172115286621,
+   "bam_worse": false
+  },
+  {
+   "regime": "A3",
+   "budget_pct": 0.5,
+   "risk_decile": "6",
+   "mean_cost_diff_per_host": -1.7797072913127407,
+   "bam_worse": false
+  },
+  {
+   "regime": "A3",
+   "budget_pct": 0.5,
+   "risk_decile": "7",
+   "mean_cost_diff_per_host": -6.138505886467932,
+   "bam_worse": false
+  },
+  {
+   "regime": "A3",
+   "budget_pct": 0.5,
+   "risk_decile": "8",
+   "mean_cost_diff_per_host": -14.363532110493558,
+   "bam_worse": false
+  },
+  {
+   "regime": "A3",
+   "budget_pct": 0.5,
+   "risk_decile": "9",
+   "mean_cost_diff_per_host": -64.22808847459737,
+   "bam_worse": false
+  },
+  {
+   "regime": "A3",
+   "budget_pct": 2.0,
+   "risk_decile": "0",
+   "mean_cost_diff_per_host": -4.596897802244525,
+   "bam_worse": false
+  },
+  {
+   "regime": "A3",
+   "budget_pct": 2.0,
+   "risk_decile": "1",
+   "mean_cost_diff_per_host": -6.661154419891686,
+   "bam_worse": false
+  },
+  {
+   "regime": "A3",
+   "budget_pct": 2.0,
+   "risk_decile": "2",
+   "mean_cost_diff_per_host": -7.958448586140654,
+   "bam_worse": false
+  },
+  {
+   "regime": "A3",
+   "budget_pct": 2.0,
+   "risk_decile": "3",
+   "mean_cost_diff_per_host": -11.207451901146703,
+   "bam_worse": false
+  },
+  {
+   "regime": "A3",
+   "budget_pct": 2.0,
+   "risk_decile": "4",
+   "mean_cost_diff_per_host": -14.336208103439734,
+   "bam_worse": false
+  },
+  {
+   "regime": "A3",
+   "budget_pct": 2.0,
+   "risk_decile": "5",
+   "mean_cost_diff_per_host": -18.29431337082754,
+   "bam_worse": false
+  },
+  {
+   "regime": "A3",
+   "budget_pct": 2.0,
+   "risk_decile": "6",
+   "mean_cost_diff_per_host": -27.39656306267522,
+   "bam_worse": false
+  },
+  {
+   "regime": "A3",
+   "budget_pct": 2.0,
+   "risk_decile": "7",
+   "mean_cost_diff_per_host": -40.24784218108799,
+   "bam_worse": false
+  },
+  {
+   "regime": "A3",
+   "budget_pct": 2.0,
+   "risk_decile": "8",
+   "mean_cost_diff_per_host": -105.85777498182152,
+   "bam_worse": false
+  },
+  {
+   "regime": "A3",
+   "budget_pct": 2.0,
+   "risk_decile": "9",
+   "mean_cost_diff_per_host": -215.01465527448062,
+   "bam_worse": false
+  },
+  {
+   "regime": "A3",
+   "budget_pct": 5.0,
+   "risk_decile": "0",
+   "mean_cost_diff_per_host": -12.818381597227194,
+   "bam_worse": false
+  },
+  {
+   "regime": "A3",
+   "budget_pct": 5.0,
+   "risk_decile": "1",
+   "mean_cost_diff_per_host": -19.05731712201316,
+   "bam_worse": false
+  },
+  {
+   "regime": "A3",
+   "budget_pct": 5.0,
+   "risk_decile": "2",
+   "mean_cost_diff_per_host": -26.091069231419446,
+   "bam_worse": false
+  },
+  {
+   "regime": "A3",
+   "budget_pct": 5.0,
+   "risk_decile": "3",
+   "mean_cost_diff_per_host": -39.37643076042124,
+   "bam_worse": false
+  },
+  {
+   "regime": "A3",
+   "budget_pct": 5.0,
+   "risk_decile": "4",
+   "mean_cost_diff_per_host": -50.65746828332923,
+   "bam_worse": false
+  },
+  {
+   "regime": "A3",
+   "budget_pct": 5.0,
+   "risk_decile": "5",
+   "mean_cost_diff_per_host": -73.11610130205058,
+   "bam_worse": false
+  },
+  {
+   "regime": "A3",
+   "budget_pct": 5.0,
+   "risk_decile": "6",
+   "mean_cost_diff_per_host": -121.91111713052801,
+   "bam_worse": false
+  },
+  {
+   "regime": "A3",
+   "budget_pct": 5.0,
+   "risk_decile": "7",
+   "mean_cost_diff_per_host": -241.19080317664438,
+   "bam_worse": false
+  },
+  {
+   "regime": "A3",
+   "budget_pct": 5.0,
+   "risk_decile": "8",
+   "mean_cost_diff_per_host": -337.5588080696589,
+   "bam_worse": false
+  },
+  {
+   "regime": "A3",
+   "budget_pct": 5.0,
+   "risk_decile": "9",
+   "mean_cost_diff_per_host": -313.33922119222467,
+   "bam_worse": false
+  },
+  {
+   "regime": "B1",
+   "budget_pct": 0.5,
+   "risk_decile": "0",
+   "mean_cost_diff_per_host": 0.5250899848410466,
+   "bam_worse": true
+  },
+  {
+   "regime": "B1",
+   "budget_pct": 0.5,
+   "risk_decile": "1",
+   "mean_cost_diff_per_host": -0.7501946636896297,
+   "bam_worse": false
+  },
+  {
+   "regime": "B1",
+   "budget_pct": 0.5,
+   "risk_decile": "2",
+   "mean_cost_diff_per_host": 0.581943459210343,
+   "bam_worse": true
+  },
+  {
+   "regime": "B1",
+   "budget_pct": 0.5,
+   "risk_decile": "3",
+   "mean_cost_diff_per_host": 0.5550553716784005,
+   "bam_worse": true
+  },
+  {
+   "regime": "B1",
+   "budget_pct": 0.5,
+   "risk_decile": "4",
+   "mean_cost_diff_per_host": -0.6869467649130155,
+   "bam_worse": false
+  },
+  {
+   "regime": "B1",
+   "budget_pct": 0.5,
+   "risk_decile": "5",
+   "mean_cost_diff_per_host": -2.13548511648194,
+   "bam_worse": false
+  },
+  {
+   "regime": "B1",
+   "budget_pct": 0.5,
+   "risk_decile": "6",
+   "mean_cost_diff_per_host": -2.804108946529792,
+   "bam_worse": false
+  },
+  {
+   "regime": "B1",
+   "budget_pct": 0.5,
+   "risk_decile": "7",
+   "mean_cost_diff_per_host": -5.951946605550548,
+   "bam_worse": false
+  },
+  {
+   "regime": "B1",
+   "budget_pct": 0.5,
+   "risk_decile": "8",
+   "mean_cost_diff_per_host": -15.868427436673066,
+   "bam_worse": false
+  },
+  {
+   "regime": "B1",
+   "budget_pct": 0.5,
+   "risk_decile": "9",
+   "mean_cost_diff_per_host": -70.58881648561696,
+   "bam_worse": false
+  },
+  {
+   "regime": "B1",
+   "budget_pct": 2.0,
+   "risk_decile": "0",
+   "mean_cost_diff_per_host": -4.6620883825998085,
+   "bam_worse": false
+  },
+  {
+   "regime": "B1",
+   "budget_pct": 2.0,
+   "risk_decile": "1",
+   "mean_cost_diff_per_host": -7.276118545843659,
+   "bam_worse": false
+  },
+  {
+   "regime": "B1",
+   "budget_pct": 2.0,
+   "risk_decile": "2",
+   "mean_cost_diff_per_host": -8.531237208123741,
+   "bam_worse": false
+  },
+  {
+   "regime": "B1",
+   "budget_pct": 2.0,
+   "risk_decile": "3",
+   "mean_cost_diff_per_host": -10.311955888590973,
+   "bam_worse": false
+  },
+  {
+   "regime": "B1",
+   "budget_pct": 2.0,
+   "risk_decile": "4",
+   "mean_cost_diff_per_host": -14.131649633151715,
+   "bam_worse": false
+  },
+  {
+   "regime": "B1",
+   "budget_pct": 2.0,
+   "risk_decile": "5",
+   "mean_cost_diff_per_host": -19.00482063988334,
+   "bam_worse": false
+  },
+  {
+   "regime": "B1",
+   "budget_pct": 2.0,
+   "risk_decile": "6",
+   "mean_cost_diff_per_host": -26.49135348139094,
+   "bam_worse": false
+  },
+  {
+   "regime": "B1",
+   "budget_pct": 2.0,
+   "risk_decile": "7",
+   "mean_cost_diff_per_host": -41.26100731700908,
+   "bam_worse": false
+  },
+  {
+   "regime": "B1",
+   "budget_pct": 2.0,
+   "risk_decile": "8",
+   "mean_cost_diff_per_host": -104.68714405046322,
+   "bam_worse": false
+  },
+  {
+   "regime": "B1",
+   "budget_pct": 2.0,
+   "risk_decile": "9",
+   "mean_cost_diff_per_host": -222.56673254098743,
+   "bam_worse": false
+  },
+  {
+   "regime": "B1",
+   "budget_pct": 5.0,
+   "risk_decile": "0",
+   "mean_cost_diff_per_host": -12.111402297160742,
+   "bam_worse": false
+  },
+  {
+   "regime": "B1",
+   "budget_pct": 5.0,
+   "risk_decile": "1",
+   "mean_cost_diff_per_host": -19.795602866795345,
+   "bam_worse": false
+  },
+  {
+   "regime": "B1",
+   "budget_pct": 5.0,
+   "risk_decile": "2",
+   "mean_cost_diff_per_host": -27.086618233533382,
+   "bam_worse": false
+  },
+  {
+   "regime": "B1",
+   "budget_pct": 5.0,
+   "risk_decile": "3",
+   "mean_cost_diff_per_host": -38.18138004736838,
+   "bam_worse": false
+  },
+  {
+   "regime": "B1",
+   "budget_pct": 5.0,
+   "risk_decile": "4",
+   "mean_cost_diff_per_host": -51.283582388670986,
+   "bam_worse": false
+  },
+  {
+   "regime": "B1",
+   "budget_pct": 5.0,
+   "risk_decile": "5",
+   "mean_cost_diff_per_host": -73.0993741123224,
+   "bam_worse": false
+  },
+  {
+   "regime": "B1",
+   "budget_pct": 5.0,
+   "risk_decile": "6",
+   "mean_cost_diff_per_host": -121.58672560925618,
+   "bam_worse": false
+  },
+  {
+   "regime": "B1",
+   "budget_pct": 5.0,
+   "risk_decile": "7",
+   "mean_cost_diff_per_host": -240.49026373970412,
+   "bam_worse": false
+  },
+  {
+   "regime": "B1",
+   "budget_pct": 5.0,
+   "risk_decile": "8",
+   "mean_cost_diff_per_host": -340.8406057288896,
+   "bam_worse": false
+  },
+  {
+   "regime": "B1",
+   "budget_pct": 5.0,
+   "risk_decile": "9",
+   "mean_cost_diff_per_host": -319.38794241756045,
+   "bam_worse": false
+  }
+ ],
+ "by_tier_tertile": [
+  {
+   "regime": "A3",
+   "budget_pct": 0.5,
+   "tier_tertile": "low",
+   "mean_cost_diff_per_host": -1.790475132569696,
+   "bam_worse": false
+  },
+  {
+   "regime": "A3",
+   "budget_pct": 0.5,
+   "tier_tertile": "mid",
+   "mean_cost_diff_per_host": -3.5299992313284747,
+   "bam_worse": false
+  },
+  {
+   "regime": "A3",
+   "budget_pct": 0.5,
+   "tier_tertile": "high",
+   "mean_cost_diff_per_host": -21.882983466545262,
+   "bam_worse": false
+  },
+  {
+   "regime": "A3",
+   "budget_pct": 2.0,
+   "tier_tertile": "low",
+   "mean_cost_diff_per_host": -18.218554632821338,
+   "bam_worse": false
+  },
+  {
+   "regime": "A3",
+   "budget_pct": 2.0,
+   "tier_tertile": "mid",
+   "mean_cost_diff_per_host": -32.89511379583706,
+   "bam_worse": false
+  },
+  {
+   "regime": "A3",
+   "budget_pct": 2.0,
+   "tier_tertile": "high",
+   "mean_cost_diff_per_host": -81.10477427541568,
+   "bam_worse": false
+  },
+  {
+   "regime": "A3",
+   "budget_pct": 5.0,
+   "tier_tertile": "low",
+   "mean_cost_diff_per_host": -60.97934885253143,
+   "bam_worse": false
+  },
+  {
+   "regime": "A3",
+   "budget_pct": 5.0,
+   "tier_tertile": "mid",
+   "mean_cost_diff_per_host": -118.23134895084486,
+   "bam_worse": false
+  },
+  {
+   "regime": "A3",
+   "budget_pct": 5.0,
+   "tier_tertile": "high",
+   "mean_cost_diff_per_host": -172.35304884434768,
+   "bam_worse": false
+  },
+  {
+   "regime": "B1",
+   "budget_pct": 0.5,
+   "tier_tertile": "low",
+   "mean_cost_diff_per_host": -10.143070408005544,
+   "bam_worse": false
+  },
+  {
+   "regime": "B1",
+   "budget_pct": 0.5,
+   "tier_tertile": "mid",
+   "mean_cost_diff_per_host": -10.104135657902424,
+   "bam_worse": false
+  },
+  {
+   "regime": "B1",
+   "budget_pct": 0.5,
+   "tier_tertile": "high",
+   "mean_cost_diff_per_host": -8.746852196713986,
+   "bam_worse": false
+  },
+  {
+   "regime": "B1",
+   "budget_pct": 2.0,
+   "tier_tertile": "low",
+   "mean_cost_diff_per_host": -47.86159702547989,
+   "bam_worse": false
+  },
+  {
+   "regime": "B1",
+   "budget_pct": 2.0,
+   "tier_tertile": "mid",
+   "mean_cost_diff_per_host": -46.304032461526226,
+   "bam_worse": false
+  },
+  {
+   "regime": "B1",
+   "budget_pct": 2.0,
+   "tier_tertile": "high",
+   "mean_cost_diff_per_host": -44.26760941705227,
+   "bam_worse": false
+  },
+  {
+   "regime": "B1",
+   "budget_pct": 5.0,
+   "tier_tertile": "low",
+   "mean_cost_diff_per_host": -127.37941542472866,
+   "bam_worse": false
+  },
+  {
+   "regime": "B1",
+   "budget_pct": 5.0,
+   "tier_tertile": "mid",
+   "mean_cost_diff_per_host": -123.20658254734667,
+   "bam_worse": false
+  },
+  {
+   "regime": "B1",
+   "budget_pct": 5.0,
+   "tier_tertile": "high",
+   "mean_cost_diff_per_host": -125.56774464901483,
+   "bam_worse": false
+  }
+ ]
+}

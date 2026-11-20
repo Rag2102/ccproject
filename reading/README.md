@@ -13,6 +13,7 @@ Each note uses the v5 template: problem, data, baseline, metric, claim, limitati
 | [real_systems.md](real_systems.md) | OpenStack Watcher and KubeVirt documentation | web pages |
 | [xu2018cdef.md](xu2018cdef.md) | Improving Service Availability of Cloud Systems by Predicting Disk Error, ATC 2018 (Week 5) | whole paper |
 | [tirmazi2020borg.md](tirmazi2020borg.md) | Borg: the Next Generation, EuroSys 2020, plus the trace v3 documentation (Week 6) | whole paper |
+| [zhang2024deoxys.md](zhang2024deoxys.md) | Deoxys, SoCC 2024 (arXiv copy; 28 Oct) | sections 1-5 and 8-10; 6-7 skimmed |
 | [botezatu2016.md](botezatu2016.md) | Predicting Disk Replacement towards Reliable Data Centers, KDD 2016 (Week 5) | not read: closed access; template only |
 
-Not yet read: Botezatu et al., KDD 2016 (needs library access). NENYA and Deoxys are abstract-only rows in `docs/v2/T5_positioning.md`.
+Not yet read: Botezatu et al., KDD 2016 (needs library access). NENYA was read in full on 1 Nov 2026 (`wang2022nenya.md`).

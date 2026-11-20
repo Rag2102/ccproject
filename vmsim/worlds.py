@@ -118,6 +118,24 @@ def generate(cfg: SimConfig, seed: int) -> World:
             rng.uniform(size=n),
         )
         if (host < 0).any():
+            # small clusters can fragment before the largest VMs are placed: retry largest first
+            # (first-fit decreasing). Only when the plain pass fails, so every world that placed
+            # before (all eval and replication seeds at 2,000 hosts) is unchanged.
+            order = np.argsort(-vms.mem_gb, kind="stable")
+            h2 = placement.place_class(
+                vms.mem_gb[order],
+                tier[order],
+                hosts.cap_gb.astype(float),
+                np.ones(len(hosts.cap_gb), bool),
+                host_class,
+                np.asarray(pc.class_given_tier),
+                rng,
+                rng.uniform(size=n),
+                rng.uniform(size=n),
+            )
+            host = np.empty_like(h2)
+            host[order] = h2
+        if (host < 0).any():
             raise RuntimeError("regime B2: initial VMs do not fit")
     else:
         raise ValueError(f"placement regime {pc.regime!r} needs inputs the world cannot build yet")

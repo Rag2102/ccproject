@@ -103,6 +103,11 @@ def figure(d: pd.DataFrame, path: Path) -> None:
     matplotlib.use("Agg")
     import matplotlib.pyplot as plt
 
+    sys.path.insert(0, str(Path(__file__).resolve().parent))
+    import figstyle
+
+    figstyle.apply()
+
     fig, ax = plt.subplots(2, 2, figsize=(9, 7))
     base = (d.q == 0.02) & (d.lam == 1.0) & (d.s_n == 0) & (d.gamma == 1)
     rr = np.linspace(-0.95, 0.95, 77)

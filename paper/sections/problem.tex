@@ -28,6 +28,13 @@ budget. The question is which VMs to move.
     $w_i$ & resource $i$'s migration consumes from the budget (memory, GB) \\
     $B$ & daily budget, in GB migrated per cluster \\
     $x_i$ & decision: migrate $i$ today ($x_i \in \{0,1\}$) \\
+    $\kappa_i$ & averted cost per unit of budget, $c_i e_i / w_i$ \\
+    $\rho$, $\rho_L$ & correlation of criticality ($\log\kappa$) and host risk ($\log p$); $\rho_L$ on the latent copula axis \\
+    $\tau_b$ & Kendall's rank correlation (measured in traces) \\
+    $\sigma_p$, $\sigma_\kappa$ & standard deviations of $\log p$ and $\log\kappa$ \\
+    $q$ & share of VMs the budget allows \\
+    $\gamma$ & miscalibration: the policy sees $p^\gamma$ \\
+    $\Delta$ & advantage over the threshold, $(C_{\mathrm{P2}} - C)/C_{\mathrm{P2}}$ \\
     \bottomrule
   \end{tabular}
   \caption{Notation.}

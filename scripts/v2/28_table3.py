@@ -1,0 +1,187 @@
+"""Week 19: Table 3 (main results) from results/summary/confirmatory.json, never by hand.
+
+One row per (regime, budget) of the confirmatory family, one column per policy (P4 BAM, P5
+Narya-inspired, P6 guard), each against P2: the regression-adjusted mean Delta, its
+Bonferroni-simultaneous BCa interval, the Holm-adjusted p and whether the win criterion holds
+(mean adjusted Delta >= 1% and Holm p < 0.05). n and the Holm scope are in the caption.
+
+ADR-005: P2 is tuned to use the budget and can cost more than never migrating, so every results
+table shows P0 and P3 beside it. Two descriptive columns follow the confirmatory ones: the v1 rule
+P3 against P2 (exploratory), and P2's own saving against never migrating (P0, from
+34_vs_p0.py). A companion table (table3_p0) gives P3-P6 against P0.
+
+Writes results/summary/table3.csv and paper/tables/table3.tex (and table3_p0.tex).
+"""
+
+from __future__ import annotations
+
+import argparse
+import json
+from pathlib import Path
+
+import pandas as pd
+
+ROOT = Path(__file__).resolve().parents[2]
+POLS = {"P4": "BAM (P4)", "P5": "Narya-inspired (P5)", "P6": "Guard (P6)"}
+
+
+def pct(x: float | None, nd: int = 1) -> str:
+    return "--" if x is None else f"{100 * x:+.{nd}f}"
+
+
+def cell(c: dict) -> tuple[str, str]:
+    lo, hi = c.get("ci_bca_simultaneous") or c.get("ci_bca") or [None, None]
+    ci = "--" if lo is None else f"[{pct(lo)}, {pct(hi)}]"
+    hp = c.get("holm_p")
+    mark = r"\,$\checkmark$" if c.get("win") else ""
+    tex = f"{pct(c['delta_adjusted'])}{mark} {{\\scriptsize {ci}}}"
+    if hp is not None:
+        tex += f" {{\\scriptsize $p_H$={hp:.3f}}}"
+    hp_txt = "--" if hp is None else f"{hp:.3f}"
+    txt = f"{pct(c['delta_adjusted'])}% {ci} Holm p={hp_txt}" + (" WIN" if c.get("win") else "")
+    return tex, txt
+
+
+def main() -> None:
+    ap = argparse.ArgumentParser(description=__doc__.splitlines()[0])
+    ap.add_argument("--dry-run", action="store_true")
+    ap.add_argument("--small", action="store_true", help="make reproduce-small")
+    a = ap.parse_args()
+    summ = (
+        ROOT
+        / "results"
+        / ("small" if a.small else "")
+        / ("dryrun_summary" if a.dry_run else "summary")
+    )
+    conf = json.loads((summ / "confirmatory.json").read_text())
+    other = {}
+    for f in summ.glob("[A-E].json"):
+        for c in json.loads(f.read_text())["cells"]:
+            other[(c["regime"], c["budget_pct"], c["policy"])] = c
+    vp0 = summ / "vs_p0.json"
+    p0 = (
+        {
+            (c["regime"], c["budget_pct"], c["policy"]): c
+            for c in json.loads(vp0.read_text())["cells"]
+        }
+        if vp0.exists()
+        else {}
+    )
+
+    def p0cell(reg: str, b: float, pol: str) -> tuple[str, str]:
+        c = p0.get((reg, b, pol))
+        if c is None:
+            return "--", "--"
+        lo, hi = c["ci_bca"]
+        return (
+            f"{pct(c['saving_vs_p0_mean'])} {{\\scriptsize [{pct(lo)}, {pct(hi)}]}}",
+            f"{pct(c['saving_vs_p0_mean'])}% [{pct(lo)}, {pct(hi)}]",
+        )
+
+    rows, rows_p0, csv = [], [], []
+    by = {(c["regime"], c["budget_pct"], c["policy"]): c for c in conf["cells"]}
+    keys = sorted(
+        {(c["regime"], c["budget_pct"]) for c in conf["cells"]}, key=lambda k: (k[0], k[1])
+    )
+    for reg, b in keys:
+        texs = []
+        rec = {"regime": reg, "budget_pct": b}
+        for p in POLS:
+            c = by.get((reg, b, p))
+            if c is None:
+                texs.append("--")
+                continue
+            t, txt = cell(c)
+            texs.append(t)
+            rec[p] = txt
+            rec[p + "_n"] = c["n_seeds"]
+        c3 = other.get((reg, b, "P3"))
+        texs.append("--" if c3 is None else f"{pct(c3['delta_adjusted'])}")
+        rec["P3"] = "--" if c3 is None else f"{pct(c3['delta_adjusted'])}%"
+        t0, x0 = p0cell(reg, b, "P2")
+        texs.append(t0)
+        rec["P2_vs_P0"] = x0
+        rows.append(f"{reg} & {b:g}\\% & " + " & ".join(texs) + r" \\")
+        rows_p0.append(
+            f"{reg} & {b:g}\\% & "
+            + " & ".join(p0cell(reg, b, q)[0] for q in ("P2", "P3", "P4", "P5", "P6"))
+            + r" \\"
+        )
+        csv.append(rec)
+    # Week 30: exploratory rows (post-freeze, outside the family): the second placement source
+    # (S_second.json, B1-f) and the published cost range (S_costrange.json, ADR-009), if run
+    for tag in ("second", "costrange"):
+        f = summ / f"S_{tag}.json"
+        if not f.exists():
+            continue
+        ex = {
+            (c["regime"], c["budget_pct"], c["policy"]): c
+            for c in json.loads(f.read_text())["cells"]
+        }
+        for reg, b in sorted({(r, bb) for r, bb, _ in ex}):
+            texs = [
+                "--" if (c := ex.get((reg, b, p))) is None else pct(c["delta_adjusted"])
+                for p in POLS
+            ]
+            p3 = ex.get((reg, b, "P3"))
+            texs += ["--" if p3 is None else pct(p3["delta_adjusted"]), "--"]
+            name = reg.replace("@", r"\,@\,")
+            rows.append(f"{name}$^\\dagger$ & {b:g}\\% & " + " & ".join(texs) + r" \\")
+            csv.append(
+                {"regime": reg, "budget_pct": b, "family": f"exploratory ({tag})"}
+                | {
+                    p: f"{pct(ex[(reg, b, p)]['delta_adjusted'])}%"
+                    for p in POLS
+                    if (reg, b, p) in ex
+                }
+            )
+    n = max((c["n_seeds"] for c in conf["cells"]), default=0)
+    tex = "\n".join(
+        [
+            "% generated by scripts/v2/28_table3.py from results/summary/confirmatory.json;"
+            " do not edit",
+            r"\begin{table*}[t]\centering\small",
+            r"\caption{Main results. Regression-adjusted $\Delta$ against the "
+            r"budget-tuned threshold P2 "
+            rf"(\%, positive is better), Bonferroni-simultaneous BCa intervals, $n={n}$ seeds, "
+            rf"Holm over {conf['present']} of {conf['family_size']} confirmatory comparisons "
+            rf"({conf['holm_scope']}). $\checkmark$: mean $\geq 1\%$ and Holm $p<0.05$. "
+            r"Descriptive, outside the family (ADR-005): the v1 rule P3 against P2, and P2's own "
+            r"saving against never migrating (P0; negative means P2 costs more than doing "
+            r"nothing). $^\dagger$ Exploratory rows added after the freeze (second placement "
+            r"source; published migration-cost range, ADR-009): means only, outside the family.}",
+            r"\label{tab:main}",
+            r"\begin{tabular}{llccccc}\toprule",
+            "Regime & Budget & " + " & ".join(POLS.values()) + r" & P3 & P2 vs P0 \\ \midrule",
+            *rows,
+            r"\bottomrule\end{tabular}\end{table*}",
+        ]
+    )
+    out_tex = (
+        (summ / "table3.tex")
+        if (a.small or a.dry_run)
+        else ROOT / "paper" / "tables" / "table3.tex"
+    )
+    out_tex.parent.mkdir(parents=True, exist_ok=True)
+    out_tex.write_text(tex + "\n")
+    tex0 = "\n".join(
+        [
+            "% generated by scripts/v2/28_table3.py from results/summary/vs_p0.json; do not edit",
+            r"\begin{table*}[t]\centering\small",
+            r"\caption{The same cells against never migrating (P0): mean per-seed saving "
+            rf"$(C_{{P0}} - C)/C_{{P0}}$ (\%, positive is cheaper than doing nothing), 95\% BCa "
+            rf"intervals, $n={n}$ seeds. Descriptive; not part of the confirmatory family.}}",
+            r"\label{tab:vsp0}",
+            r"\begin{tabular}{llccccc}\toprule",
+            r"Regime & Budget & P2 & P3 & BAM (P4) & P5 & Guard (P6) \\ \midrule",
+            *rows_p0,
+            r"\bottomrule\end{tabular}\end{table*}",
+        ]
+    )
+    out_tex.with_name("table3_p0.tex").write_text(tex0 + "\n")
+    pd.DataFrame(csv).to_csv(summ / "table3.csv", index=False)
+    print(f"{len(rows)} rows -> {out_tex.relative_to(ROOT)}")
+
+
+if __name__ == "__main__":
+    main()

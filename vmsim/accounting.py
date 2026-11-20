@@ -17,6 +17,7 @@ from __future__ import annotations
 
 import hashlib
 import json
+import os
 import subprocess
 from dataclasses import dataclass, field
 from pathlib import Path
@@ -51,9 +52,12 @@ def git_sha() -> str:
             capture_output=True,
             text=True,
         ).stdout.strip()
-        return sha + ("-dirty" if dirty else "")
     except OSError:
-        return "unknown"
+        sha, dirty = "", ""
+    if not sha:  # a `git archive` build (clean container): the commit comes from the build
+        env = os.environ.get("VMMBENCH_GIT_SHA")
+        return f"{env}+archive" if env else "unknown"
+    return sha + ("-dirty" if dirty else "")
 
 
 @dataclass

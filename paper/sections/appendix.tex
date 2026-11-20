@@ -1,0 +1,66 @@
+% Week 33, task 3. Every number is a macro from paper/numbers.tex (scripts/v2/40_numbers.py).
+% The robustness grid fills in from results/summary/w20_*.json after the Week 20 runs.
+\section{Power pilot and scale}
+\label{app:pilot}
+Before the protocol froze, a pilot on seeds that are used nowhere else (2,000 hosts, 365 days
+plus a 30-day warm-up, a 2\% budget) measured the seed-to-seed spread of the paired difference
+$\Delta$ between the v1 rule P3 and the tuned threshold P2, as a proxy for every confirmatory
+comparison. Its standard deviation was \VPilotSDAThree\% in A3 and \VPilotSDBOne\% in B1. The
+protocol requires it to sit below the Bonferroni column for the chosen number of seeds (1.6\% at
+\VEvalSeeds{} seeds, 2.1\% at 50), so the matrix runs \VEvalSeeds{} evaluation seeds on
+\VHosts{} hosts, with a rule fixed in advance: any regime whose observed spread exceeds the
+\VEvalSeeds-seed bound is extended to 50 seeds for every policy and decided against the 50-seed
+bound. The rule depends on the spread only, never on the sign or size of $\Delta$. In the main
+run it was triggered for A3 and A5 by the bandit and the guard, whose per-seed results vary
+more than BAM's. Those regimes are reported at 50 seeds.
+% TODO after run_rest.sh (ADR-007 extension): state whether any verdict changed; at 30 seeds the
+% A3 and A5 margins over the bar are wide (RESULTS_W18.md), but this sentence waits for the run.
+
+\section{The tuned threshold's within-host order}
+\label{app:p2order}
+P2 moves every VM on a host whose failure probability clears its threshold $\tau$, in some order,
+until the day's budget is spent. It is tuned per regime and budget on development seeds to use
+about 95\% of the budget, as the protocol defines it, choosing both $\tau$ and the order (smallest
+VM first, largest first or random). In the pilot the three orders reached \VPTwoUtilLo--\VPTwoUtilHi\%
+utilisation at the same $\tau$ and their total costs differed by at most \VPTwoOrderSpread\%
+across \VPTwoOrderCells{} cells, so the order is immaterial to the comparison. Tuning P2 on cost
+instead of on the budget was considered and rejected before any evaluation run, because it would
+have changed a pre-registered rule after seeing pilot results; the cost of that choice is that
+P2 costs more than never migrating, which every results table shows next to it.
+
+\section{How P5 differs from Narya}
+\label{app:narya}
+P5 is inspired by Narya~\cite{levy2020narya}, not a re-implementation: Narya runs on proprietary
+telemetry with unpublished rules and thresholds. Table~\ref{tab:narya} lists the differences that
+matter for the comparison. Two of them shape the results. First, P5 can mark a host so that it
+takes no new VMs (Narya's \emph{unallocatable} action), which no other policy can do; the
+exploratory diagnosis in Section~\ref{sec:eval} attributes P5's whole advantage over BAM to it.
+Second, P5 learns online within each run, so its first weeks are exploration.
+
+\begin{table}[h]
+  \centering\small
+  \caption{Narya and the Narya-inspired P5 (faithful variant).}
+  \label{tab:narya}
+  \begin{tabular}{p{0.2\columnwidth}p{0.34\columnwidth}p{0.34\columnwidth}}
+    \toprule
+    & Narya & P5 \\
+    \midrule
+    Flags a node & 51 rules and a boosted model, 7-day horizon & host risk in the top 2\% that day \\
+    Actions & six primitive and four composite, plus no-op & no-op, unallocatable, unallocatable then migrate \\
+    Reward & interruptions over 10--30 days & cost in minutes over 14 days, migration included \\
+    Posterior & Gamma prior on a Poisson rate & the same \\
+    Forgetting & decay 0.99 & the same \\
+    Exploration & 5--10\% floor & 10\% \\
+    Migration cost & not in the decision & in the reward, not the choice \\
+    \bottomrule
+  \end{tabular}
+\end{table}
+
+\section{Robustness grid}
+\label{app:robust}
+The full grid of the robustness study (Section~\ref{sec:eval}) varies, one at a time and then
+jointly in a Morris screening, the cost-model estimation error, miscalibration, predictor noise,
+the non-disk hazard, repair time, unmitigated downtime, concurrent migrations per host and the
+initial fill. The two factors with the largest effect on BAM's advantage are the
+\VMorrisTopFactor{} and the \VMorrisSecondFactor. The per-factor table is generated from the
+Week 20 summaries and appears here once they exist.

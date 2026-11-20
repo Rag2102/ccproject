@@ -19,6 +19,7 @@ matrix without overlap. Example: for i in 1..8: 24_run_matrix.py --phase run --g
 from __future__ import annotations
 
 import argparse
+import copy
 import hashlib
 import json
 import os
@@ -50,8 +51,8 @@ def log(msg: str) -> None:
     print(f"{time.strftime('%H:%M:%S')} {msg}", flush=True)
 
 
-def load_matrix() -> dict:
-    return yaml.safe_load(MATRIX.read_text())
+def load_matrix(path: Path | None = None) -> dict:
+    return yaml.safe_load((path or MATRIX).read_text())
 
 
 def seed_range(s: str) -> list[int]:
@@ -86,19 +87,29 @@ def sha256_file(p: Path) -> str:
 
 
 def git_sha() -> str:
-    sha = subprocess.run(
-        ["git", "-C", str(ROOT), "rev-parse", "HEAD"], capture_output=True, text=True
-    ).stdout.strip()
-    dirty = subprocess.run(
-        ["git", "-C", str(ROOT), "status", "--porcelain", "--", "vmsim", "scripts/v2", "configs"],
-        capture_output=True,
-        text=True,
-    ).stdout.strip()
+    """The commit this run comes from. A checkout asks git; a build from `git archive` (the clean
+    container, Dockerfile) has no .git and gets the commit from VMMBENCH_GIT_SHA instead."""
+    env = os.environ.get("VMMBENCH_GIT_SHA")
+    try:
+        sha = subprocess.run(
+            ["git", "-C", str(ROOT), "rev-parse", "HEAD"], capture_output=True, text=True
+        ).stdout.strip()
+        dirty = subprocess.run(
+            ["git", "-C", str(ROOT), "status", "--porcelain", "--"]
+            + ["vmsim", "scripts/v2", "configs"],
+            capture_output=True,
+            text=True,
+        ).stdout.strip()
+    except OSError:
+        sha, dirty = "", ""
+    if not sha:
+        return f"{env}+archive" if env else "unknown"
     return sha + ("+dirty" if dirty else "")
 
 
 # --------------------------------------------------------------------------- cards
 def card(m: dict, regime: str) -> dict:
+    m = m.get("_full", m)  # the frozen card, whatever filters this invocation applies
     cfg = scenarios.regime(base_config(m), regime)
     pc, fc, mc = cfg.placement, cfg.failure, cfg.migration
     kind = {
@@ -109,6 +120,7 @@ def card(m: dict, regime: str) -> dict:
     }[pc.regime]
     if regime.startswith("B1"):
         kind = "rank_copula"
+    base_reg, cost = scenarios.split_cost(regime)
     return {
         "id": regime,
         "version": m["version"],
@@ -118,7 +130,7 @@ def card(m: dict, regime: str) -> dict:
             "target_spearman": pc.rho,
             "arrival_blend": pc.arrival_blend,
             "kappa_sigma": cfg.cost.kappa_sigma,
-            "calibrations": [regime.split("-")[1] if "-" in regime else "point"],
+            "calibrations": [base_reg.split("-")[1] if "-" in base_reg else "point"],
         },
         "hosts": {
             "n": cfg.n_hosts,
@@ -127,7 +139,7 @@ def card(m: dict, regime: str) -> dict:
         },
         "horizon_days": cfg.horizon_days,
         "warmup_days": cfg.warmup_days,
-        "predictor": {"kind": m["predictor_by_regime"].get(regime, m["predictor"])},
+        "predictor": {"kind": m["predictor_by_regime"].get(base_reg, m["predictor"])},
         "migration": {
             "model": "precopy",
             "nic_gbps": mc.nic_gbps,
@@ -139,7 +151,7 @@ def card(m: dict, regime: str) -> dict:
         "provenance": {
             "rho": "MEASURED" if regime.startswith("B") else "ASSUMED",
             "hazard": "DERIVED",
-            "migration": "ASSUMED",
+            "migration": "DERIVED" if cost else "ASSUMED",  # ADR-009: published range
             "costs": "DERIVED",
         },
         "config_hash": accounting.config_hash(cfg.to_dict()),
@@ -168,7 +180,9 @@ def tune_path(root: Path, regime: str, pct: float) -> Path:
 def phase_tune(m: dict, root: Path, groups: list[str], shard: str | None, dry: bool) -> None:
     units = [(r, b) for g in groups for r in m["regimes"][g] for b in m["budgets_pct"]]
     a, b = m["seeds"]["dev"]
-    dev = [101, 102] if dry else list(range(a, b + 1))
+    tun = m.get("tuning", {})
+    lo, hi = tun.get("dev_seeds") or [a, b]
+    dev = [101, 102] if dry else list(range(lo, hi + 1))
     for regime, pct in shard_of(units, shard):
         out = tune_path(root, regime, pct)
         if out.exists():
@@ -176,7 +190,9 @@ def phase_tune(m: dict, root: Path, groups: list[str], shard: str | None, dry: b
         t = time.time()
         cfg = scenarios.regime(base_config(m), regime)
         preps = [engine.prepare(worlds.generate(cfg, s), cfg) for s in dev]
-        res = tune_p2(preps, pct / 100, criterion="budget", steps=4 if dry else 12)
+        res = tune_p2(
+            preps, pct / 100, criterion="budget", steps=4 if dry else tun.get("steps", 12)
+        )
         res.update({"regime": regime, "budget_pct": pct, "dev_seeds": dev})
         out.parent.mkdir(parents=True, exist_ok=True)
         tmp = out.with_suffix(".tmp")
@@ -325,7 +341,9 @@ def flatten(rec: dict) -> dict:
     return out
 
 
-def phase_collect(m: dict, root: Path, groups: list[str], seeds: list[int]) -> None:
+def phase_collect(
+    m: dict, root: Path, groups: list[str], seeds: list[int], subdir: str | None = None
+) -> None:
     man, report = [], []
     for g in groups:
         for regime in m["regimes"][g]:
@@ -350,13 +368,15 @@ def phase_collect(m: dict, root: Path, groups: list[str], seeds: list[int]) -> N
                     rows = [flatten(json.loads(f.read_text())) for f in have]
                     df = pd.DataFrame(rows).sort_values("seed")
                     df = df[df["seed"].isin(seeds)]
-                    out = root / g / f"{regime}_b{pct:g}_{pid}.parquet"
+                    out = root / g / (subdir or "") / f"{regime}_b{pct:g}_{pid}.parquet"
+                    out.parent.mkdir(parents=True, exist_ok=True)
                     df.to_parquet(out, index=False)
                     man.append({"file": str(out.relative_to(ROOT)), "sha256": sha256_file(out)})
     rep = pd.DataFrame(report)
-    rep.to_csv(root / "completeness.csv", index=False)
+    tag = f"_{subdir}" if subdir else ""
+    rep.to_csv(root / f"completeness{tag}.csv", index=False)
     if man:
-        pd.DataFrame(man).to_csv(root / "manifest.csv", index=False)
+        pd.DataFrame(man).to_csv(root / f"manifest{tag}.csv", index=False)
     done = int((rep["missing"] == 0).sum())
     log(f"cells complete: {done} of {len(rep)}; runs missing: {int(rep['missing'].sum())}")
 
@@ -369,9 +389,26 @@ def main() -> None:
     ap.add_argument("--shard")
     ap.add_argument("--family", default="eval")
     ap.add_argument("--dry-run", action="store_true")
+    ap.add_argument("--small", action="store_true", help="make reproduce-small: matrix_small.yaml")
+    ap.add_argument("--regimes", nargs="+", help="only these regimes (e.g. the confirmatory cells)")
+    ap.add_argument("--policies", nargs="+", help="only these policies")
+    ap.add_argument("--budgets", nargs="+", type=float, help="only these budgets (%)")
+    ap.add_argument("--subdir", help="collect: write cells under <group>/<subdir> (replication)")
+    ap.add_argument(
+        "--extra-regimes", nargs="+", help="add regimes as group S (Week 21 second source, B1-f)"
+    )
     a = ap.parse_args()
-    m = load_matrix()
-    root = ROOT / "results" / ("dryrun" if a.dry_run else "raw")
+    m = load_matrix(MATRIX.with_name("matrix_small.yaml") if a.small else None)
+    if a.extra_regimes:
+        m["regimes"]["S"] = list(a.extra_regimes)
+    m["_full"] = copy.deepcopy(m)
+    if a.regimes:
+        m["regimes"] = {g: [r for r in rs if r in a.regimes] for g, rs in m["regimes"].items()}
+    if a.policies:
+        m["policies"] = [p for p in m["policies"] if p in a.policies]
+    if a.budgets:
+        m["budgets_pct"] = [b for b in m["budgets_pct"] if float(b) in a.budgets]
+    root = ROOT / "results" / ("small/raw" if a.small else "dryrun" if a.dry_run else "raw")
     if a.phase == "cards":
         phase_cards(m)
     elif a.phase == "tune":
@@ -379,7 +416,7 @@ def main() -> None:
     elif a.phase == "run":
         phase_run(m, root, a.groups, seed_range(a.seeds), a.shard, a.family)
     else:
-        phase_collect(m, root, a.groups, seed_range(a.seeds))
+        phase_collect(m, root, a.groups, seed_range(a.seeds), a.subdir)
 
 
 if __name__ == "__main__":

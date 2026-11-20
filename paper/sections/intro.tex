@@ -1,0 +1,70 @@
+% Introduction (Week 23). Every sentence maps to a row of docs/v2/CLAIMS_LEDGER.md; result
+% sentences use only macros, so they read correctly whichever way the confirmatory family comes
+% out. The one interpretive sentence per result is written after the results freeze (G3 shape).
+\section{Introduction}
+\label{sec:intro}
+
+Cloud operators predict host hardware failures and move virtual machines (VMs) off hosts that are
+likely to fail before they do~\cite{levy2020narya,xu2018cdef}. Live migration is not free: each
+move consumes network and host capacity and briefly pauses the VM~\cite{clark2005live}, so
+operators cap how much they move per day. Under such a cap the question is no longer \emph{whether}
+a host is risky but \emph{which} VMs to move first.
+
+The operational default ranks by failure probability alone: migrate VMs on hosts whose predicted
+probability exceeds a tuned threshold. A natural alternative is to rank VMs by expected benefit
+per unit of budget, so that a small, critical VM on a moderately risky host can go before a large,
+unimportant one on a riskier host. Expected-cost decision rules of this kind are
+classical~\cite{elkan2001foundations}, and production systems already use cost-aware and learned
+mitigation policies~\cite{levy2020narya,wang2022nenya,zhang2024deoxys}. What is missing is an
+answer to \emph{when} workload-aware ranking beats a well-tuned threshold, by how much, and
+whether the conditions under which it wins occur in real placement. Production results are
+reported only as relative improvements on private data~\cite{levy2020narya}, against a fixed
+action plan rather than a tuned threshold, and with no public artifact.
+
+Our own course prototype (Section~\ref{sec:v1}) gave a sharp, wrong answer. It found the
+cost-aware rule \VVOneAdvRandom\% \emph{behind} a matched threshold when VM criticality and host
+risk were independent, and ahead only when they were strongly correlated, suggesting a break-even
+correlation. Diagnosing that result is where this paper starts. The loss came from two accounting
+errors, not from the decision rule: the threshold received a larger budget, and migrations were
+credited with failures a median of \VVOneMedianLeadDays{} days after a 30-day decision. With both
+repaired, the same rule is \VVOneAdvAligned\% ahead at zero correlation.
+
+This paper replaces the prototype's sweep with a measurement, a theory and a pre-registered
+evaluation. We make four contributions.
+
+\begin{itemize}
+  \item \textbf{A measurement of where real placement sits} (C1, Section~\ref{sec:rho}). In three
+  Google 2019 cells, the rank correlation between task criticality and machine risk is
+  $|\tau_b| \le \VGOneMaxAbsTauB$ under every tier mapping and risk proxy we tried; a fourth
+  cell analysed separately gives $\tau_b = \VSecondTauB$. Critical work is essentially uncorrelated
+  with machine risk. The sign depends on analysis choices; the magnitude does not.
+
+  \item \textbf{A break-even theory} (C2, Section~\ref{sec:approach}). Under calibrated
+  probabilities, equal budgets and accounting over the decision's own horizon, budget-aware
+  ranking never loses in expectation to a threshold on probability. Under a Gaussian copula the
+  advantage has a closed form, confirmed by Monte Carlo at all \VTheoryPoints{} points of our
+  grid. It is driven by the \emph{spread} of costs per unit of budget and is largest near zero
+  correlation; there is no break-even correlation. Noise in the probabilities alone does not
+  reverse it, but flattening miscalibration can.
+
+  \item \textbf{A budget-aware policy with a guard, evaluated against a pre-registered bar}
+  (C3, Sections~\ref{sec:approach} and~\ref{sec:eval}). Budget-aware migration (BAM) ranks VMs
+  by benefit per GB moved. A guard (P6) runs the threshold unless a sequential test and a
+  calibration audit both support switching. In a simulator validated against closed forms and the
+  prototype, with the threshold tuned to use the same budget, BAM's adjusted advantage in the
+  measured regime is \VDeltaPFourBOneTwo\% at a 2\% budget (simultaneous 95\% CI
+  [\VCILoPFourBOneTwo, \VCIHiPFourBOneTwo]\%); \VWins{} of \VFamilySize{} confirmatory comparisons
+  clear the bar fixed before any evaluation run (an advantage of at least 1\% and Holm-adjusted
+  $p < 0.05$).
+  % After results-frozen: one sentence stating the G3 shape (strong / conditional / little benefit).
+
+  \item \textbf{An open benchmark} (C4, Section~\ref{sec:eval}). VMMBench packages hashed failure
+  worlds built only from public data, scenario cards, a result schema with a validator, and a
+  one-command reduced reproduction that runs in minutes on a laptop.
+\end{itemize}
+
+Section~\ref{sec:background} gives background and the prototype's finding,
+Section~\ref{sec:problem} the decision problem, Section~\ref{sec:approach} the theory and
+policies, Sections~\ref{sec:data} and~\ref{sec:sim} the data, failure model and simulator, and
+Section~\ref{sec:eval} the evaluation. Section~\ref{sec:discussion} lists every synthetic or
+assumed element and the threats to validity; Section~\ref{sec:related} covers related work.

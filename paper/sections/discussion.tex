@@ -1,0 +1,86 @@
+% Discussion and threats to validity (Week 23). Table~\ref{tab:assumed} is the one place where every
+% synthetic or assumed element is named (plan Week 23, task 4). The sensitivity sentence uses the
+% Week 20 Morris ranking (results/summary/w20_morris.json) and is completed after results-frozen.
+\section{Discussion and threats to validity}
+\label{sec:discussion}
+
+\paragraph{What the evidence supports.}
+Three findings do not depend on the simulator. Critical work in the measured Google cells is
+essentially uncorrelated with machine risk (Section~\ref{sec:rho}). Under calibrated
+probabilities, equal budgets and horizon-matched accounting, budget-aware ranking cannot lose in
+expectation, and its advantage grows with the spread of cost per GB rather than with correlation
+(Section~\ref{sec:approach}). And the prototype's apparent loss was an accounting artifact
+(Section~\ref{sec:v1}). The size of the advantage in a realistic cluster, by contrast, is a
+simulator result: it rests on the elements in Table~\ref{tab:assumed}, and we report it as such.
+
+\paragraph{The comparator.}
+We tune the threshold to use the budget, because an operator who has been given a budget usually
+spends it; Section~\ref{sec:eval} shows the never-migrate and cost-aware-threshold policies beside it
+so the reader can see what that choice costs. A threshold tuned on total cost instead would stop
+early and narrow the gap, since part of BAM's advantage comes from its stopping rule rather than
+its ranking. Narya's own comparator was a fixed action plan~\cite{levy2020narya}; neither choice
+is the only reasonable one.
+
+\begin{table}[t]
+  \centering
+  \small
+  \begin{tabular}{@{}p{0.42\columnwidth}p{0.18\columnwidth}p{0.3\columnwidth}@{}}
+    \toprule
+    Element & Status & Varied in \\
+    \midrule
+    Host risk composed from its drives & assumed & -- \\
+    Non-disk hazard (Weibull, shape 0.7) & assumed & $0\times$--$3\times$ disk \\
+    Repair time (log-normal, median 2 d) & assumed & 1--4 d \\
+    Tier weights 1.0 / 0.6 / 0.3 & assumed (prototype) & flat; 1 / 3 / 10 \\
+    Unmitigated downtime 10 min & assumed (prototype) & 5--20 min \\
+    Link 10\,Gb/s, 50\% usable; 2 concurrent & assumed & true rate $\times0.5$, $\times1.5$; 1--4 \\
+    Dirty rate 150\,MB/s at full CPU & assumed (prototype) & true rate $\times0.5$, $\times1.5$ \\
+    Initial fill 70\% & assumed & 60--80\% \\
+    Risk horizon 30 d & assumed & 7, 14 d \\
+    Placement at a target correlation & synthetic (A, D) & $\rho_L$ 0--0.9 \\
+    Cost spread at zero correlation & synthetic (E) & $\sigma_\kappa$ 0.25--1.0 \\
+    Class-constrained placement & synthetic (B2) & -- \\
+    Adversarial placement & synthetic (C) & -- \\
+    Drift at mid-run & synthetic (D) & -- \\
+    Predictor noise and miscalibration & synthetic & logit noise 0--2; $\gamma$ 0.5--2 \\
+    Risk proxy: long removals & proxy, not failures & 3 proxies, 2 weightings, 3 mappings \\
+    \bottomrule
+  \end{tabular}
+  \caption{Every synthetic or assumed element, in one place.}
+  \label{tab:assumed}
+\end{table}
+
+\paragraph{Internal validity.}
+The simulator is validated against closed forms, its own predicted failure counts and the
+prototype's costs (Table~\ref{tab:g2}), and its policies are compared on common random numbers.
+It is still a model. Failures are drawn from drive hazards and an assumed non-disk term, and the
+simulated time between a node's failures is less bursty than node logs suggest; correlated
+failures across racks are not modelled. The theory assumes a single decision with a fixed
+completion probability, while the simulator decides daily with queue-aware completion; the
+residual this creates is reported, not tuned away. The threshold and the guard's parameters were
+tuned on development seeds disjoint from the evaluation seeds, and the analysis was frozen before
+any evaluation run; every later change is logged in the artifact.
+% After results-frozen: name the factors the Morris ranking puts first and second
+% (\VMorrisTopFactor, \VMorrisSecondFactor) and whether any of them reverses the sign.
+
+\paragraph{External validity.}
+The failure data come from one operator's drives, and drives are not hosts. The placement
+measurement covers four cells of one provider's 2019 trace, chosen before reading them; it says
+nothing about how other schedulers place critical work, and a provider that deliberately puts
+critical VMs on new hardware would sit elsewhere on the correlation axis. VM sizes, lifetimes and
+tiers come from Azure's 2017 trace; the tier-to-cost mapping is an assumption carried over from
+the prototype and is varied. None of the results is a claim about production performance.
+
+\paragraph{Construct validity.}
+Three constructs are proxies. A drive failure stands for a host failure. A long machine removal in
+the Google trace stands for elevated hardware risk; it also captures decommissioning and
+maintenance, which is why we report three proxies, two weightings and three tier mappings and show that the
+conclusion holds under each.
+And customer impact is measured in tier-weighted minutes of interruption, which ignores that some
+interruptions cost far more than their duration.
+
+\paragraph{When to use which policy.}
+If the operator's cost per GB varies little across VMs, ranking by probability is enough and
+simpler. If it varies widely and the probabilities are well calibrated, budget-aware ranking is
+never worse and can be materially better. If calibration cannot be checked, the guard is the safer
+choice: it costs little when the evidence is weak because it stays on the threshold.

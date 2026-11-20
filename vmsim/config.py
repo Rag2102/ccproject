@@ -23,6 +23,10 @@ class MigrationConfig:
     blackout_converged_s: float = 1.0  # v1
     blackout_fallback_s: float = 60.0  # v1
     v1_closed_form: bool = False  # True for the v1 regression (SIM_SPEC section 6)
+    # Week 20 cost-model error: the realised migrations use bandwidth and dirty rate x these
+    # factors, while the policies' estimates (mig_cost_est, mig_s_est) stay at the nominal values
+    true_bw_factor: float = 1.0
+    true_dirty_factor: float = 1.0
 
 
 @dataclass(frozen=True)

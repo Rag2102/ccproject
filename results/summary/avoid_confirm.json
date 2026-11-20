@@ -1,0 +1,388 @@
+{
+ "rule": "ADR-011",
+ "verdict": "confirmed",
+ "primary": [
+  {
+   "regime": "B1",
+   "against": "P0",
+   "n": 50,
+   "diff_mean": 0.11207256473279449,
+   "ci_bca": [
+    0.1025060185299467,
+    0.12134836939803795
+   ],
+   "wilcoxon_p": 1.7763568394002505e-15,
+   "holm_p": 1.0658141036401503e-14,
+   "passed": true
+  },
+  {
+   "regime": "B1",
+   "against": "P4",
+   "n": 50,
+   "diff_mean": 0.07528536474599631,
+   "ci_bca": [
+    0.07018579010609016,
+    0.08034564986672905
+   ],
+   "wilcoxon_p": 1.7763568394002505e-15,
+   "holm_p": 1.0658141036401503e-14,
+   "passed": true
+  },
+  {
+   "regime": "B1",
+   "against": "P5",
+   "n": 50,
+   "diff_mean": 0.03141770573830321,
+   "ci_bca": [
+    0.02390531942507839,
+    0.039136784756373805
+   ],
+   "wilcoxon_p": 1.5961560961841315e-09,
+   "holm_p": 1.5961560961841315e-09,
+   "passed": true
+  },
+  {
+   "regime": "B2",
+   "against": "P0",
+   "n": 50,
+   "diff_mean": 0.0892917715274515,
+   "ci_bca": [
+    0.08181572868903673,
+    0.09616957715889234
+   ],
+   "wilcoxon_p": 1.7763568394002505e-15,
+   "holm_p": 1.0658141036401503e-14,
+   "passed": true
+  },
+  {
+   "regime": "B2",
+   "against": "P4",
+   "n": 50,
+   "diff_mean": 0.038766479873480496,
+   "ci_bca": [
+    0.03378825671683183,
+    0.04342641542789939
+   ],
+   "wilcoxon_p": 3.552713678800501e-15,
+   "holm_p": 1.0658141036401503e-14,
+   "passed": true
+  },
+  {
+   "regime": "B2",
+   "against": "P5",
+   "n": 50,
+   "diff_mean": 0.025319419616452076,
+   "ci_bca": [
+    0.019869212567830166,
+    0.030681903122493453
+   ],
+   "wilcoxon_p": 5.610267805877811e-11,
+   "holm_p": 1.1220535611755622e-10,
+   "passed": true
+  }
+ ],
+ "secondary": [
+  {
+   "regime": "B1",
+   "policy": "P4",
+   "predictor": "oracle",
+   "saving_mean": 0.03678719998679816,
+   "ci_bca": [
+    0.028303483992585993,
+    0.04419646058114976
+   ],
+   "migrations_mean": 25209.94,
+   "rejected_arrivals_mean": 143.12
+  },
+  {
+   "regime": "B1",
+   "policy": "P5",
+   "predictor": "oracle",
+   "saving_mean": 0.08065485899449126,
+   "ci_bca": [
+    0.06883861160018334,
+    0.0902003589698447
+   ],
+   "migrations_mean": 1186.86,
+   "rejected_arrivals_mean": 157.0
+  },
+  {
+   "regime": "B1",
+   "policy": "P0+avoid",
+   "predictor": "oracle",
+   "saving_mean": 0.11207256473279449,
+   "ci_bca": [
+    0.1025060185299467,
+    0.12134836939803795
+   ],
+   "migrations_mean": 0.0,
+   "rejected_arrivals_mean": 174.68
+  },
+  {
+   "regime": "B1",
+   "policy": "P4+avoid",
+   "predictor": "oracle",
+   "saving_mean": 0.11545845752074284,
+   "ci_bca": [
+    0.10493808208121452,
+    0.12529188246240622
+   ],
+   "migrations_mean": 14786.46,
+   "rejected_arrivals_mean": 171.72
+  },
+  {
+   "regime": "B1",
+   "policy": "P0+avoid",
+   "predictor": "noisy_0.5",
+   "saving_mean": 0.07385202999264888,
+   "ci_bca": [
+    0.06378803922443183,
+    0.08209662171892042
+   ],
+   "migrations_mean": 0.0,
+   "rejected_arrivals_mean": 121.24
+  },
+  {
+   "regime": "B1",
+   "policy": "P0+avoid",
+   "predictor": "noisy_1",
+   "saving_mean": 0.03800007696127459,
+   "ci_bca": [
+    0.030596932255333165,
+    0.04606653602643
+   ],
+   "migrations_mean": 0.0,
+   "rejected_arrivals_mean": 165.86
+  },
+  {
+   "regime": "B1",
+   "policy": "P0+avoid",
+   "predictor": "noisy_2",
+   "saving_mean": 0.023102050528802823,
+   "ci_bca": [
+    0.014940675048152087,
+    0.0306897083245648
+   ],
+   "migrations_mean": 0.0,
+   "rejected_arrivals_mean": 171.0
+  },
+  {
+   "regime": "B1",
+   "policy": "P0+avoid",
+   "predictor": "noise",
+   "saving_mean": 0.01573190015417548,
+   "ci_bca": [
+    0.007401561434509612,
+    0.023247612243206026
+   ],
+   "migrations_mean": 0.0,
+   "rejected_arrivals_mean": 175.36
+  },
+  {
+   "regime": "B1",
+   "policy": "P4",
+   "predictor": "noisy_0.5",
+   "saving_mean": -0.5522729401061277,
+   "ci_bca": [
+    -0.5699798613214144,
+    -0.5346325043066267
+   ],
+   "migrations_mean": 192084.54,
+   "rejected_arrivals_mean": 93.14
+  },
+  {
+   "regime": "B1",
+   "policy": "P4",
+   "predictor": "noisy_1",
+   "saving_mean": -2.481736236149366,
+   "ci_bca": [
+    -2.5323734163150315,
+    -2.437329208715276
+   ],
+   "migrations_mean": 598886.24,
+   "rejected_arrivals_mean": 15.88
+  },
+  {
+   "regime": "B1",
+   "policy": "P4",
+   "predictor": "noisy_2",
+   "saving_mean": -4.191516575313895,
+   "ci_bca": [
+    -4.2821601403941685,
+    -4.121692546743156
+   ],
+   "migrations_mean": 858603.12,
+   "rejected_arrivals_mean": 0.96
+  },
+  {
+   "regime": "B1",
+   "policy": "P4",
+   "predictor": "noise",
+   "saving_mean": -0.8687698580060312,
+   "ci_bca": [
+    -0.8946096408349419,
+    -0.8418232561895822
+   ],
+   "migrations_mean": 210671.2,
+   "rejected_arrivals_mean": 129.78
+  },
+  {
+   "regime": "B1",
+   "policy": "P0",
+   "predictor": "oracle",
+   "saving_mean": 0.0,
+   "rejected_arrivals_mean": 169.16
+  },
+  {
+   "regime": "B2",
+   "policy": "P4",
+   "predictor": "oracle",
+   "saving_mean": 0.05052529165397101,
+   "ci_bca": [
+    0.04509404463959576,
+    0.05545181152526976
+   ],
+   "migrations_mean": 23122.04,
+   "rejected_arrivals_mean": 0.2
+  },
+  {
+   "regime": "B2",
+   "policy": "P5",
+   "predictor": "oracle",
+   "saving_mean": 0.06397235191099941,
+   "ci_bca": [
+    0.05569275343487868,
+    0.07109353109883576
+   ],
+   "migrations_mean": 1369.5,
+   "rejected_arrivals_mean": 2.98
+  },
+  {
+   "regime": "B2",
+   "policy": "P0+avoid",
+   "predictor": "oracle",
+   "saving_mean": 0.0892917715274515,
+   "ci_bca": [
+    0.08181572868903673,
+    0.09616957715889234
+   ],
+   "migrations_mean": 0.0,
+   "rejected_arrivals_mean": 3.4
+  },
+  {
+   "regime": "B2",
+   "policy": "P4+avoid",
+   "predictor": "oracle",
+   "saving_mean": 0.09833557753985078,
+   "ci_bca": [
+    0.09177822498632646,
+    0.10488889724176198
+   ],
+   "migrations_mean": 15650.5,
+   "rejected_arrivals_mean": 3.0
+  },
+  {
+   "regime": "B2",
+   "policy": "P0+avoid",
+   "predictor": "noisy_0.5",
+   "saving_mean": 0.06417936686533961,
+   "ci_bca": [
+    0.059201520445869106,
+    0.06875292514364853
+   ],
+   "migrations_mean": 0.0,
+   "rejected_arrivals_mean": 1.0
+  },
+  {
+   "regime": "B2",
+   "policy": "P0+avoid",
+   "predictor": "noisy_1",
+   "saving_mean": 0.03112716870300844,
+   "ci_bca": [
+    0.027310086475828256,
+    0.034568444863487126
+   ],
+   "migrations_mean": 0.0,
+   "rejected_arrivals_mean": 1.34
+  },
+  {
+   "regime": "B2",
+   "policy": "P0+avoid",
+   "predictor": "noisy_2",
+   "saving_mean": 0.009780788012288455,
+   "ci_bca": [
+    0.00721176104841199,
+    0.012402191981076128
+   ],
+   "migrations_mean": 0.0,
+   "rejected_arrivals_mean": 1.26
+  },
+  {
+   "regime": "B2",
+   "policy": "P0+avoid",
+   "predictor": "noise",
+   "saving_mean": 0.0010769923201380388,
+   "ci_bca": [
+    -0.0017317327567554117,
+    0.003878254750003034
+   ],
+   "migrations_mean": 0.0,
+   "rejected_arrivals_mean": 1.76
+  },
+  {
+   "regime": "B2",
+   "policy": "P4",
+   "predictor": "noisy_0.5",
+   "saving_mean": -0.5249309415765616,
+   "ci_bca": [
+    -0.5419143493700584,
+    -0.5100583975852118
+   ],
+   "migrations_mean": 185301.94,
+   "rejected_arrivals_mean": 0.0
+  },
+  {
+   "regime": "B2",
+   "policy": "P4",
+   "predictor": "noisy_1",
+   "saving_mean": -2.468663141024747,
+   "ci_bca": [
+    -2.524501223447743,
+    -2.4243971386646233
+   ],
+   "migrations_mean": 589768.1,
+   "rejected_arrivals_mean": 0.0
+  },
+  {
+   "regime": "B2",
+   "policy": "P4",
+   "predictor": "noisy_2",
+   "saving_mean": -4.278532213218533,
+   "ci_bca": [
+    -4.378332581193454,
+    -4.206212450697526
+   ],
+   "migrations_mean": 859763.06,
+   "rejected_arrivals_mean": 0.0
+  },
+  {
+   "regime": "B2",
+   "policy": "P4",
+   "predictor": "noise",
+   "saving_mean": -0.8996354520598336,
+   "ci_bca": [
+    -0.9267506574199382,
+    -0.8741037828691236
+   ],
+   "migrations_mean": 210543.74,
+   "rejected_arrivals_mean": 0.0
+  },
+  {
+   "regime": "B2",
+   "policy": "P0",
+   "predictor": "oracle",
+   "saving_mean": 0.0,
+   "rejected_arrivals_mean": 1.54
+  }
+ ]
+}

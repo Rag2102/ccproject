@@ -25,9 +25,15 @@ CELLS = ["A2", "A3", "A4", "A5", "A6", "A7", "B1", "B1-high", "D0"]
 
 
 def main() -> None:
+    import argparse
+
+    ap = argparse.ArgumentParser()
+    ap.add_argument("--cells", nargs="+", help="only these cells, merged into the existing file")
+    a = ap.parse_args()
     base = SimConfig(n_hosts=2_000, horizon_days=120, name="calib")
-    out = {}
-    for cell in CELLS:
+    path = ROOT / "results" / "v2" / "regime_calibration.json"
+    out = json.loads(path.read_text()) if a.cells and path.exists() else {}
+    for cell in a.cells or CELLS:
         cfg = scenarios.regime(base, cell, calibrated=False)
         if cfg.placement.regime != "rho":
             continue
@@ -47,7 +53,6 @@ def main() -> None:
             f"({time.time() - t:.0f}s)",
             flush=True,
         )
-    path = ROOT / "results" / "v2" / "regime_calibration.json"
     path.write_text(json.dumps(out, indent=2))
     print("wrote", path)
 

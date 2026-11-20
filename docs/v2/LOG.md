@@ -2,6 +2,109 @@
 
 Sunday ritual (15 minutes): update this log, tick the week's "done when", log any cut as an ADR, re-read the next gate's criteria, update `CAPACITY.md` for the coming month, write Monday's first task. Newest week first. Hours are yours to fill; nothing here is estimated.
 
+## Novelty runs (2 Nov 2026, ahead of the panel)
+- ADR-012 law: supported. ADR-009 cost range: done on 4 of 6 sources. ADR-013: N and S confirmed.
+- Found: BAM's saving against P0 reverses at cheap migration. Mostly re-migration, partly first moves (dev seeds).
+- Found: under selective placement, migration adds nothing measurable.
+- Results: `RESULTS_COSTRANGE.md`, `RESULTS_SELECTIVE_NET.md`. Claims: `NOVELTY.md` N6-N8, ledger C10-C13.
+- Open: G3 with the advisor; Liu 2011, SoCC 2015 unread; US 9277002 to read. Committed in a59d57b.
+
+## Weeks 29-40 prepared (26 Oct 2026; W35 and W38 left out by the owner)
+- ADR-009 accepted. Cost-range rule fixed before any rerun; Clark 2005 extracted; five sources wait for their text. Runner, dev-seed pre-check and `run_w30.sh` built and tested at small scale.
+- Console S5 (paired seeds) and S6 (figures); light theme, reduced motion, 360 px.
+- Checks: reporting audit (found and fixed: savings without intervals; the refuted "option to wait" explanation still in the evaluation text), grayscale, contribution map, references, anonymity, clean-clone final check (byte-identical rebuild), supplementary zip.
+- Paper: appendix, statements, F4b with avoidance. Docs: `REBUTTAL_FAQ.md`, `POSITIONING.md`, `LICENCE_REVIEW.md`, `TASKS_W29-W40.md`.
+- Fixed: `.gitignore` had kept the cell Parquets out of git, against PROTOCOL section 10; they are committed now (6.8 MB).
+- Owner decisions raised: v1's third-party Backblaze summary (licence); approval to fetch five papers.
+
+## Avoidance on the eval seeds (26 Oct 2026, ADR-010, exploratory)
+- 1,440 runs in 14 minutes, every regime, eval seeds 1-30. The dev-seed finding holds: avoidance alone saves 11-20% against never migrating in every A and E cell, 6-13 points ahead of BAM and 2-3 ahead of P5, with no migrations. Adding BAM on top gains at most about 2 points.
+- Rejected arrivals rise by up to about a quarter in tight A regimes: the main caveat. B, C and D are run and join the summary once their P0 runs exist.
+- `RESULTS_AVOID.md`; Console S1 shows it in the "vs never migrating" view.
+
+## Console and site (13 Oct 2026)
+- Console S1 opens on the saving against never migrating (P0; `vs_p0.json`, descriptive), with a toggle to the pre-registered Δ against P2. The ADR-010 avoidance baselines appear there once `37_explore_avoid.py` has run (`41_console_data.py` reads `explore_avoid.json`).
+- Site (`ui-redesign`): the v2 section shows the Week 18 results against P0 per regime, the avoidance finding (dev seeds, labelled exploratory), the guard result, and 18/60 weeks done with code to Week 28.
+
+## Diagnosis: why P5 beats BAM (13 Oct 2026, exploratory, dev seeds 101-105)
+- P5's whole advantage is avoid-allocation: with its marks off it is at or below BAM.
+- Avoidance alone (no migration, no budget) saves 10.6-21.9% against P0, more than any migration policy; BAM adds about ±1 point on top.
+- Option to wait: refuted (BAM-wait7 saves less than BAM).
+- Guard with a P0 fallback: no longer harmful in A.
+- Mechanism: avoidance protects long-lived VMs as much as BAM's migrations, but for free.
+- `DIAG_P5_VS_BAM.md`; ADR-010 (proposed) adds avoidance as an exploratory baseline on the eval seeds.
+
+## Week 18 results (read 5 Oct 2026)
+- run: 330 of 330 cells (A1-A7, E1-E3; 30 seeds), done 10:33. Analysis: `RESULTS_W18.md`, F4, F4b (new), A/E paragraph in `evaluation.tex`. B and C not run or opened.
+- pre-registered: all 12 A3/A5 confirmatory comparisons meet the bar. The SD extension rule is triggered (P5, P6 above 1.6%): A3 and A5 go to n = 50, queued last in `run_rest.sh`.
+- against never migrating:
+  - P2 is worse in every seed.
+  - BAM saves 5-11% (A) and goes from −2.4% to +5.3% with cost spread (E).
+  - **P5 beats BAM everywhere with about 34× fewer migrations.**
+  - P6 is below P0.
+- decisions needed (owner + advisor, at G3): paper framing given that P5 beats BAM; whether to add exploratory variants (BAM with an option to wait; guard falling back to P0).
+
+## Weeks 23-28 (8 Mar-18 Apr 2027), prepared 5 Oct 2026
+- planned hours: 14 + 12 + 12 + 10 + 7 + 7   actual hours: __
+- done:
+  - W23: complete draft (intro, background, related work, discussion with every assumed element, abstract, conclusion; notation and numbers passes).
+  - W24: three mock reviews with a rebuttal table; Dockerfile and clean-container check, which found a real bug (git dependency, fixed); citations checked.
+  - W25: artifact (Apache-2.0, CITATION.cff, fetch_data.sh with checksums, ARTIFACT.md, make reproduce/release); SoCC rules; Console S1-S4 with a double-blind build.
+  - W26: submission pack draft and next-cycle plan.
+  - W27-28 ready-now parts: feedback.csv, weakest-claim note, ADR-009, number-diff script, venue check.
+- evaluation runs:
+  - Week 18 running (started 02:56; about 95 min lost to sleep).
+  - Weeks 19-21 and the second source taken off the queue at the owner's request; `scripts/v2/run_rest.sh` runs them.
+- second source: cell f τ-b −0.004 (latent −0.006), would-be class C0, agrees with G1.
+- found and fixed before any result was read (all in CHANGES_AFTER_FREEZE.md):
+  - group S stats crash;
+  - Table 3 missing the P0/P3 columns ADR-005 required;
+  - git needed in a clean build.
+- slipped (and why): everything that reads results (Evaluation prose, G3, claims ledger, RETRO) waits for the runs; PDF and page check wait for LaTeX.
+- next: Week 18 analysis (A/E only, protocol order) as soon as it collects.
+
+## Weeks 21-22 (22 Feb-7 Mar 2027)
+- planned hours: 12 + 14   actual hours: __
+- done (5 Oct, ahead of the weeks):
+  - Week 21: the regime-D adaptive analysis and F8; the seed-replication launcher; `make reproduce-small` (3.6 min); the G3 template; SoCC verified on the official page.
+  - Week 22: `paper/main.tex` (SoCC format); `numbers.tex` (143 macros) with a missing-macro test; the claims ledger; Okabe-Ito figure style; the static Console skeleton.
+  - Bug fixed: B2 world generation at small scale; the frozen matrix is unaffected (logged).
+- slipped (and why):
+  - every result-dependent item (G3 verdict, results freeze, results prose) waits for the overnight runs;
+  - the paper is not compiled yet (BasicTeX, yours to install);
+  - the second placement source waits for a decision.
+- decisions made: Alibaba 2018 as the second source (owner), then found unusable (no machine-risk signal); BasicTeX; a static Console with no npm.
+- risks changed: R-new, second source. Alibaba 2018 has no failure signal; without a second source G3 cannot be Strong.
+- next task: run `scripts/v2/run_overnight.sh`; decide the second source
+
+## Weeks 17-20 (25 Jan-21 Feb 2027)
+- planned hours: 12 × 4   actual hours: __
+- done (4-5 Oct, ahead of the weeks):
+  - Week 17:
+    - THEORY.md (T1-T4; T4 partly false as stated), with a Monte Carlo check at 3,024 points, all in tolerance;
+    - the break-even surface, and the v1 anomaly closed;
+    - PROTOCOL v1.0 frozen with the matrix and scenario cards (tags `protocol-v1.0`, `v2.0-rc1`, `v2.0-rc2`);
+    - the runner, statistics and F4 scripts, and a full dry run (528 of 528 cells);
+    - the Approach section of the paper.
+  - Earlier gaps closed: the benchmark schemas, regimes E and B2, and the tier-margin bug in the latent axis (regimes recalibrated).
+  - Week 18: the launcher is ready. The P2 pre-filter bug was found in tuning and fixed before any evaluation run (CHANGES_AFTER_FREEZE).
+  - Weeks 19-20: every script and runner built and smoke-tested (`TASKS_W19-W20.md`).
+  - Site: redesign, a v2 research section, and the v2 ensemble in the live demo (`ui-redesign` branch).
+- slipped (and why): the evaluation runs for Weeks 18-20. They take about 12 h of compute and run overnight on your machine (`scripts/v2/run_overnight.sh`).
+- decisions made:
+  - ADR-007: 2,000 hosts × 365 days, n = 30, with an SD-triggered extension;
+  - ADR-008: the oracle for the main matrix;
+  - natural cost spread in A;
+  - P5 = faithful variant;
+  - Week 20: P2 retuned per robustness setting, Morris in the repo, model-based worlds deferred past Week 21.
+- found:
+  - the advantage of cost-aware selection is driven by cost spread and is largest near ρ = 0 (theory);
+  - flattening miscalibration is the dangerous direction for BAM;
+  - v1's +0.2% under consistent accounting matches the closed form;
+  - the deployed ensemble's test PR-AUC is 0.103 (one calibration on the mean), not Week 16's 0.131.
+- risks changed: R3 (compute): the full matrix plus Week 20 is about 12 h on 8 cores, run overnight
+- next task: run `scripts/v2/run_overnight.sh`; then statistics and the A and E paragraph before opening B and C
+
 ## Weeks 15-16 (11-24 Jan 2027)
 - planned hours: 12 × 2   actual hours: __
 - done (4 Oct, ahead of the weeks):

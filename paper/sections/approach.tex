@@ -19,7 +19,7 @@ still running $H$ days ahead given its age, since most VMs leave long before the
 $e_i$ depends on the VM's place in its host's migration queue, so it is recomputed after every
 pick. For fixed $e$, choosing what to move is a knapsack, and density order is optimal for its
 relaxation and within one item of the integer optimum~\cite{dantzig1957discrete}. On simulator
-snapshots the greedy is within 0.05\% of an exact solver on average.
+snapshots the greedy is within \VBamExactGap\% of an exact solver on average.
 
 \paragraph{What the theory does and does not promise.}
 Under four assumptions (calibrated $p$, failures independent given $p$, the same budget for every
@@ -28,8 +28,11 @@ expectation than a threshold on $p$ given the same budget. That accounting rule 
 credited migrations with failures months later and found the opposite sign.
 
 Under a Gaussian copula on $(\log p, \log\kappa)$ with $\kappa = c e / w$, the advantage has a
-closed form, which a Monte Carlo confirms at all 3,024 points of our grid. Its main term is
-$\Phi(z_q + \sigma_z) - \Phi(z_q + \sigma_p + \rho\,\sigma_\kappa)$, which is never negative and is
+closed form, which a Monte Carlo confirms at all \VTheoryPoints{} points of our grid. Its main term is
+$\Phi(z_q + \sigma_z) - \Phi(z_q + \sigma_p + \rho\,\sigma_\kappa)$, where $q$ is the share of VMs the
+budget allows, $z_q = \Phi^{-1}(q)$, $\sigma_p$ and $\sigma_\kappa$ are the standard deviations of $\log p$
+and $\log\kappa$, and $\sigma_z^2 = \sigma_p^2 + 2\rho\sigma_p\sigma_\kappa + \sigma_\kappa^2$. Since
+$\sigma_z^2 - (\sigma_p + \rho\sigma_\kappa)^2 = \sigma_\kappa^2(1-\rho^2)$, the term is never negative, and it is
 zero only when costs do not vary or are perfectly aligned with risk. The advantage is therefore
 driven by the spread of costs, and is largest near $\rho = 0$, not above a break-even correlation.
 

@@ -228,3 +228,22 @@ def test_v1_regression_within_one_percent():
     assert r["pass"], r
     assert r["cost_sensitive"]["migrations"] == 5_116
     assert r["threshold_matched"]["migrations"] == 5_522
+
+
+def test_cost_model_error_changes_realised_cost_not_estimates():
+    """Week 20: true_bw_factor slows real migrations; the policies' estimates stay nominal."""
+    from dataclasses import replace
+
+    from vmsim import engine, scenarios, worlds
+    from vmsim.config import SimConfig
+    from vmsim.policies.reference import Threshold
+
+    base = scenarios.regime(SimConfig(n_hosts=300, horizon_days=40, name="t"), "A1")
+    slow = replace(base, migration=replace(base.migration, true_bw_factor=0.5))
+    w = worlds.generate(base, 3)
+    pa, pb = engine.prepare(w, base), engine.prepare(w, slow)
+    assert (pa.vm["mig_cost_est"] == pb.vm["mig_cost_est"]).all()
+    pol = Threshold(1e-6, "random", "P2")
+    a = engine.run(pa, pol, budget_frac=0.01, check=True)
+    b = engine.run(pb, Threshold(1e-6, "random", "P2"), budget_frac=0.01, check=True)
+    assert b["cost_migration"] > a["cost_migration"]
